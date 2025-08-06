@@ -31,6 +31,7 @@ urlpatterns = [
 
     # Your app URLs
     path('account/',include('account.urls')),
+    path('customer/',include('customer.urls')),
     # Swagger UI
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
