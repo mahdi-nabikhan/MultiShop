@@ -6,6 +6,9 @@ from django.db import models
 # Create your models here.
 
 class Manager(User):
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    is_manager = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.email}'
@@ -67,13 +70,13 @@ class Store(models.Model):
             created_at (DateTimeField): Timestamp of when the shop was created.
         """
     manager = models.OneToOneField(Manager, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='store/')
+    image = models.ImageField(upload_to='store/', null=True, blank=True)
     name = models.CharField(max_length=120)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.name}, {self.description}, {self.manager.user.first_name}'
+        return f'{self.name}, {self.description}, {self.manager.email}'
 
 
 class ShopAddress(models.Model):
@@ -120,7 +123,6 @@ class ShopRate(models.Model):
     total = models.DecimalField(max_digits=5, decimal_places=0, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-
         self.total = self.total_rate()
         return super().save(*args, **kwargs)
 
