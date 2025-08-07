@@ -5,16 +5,17 @@ from django.db import models
 
 # Create your models here.
 
-class Manager(User):
+class Manager(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50, blank=True, null=True)
     last_name = models.CharField(max_length=50, blank=True, null=True)
     is_manager = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.email}'
+        return f'{self.user.email}'
 
 
-class Admin(User):
+class Admin(models.Model):
     """
         Specialized extension of the custom User model representing shop admin.
 
@@ -29,14 +30,15 @@ class Admin(User):
             - Each admin is associated with exactly one shop.
             - Inherits all authentication and permission logic from User.
         """
-
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     shop = models.ForeignKey('Store', on_delete=models.CASCADE)
+    username=models.CharField(max_length=256)
 
     def __str__(self):
-        return f'{self.email}'
+        return f'{self.user.email}'
 
 
-class Operator(User):
+class Operator(models.Model):
     """
         Specialized extension of the custom User model representing shop operators.
 
@@ -51,11 +53,11 @@ class Operator(User):
             - Each operator is associated with exactly one shop.
             - Inherits all authentication and permission logic from User.
         """
-
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     Store = models.ForeignKey('Store', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.email}'
+        return f'{self.user.email}'
 
 
 class Store(models.Model):

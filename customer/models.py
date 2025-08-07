@@ -6,12 +6,13 @@ from website.models import *
 # Create your models here.
 
 
-class Customer(User):
+class Customer(models.Model):
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     username = models.CharField(max_length=225,null=True,blank=True)
     is_customer = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.email
+        return self.user.email
 
 
 class Address(models.Model):
