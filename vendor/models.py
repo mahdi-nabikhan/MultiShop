@@ -120,7 +120,7 @@ class ShopRate(models.Model):
     total = models.DecimalField(max_digits=5, decimal_places=0, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Update total before saving
+
         self.total = self.total_rate()
         return super().save(*args, **kwargs)
 
