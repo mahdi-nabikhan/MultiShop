@@ -49,3 +49,29 @@ class ManagerSerializer(serializers.ModelSerializer):
         store = Store.objects.create(manager=manager, **store)
         ShopAddress.objects.create(store=store, **address)
         return manager
+
+
+class AdminsSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Admin
+        fields = ['email', 'password', 'password2']
+
+    def validate(self, data):
+        password = data['password']
+        password2 = data['password2']
+        if password != password2:
+            msg = 'passwords do not match'
+            raise ValidationError(msg, code='password')
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            raise ValidationError(e)
+        return data
+
+    def create(self, validated_data):
+        validated_data.pop('password2')
+        manager = Manager.objects.get(pk=self.context.get('request').user.pk)
+        store = Store.objects.get(manager=manager)
+        return Admin.objects.create(shop=store,**validated_data)
