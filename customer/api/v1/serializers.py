@@ -17,14 +17,13 @@ class CustomerRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
 
-
         user_serializer = UserSerializer(data=user_data, context=self.context)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
 
-
         customer = Customer.objects.create(user=user, **validated_data)
         return customer
+
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,7 +38,7 @@ class AddressSerializer(serializers.ModelSerializer):
         read_only_fields = ['customer']
 
     def create(self, validated_data):
-        validated_data['customer'] = Customer.objects.get(pk=self.context.get('request').user.pk)
+        validated_data['customer'] = Customer.objects.get(user_id=self.context.get('request').user.id)
         return super().create(validated_data)
 
     def to_representation(self, instance):

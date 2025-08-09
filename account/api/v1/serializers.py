@@ -35,11 +35,14 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField()
+    password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['email', 'password', 'password2']
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
     def validate(self, attrs):
 
