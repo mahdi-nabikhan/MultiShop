@@ -2,6 +2,11 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from account.models import *
+from rest_framework import serializers, validators
+from django.utils.translation import gettext_lazy as _
+from rest_framework.exceptions import ValidationError
+
+from django.contrib.auth.password_validation import validate_password
 
 
 class LoginSerializer(serializers.Serializer):
@@ -30,6 +35,25 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField()
+
     class Meta:
         model = User
-        fields = ['email', 'created_date']
+        fields = ['email', 'password', 'password2']
+
+    def validate(self, attrs):
+
+        password1 = attrs.get('password')
+        password2 = attrs.get('password2')
+        if password1 != password2:
+            msg = _('password most be match')
+            raise serializers.ValidationError(msg, code='invalid password')
+        try:
+            validate_password(password1)
+        except ValidationError as e:
+            raise serializers.ValidationError(e)
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop('password2')
+        return User.objects.create_user(**validated_data)

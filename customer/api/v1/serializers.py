@@ -8,34 +8,28 @@ from account.api.v1.serializers import *
 
 
 class CustomerRegisterSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField()
+    user = UserSerializer(write_only=True)
 
     class Meta:
         model = Customer
-        fields = ['email', 'password', 'password2']
-        write_only_fields = ['password', 'password2']
-
-    def validate(self, attrs):
-        password = attrs.get('password')
-        password2 = attrs.get('password2')
-        if password != password2:
-            msg = _('password most be match')
-            raise serializers.ValidationError(msg, code='invalid password')
-        try:
-            validate_password(password)
-        except ValidationError as e:
-            raise serializers.ValidationError(e)
-        return attrs
+        fields = ['username', 'user']
 
     def create(self, validated_data):
-        validated_data.pop('password2')
-        return Customer.objects.create_user(**validated_data)
+        user_data = validated_data.pop('user')
 
+
+        user_serializer = UserSerializer(data=user_data, context=self.context)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+
+        customer = Customer.objects.create(user=user, **validated_data)
+        return customer
 
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['email', 'username']
+        fields = ['username']
 
 
 class AddressSerializer(serializers.ModelSerializer):

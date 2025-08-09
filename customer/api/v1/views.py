@@ -12,7 +12,8 @@ class CustomerRegisterApiView(GenericAPIView):
         data = request.data
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
-            user = serializer.save()
+            customer = serializer.save()
+            user=customer.user
             Token.objects.create(user=user)
             return Response({'user': user.email, 'massage': 'customer successfully registered'},
                             status=status.HTTP_201_CREATED)
