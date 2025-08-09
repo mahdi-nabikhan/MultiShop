@@ -2,7 +2,7 @@ from rest_framework import serializers
 from vendor.models import *
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
-
+from website.models import *
 from customer.models import *
 from django.contrib.auth.password_validation import validate_password
 from account.api.v1.serializers import *
@@ -60,7 +60,27 @@ class AdminsSerializer(serializers.ModelSerializer):
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
 
-
         manager = Manager.objects.get(user_id=self.context['request'].user.id)
         store = Store.objects.get(manager=manager)
         return Admin.objects.create(shop=store, user=user)
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+        read_only_fields = ['store','pk']
+
+    def create(self, validated_data):
+        user = self.context.get('request').user
+        manager = Manager.objects.filter(user=user).exists()
+        admin = Admin.objects.filter(user=user).exists()
+        if manager:
+            store = Store.objects.get(manager__user=user)
+            product = Product.objects.create(store=store, **validated_data)
+            return product
+        elif admin:
+            store = Store.objects.get(admin__user=user)
+            return Product.objects.create(store=store, **validated_data)
+        else:
+            raise ValidationError()
