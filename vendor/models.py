@@ -78,7 +78,7 @@ class Store(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.name}, {self.description}, {self.manager.email}'
+        return f'{self.name}, {self.description}, {self.manager.user.email}'
 
 
 class ShopAddress(models.Model):
