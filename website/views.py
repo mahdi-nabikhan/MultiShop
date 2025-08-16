@@ -1,8 +1,12 @@
 from django.shortcuts import render
 from vendor.models import *
 from .models import *
-from django.views import generic
+
 from django.views import View
+
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.views import generic
 
 
 # Create your views here.
@@ -31,6 +35,7 @@ class ProductsDetailView(generic.DetailView):
     model = Product
     context_object_name = 'product'
     pk_url_kwarg = 'pk'
+    template_name = 'product_detail.html'
 
 
 class ShopDetailView(generic.DetailView):
@@ -42,6 +47,13 @@ class ShopDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         store = self.get_object()
-        context['products'] = Product.objects.filter(store=store)
+
+        product_list = Product.objects.filter(store=store).order_by('id')
+        paginator = Paginator(product_list, 4)
+
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context['products'] = page_obj
         context['address'] = ShopAddress.objects.filter(store=store)
         return context
