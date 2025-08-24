@@ -3,6 +3,7 @@ from .views import *
 
 app_name = 'account'
 urlpatterns = [
-    path('api/v1/', include('account.api.v1.urls'))
+    path('api/v1/', include('account.api.v1.urls')),
+    path('login/',LoginView.as_view(),name='login'),
 
 ]

@@ -109,6 +109,7 @@ class CustomerAddCommentsApiView(GenericAPIView):
 class CommentDetailApiView(GenericAPIView):
     serializer_class = CommentSerializer
     model = Comments
+    queryset = Comments.objects.all()
 
     def get(self, request, pk):
         obj = self.model.objects.get(pk=pk)

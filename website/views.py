@@ -7,17 +7,18 @@ from django.views import View
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views import generic
+from django.views import View
 
 
 # Create your views here.
 
 
-class AllShopView(generic.ListView):
-    model = Store
-    queryset = Store.objects.all()
-    context_object_name = 'store_list'
+class AllShopView(View):
     template_name = 'index.html'
-    paginate_by = 4
+
+    def get(self, request):
+        stores = Store.objects.all()
+        return render(request, self.template_name, {'store_list': stores})
 
 
 class StoreProductsViews(View):

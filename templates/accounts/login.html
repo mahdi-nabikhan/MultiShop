@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Django API Login with Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #profileData {
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login with Email</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+
+        <button id="profileBtn" style="margin-top:15px; display:none;">Get Profile</button>
+
+        <div id="profileData"></div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const profileBtn = document.getElementById("profileBtn");
+        const profileData = document.getElementById("profileData");
+
+        // لاگین و گرفتن توکن
+        loginForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+
+            let response = await fetch("{% url 'account:api/v1:login' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email: email, password: password }),
+            });
+
+            if (response.ok) {
+                let data = await response.json();
+                localStorage.setItem("authToken", data.token);  // ذخیره توکن
+                alert("Login successful!");
+                profileBtn.style.display = "block"; // دکمه نمایش پروفایل ظاهر میشه
+            } else {
+                alert("Login failed! Check email or password.");
+            }
+        });
+
+        // گرفتن پروفایل کاربر
+        profileBtn.addEventListener("click", async function() {
+            let token = localStorage.getItem("authToken");
+
+            let response = await fetch("{% url 'account:api/v1:profile' %}", {
+                method: "GET",
+                headers: {
+                    "Authorization": "Token " + token
+                }
+            });
+
+            if (response.ok) {
+                let data = await response.json();
+                profileData.style.display = "block";
+                profileData.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+            } else {
+                alert("Failed to fetch profile. Maybe token is invalid?");
+            }
+        });
+    </script>
+</body>
+</html>
