@@ -26,7 +26,7 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.customer.first_name},"
+        return f"{self.customer.username},"
 
 
 class OrderItem(models.Model):
