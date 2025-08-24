@@ -101,3 +101,31 @@ class ProductDetailAPIView(GenericAPIView):
         obj = self.model.objects.get(pk=pk)
         obj.delete()
         return Response({'massage': 'your product successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class StoreUpdateApiView(GenericAPIView):
+    serializer_class = StoreSerializer
+
+    def get_queryset(self):
+        store = Store.objects.get(manager__user=self.request.user)
+        return store
+
+    def put(self, request):
+        data = request.data
+        store = self.get_queryset()
+        serializer = self.serializer_class(instance=store, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        data = request.data
+        store = self.get_queryset()
+        serializer = self.serializer_class(instance=store, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
