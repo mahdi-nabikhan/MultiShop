@@ -5,7 +5,7 @@ from account.models import *
 from rest_framework import serializers, validators
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
-
+from django.contrib.auth import login
 from django.contrib.auth.password_validation import validate_password
 
 
@@ -31,6 +31,7 @@ class LoginSerializer(serializers.Serializer):
             msg = _('Must include "email" and "password".')
             raise serializers.ValidationError({'non_field_errors': [msg]})
         attrs['user'] = user
+        login(self.context.get('request'),user)
         return attrs
 
 
