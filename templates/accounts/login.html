@@ -38,7 +38,6 @@
 </div>
 
 <script>
-// تابع گرفتن CSRF از cookie
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -77,7 +76,7 @@ getUserInfo();
 document.getElementById("loginForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
-    const formData = { 
+    const formData = {
         email: this.email.value,
         password: this.password.value
     };
@@ -85,7 +84,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     try {
         let response = await fetch("{% url 'account:api/v1:login' %}", {
             method: "POST",
-            headers: { 
+            headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": csrftoken
             },
@@ -95,14 +94,15 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         const data = await response.json();
 
         if (response.ok) {
-            // ذخیره توکن
             localStorage.setItem("token", data.auth_token);
 
             document.getElementById("result").innerHTML =
                 `<p class="text-success">Login successful! Redirecting...</p>`;
 
-            // ریدایرکت بعد از 3 ثانیه
-            setTimeout(() => window.location.href = "{% url 'shop-list' %}", 3000);
+            
+            const redirectUrl = data.redirect_url || "{% url 'shop-list' %}";
+            setTimeout(() => window.location.href = redirectUrl, 1500);
+
         } else {
             document.getElementById("result").innerHTML =
                 `<p class="text-danger">Login failed: ${JSON.stringify(data)}</p>`;

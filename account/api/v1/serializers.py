@@ -31,7 +31,7 @@ class LoginSerializer(serializers.Serializer):
             msg = _('Must include "email" and "password".')
             raise serializers.ValidationError({'non_field_errors': [msg]})
         attrs['user'] = user
-        login(self.context.get('request'),user)
+
         return attrs
 
 
