@@ -1,16 +1,62 @@
-{% extends 'base/admin_panel_base.html' %}
-
-
+{% extends "base/admin_panel_base.html" %}
 
 {% block content %}
-    <div class="card mt-4">
-                <div class="card-header">
-                    Dashboard Overview
-                </div>
-                <div class="card-body">
-                    <p>Total Products: 120</p>
-                    <p>Total Users: 450</p>
-                    <p>Total {{ user }}: 87</p>
-                </div>
-            </div>
-{% endblock content %}
+<h3>📦 All Products</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>{{ user }}</th>
+            <th>Description</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Price After Discount</th>
+        </tr>
+    </thead>
+    <tbody id="productTable"></tbody>
+</table>
+
+<script>
+const token = localStorage.getItem("token");
+if (!token) {
+    alert("You are not logged in! Redirecting...");
+    window.location.href = "{% url 'account:login' %}";
+}
+
+async function loadProducts() {
+    try {
+        const response = await fetch("{% url 'vendors:api/v1:all-product-shop' %}", {
+            headers: { "Authorization": `Token ${token}` }
+        });
+        const data = await response.json();
+
+        const tableBody = document.getElementById("productTable");
+        tableBody.innerHTML = "";
+
+        if (response.ok) {
+            data.forEach((item, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.name}</td>
+                        <td>${item.description}</td>
+                        <td>${item.quantity_in_stock}</td>
+                        <td>${item.price}</td>
+                        <td>${item.price_after || "-"}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-danger">${data.detail || 'No products found'}</td></tr>`;
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById("productTable").innerHTML =
+            `<tr><td colspan="6" class="text-danger">Error fetching products</td></tr>`;
+    }
+}
+
+loadProducts();
+</script>
+{% endblock %}

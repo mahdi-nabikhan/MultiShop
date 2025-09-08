@@ -137,6 +137,7 @@ class AllProductShopApiView(GenericAPIView):
 
     def get_queryset(self):
         if Store.objects.filter(manager__user=self.request.user).exists():
+            print('this is you products -----------------------------',self.model.objects.filter(store__manager__user=self.request.user))
             return self.model.objects.filter(store__manager__user=self.request.user)
         elif Store.objects.filter(admin__user=self.request.user).exists():
             return self.model.objects.filter(store__admin__user=self.request.user)

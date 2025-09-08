@@ -23,11 +23,11 @@ class CustomObtainAuthToken(ObtainAuthToken):
             if Customer.objects.filter(user=user).exists():
                 redirect_url=reverse('shop-list')
             if Admin.objects.filter(user=user).exists():
-                redirect_url=reverse('panel')
+                redirect_url=reverse('vendors:panel')
             if Manager.objects.filter(user=user).exists():
-                redirect_url = reverse('panel')
+                redirect_url = reverse('vendors:panel')
             if Operator.objects.filter(user=user).exists():
-                redirect_url = reverse('panel')
+                redirect_url = reverse('vendors:panel')
 
             return Response({'user-id': user.id, 'token': token.key,'redirect_url':redirect_url}, status=status.HTTP_200_OK)
         else:

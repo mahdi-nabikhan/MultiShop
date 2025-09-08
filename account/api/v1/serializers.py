@@ -32,6 +32,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'non_field_errors': [msg]})
         attrs['user'] = user
 
+
         return attrs
 
 
