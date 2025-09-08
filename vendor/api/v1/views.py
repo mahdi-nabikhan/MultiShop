@@ -129,3 +129,21 @@ class StoreUpdateApiView(GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AllProductShopApiView(GenericAPIView):
+    serializer_class = ProductSerializer
+    model = Product
+
+    def get_queryset(self):
+        if Store.objects.filter(manager__user=self.request.user).exists():
+            return self.model.objects.filter(store__manager__user=self.request.user)
+        elif Store.objects.filter(admin__user=self.request.user).exists():
+            return self.model.objects.filter(store__admin__user=self.request.user)
+        else:
+            return {'not found'}
+
+    def get(self, request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(obj, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

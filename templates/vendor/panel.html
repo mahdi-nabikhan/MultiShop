@@ -1,13 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>
-    ssag
-</h1>
+{% extends 'base/admin_panel_base.html' %}
 
-</body>
-</html>
+
+
+{% block content %}
+    <div class="card mt-4">
+                <div class="card-header">
+                    Dashboard Overview
+                </div>
+                <div class="card-body">
+                    <p>Total Products: 120</p>
+                    <p>Total Users: 450</p>
+                    <p>Total {{ user }}: 87</p>
+                </div>
+            </div>
+{% endblock content %}
