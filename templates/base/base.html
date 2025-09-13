@@ -35,7 +35,7 @@
         <div class="row bg-secondary py-1 px-xl-5">
             <div class="col-lg-6 d-none d-lg-block">
                 <div class="d-inline-flex align-items-center h-100">
-                    <a class="text-body mr-3" href="">{{ request.user }}</a>
+                    <span id="usernameDisplay">Guest</span>
                     <a class="text-body mr-3" href="">Contact</a>
                     <a class="text-body mr-3" href="">Help</a>
                     <a class="text-body mr-3" href="">FAQs</a>
@@ -266,6 +266,32 @@
 
     <!-- Template Javascript -->
     <script src="{% static "js/main.js"%}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+        fetch("{% url 'account:api/v1:profile' %}", {  // مسیر درست API
+            headers: {
+                "Authorization": `Token ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Unauthorized");
+            return response.json();
+        })
+        .then(data => {
+            // نمایش نام یا ایمیل کاربر در topbar
+            document.getElementById("usernameDisplay").innerText = data.email || data.username;
+        })
+        .catch(err => {
+            console.log("User not logged in", err);
+            document.getElementById("usernameDisplay").innerText = "Guest";
+        });
+    }
+});
+</script>
 </body>
 
 </html>

@@ -18,6 +18,7 @@ class AllShopView(View):
 
     def get(self, request):
         stores = Store.objects.all()
+        print('this is your user',request.user)
         return render(request, self.template_name, {'store_list': stores})
 
 
