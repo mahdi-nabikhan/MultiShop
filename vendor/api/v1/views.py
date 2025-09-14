@@ -34,6 +34,20 @@ class AdminRegisterAPIView(GenericAPIView):
                 status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class OperatorRegisterAPIView(GenericAPIView):
+    serializer_class = OperatorSerializer
+
+    def post(self, request):
+        data = request.data
+        serializer = self.serializer_class(data=data, context={'request': request})
+        if serializer.is_valid():
+            admin = serializer.save()
+            Token.objects.create(user=admin.user)
+            return Response(
+                {'email': serializer.validated_data.get('email'), 'massage': 'admin successfully registered'},
+                status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddProductAPIView(GenericAPIView):
@@ -137,7 +151,9 @@ class AllProductShopApiView(GenericAPIView):
 
     def get_queryset(self):
         if Store.objects.filter(manager__user=self.request.user).exists():
-            print('this is you products -----------------------------',self.model.objects.filter(store__manager__user=self.request.user), 'this  your user' , self.request.user)
+            print('this is you products -----------------------------',
+                  self.model.objects.filter(store__manager__user=self.request.user), 'this  your user',
+                  self.request.user)
             return self.model.objects.filter(store__manager__user=self.request.user)
         elif Store.objects.filter(admin__user=self.request.user).exists():
             return self.model.objects.filter(store__admin__user=self.request.user)
@@ -148,3 +164,17 @@ class AllProductShopApiView(GenericAPIView):
         obj = self.get_queryset()
         serializer = self.serializer_class(obj, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AddProductImageAPIView(GenericAPIView):
+    serializer_class = AddImageSerializer
+    model = Product
+
+    def post(self, request, pk):
+        data = request.data
+        serializer = self.serializer_class(data=data, context={'request': request, 'pk': pk})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

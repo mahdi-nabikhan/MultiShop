@@ -9,5 +9,7 @@ urlpatterns = [
     path('add/product/', AddProductAPIView.as_view(), name='add-product'),
     path('detail/product/<int:pk>/', ProductDetailAPIView.as_view(), name='detail-product'),
     path('all/product/shop/',AllProductShopApiView.as_view(),name='all-product-shop'),
+    path('operator/register/', OperatorRegisterAPIView.as_view(), name='operator-register'),
+    path('add/product/image/<int:pk>/',AddProductImageAPIView.as_view(), name='add-product-image'),
 
 ]

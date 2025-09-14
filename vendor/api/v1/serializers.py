@@ -6,6 +6,7 @@ from website.models import *
 from customer.models import *
 from django.contrib.auth.password_validation import validate_password
 from account.api.v1.serializers import *
+from website.models import *
 
 
 class StoreAddressSerializer(serializers.ModelSerializer):
@@ -65,11 +66,30 @@ class AdminsSerializer(serializers.ModelSerializer):
         return Admin.objects.create(shop=store, user=user)
 
 
+class OperatorSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Operator
+        fields = ['username', 'user']
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+
+        user_serializer = UserSerializer(data=user_data, context=self.context)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+        manager = Manager.objects.get(user_id=self.context['request'].user.id)
+        store = Store.objects.get(manager=manager)
+        return Operator.objects.create(shop=store, user=user)
+
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-        read_only_fields = ['store','pk']
+        read_only_fields = ['store', 'pk']
 
     def create(self, validated_data):
         user = self.context.get('request').user
@@ -84,3 +104,20 @@ class ProductSerializer(serializers.ModelSerializer):
             return Product.objects.create(store=store, **validated_data)
         else:
             raise ValidationError()
+
+
+class AddImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImages
+        fields = "__all__"
+        read_only_fields = ['title', 'description']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['product'] = ProductSerializer(instance.product).data
+        return rep
+
+    def create(self, validated_data):
+        pk = self.context.get('pk')
+        validated_data['product'] = Product.objects.get(pk=pk)
+        return validated_data

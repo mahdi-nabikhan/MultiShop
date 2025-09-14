@@ -54,7 +54,8 @@ class Operator(models.Model):
             - Inherits all authentication and permission logic from User.
         """
     user=models.OneToOneField(User,on_delete=models.CASCADE)
-    Store = models.ForeignKey('Store', on_delete=models.CASCADE)
+    shop = models.ForeignKey('Store', on_delete=models.CASCADE)
+    username = models.CharField(max_length=256)
 
     def __str__(self):
         return f'{self.user.email}'
