@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Sum
 from vendor.models import Store
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -41,9 +43,17 @@ class Discount(models.Model):
 
     discount_type = models.CharField(max_length=250, choices=DiscountType.choices)
     value = models.IntegerField()
+    products = models.OneToOneField('Product', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f'{self.discount_type}: {self.value}'
+
+    def apply_discount(self, price: int) -> int:
+        if self.discount_type == 'cash':
+            return max(price - self.value, 0)
+        elif self.discount_type == 'percentage':
+            return max(int(price * (1 - (self.value / 100))), 0)
+        return price
 
 
 class Product(models.Model):
@@ -64,11 +74,11 @@ class Product(models.Model):
     description = models.TextField()
     quantity_in_stock = models.PositiveIntegerField()
     price = models.PositiveIntegerField()
-    discount = models.OneToOneField(Discount, on_delete=models.SET_NULL, null=True, blank=True)
     price_after = models.PositiveIntegerField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='product_category')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name='product_store')
     product_image = models.ImageField(upload_to='product_images', null=True, blank=True)
+
     def __str__(self):
         return f"{self.name} {self.description}"
 
@@ -98,3 +108,17 @@ class ProductRate(models.Model):
 
     def __str__(self):
         return f'{self.product} {self.rate}'
+
+
+@receiver(post_save, sender=Discount)
+def update_product_price_after(sender, instance, **kwargs):
+    if instance.products:
+        instance.products.price_after = instance.apply_discount(instance.products.price)
+        instance.products.save(update_fields=['price_after'])
+
+
+@receiver(post_delete, sender=Discount)
+def reset_product_price_after(sender, instance, **kwargs):
+    if instance.product:
+        instance.products.price_after = instance.product.price
+        instance.products.save(update_fields=['price_after'])

@@ -121,3 +121,10 @@ class AddImageSerializer(serializers.ModelSerializer):
         pk = self.context.get('pk')
         validated_data['product'] = Product.objects.get(pk=pk)
         return validated_data
+
+
+class AddDiscountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Discount
+        fields=['product',]
