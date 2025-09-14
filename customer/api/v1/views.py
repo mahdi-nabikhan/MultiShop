@@ -139,3 +139,15 @@ class CommentDetailApiView(GenericAPIView):
     def delete(self, request, pk):
         self.model.objects.get(pk=pk).delete()
         return Response({'massage': 'comment successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class AddProductRateAPIView(GenericAPIView):
+    serializer_class = ProductRateSerializer
+
+    def post(self, request, pk):
+        serializer = self.serializer_class(data=request.data, context={'request': request, 'pk': pk})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,10 +1,13 @@
 from rest_framework import serializers, validators
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
+
+import order.models
 from account.api.v1 import serializers as account_serializers
 from customer.models import *
 from django.contrib.auth.password_validation import validate_password
 from account.api.v1.serializers import *
+from order.models import *
 
 
 class CustomerRegisterSerializer(serializers.ModelSerializer):
@@ -58,3 +61,21 @@ class CommentSerializer(serializers.ModelSerializer):
         validated_data['user'] = Customer.objects.get(user_id=self.context.get('request').user.id)
         validated_data['product'] = self.context.get('product')
         return super().create(validated_data)
+
+
+class ProductRateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductRate
+        fields = '__all__'
+        read_only_fields = ['product']
+
+    def create(self, validated_data):
+        customer = Customer.objects.get(user=self.context.get('request').user)
+        if Order.objects.filter(customer=customer).exists():
+            customer_order = Order.objects.get(customer=customer)
+            product = Product.objects.get(pk=self.context.get('pk'))
+            if OrderItem.objects.filter(order=customer_order, product=product).exists():
+                validated_data['product'] = product
+                return validated_data
+            else:
+                return serializers.ValidationError('you have some problems men')
