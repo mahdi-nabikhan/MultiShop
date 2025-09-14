@@ -38,3 +38,4 @@ class OrderItemSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['product'] = ProductSerializer(instance.product).data
         return rep
+

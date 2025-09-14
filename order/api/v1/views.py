@@ -34,3 +34,47 @@ class OrderItemCreateApiView(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class OrderItemListAPIView(generics.GenericAPIView):
+    serializer_class = OrderItemSerializer
+    queryset = OrderItem.objects.all()
+
+    def get(self, request, pk):
+        obj = self.queryset.filter(order__pk=pk)
+        serializer = self.serializer_class(obj, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class OrderItemDetailView(generics.GenericAPIView):
+    serializer_class = OrderItemSerializer
+    queryset = OrderItem.objects.all()
+
+    def get(self, request, pk):
+        obj = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(obj, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        data = request.data
+        obj = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(data=data, instance=obj)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request, pk):
+        data = request.data
+        obj = self.queryset.filter(pk=pk)
+        serializer = self.serializer_class(data=data, instance=obj, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        self.queryset.get(pk=pk).delete()
+        return Response({'details': 'object deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
