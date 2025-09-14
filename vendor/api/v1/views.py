@@ -181,5 +181,21 @@ class AddProductImageAPIView(GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class AddProductsDiscount(GenericAPIView):
-    pass
+
+class AddProductsDiscountAPIView(GenericAPIView):
+    serializer_class = AddDiscountSerializer
+    queryset = Discount.objects.all()
+
+    def post(self, request, pk):
+        data = request.data
+        serializer = self.serializer_class(data=data, context={'request': request, 'pk': pk})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, pk):
+        data = self.get_queryset().filter(products__pk=pk)
+        serializer = self.serializer_class(data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

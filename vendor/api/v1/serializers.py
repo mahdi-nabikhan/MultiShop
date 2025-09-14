@@ -124,7 +124,20 @@ class AddImageSerializer(serializers.ModelSerializer):
 
 
 class AddDiscountSerializer(serializers.ModelSerializer):
-
     class Meta:
-        model=Discount
-        fields=['product',]
+        model = Discount
+        fields = ['products', 'value', 'discount_type']
+        read_only_fields = ('products',)
+
+    def create(self, validated_data):
+        pk = self.context.get('pk')
+        product=Product.objects.get(pk=pk)
+        if validated_data['discount_type'] == 'cash':
+            new_price_after_discount=max(product.price - validated_data['value'], 0)
+            product.price_after = new_price_after_discount
+            product.save()
+        elif validated_data['discount_type'] == 'percentage':
+            new_price_after_discount=max(int(product.price * (1 - (validated_data['value'] / 100))), 0)
+            product.price_after = new_price_after_discount
+        validated_data['products'] = Product.objects.get(pk=pk)
+        return validated_data
