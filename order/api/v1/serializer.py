@@ -24,13 +24,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get('request')
-        order = Order.objects.filter(customer__user_id=request.user.id).exists()
+        customer = Customer.objects.get(user=request.user)
+        order,created = Order.objects.get_or_create(customer=customer, status=False)
         product = Product.objects.get(pk=self.context.get('pk'))
-        if order:
-            validated_data['order'] = Order.objects.get(customer__user_id=request.user.id)
-        else:
-            customer = Customer.objects.get(user=request.user)
-            validated_data['order'] = Order.objects.create(customer=customer)
+
+        validated_data['order'] = order
         validated_data['product'] = product
         return OrderItem.objects.create(**validated_data)
 
@@ -38,4 +36,3 @@ class OrderItemSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['product'] = ProductSerializer(instance.product).data
         return rep
-

@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.shortcuts import render, redirect
+from django.views.generic import TemplateView, View
 
 
 # Create your views here.
@@ -7,3 +7,8 @@ from django.views.generic import TemplateView
 
 class OrderDetailView(TemplateView):
     template_name = 'orders/cart.html'
+
+
+class CartAddView(View):
+    def post(self, request):
+        return redirect('orders:cart')
