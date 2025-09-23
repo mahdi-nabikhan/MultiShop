@@ -13,7 +13,7 @@ class CartSession:
 
     def add(self, product, quantity):
         unique = self.unique_id_generator(product.id)
-        if unique in self.cart:
+        if unique not in self.cart:
             self.cart[unique] = {'quantity': 0, 'price': str(product.price), 'id': str(product.id)}
         self.cart[unique]['quantity'] += int(quantity)
 
@@ -27,9 +27,16 @@ class CartSession:
 
     def __iter__(self):
         cart = self.cart.copy()
+
         for item in cart.values():
-            item['product'] = Product.objects.get(id=int(item['id']))
+            product = Product.objects.get(id=int(item['id']))
+            item['product'] = product
             item['total_price'] = int(item['product'].price) * int(item['quantity'])
+            item['unique_id'] = self.unique_id_generator(product.id)
             yield item
 
+    def delete(self, id):
+        unique = self.unique_id_generator(id)
 
+        del self.cart[unique]
+        self.save()

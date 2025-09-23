@@ -13,7 +13,7 @@ class OrderDetailView(View):
     def get(self, request):
         cart = CartSession(request)
         context = {'cart': cart}
-        return render(request, self.template_name,context)
+        return render(request, self.template_name, context)
 
 
 class CartAddView(View):
@@ -23,5 +23,11 @@ class CartAddView(View):
         cart = CartSession(request)
         cart.add(product, quantity)
         cart.save()
-        return redirect('orders:cart')
+        return redirect('order-detail')
 
+
+class CartDeleteView(View):
+    def get(self, request, id):
+        cart = CartSession(request)
+        cart.delete(id)
+        return redirect('order-detail')
