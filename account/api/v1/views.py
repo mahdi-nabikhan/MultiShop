@@ -10,26 +10,29 @@ from .serializers import UserSerializer
 from customer.models import *
 from vendor.models import *
 from django.shortcuts import reverse
+
+
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        redirect_url=None
-        serializer = self.serializer_class(data=data,context={'request': request})
+        redirect_url = None
+        serializer = self.serializer_class(data=data, context={'request': request})
         if serializer.is_valid():
             user = serializer.validated_data.get('user')
             token, create = Token.objects.get_or_create(user=user)
             if Customer.objects.filter(user=user).exists():
-                redirect_url=reverse('shop-list')
+                redirect_url = reverse('shop-list')
             if Admin.objects.filter(user=user).exists():
-                redirect_url=reverse('vendors:panel')
+                redirect_url = reverse('vendors:panel')
             if Manager.objects.filter(user=user).exists():
                 redirect_url = reverse('vendors:panel')
             if Operator.objects.filter(user=user).exists():
                 redirect_url = reverse('vendors:panel')
 
-            return Response({'user-id': user.id, 'token': token.key,'redirect_url':redirect_url}, status=status.HTTP_200_OK)
+            return Response({'user-id': user.id, 'token': token.key, 'redirect_url': redirect_url},
+                            status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -39,5 +42,13 @@ class ProfileApiView(APIView):
 
     def get(self, request):
         serializer = UsersSerializer(request.user)
-        print('user is',serializer.data)
+        print('user is', serializer.data)
         return Response(serializer.data)
+
+
+class LogOutApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response({'details': 'logged out successfully'}, status=status.HTTP_200_OK)

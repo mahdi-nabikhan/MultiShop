@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem("token");
 
     if (token) {
-        fetch("{% url 'account:api/v1:profile' %}", {  // مسیر درست API
+        fetch("{% url 'account:api/v1:profile' %}", {
             headers: {
                 "Authorization": `Token ${token}`
             }
@@ -282,8 +282,33 @@ document.addEventListener("DOMContentLoaded", () => {
             return response.json();
         })
         .then(data => {
-            // نمایش نام یا ایمیل کاربر در topbar
-            document.getElementById("usernameDisplay").innerText = data.email || data.username;
+            // نمایش نام کاربر
+            const usernameEl = document.getElementById("usernameDisplay");
+            usernameEl.innerText = data.email || data.username;
+
+            // ساخت دکمه لاگ اوت
+            const logoutBtn = document.createElement("button");
+            logoutBtn.innerText = "Logout";
+            logoutBtn.className = "btn btn-sm btn-danger ml-2";
+            usernameEl.insertAdjacentElement("afterend", logoutBtn);
+
+            logoutBtn.addEventListener("click", () => {
+                fetch("{% url 'account:api/v1:logout' %}", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Token ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to logout");
+                    // حذف توکن از localStorage
+                    localStorage.removeItem("token");
+                    // رفرش صفحه یا هدایت به صفحه لاگین
+                    window.location.reload();
+                })
+                .catch(err => console.error("Logout error:", err));
+            });
         })
         .catch(err => {
             console.log("User not logged in", err);
@@ -292,6 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 </script>
+
 </body>
 
 </html>
