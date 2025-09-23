@@ -66,7 +66,7 @@
                             
                             
                         </div>
-                       <div>
+                    <div>
     <label for="quantity-{{ product.pk }}">تعداد:</label>
     <input type="number" id="quantity-{{ product.pk }}" value="1" min="1">
 
@@ -74,6 +74,7 @@
         <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
     </button>
 </div>
+
 
                     </div>
                     <div class="d-flex pt-2">
@@ -240,38 +241,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll(".add-to-cart").forEach(button => {
         button.addEventListener("click", function () {
-            if (!token) {
-                alert("ابتدا وارد حساب خود شوید!");
-                return;
-            }
-
             const productId = this.dataset.productId;
             const quantityInput = document.querySelector(`#quantity-${productId}`);
             const quantity = quantityInput ? quantityInput.value : 1;
 
-            console.log('Sending to API:', `/order/item/${productId}/`, { quantity });
+            if (token) {
+                // ----------------- حالت API -----------------
+                fetch(`/order/api/v1/order/item/${productId}/`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Token ${token}`
+                    },
+                    body: JSON.stringify({ quantity: quantity })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.id) {
+                        alert(`محصول با تعداد ${data.quantity} به سبد خرید اضافه شد!`);
+                    } else {
+                        alert("خطا در افزودن محصول به سبد خرید");
+                    }
+                })
+                .catch(err => console.error(err));
+            } else {
+                // ----------------- حالت Session -----------------
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = `/order/order/item/${productId}/`;
 
-            fetch(`/order/api/v1/order/item/${productId}/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Token ${token}`  // ارسال توکن
-                },
-                body: JSON.stringify({ quantity: quantity })
-            })
-            .then(res => {
-                console.log('Status:', res.status);
-                return res.json();
-            })
-            .then(data => {
-                console.log('Response:', data);
-                if (data.id) {
-                    alert(`محصول با تعداد ${data.quantity} به سبد خرید اضافه شد!`);
-                } else {
-                    alert("خطا در افزودن محصول به سبد خرید");
-                }
-            })
-            .catch(err => console.error(err));
+                // اضافه کردن csrf_token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const csrfInput = document.createElement("input");
+                csrfInput.type = "hidden";
+                csrfInput.name = "csrfmiddlewaretoken";
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+
+                // اضافه کردن quantity
+                const qtyInput = document.createElement("input");
+                qtyInput.type = "hidden";
+                qtyInput.name = "quantity";
+                qtyInput.value = quantity;
+                form.appendChild(qtyInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
         });
     });
 });
