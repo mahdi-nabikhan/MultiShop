@@ -7,3 +7,7 @@ from django.views.generic import TemplateView
 
 class LoginView(TemplateView):
     template_name = 'accounts/login.html'
+
+
+class JwtLogin(TemplateView):
+    template_name='accounts/jwt_login.html'

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth.password_validation import validate_password
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField(label=_("Email"), write_only=True)
@@ -68,3 +68,11 @@ class UsersSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email"]
+
+class CustomeTokenObtainPairSerializer(TokenObtainPairSerializer):
+    
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+        validated_data['email'] = self.user.email
+        validated_data['user_id'] = self.user.id
+        return validated_data

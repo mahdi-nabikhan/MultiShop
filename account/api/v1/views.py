@@ -10,7 +10,10 @@ from .serializers import UserSerializer
 from customer.models import *
 from vendor.models import *
 from django.shortcuts import reverse
-
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from django.urls import reverse
 
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = LoginSerializer
@@ -52,3 +55,54 @@ class LogOutApiView(APIView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response({'details': 'logged out successfully'}, status=status.HTTP_200_OK)
+
+
+class CustomeObtainPairView(TokenObtainPairView):
+    serializer_class = CustomeTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.user
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
+            # تعیین redirect_url
+            redirect_url = None
+            if Customer.objects.filter(user=user).exists():
+                redirect_url = reverse('shop-list')
+            elif Admin.objects.filter(user=user).exists():
+                redirect_url = reverse('vendors:panel')
+            elif Manager.objects.filter(user=user).exists():
+                redirect_url = reverse('vendors:panel')
+            elif Operator.objects.filter(user=user).exists():
+                redirect_url = reverse('vendors:panel')
+
+            response = Response({
+                'user_id': user.id,
+                'redirect_url': redirect_url,
+            }, status=200)
+
+          
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                httponly=True,
+                secure=True,   
+                samesite='Strict',  
+                max_age=60*15 
+            )
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh_token,
+                httponly=True,
+                secure=True,
+                samesite='Strict',
+                max_age=60*60*24*7  # 7 روز
+            )
+
+            return response
+
+        return Response(serializer.errors, status=400)
