@@ -69,7 +69,7 @@ class CustomeObtainPairView(TokenObtainPairView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            # تعیین redirect_url
+            
             redirect_url = None
             if Customer.objects.filter(user=user).exists():
                 redirect_url = reverse('shop-list')
@@ -90,16 +90,16 @@ class CustomeObtainPairView(TokenObtainPairView):
                 key='access_token',
                 value=access_token,
                 httponly=True,
-                secure=True,   
-                samesite='Strict',  
+                secure=False,   
+                samesite='lax',  
                 max_age=60*15 
             )
             response.set_cookie(
                 key='refresh_token',
                 value=refresh_token,
                 httponly=True,
-                secure=True,
-                samesite='Strict',
+                secure=False,
+                samesite='lax',
                 max_age=60*60*24*7  # 7 روز
             )
 
