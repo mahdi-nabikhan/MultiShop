@@ -90,7 +90,7 @@ class CustomeObtainPairView(TokenObtainPairView):
                 key='access_token',
                 value=access_token,
                 httponly=True,
-                secure=False,   
+                secure=True,   
                 samesite='lax',  
                 max_age=60*15 
             )
@@ -98,7 +98,7 @@ class CustomeObtainPairView(TokenObtainPairView):
                 key='refresh_token',
                 value=refresh_token,
                 httponly=True,
-                secure=False,
+                secure=True,
                 samesite='lax',
                 max_age=60*60*24*7  # 7 روز
             )
