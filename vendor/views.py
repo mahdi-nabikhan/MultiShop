@@ -10,3 +10,7 @@ class PanelTemplateView(TemplateView):
 class AddProductTempalteView(TemplateView):
     template_name='vendor/adding_producs.html'
     
+    
+class AddAdminTemplateView(TemplateView):
+    template_name ='vendor/register_admin.html'
+    
