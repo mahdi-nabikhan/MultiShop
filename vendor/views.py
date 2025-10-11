@@ -6,3 +6,7 @@ from django.views.generic import TemplateView
 
 class PanelTemplateView(TemplateView):
     template_name = 'vendor/panel.html'
+
+class AddProductTempalteView(TemplateView):
+    template_name='vendor/adding_producs.html'
+    

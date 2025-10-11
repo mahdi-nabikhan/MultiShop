@@ -83,6 +83,8 @@ class CustomeObtainPairView(TokenObtainPairView):
             response = Response({
                 'user_id': user.id,
                 'redirect_url': redirect_url,
+                'access_token':access_token,
+                'refresh_token':refresh_token
             }, status=200)
 
           
