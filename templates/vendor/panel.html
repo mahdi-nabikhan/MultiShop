@@ -12,6 +12,7 @@
             <th>Stock</th>
             <th>Price</th>
             <th>Price After Discount</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody id="productTable"></tbody>
@@ -24,10 +25,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             const response = await fetch("{% url 'vendors:api/v1:all-product-shop' %}", {
                 method: "GET",
-                credentials: "include",  // 🔹 این مهم‌ترین قسمت است (ارسال خودکار JWT HttpOnly cookie)
-                headers: {
-                    "Content-Type": "application/json"
-                }
+                credentials: "include",  // 🔹 JWT HttpOnly cookie
+                headers: { "Content-Type": "application/json" }
             });
 
             const tableBody = document.getElementById("productTable");
@@ -35,9 +34,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (response.ok) {
                 const data = await response.json();
-
                 if (data.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="6" class="text-muted text-center">No products found</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-muted text-center">No products found</td></tr>`;
                     return;
                 }
 
@@ -50,6 +48,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                             <td>${item.quantity_in_stock}</td>
                             <td>${item.price}</td>
                             <td>${item.price_after || "-"}</td>
+                            <td>
+                                <a href="/vendor/product/detail?id=${item.id}" class="btn btn-sm btn-primary">
+                                    Details
+                                </a>
+            
+                                </a>
+                            </td>
                         </tr>
                     `;
                 });
@@ -59,13 +64,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 window.location.href = "{% url 'account:login' %}";
             } else {
                 const errData = await response.json();
-                tableBody.innerHTML = `<tr><td colspan="6" class="text-danger">${errData.detail || 'Failed to load products'}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-danger">${errData.detail || 'Failed to load products'}</td></tr>`;
             }
 
         } catch (err) {
             console.error("Error fetching products:", err);
             document.getElementById("productTable").innerHTML =
-                `<tr><td colspan="6" class="text-danger text-center">Error loading products</td></tr>`;
+                `<tr><td colspan="7" class="text-danger text-center">Error loading products</td></tr>`;
         }
     }
 

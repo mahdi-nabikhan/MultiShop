@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView,View
 
 
 # Create your views here.
@@ -13,4 +13,9 @@ class AddProductTempalteView(TemplateView):
     
 class AddAdminTemplateView(TemplateView):
     template_name ='vendor/register_admin.html'
+    
+    
+class ProductDetailTemplteView(TemplateView):
+    template_name='vendor/products_detail.html'
+    
     
