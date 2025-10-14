@@ -31,3 +31,7 @@ class CartDeleteView(View):
         cart = CartSession(request)
         cart.delete(id)
         return redirect('order-detail')
+
+
+class ShopOrderTemplateView(TemplateView):
+    template_name = 'orders/shop_orders.html'

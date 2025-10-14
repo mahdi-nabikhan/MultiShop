@@ -78,3 +78,12 @@ class OrderItemDetailView(generics.GenericAPIView):
     def delete(self, request, pk):
         self.queryset.get(pk=pk).delete()
         return Response({'details': 'object deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ShopOrderListApiView(generics.GenericAPIView):
+    serializer_class = OrderSerializer
+    model = Order
+
+    def get_queryset(self):
+        Order.objects.filter(prod)
+        return
