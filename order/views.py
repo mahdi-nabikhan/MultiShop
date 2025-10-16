@@ -23,14 +23,14 @@ class CartAddView(View):
         cart = CartSession(request)
         cart.add(product, quantity)
         cart.save()
-        return redirect('order-detail')
+        return redirect('order:order-detail')
 
 
 class CartDeleteView(View):
     def get(self, request, id):
         cart = CartSession(request)
         cart.delete(id)
-        return redirect('order-detail')
+        return redirect('order:order-detail')
 
 
 class ShopOrderTemplateView(TemplateView):

@@ -9,5 +9,6 @@ urlpatterns = [
     path('add/comment/<int:pk>/',CustomerAddCommentsApiView.as_view(), name='add-comment'),
     path('all/comments/',CustomerCommentsApiView.as_view(), name='all-comments'),
     path('detail/comment/<int:pk>/',CommentDetailApiView.as_view(), name='detail-comment'),
-    path('add/product/rate/<int:pk>/',AddProductRateAPIView.as_view(),name='add_product_rate')
+    path('add/product/rate/<int:pk>/',AddProductRateAPIView.as_view(),name='add_product_rate'),
+    path('all/products/comments/<int:pk>/',AllProductsCommentApiView.as_view(),name='products-comments')
 ]

@@ -1,0 +1,61 @@
+{% extends "base/admin_panel_base.html" %}
+
+{% block content %}
+<h3>🛒 All Orders</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="ordersTable">
+        <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+    </tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const tableBody = document.getElementById("ordersTable");
+
+    try {
+        const response = await fetch("{% url 'order:order_api_vi:order-list' %}", {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!response.ok) throw new Error("Failed to load orders.");
+
+        const orders = await response.json();
+        tableBody.innerHTML = "";
+
+        if (orders.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No orders found</td></tr>`;
+            return;
+        }
+
+        orders.forEach((order, index) => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${order.customer || "-"}</td>
+                    <td>${order.status ? "Completed ✅" : "Pending ⏳"}</td>
+                    <td>${new Date(order.created).toLocaleString()}</td>
+                    <td>
+                        
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (err) {
+        console.error(err);
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-danger text-center">${err.message}</td></tr>`;
+    }
+});
+</script>
+{% endblock %}

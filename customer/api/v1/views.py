@@ -151,3 +151,15 @@ class AddProductRateAPIView(GenericAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AllProductsCommentApiView(GenericAPIView):
+    serializer_class = CommentSerializer
+    model=Comments
+    def get(self,request,pk):
+        comments_obj=self.model.objects.filter(product__pk=pk)
+        context={'request':request}
+        serializer=self.serializer_class(context=context,instance=comments_obj,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    
