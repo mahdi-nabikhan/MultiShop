@@ -79,3 +79,10 @@ class ProductRateSerializer(serializers.ModelSerializer):
                 return validated_data
             else:
                 return serializers.ValidationError('you have some problems men')
+
+
+class CustomerDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Customer
+        fields='__all__'
+        read_only_fields=['user']

@@ -6,3 +6,8 @@ from django.views.generic import TemplateView
 
 class CostumerRegisterTemplateView(TemplateView):
     template_name = 'accounts/costomer_register.html'
+
+
+
+class CustomerProfileTemplateView(TemplateView):
+    template_name='customer/profile.html'

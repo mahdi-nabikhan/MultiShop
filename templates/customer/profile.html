@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Feather Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <style>
+    body { background-color: #f8f9fa; margin-top: 20px; }
+    .main-body { padding: 15px; }
+    .card { box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 10px; }
+    .breadcrumb { background: none; padding: 0; margin-bottom: 20px; }
+    .auth-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; gap: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header / Auth Info -->
+  <div class="auth-header" id="authHeader"></div>
+
+  <div class="main-body">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="main-breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item"><a href="javascript:void(0)">User</a></li>
+        <li class="breadcrumb-item active" aria-current="page">User Profile</li>
+      </ol>
+    </nav>
+
+    <div class="row gutters-sm">
+      <!-- Left Side -->
+      <div class="col-md-4 mb-3">
+        <div class="card">
+          <div class="card-body text-center">
+            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+            <div class="mt-3">
+              <h4 id="profileName">John Doe</h4>
+              <p class="text-secondary mb-1">Full Stack Developer</p>
+              <p class="text-muted font-size-sm" id="profileLocation">Bay Area, San Francisco, CA</p>
+              <button class="btn btn-primary">Follow</button>
+              <button class="btn btn-outline-primary">Message</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-3">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+              <h6 class="mb-0"><i data-feather="globe" class="me-2"></i>Website</h6>
+              <span class="text-secondary" id="profileWebsite">https://bootdey.com</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+              <h6 class="mb-0"><i data-feather="github" class="me-2"></i>Github</h6>
+              <span class="text-secondary" id="profileGithub">bootdey</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Side -->
+      <div class="col-md-8">
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-3"><h6 class="mb-0">Full Name</h6></div>
+              <div class="col-sm-9 text-secondary" id="fullName">Kenneth Valdez</div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3"><h6 class="mb-0">Email</h6></div>
+              <div class="col-sm-9 text-secondary" id="email">fip@jukmuh.al</div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3"><h6 class="mb-0">Phone</h6></div>
+              <div class="col-sm-9 text-secondary" id="phone">(239) 816-9029</div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-sm-3"><h6 class="mb-0">Address</h6></div>
+              <div class="col-sm-9 text-secondary" id="address">Bay Area, San Francisco, CA</div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-sm-12">
+                <a class="btn btn-info" target="_blank" href="#">Edit</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End row -->
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Feather Icons Init -->
+<script>
+  feather.replace();
+</script>
+
+<!-- 🔹 Fetch User from JWT Cookie and Fill Profile -->
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const authHeader = document.getElementById("authHeader");
+
+  const createButton = (text, classes, href="#") => {
+    const btn = document.createElement("a");
+    btn.innerText = text;
+    btn.className = classes;
+    btn.href = href;
+    return btn;
+  };
+
+  try {
+    const res = await fetch("{% url 'account:api/v1:profile' %}", {
+      method: "GET",
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("Not authenticated");
+
+    const data = await res.json();
+
+    // Header username + logout button
+    const userSpan = document.createElement("span");
+    userSpan.innerHTML = `<i class="fa fa-user text-primary me-2"></i>${data.username || data.email}`;
+    userSpan.classList.add("text-dark");
+
+    const logoutBtn = createButton("Logout", "btn btn-sm btn-danger");
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        const resLogout = await fetch("{% url 'account:api/v1:logout' %}", {
+          method: "POST",
+          credentials: "include"
+        });
+        if (resLogout.ok) window.location.reload();
+        else alert("Logout failed");
+      } catch (err) {
+        console.error("Logout error:", err);
+      }
+    });
+
+    authHeader.appendChild(userSpan);
+    authHeader.appendChild(logoutBtn);
+
+    // Fill Profile Left & Right
+    document.getElementById("profileName").innerText = data.username || data.full_name;
+    document.getElementById("fullName").innerText = data.full_name || data.username;
+    document.getElementById("email").innerText = data.user?.email || data.email;
+    document.getElementById("phone").innerText = data.phone || "-";
+    document.getElementById("address").innerText = data.address || "-";
+    document.getElementById("profileWebsite").innerText = data.website || "https://bootdey.com";
+    document.getElementById("profileGithub").innerText = data.github || "bootdey";
+    document.getElementById("profileLocation").innerText = data.location || "Bay Area, San Francisco, CA";
+
+  } catch(err) {
+    console.log("User not logged in:", err);
+    const loginBtn = createButton("Sign in", "btn btn-sm btn-light me-2", "{% url 'account:login' %}");
+    authHeader.appendChild(loginBtn);
+    authHeader.appendChild(signupBtn);
+  }
+});
+</script>
+
+</body>
+</html>

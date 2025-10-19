@@ -163,3 +163,15 @@ class AllProductsCommentApiView(GenericAPIView):
     
     
     
+    
+class CustomerDetailApiView(GenericAPIView):
+    serializer_class=CustomerDetailSerializer
+    model=Customer
+    
+    def get_queryset(self):
+        return self.model.objects.get(user=self.request.user) 
+    
+    def get(self,request):
+        obj=self.get_queryset()
+        serializer=self.serializer_class(obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)
