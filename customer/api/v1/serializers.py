@@ -1,7 +1,7 @@
 from rest_framework import serializers, validators
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
-
+from account.api.v1.serializers import UserSerializer
 import order.models
 from account.api.v1 import serializers as account_serializers
 from customer.models import *
@@ -61,8 +61,12 @@ class CommentSerializer(serializers.ModelSerializer):
         validated_data['user'] = Customer.objects.get(user_id=self.context.get('request').user.id)
         validated_data['product'] = self.context.get('product')
         return super().create(validated_data)
-
-
+    
+    def to_representation(self, instance):
+        rep=super().to_representation(instance)
+        rep['user']=UsersSerializer(instance.user.user).data
+        return rep
+    
 class ProductRateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRate

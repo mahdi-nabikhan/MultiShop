@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+{% load static %}
+<!
+DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,15 +13,13 @@
   <!-- Feather Icons -->
   <script src="https://unpkg.com/feather-icons"></script>
 
-  <!-- Google Material Icons -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
   <style>
     body { background-color: #f8f9fa; margin-top: 20px; }
     .main-body { padding: 15px; }
     .card { box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 10px; }
     .breadcrumb { background: none; padding: 0; margin-bottom: 20px; }
     .auth-header { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; gap: 10px; }
+    #userComments div { background-color: #f1f3f5; }
   </style>
 </head>
 <body>
@@ -33,7 +33,7 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="main-breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        
         <li class="breadcrumb-item"><a href="javascript:void(0)">User</a></li>
         <li class="breadcrumb-item active" aria-current="page">User Profile</li>
       </ol>
@@ -44,13 +44,11 @@
       <div class="col-md-4 mb-3">
         <div class="card">
           <div class="card-body text-center">
-            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+            <img src="{% static 'images/default-avatar.png' %}" alt="User Avatar" class="rounded-circle" width="150">
             <div class="mt-3">
-              <h4 id="profileName">John Doe</h4>
+              <h4 id="profileName">Loading...</h4>
               <p class="text-secondary mb-1">Full Stack Developer</p>
-              <p class="text-muted font-size-sm" id="profileLocation">Bay Area, San Francisco, CA</p>
-              <button class="btn btn-primary">Follow</button>
-              <button class="btn btn-outline-primary">Message</button>
+              <p class="text-muted font-size-sm" id="profileLocation">-</p>
             </div>
           </div>
         </div>
@@ -59,11 +57,11 @@
           <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
               <h6 class="mb-0"><i data-feather="globe" class="me-2"></i>Website</h6>
-              <span class="text-secondary" id="profileWebsite">https://bootdey.com</span>
+              <span class="text-secondary" id="profileWebsite">-</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
               <h6 class="mb-0"><i data-feather="github" class="me-2"></i>Github</h6>
-              <span class="text-secondary" id="profileGithub">bootdey</span>
+              <span class="text-secondary" id="profileGithub">-</span>
             </li>
           </ul>
         </div>
@@ -71,35 +69,41 @@
 
       <!-- Right Side -->
       <div class="col-md-8">
+        <!-- Profile Info -->
         <div class="card mb-3">
           <div class="card-body">
             <div class="row">
               <div class="col-sm-3"><h6 class="mb-0">Full Name</h6></div>
-              <div class="col-sm-9 text-secondary" id="fullName">Kenneth Valdez</div>
+              <div class="col-sm-9 text-secondary" id="fullName">-</div>
             </div>
             <hr>
             <div class="row">
               <div class="col-sm-3"><h6 class="mb-0">Email</h6></div>
-              <div class="col-sm-9 text-secondary" id="email">fip@jukmuh.al</div>
+              <div class="col-sm-9 text-secondary" id="email">-</div>
             </div>
             <hr>
             <div class="row">
               <div class="col-sm-3"><h6 class="mb-0">Phone</h6></div>
-              <div class="col-sm-9 text-secondary" id="phone">(239) 816-9029</div>
+              <div class="col-sm-9 text-secondary" id="phone">-</div>
             </div>
             <hr>
             <div class="row">
               <div class="col-sm-3"><h6 class="mb-0">Address</h6></div>
-              <div class="col-sm-9 text-secondary" id="address">Bay Area, San Francisco, CA</div>
-            </div>
-            <hr>
-            <div class="row">
-              <div class="col-sm-12">
-                <a class="btn btn-info" target="_blank" href="#">Edit</a>
-              </div>
+              <div class="col-sm-9 text-secondary" id="address">-</div>
             </div>
           </div>
         </div>
+
+        <!-- User Comments -->
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5 class="mb-3">Your Comments</h5>
+            <div id="userComments">
+              <p class="text-muted">Loading comments...</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div> <!-- End row -->
   </div>
@@ -113,7 +117,7 @@
   feather.replace();
 </script>
 
-<!-- 🔹 Fetch User from JWT Cookie and Fill Profile -->
+<!-- Fetch User Profile -->
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const authHeader = document.getElementById("authHeader");
@@ -127,46 +131,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   try {
-    const res = await fetch("{% url 'account:api/v1:profile' %}", {
+    const res = await fetch("/customer/api/v1/customer/detail/", {
       method: "GET",
       credentials: "include"
     });
-
     if (!res.ok) throw new Error("Not authenticated");
 
     const data = await res.json();
 
-    // Header username + logout button
+    // Header username + logout
     const userSpan = document.createElement("span");
-    userSpan.innerHTML = `<i class="fa fa-user text-primary me-2"></i>${data.username || data.email}`;
+    userSpan.innerHTML = `<i class="fa fa-user text-primary me-2"></i>${data.username || data.user.email}`;
     userSpan.classList.add("text-dark");
 
     const logoutBtn = createButton("Logout", "btn btn-sm btn-danger");
     logoutBtn.addEventListener("click", async () => {
-      try {
-        const resLogout = await fetch("{% url 'account:api/v1:logout' %}", {
-          method: "POST",
-          credentials: "include"
-        });
-        if (resLogout.ok) window.location.reload();
-        else alert("Logout failed");
-      } catch (err) {
-        console.error("Logout error:", err);
-      }
+      const resLogout = await fetch("{% url 'account:api/v1:logout' %}", {
+        method: "POST",
+        credentials: "include"
+      });
+      if (resLogout.ok) window.location.reload();
+      else alert("Logout failed");
     });
 
     authHeader.appendChild(userSpan);
     authHeader.appendChild(logoutBtn);
 
-    // Fill Profile Left & Right
-    document.getElementById("profileName").innerText = data.username || data.full_name;
-    document.getElementById("fullName").innerText = data.full_name || data.username;
-    document.getElementById("email").innerText = data.user?.email || data.email;
+    // Fill profile
+    document.getElementById("profileName").innerText = data.username || data.user.email;
+    document.getElementById("fullName").innerText = data.username || data.user.email;
+    document.getElementById("email").innerText = data.user.email;
     document.getElementById("phone").innerText = data.phone || "-";
     document.getElementById("address").innerText = data.address || "-";
-    document.getElementById("profileWebsite").innerText = data.website || "https://bootdey.com";
-    document.getElementById("profileGithub").innerText = data.github || "bootdey";
-    document.getElementById("profileLocation").innerText = data.location || "Bay Area, San Francisco, CA";
+    document.getElementById("profileWebsite").innerText = data.website || "-";
+    document.getElementById("profileGithub").innerText = data.github || "-";
+    document.getElementById("profileLocation").innerText = data.location || "-";
 
   } catch(err) {
     console.log("User not logged in:", err);
@@ -175,6 +174,51 @@ document.addEventListener("DOMContentLoaded", async () => {
     authHeader.appendChild(signupBtn);
   }
 });
+</script>
+
+<!-- Fetch User Comments -->
+<script>
+async function loadUserComments() {
+  const container = document.getElementById("userComments");
+  container.innerHTML = "<p class='text-muted'>Loading comments...</p>";
+
+  try {
+    const res = await fetch("/customer/api/v1/all/comments/", {
+      method: "GET",
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("Failed to load comments");
+
+    const comments = await res.json();
+
+    if (!comments || comments.length === 0) {
+      container.innerHTML = "<p class='text-muted'>No comments yet.</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+
+    comments.forEach(c => {
+      const commentDiv = document.createElement("div");
+      commentDiv.classList.add("mb-3", "p-2", "border", "rounded");
+
+      commentDiv.innerHTML = `
+        <strong>${c.user.email}</strong> 
+        <span class="text-secondary small">[${c.status}]</span>
+        <p>${c.descriptions}</p>
+      `;
+
+      container.appendChild(commentDiv);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p class='text-danger'>Failed to load comments</p>";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadUserComments);
 </script>
 
 </body>
