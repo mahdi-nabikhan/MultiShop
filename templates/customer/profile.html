@@ -88,15 +88,30 @@
           </div>
         </div>
 
-        <!-- User Comments -->
-        <div class="card mt-3">
-          <div class="card-body scroll-box">
-            <h5 class="mb-3">Your Comments</h5>
-            <div id="userComments">
-              <p class="text-muted">Loading comments...</p>
-            </div>
-          </div>
+       <!-- User Comments & Addresses -->
+<div class="card mt-3">
+  <div class="card-body">
+    <div class="row">
+      <!-- Left: Comments -->
+      <div class="col-md-6">
+        <h5 class="mb-3">Your Comments</h5>
+        <div id="userComments" class="scroll-box" style="max-height: 300px;">
+          <p class="text-muted">Loading comments...</p>
         </div>
+      </div>
+
+      <!-- Right: Addresses -->
+      <div class="col-md-6">
+        <h5 class="mb-3">Your Addresses</h5>
+        <div id="userAddresses" class="scroll-box" style="max-height: 300px;">
+          <p class="text-muted">Loading addresses...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
       </div>
     </div> <!-- End row -->
@@ -181,7 +196,8 @@ async function loadOrders() {
       const div = document.createElement("div");
       div.classList.add("mb-2", "p-2", "border", "rounded");
       div.innerHTML = `<strong>Order #${o.id}</strong><br>
-                       <small class="text-secondary">Status: ${o.status ? "Completed" : "Pending"} | Created: ${o.created}</small>`;
+                       <small class="text-secondary">Status: ${o.status ? "Completed" : "Pending"} | Created: ${o.created}</small>
+                       <a href ='/website/shop/list/'> detail </a>`;
       container.appendChild(div);
     });
 
@@ -215,7 +231,7 @@ async function loadUserComments() {
       div.classList.add("mb-3", "p-2", "border", "rounded");
       div.innerHTML = `<strong>${c.user.email}</strong> 
                        <span class="text-secondary small">[${c.status}]</span>
-                       <p>${c.descriptions}</p>`;
+                       <p>${c.descriptions} </p> <a href='/website/shop/list/'>detail</a>`;
       container.appendChild(div);
     });
 
@@ -226,6 +242,39 @@ async function loadUserComments() {
 }
 document.addEventListener("DOMContentLoaded", loadUserComments);
 </script>
-
+<!-- Fetch User Addresses -->
+<script>
+  async function loadUserAddresses() {
+    const container = document.getElementById("userAddresses");
+    container.innerHTML = "<p class='text-muted'>Loading addresses...</p>";
+  
+    try {
+      const res = await fetch("/customer/api/v1/add/address/", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load addresses");
+  
+      const addresses = await res.json();
+      if (!addresses || addresses.length === 0) {
+        container.innerHTML = "<p class='text-muted'>No addresses yet.</p>";
+        return;
+      }
+  
+      container.innerHTML = "";
+      addresses.forEach(a => {
+        const div = document.createElement("div");
+        div.classList.add("mb-3", "p-2", "border", "rounded");
+        div.innerHTML = `<p><strong>State:</strong> ${a.state}</p>
+                         <p><strong>City:</strong> ${a.city}</p>
+                         <p><strong>Postal Code:</strong> ${a.postal_code}</p> <a href='/website/shop/list/'>detail</a>`;
+        container.appendChild(div);
+      });
+  
+    } catch(err) {
+      console.error(err);
+      container.innerHTML = "<p class='text-danger'>Failed to load addresses</p>";
+    }
+  }
+  document.addEventListener("DOMContentLoaded", loadUserAddresses);
+  </script>
+  
 </body>
 </html>
