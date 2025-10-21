@@ -228,10 +228,11 @@ async function loadUserComments() {
     container.innerHTML = "";
     comments.forEach(c => {
       const div = document.createElement("div");
+      const id = c.id || c.pk || c.comment_id;
       div.classList.add("mb-3", "p-2", "border", "rounded");
       div.innerHTML = `<strong>${c.user.email}</strong> 
                        <span class="text-secondary small">[${c.status}]</span>
-                       <p>${c.descriptions} </p> <a href='/website/shop/list/'>detail</a>`;
+                       <p>${c.descriptions} </p> <a href={%url 'customer:comments-detail'${c.id}}>Detail</a> `;
       container.appendChild(div);
     });
 
@@ -311,7 +312,10 @@ document.addEventListener("DOMContentLoaded", loadUserComments);
             <h6>${addr.state}, ${addr.city}</h6>
             <p>${addr.address}</p>
             <p><strong>Postal Code:</strong> ${addr.postal_code}</p>
-            <button class="btn btn-outline-primary btn-sm" onclick="showAddressDetail(${id})">Details</button>
+            <button class="btn btn-outline-primary btn-sm" onclick="showCommentDetail(${id})">
+              Details
+            </button>
+            
           `;
           container.appendChild(div);
         });
@@ -336,6 +340,144 @@ document.addEventListener("DOMContentLoaded", loadUserComments);
   
     document.addEventListener("DOMContentLoaded", loadAddresses);
   </script>
-  
+  <script>
+    async function loadUserComments() {
+      const container = document.getElementById("userComments");
+      container.innerHTML = "<p class='text-muted'>Loading comments...</p>";
+    
+      try {
+        const res = await fetch("/customer/api/v1/all/comments/", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to load comments");
+    
+        const comments = await res.json();
+        if (!comments || comments.length === 0) {
+          container.innerHTML = "<p class='text-muted'>No comments yet.</p>";
+          return;
+        }
+    
+        container.innerHTML = "";
+        comments.forEach(c => {
+          const id = c.id || c.pk || c.comment_id; // هر چیزی که ID واقعی است
+          const div = document.createElement("div");
+          div.classList.add("mb-3", "p-2", "border", "rounded");
+          div.innerHTML = `
+            <strong>${c.user.email}</strong> 
+            <span class="text-secondary small">[${c.status}]</span>
+    
+            <p>${c.descriptions} </p> <button class="btn btn-outline-primary btn-sm" onclick="showCommentDetail(${id})">Details</button>
+            `; 
+         
+          container.appendChild(div);
+        });
+    
+      } catch(err) {
+        console.error(err);
+        container.innerHTML = "<p class='text-danger'>Failed to load comments</p>";
+      }
+    }
+    function showCommentDetail(id) {
+      if (!id) {
+        alert("Comment ID not found!");
+        return;
+      }
+      localStorage.setItem("selectedCommentId", id);
+      const url = "/customer/detail/comments/"; // مسیر تمپلیت جزئیات کامنت
+      console.log("Redirecting to:", url);
+      window.location.href = url;
+    }
+    
+    document.addEventListener("DOMContentLoaded", loadUserComments);
+    // کلیک روی جزئیات کامنت
+
+    
+  </script>
+  <script>
+    <!-- Fetch User Comments -->
+<script>
+async function loadUserComments() {
+  const container = document.getElementById("userComments");
+  container.innerHTML = "<p class='text-muted'>Loading comments...</p>";
+
+  try {
+    const res = await fetch("/customer/api/v1/all/comments/", { credentials: "include" });
+    if (!res.ok) throw new Error("Failed to load comments");
+
+    const comments = await res.json();
+    if (!comments.length) {
+      container.innerHTML = "<p class='text-muted'>No comments yet.</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+    comments.forEach(c => {
+      const id = c.id || c.pk || c.comment_id;
+      const div = document.createElement("div");
+      div.classList.add("mb-3", "p-2", "border", "rounded");
+      div.innerHTML = `
+        <strong>${c.user.email}</strong> 
+        <span class="text-secondary small">[${c.status}]</span>
+        <p>${c.descriptions}</p>
+        <button class="btn btn-outline-primary btn-sm" onclick="showCommentDetail(${id})">Details</button>
+      `;
+      container.appendChild(div);
+    });
+
+  } catch(err) {
+    console.error(err);
+    container.innerHTML = "<p class='text-danger'>Failed to load comments</p>";
+  }
+}
+
+// Fetch User Addresses
+async function loadUserAddresses() {
+  const container = document.getElementById("userAddresses");
+  container.innerHTML = "<p class='text-muted'>Loading addresses...</p>";
+
+  try {
+    const res = await fetch("/customer/api/v1/add/address/", { credentials: "include" });
+    if (!res.ok) throw new Error("Failed to load addresses");
+
+    const addresses = await res.json();
+    if (!addresses.length) {
+      container.innerHTML = "<p class='text-muted'>No addresses yet.</p>";
+      return;
+    }
+
+    container.innerHTML = "";
+    addresses.forEach(a => {
+      const id = a.id || a.pk || a.address_id;
+      const div = document.createElement("div");
+      div.classList.add("mb-3", "p-2", "border", "rounded");
+      div.innerHTML = `
+        <p><strong>State:</strong> ${a.state}</p>
+        <p><strong>City:</strong> ${a.city}</p>
+        <p><strong>Postal Code:</strong> ${a.postal_code}</p>
+        <button class="btn btn-outline-primary btn-sm" onclick="showAddressDetail(${id})">Details</button>
+      `;
+      container.appendChild(div);
+    });
+
+  } catch(err) {
+    console.error(err);
+    container.innerHTML = "<p class='text-danger'>Failed to load addresses</p>";
+  }
+}
+
+// Button Handlers
+
+
+  if (!id) return alert("Address ID not found!");
+  localStorage.setItem("selectedAddressId", id);
+  window.location.href = "/customer/detail/address/";
+};
+
+// Load on DOMContentLoaded
+document.addEventListener("DOMContentLoaded", () => {
+  loadUserComments();
+  loadUserAddresses();
+});
+</script>
+
+  </script>
 </body>
 </html>

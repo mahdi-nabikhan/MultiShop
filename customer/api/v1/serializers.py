@@ -55,7 +55,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments
         fields = '__all__'
-        read_only_fields = ['user']
+        read_only_fields = ['user','product','status']
 
     def create(self, validated_data):
         validated_data['user'] = Customer.objects.get(user_id=self.context.get('request').user.id)
