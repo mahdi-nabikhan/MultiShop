@@ -264,8 +264,10 @@ document.addEventListener("DOMContentLoaded", loadUserComments);
         div.classList.add("mb-3", "p-2", "border", "rounded");
         div.innerHTML = `<p><strong>State:</strong> ${a.state}</p>
                          <p><strong>City:</strong> ${a.city}</p>
-                         <p><strong>Postal Code:</strong> ${a.postal_code}</p> <a href='/website/shop/list/'>detail</a>`;
-        container.appendChild(div);
+                         <p><strong>Postal Code:</strong> ${a.postal_code}</p>  <a href="/customer/detail/address/" class="address-detail-link" data-id="${a.pk}">Detail</a>`;
+        console.log(a.pk)
+                         container.appendChild(div);
+
       });
   
     } catch(err) {
@@ -274,6 +276,65 @@ document.addEventListener("DOMContentLoaded", loadUserComments);
     }
   }
   document.addEventListener("DOMContentLoaded", loadUserAddresses);
+  document.addEventListener("click", e => {
+    if (e.target.classList.contains("address-detail-link")) {
+      e.preventDefault();
+      const addressId = e.target.getAttribute("data-id");
+      localStorage.setItem("selectedAddressId", addressId);
+      window.location.href = "/customer/detail/address/";
+    }
+  });
+  
+  </script>
+  <script>
+    async function loadAddresses() {
+      const container = document.getElementById("userAddresses");
+      container.innerHTML = "<p class='text-muted'>Loading...</p>";
+  
+      try {
+        const res = await fetch("/customer/api/v1/add/address/", {
+          credentials: "include" // 🔑 برای کوکی و احراز هویت
+        });
+        if (!res.ok) throw new Error("Failed to load addresses");
+  
+        const data = await res.json();
+  
+        container.innerHTML = "";
+        data.forEach(addr => {
+          // 👇 اگر id نبود از pk یا address_id استفاده کن
+          const id = addr.id || addr.pk || addr.address_id;
+          console.log("Loaded address:", addr, " | id:", id);
+  
+          const div = document.createElement("div");
+          div.className = "card mb-3 p-3";
+          div.innerHTML = `
+            <h6>${addr.state}, ${addr.city}</h6>
+            <p>${addr.address}</p>
+            <p><strong>Postal Code:</strong> ${addr.postal_code}</p>
+            <button class="btn btn-outline-primary btn-sm" onclick="showAddressDetail(${id})">Details</button>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p class='text-danger'>Failed to load addresses</p>";
+      }
+    }
+  
+    function showAddressDetail(id) {
+      if (!id) {
+        alert("Address ID not found!");
+        return;
+      }
+      localStorage.setItem("selectedAddressId", id);
+      // مسیر درست
+      const url = "/customer/detail/address/"
+      console.log("Redirecting to:", url);
+  
+      window.location.href = url;
+    }
+  
+    document.addEventListener("DOMContentLoaded", loadAddresses);
   </script>
   
 </body>

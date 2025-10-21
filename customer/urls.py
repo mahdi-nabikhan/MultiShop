@@ -4,6 +4,6 @@ app_name='customer'
 urlpatterns=[
     path('api/v1/',include('customer.api.v1.urls')),
     path('regsiter/',CostumerRegisterTemplateView.as_view(),name='register'),
-    path('customer/profile/',CustomerProfileTemplateView.as_view(),name='profile')
-
+    path('customer/profile/',CustomerProfileTemplateView.as_view(),name='profile'),
+    path('detail/address/',AddressDetailTemplateView.as_view(),name='address_detail')
 ]

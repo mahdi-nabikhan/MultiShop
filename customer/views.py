@@ -11,3 +11,6 @@ class CostumerRegisterTemplateView(TemplateView):
 
 class CustomerProfileTemplateView(TemplateView):
     template_name='customer/profile.html'
+    
+class AddressDetailTemplateView(TemplateView):
+    template_name = 'customer/address_detail.html'

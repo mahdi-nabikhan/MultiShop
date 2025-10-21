@@ -37,8 +37,8 @@ class CustomerSerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ['state', 'state', 'city', 'postal_code', 'customer']
-        read_only_fields = ['customer']
+        fields = ['id','state', 'state', 'city', 'postal_code', 'customer']
+        read_only_fields = ['customer','id']
 
     def create(self, validated_data):
         validated_data['customer'] = Customer.objects.get(user_id=self.context.get('request').user.id)
