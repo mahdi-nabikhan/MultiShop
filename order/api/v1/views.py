@@ -52,7 +52,7 @@ class OrderItemDetailView(generics.GenericAPIView):
 
     def get(self, request, pk):
         obj = self.queryset.get(pk=pk)
-        serializer = self.serializer_class(obj, many=True)
+        serializer = self.serializer_class(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
@@ -60,17 +60,19 @@ class OrderItemDetailView(generics.GenericAPIView):
         obj = self.queryset.get(pk=pk)
         serializer = self.serializer_class(data=data, instance=obj)
         if serializer.is_valid():
-            serializer.save()
+            
+            serializer.save(total=obj.product.price * obj.quantity)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
     def patch(self, request, pk):
         data = request.data
-        obj = self.queryset.filter(pk=pk)
+        obj = self.queryset.get(pk=pk)
         serializer = self.serializer_class(data=data, instance=obj, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            
+            serializer.save(total=obj.product.price * obj.quantity)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)

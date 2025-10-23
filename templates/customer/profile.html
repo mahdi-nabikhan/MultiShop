@@ -195,9 +195,12 @@ async function loadOrders() {
     orders.forEach(o => {
       const div = document.createElement("div");
       div.classList.add("mb-2", "p-2", "border", "rounded");
-      div.innerHTML = `<strong>Order #${o.id}</strong><br>
-                       <small class="text-secondary">Status: ${o.status ? "Completed" : "Pending"} | Created: ${o.created}</small>
-                       <a href ='/website/shop/list/'> detail </a>`;
+      div.innerHTML = `
+  <strong>Order #${o.id}</strong><br>
+  <small class="text-secondary">Status: ${o.status ? "Completed" : "Pending"} | Created: ${o.created}</small><br>
+  <button class="btn btn-outline-primary btn-sm mt-2" onclick="showOrderDetail(${o.id})">Details</button>
+`;
+
       container.appendChild(div);
     });
 
@@ -207,6 +210,10 @@ async function loadOrders() {
   }
 }
 document.addEventListener("DOMContentLoaded", loadOrders);
+function showOrderDetail(orderId) {
+  localStorage.setItem("selectedOrderId", orderId);
+  window.location.href = "/customer/order/item/detail/"; // مسیر صفحه جزئیات سفارش
+}
 </script>
 
 <!-- Fetch User Comments -->
@@ -463,21 +470,15 @@ async function loadUserAddresses() {
   }
 }
 
-// Button Handlers
 
 
-  if (!id) return alert("Address ID not found!");
-  localStorage.setItem("selectedAddressId", id);
-  window.location.href = "/customer/detail/address/";
-};
 
-// Load on DOMContentLoaded
-document.addEventListener("DOMContentLoaded", () => {
-  loadUserComments();
-  loadUserAddresses();
-});
 </script>
 
+function showOrderDetail(orderId) {
+  localStorage.setItem("selectedOrderId", orderId);
+  window.location.href = "/customer/order/item/detail/"; // مسیر صفحه جزئیات سفارش
+}
   </script>
 </body>
 </html>

@@ -17,3 +17,7 @@ class AddressDetailTemplateView(TemplateView):
     
 class CommentDetailTemplateView(TemplateView):
     template_name ='customer/comments_detail.html'
+    
+    
+class CustomerOrderItemTemplateView(TemplateView):
+    template_name='customer/order_detail.html'
