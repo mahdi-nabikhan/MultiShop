@@ -11,6 +11,7 @@ urlpatterns = [
     path('all/product/shop/',AllProductShopApiView.as_view(),name='all-product-shop'),
     path('operator/register/', OperatorRegisterAPIView.as_view(), name='operator-register'),
     path('add/product/image/<int:pk>/',AddProductImageAPIView.as_view(), name='add-product-image'),
-    path('add/product/discount/<int:pk>/',AddProductsDiscountAPIView.as_view(),name='add-discount-products')
+    path('add/product/discount/<int:pk>/',AddProductsDiscountAPIView.as_view(),name='add-discount-products'),
+    path('update/orderitem/<int:pk>/',OrderItemUpdateStatusApiView.as_view(),name='update_orderitem_shop')
 
 ]

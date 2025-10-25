@@ -7,6 +7,7 @@ from customer.models import *
 from django.contrib.auth.password_validation import validate_password
 from account.api.v1.serializers import *
 from website.models import *
+from order.models import OrderItem
 
 
 class StoreAddressSerializer(serializers.ModelSerializer):
@@ -141,3 +142,12 @@ class AddDiscountSerializer(serializers.ModelSerializer):
             product.price_after = new_price_after_discount
         validated_data['products'] = Product.objects.get(pk=pk)
         return validated_data
+
+class OrderItemUpdateStatusSerializer(serializers.ModelSerializer):
+    class Meta :
+        model=OrderItem
+        fields=['pk','status']
+        
+        
+        
+        

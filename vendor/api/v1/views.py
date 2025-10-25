@@ -199,3 +199,21 @@ class AddProductsDiscountAPIView(GenericAPIView):
         data = self.get_queryset().filter(products__pk=pk)
         serializer = self.serializer_class(data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class OrderItemUpdateStatusApiView(GenericAPIView):
+    serializer_class=OrderItemUpdateStatusSerializer
+    queryset=OrderItem.objects.all()
+    
+    
+    def put(self,request,pk):
+        obj=self.queryset.get(pk=pk)
+        serializer=self.serializer_class(data=request.data, instance=obj)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.data,status=status.HTTP_404_NOT_FOUND)
+        
+
+
