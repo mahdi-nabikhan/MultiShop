@@ -175,3 +175,13 @@ class CustomerDetailApiView(GenericAPIView):
         obj=self.get_queryset()
         serializer=self.serializer_class(obj)
         return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    
+    
+class CanRateAPIView(GenericAPIView):
+    def get(self, request, pk):
+        customer = Customer.objects.get(user=request.user)
+        product = Product.objects.get(pk=pk)
+        exists = OrderItem.objects.filter(order__customer=customer, product=product).exists()
+        return Response({"can_rate": exists})

@@ -73,16 +73,21 @@ class ProductRateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['product']
 
+    def validate(self, attrs):
+        request = self.context.get('request')
+        customer = Customer.objects.get(user=request.user)
+        product = Product.objects.get(pk=self.context.get('pk'))
+
+
+        if not OrderItem.objects.filter(order__customer=customer, product=product).exists():
+            raise serializers.ValidationError("You can rate only purchased products!")
+
+        return attrs
+
     def create(self, validated_data):
-        customer = Customer.objects.get(user=self.context.get('request').user)
-        if Order.objects.filter(customer=customer).exists():
-            customer_order = Order.objects.get(customer=customer)
-            product = Product.objects.get(pk=self.context.get('pk'))
-            if OrderItem.objects.filter(order=customer_order, product=product).exists():
-                validated_data['product'] = product
-                return validated_data
-            else:
-                return serializers.ValidationError('you have some problems men')
+        validated_data['product'] = Product.objects.get(pk=self.context.get('pk'))
+        return ProductRate.objects.create(**validated_data)
+
 
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
@@ -90,3 +95,6 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
         model=Customer
         fields='__all__'
         read_only_fields=['user']
+        
+        
+        
