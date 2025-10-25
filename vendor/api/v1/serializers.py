@@ -146,8 +146,14 @@ class AddDiscountSerializer(serializers.ModelSerializer):
 class OrderItemUpdateStatusSerializer(serializers.ModelSerializer):
     class Meta :
         model=OrderItem
-        fields=['pk','status']
-        
+        fields=['pk','status','product']
+        read_only_fields=['product']
+            
+    def to_representation(self, instance):
+        response=super().to_representation(instance)
+        response['product']=ProductSerializer(instance.product).data
+        return response
+    
         
         
         
