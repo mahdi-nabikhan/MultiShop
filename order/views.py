@@ -17,8 +17,8 @@ class OrderDetailView(View):
 
 
 class CartAddView(View):
-    def post(self, request, id):
-        product = Product.objects.get(id=id)
+    def post(self, request, pk):
+        product = Product.objects.get(pk=pk)
         quantity = int(request.POST['quantity'])
         cart = CartSession(request)
         cart.add(product, quantity)

@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from vendor.models import *
 from .models import *

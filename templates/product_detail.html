@@ -54,18 +54,22 @@
                 <h3 class="font-weight-semi-bold mb-4">Price after Discount: {{ product.price_after }}</h3>
                 <p class="mb-4">Description: {{ product.description }}</p>
 
-                <div class="d-flex align-items-center mb-4 pt-2">
-                    <label for="quantity-{{ product.pk }}">تعداد:</label>
-                    <input type="number" id="quantity-{{ product.pk }}" value="1" min="1">
-                    <button class="btn btn-primary px-3 add-to-cart" data-product-id="{{ product.pk }}">
-                        <i class="fa fa-shopping-cart mr-1"></i> Add To Cart
-                    </button>
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                <!-- Add to Cart -->
+                <div id="cart-loggedin" style="display:none;">
+                    <input type="number" id="quantity-input" value="1" min="1" style="width:60px;">
+                    <button id="add-to-cart-btn" class="btn btn-primary">Add to Cart</button>
                 </div>
+
+                <!-- Guest Add to Cart -->
+                <form id="cart-form" action="{% url 'order:cart-add' product.pk %}" method="POST" style="display:none;">
+                    {% csrf_token %}
+                    <input type="number" name="quantity" value="1" min="1">
+                    <button type="submit">Add to Cart</button>
+                </form>
+
                 <div>
                     <div id="rating-box" style="display:none;">
                         <h5>⭐ Give Rating</h5>
-                        
                         <select id="rating" class="form-select w-25 mb-2">
                             <option value="1">1 ⭐</option>
                             <option value="2">2 ⭐⭐</option>
@@ -73,11 +77,10 @@
                             <option value="4">4 ⭐⭐⭐⭐</option>
                             <option value="5">5 ⭐⭐⭐⭐⭐</option>
                         </select>
-                    
                         <button class="btn btn-success" id="submit-rating">Submit Rating</button>
                     </div>
                 </div>
-                
+
                 <div class="d-flex pt-2">
                     <strong class="text-dark mr-2">Share on:</strong>
                     <div class="d-inline-flex">
@@ -90,8 +93,7 @@
             </div>
         </div>
     </div>
-    
-    
+
     <!-- Tabs: Description / Info / Reviews -->
     <div class="row px-xl-5">
         <div class="col">
@@ -169,23 +171,33 @@ document.addEventListener("DOMContentLoaded", () => {
     const commentsList = document.getElementById("comments-list");
     const form = document.getElementById("add-comment-form");
     const loginMsg = document.getElementById("login-message");
+    const addBtn = document.getElementById("add-to-cart-btn");
+    const cartLoggedinDiv = document.getElementById("cart-loggedin");
+    const cartForm = document.getElementById("cart-form");
+    const quantityInput = document.getElementById("quantity-input");
+    const ratingBox = document.getElementById("rating-box");
 
-    // بررسی لاگین با fetch و کوکی HttpOnly
+    // بررسی لاگین
     fetch("{% url 'account:api/v1:profile' %}", {
         method: "GET",
-        credentials: "include" // 🔹 ارسال کوکی HttpOnly
-    })
-    .then(res => {
+        credentials: "include"
+    }).then(res => {
         if(res.ok){
+            // کاربر لاگین
+            cartLoggedinDiv.style.display = "block";
+            cartForm.style.display = "none";
             form.style.display = "block";
             loginMsg.style.display = "none";
         } else {
+            // مهمان
+            cartLoggedinDiv.style.display = "none";
+            cartForm.style.display = "block";
             form.style.display = "none";
             loginMsg.style.display = "block";
         }
     });
 
-    // لود کامنت‌ها
+    // Load comments
     function loadComments(){
         fetch(`/customer/api/v1/all/products/comments/${productId}/`, {
             credentials: "include"
@@ -197,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 commentsList.innerHTML = '<p>No comments yet.</p>';
             } else {
                 data.forEach(c => {
-                    
                     if(c.status === 'C'){
                         const div = document.createElement('div');
                         div.classList.add('comment', 'mb-2');
@@ -207,21 +218,19 @@ document.addEventListener("DOMContentLoaded", () => {
                             <small class="text-muted">${new Date(c.created_at).toLocaleString()}</small>
                         </div>
                         <p class="comment-body">${c.descriptions}</p>
-                    `;
-                    
+                        `;
                         commentsList.appendChild(div);
                     }
                 });
             }
-        })
-        .catch(err => {
+        }).catch(err => {
             commentsList.innerHTML = '<p>Failed to load comments.</p>';
             console.error(err);
         });
     }
     loadComments();
 
-    // ارسال کامنت جدید
+    // ارسال کامنت
     if(form){
         form.addEventListener("submit", function(e){
             e.preventDefault();
@@ -235,8 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     'X-CSRFToken': csrfToken
                 },
                 credentials: 'include',
-                body: JSON.stringify({ descriptions: description,
-                    product: productId })
+                body: JSON.stringify({ descriptions: description, product: productId })
             })
             .then(res => res.json())
             .then(data => {
@@ -255,119 +263,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Add to Cart
-    document.querySelectorAll(".add-to-cart").forEach(button => {
-        button.addEventListener("click", function () {
-            const productId = this.dataset.productId;
-            const quantityInput = document.querySelector(`#quantity-${productId}`);
-            const quantity = quantityInput ? quantityInput.value : 1;
+    addBtn.addEventListener("click", async () => {
+        const quantity = parseInt(quantityInput.value) || 1;
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
-            fetch(`/order/api/v1/order/item/${productId}/`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({ quantity: quantity })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.id){
-                    alert(`محصول با تعداد ${data.quantity} به سبد خرید اضافه شد!`);
-                } else if(data.detail === "Authentication credentials were not provided."){
-                    // fallback session
-                    const form = document.createElement("form");
-                    form.method = "POST";
-                    form.action = `/order/order/item/${productId}/`;
-                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-                    const csrfInput = document.createElement("input");
-                    csrfInput.type = "hidden";
-                    csrfInput.name = "csrfmiddlewaretoken";
-                    csrfInput.value = csrfToken;
-                    form.appendChild(csrfInput);
-
-                    const qtyInput = document.createElement("input");
-                    qtyInput.type = "hidden";
-                    qtyInput.name = "quantity";
-                    qtyInput.value = quantity;
-                    form.appendChild(qtyInput);
-
-                    document.body.appendChild(form);
-                    form.submit();
-                } else {
-                    alert("خطا در افزودن محصول به سبد خرید");
-                }
-            })
-            .catch(err => console.error(err));
-        });
-    });
-});
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const productId = {{ product.pk }};
-        const ratingBox = document.getElementById("rating-box");
-    
-        // ✅ ابتدا بررسی کنیم آیا کاربر اجازه امتیاز دارد؟
-        fetch(`/customer/api/v1/product/${productId}/can-rate/`, {
-            method: "GET",
-            credentials: "include"
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.can_rate){
-                ratingBox.style.display = "block"; // ✅ نمایش فقط برای خریداران
-            } else {
-                ratingBox.style.display = "none"; // ❌ مخفی برای کسانی که نخریدن
-            }
-            if(data.can_rate){
-                ratingBox.style.display = "block";
-            }
-        });
-    
-        // ✅ ارسال امتیاز
-        document.getElementById("submit-rating").addEventListener("click", () => {
-            const rate = document.getElementById("rating").value;
-            const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-    
-            fetch(`/customer/api/v1/add/product/rate/${productId}/`, {
+        try {
+            const res = await fetch(`/order/api/v1/order/item/${productId}/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
                 },
                 credentials: "include",
-                body: JSON.stringify({ rate: rate })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.id){
-                    if(data.can_rate){
-                        ratingBox.style.display = "block";
-                    } else {
-                        ratingBox.style.display = "none";
-                    }
-                    alert("✅ Thanks for rating!");
-                }
-                
-            })
-            .catch(err => console.error(err));
-        });
+                body: JSON.stringify({ quantity: quantity })
+            });
+            const data = await res.json();
+            if(res.ok){
+                alert(`محصول با تعداد ${data.quantity} به سبد خرید اضافه شد!`);
+            } else {
+                alert("خطا: " + JSON.stringify(data));
+            }
+        } catch(err){
+            console.error(err);
+            alert("خطا در اتصال به سرور.");
+        }
     });
-    
 
+    // Rating
     fetch(`/customer/api/v1/product/${productId}/can-rate/`, {
         method: "GET",
         credentials: "include"
     })
     .then(res => res.json())
     .then(data => {
-        if(data.can_rate){
-            ratingBox.style.display = "block"; // ✅ نمایش فقط برای خریداران
-        } else {
-            ratingBox.style.display = "none"; // ❌ مخفی برای کسانی که نخریدن
-        }
+        ratingBox.style.display = data.can_rate ? "block" : "none";
     });
-    
+
+    document.getElementById("submit-rating").addEventListener("click", () => {
+        const rate = document.getElementById("rating").value;
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        fetch(`/customer/api/v1/add/product/rate/${productId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            credentials: "include",
+            body: JSON.stringify({ rate: rate })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.id){
+                ratingBox.style.display = data.can_rate ? "block" : "none";
+                alert("✅ Thanks for rating!");
+            }
+        }).catch(err => console.error(err));
+    });
+
+});
 </script>
+
 {% endblock content %}
