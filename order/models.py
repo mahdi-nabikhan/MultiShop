@@ -66,9 +66,9 @@ class OrderItem(models.Model):
         return self.quantity * self.product.price
 
     def save(self, *args, **kwargs):
-        """Overrides the default save method to set the total price before saving."""
-        self.total_price = self.get_total_price()
+        self.total = self.get_total_price()
         return super(OrderItem, self).save(*args, **kwargs)
+
 
     def __str__(self):
         return f"{self.product.name},{self.quantity}"

@@ -55,7 +55,12 @@
                             <h5>Total</h5>
                             <h5>$160</h5>
                         </div>
-                        <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
+                        <form action="{% url 'account:checkout_redirect' %}" method="get">
+                            <button type="submit" class="btn btn-block btn-primary font-weight-bold my-3 py-3">
+                                Proceed To Checkout
+                            </button>
+                        </form>
+                        
                     </div>
                 </div>
             </div>

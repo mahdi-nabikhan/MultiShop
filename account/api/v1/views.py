@@ -15,6 +15,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from django.urls import reverse
 from rest_framework.generics import UpdateAPIView
+from order.utils import transfer_session_cart_to_db
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = LoginSerializer
 
@@ -68,6 +69,12 @@ class CustomeObtainPairView(TokenObtainPairView):
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
+            try:
+                order = transfer_session_cart_to_db(request, user)
+            except Exception as e:
+                import logging
+                logging.exception("خطا در انتقال سبد از سشن به سفارش: %s", e)
+                order = None
 
 
             redirect_url = None
