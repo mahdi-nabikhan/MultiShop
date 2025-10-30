@@ -37,7 +37,7 @@
                     <span id="usernameDisplay">Guest</span>
                     <a class="text-body mr-3" href="">Contact</a>
                     <a class="text-body mr-3" href="">Help</a>
-                    <a class="text-body mr-3" href="">FAQs</a>
+                    <a class="text-body mr-3" href="#" id="orders-link">Orders</a>
                 </div>
             </div>
             <div class="col-lg-6 text-center text-lg-right">
@@ -142,6 +142,33 @@
             fetchProfile();
         });
     </script>
-
+<script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const ordersLink = document.getElementById("orders-link");
+        
+            ordersLink.addEventListener("click", async (e) => {
+                e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+        
+                try {
+                    // بررسی JWT / Session
+                    const res = await fetch("{% url 'account:api/v1:profile' %}", {
+                        method: "GET",
+                        credentials: "include" // ارسال کوکی HttpOnly
+                    });
+        
+                    if(res.ok){
+                        // کاربر لاگین است، بره به صفحه Orders که از session یا API پر شده
+                        window.location.href = "/order/customer/order/item/";
+                    } else {
+                        // کاربر لاگین نیست، بره صفحه login
+                        window.location.href = "{% url 'order:order-detail' %}";
+                    }
+                } catch(err){
+                    console.error(err);
+                    window.location.href = "{% url 'account:login' %}";
+                }
+            });
+        });
+</script>
 </body>
 </html>

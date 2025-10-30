@@ -93,4 +93,16 @@ class ShopOrderListApiView(generics.GenericAPIView):
         serializer=self.serializer_class(obj,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
+class OrderItemApiView(generics.GenericAPIView):
+    serializer_class=OrderItemSerializer
+    
+    def get_queryset(self):
+        order_obj=Order.objects.get(customer__user=self.request.user,status=False)
+        return OrderItem.objects.filter(order=order_obj)
+    
+    def get(self,request):
+        order_item=self.get_queryset()
+        serializer=self.serializer_class(order_item,context={'request':request},many=True)
+        return Response (serializer.data,status=status.HTTP_200_OK)
         
+            

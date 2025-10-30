@@ -35,3 +35,6 @@ class CartDeleteView(View):
 
 class ShopOrderTemplateView(TemplateView):
     template_name = 'orders/shop_orders.html'
+
+class CustomerOrderitemTemplateView(TemplateView):
+    template_name='orders/api_order_item.html'
