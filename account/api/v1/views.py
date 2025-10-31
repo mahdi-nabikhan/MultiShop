@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from django.urls import reverse
 from rest_framework.generics import UpdateAPIView
 from order.utils import transfer_session_cart_to_db
+from account.throttels import *
 class CustomObtainAuthToken(ObtainAuthToken):
     serializer_class = LoginSerializer
 
@@ -60,6 +61,7 @@ class LogOutApiView(APIView):
 
 class CustomeObtainPairView(TokenObtainPairView):
     serializer_class = CustomeTokenObtainPairSerializer
+    throttle_classes = [LoginRateThrottle]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
