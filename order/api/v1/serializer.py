@@ -36,3 +36,22 @@ class OrderItemSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['product'] = ProductSerializer(instance.product).data
         return rep
+
+
+class BillSerilizers(serializers.ModelSerializer):
+    class meta:
+        model=Bill
+        fields='__all__'
+        read_only_fields=['order']
+        
+        
+    def to_representation(self, instance):
+        response=super().to_representation(instance)
+        response['order']=OrderSerializer(instance.order).data
+        return response
+    
+    
+    def create(self, validated_data):
+        order=Order.objects.get(pk=self.context.get('pk'))
+        validated_data['order']=order
+        return Order.objects.create(**validated_data)

@@ -91,7 +91,7 @@ class Bill(models.Model):
         Methods:
             __str__(): Returns a string representation including the related cart and creation date.
         """
-    cart = models.OneToOneField(OrderItem, on_delete=models.CASCADE, related_name='bill_cart')
+    cart = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='bill_cart')
     created_at = models.DateField(auto_now_add=True)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='bill_address')
     status = models.BooleanField(default=False)

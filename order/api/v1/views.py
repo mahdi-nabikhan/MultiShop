@@ -105,4 +105,5 @@ class OrderItemApiView(generics.GenericAPIView):
         serializer=self.serializer_class(order_item,context={'request':request},many=True)
         return Response (serializer.data,status=status.HTTP_200_OK)
         
-            
+class BillCreationApiView(generics.GenericAPIView):
+    pass            
