@@ -12,11 +12,11 @@ class OrderListApiView(generics.GenericAPIView):
 
     def get(self, request):
         queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = self.serializer_class(queryset, many=True,context={'request':request})
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data,context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -106,4 +106,12 @@ class OrderItemApiView(generics.GenericAPIView):
         return Response (serializer.data,status=status.HTTP_200_OK)
         
 class BillCreationApiView(generics.GenericAPIView):
-    pass            
+    serializer_class=BillSerilizers
+    
+    
+    def get(self,request,pk):
+        pass
+    
+    
+    def post(self,requesy,pk):
+        pass

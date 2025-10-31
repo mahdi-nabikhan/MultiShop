@@ -12,7 +12,7 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ('customer',)
 
     def create(self, validated_data):
-        validated_data['customer'] = Customer.objects.get(customer__user=self.context['request'].user)
+        validated_data['customer'] = Customer.objects.get(user=self.context['request'].user)
         return Order.objects.create(**validated_data)
 
 
@@ -39,19 +39,20 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class BillSerilizers(serializers.ModelSerializer):
-    class meta:
+    class Meta:
         model=Bill
         fields='__all__'
-        read_only_fields=['order']
+        read_only_fields=['cart']
+        
         
         
     def to_representation(self, instance):
         response=super().to_representation(instance)
-        response['order']=OrderSerializer(instance.order).data
+        response['cart']=OrderSerializer(instance.cart).data
         return response
     
     
     def create(self, validated_data):
         order=Order.objects.get(pk=self.context.get('pk'))
-        validated_data['order']=order
-        return Order.objects.create(**validated_data)
+        validated_data['cart']=order
+        return Bill.objects.create(**validated_data)
