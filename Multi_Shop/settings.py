@@ -140,17 +140,32 @@ AUTH_USER_MODEL = 'account.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'axes.backends.AxesBackend',
+        
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'account.authentications.CookieJWTAuthentication'
 
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '1000/day',
+        'anon': '100/day',
+    },
     
 
 
 }
 
-AXES_FAILURE_LIMIT = 5            # تعداد تلاش ناموفق قبل از بلاک شدن
-AXES_COOLOFF_TIME = 1             # بلاک شدن برای 1 ساعت
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1             
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
+
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend'
+
+]
