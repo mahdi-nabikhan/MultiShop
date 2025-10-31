@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'drf_yasg',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'axes'
 
 ]
 
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware'
 
 ]
 
@@ -138,12 +140,17 @@ AUTH_USER_MODEL = 'account.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'axes.backends.AxesBackend',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'account.authentications.CookieJWTAuthentication'
 
     ],
+    
 
 
 }
 
+AXES_FAILURE_LIMIT = 5            # تعداد تلاش ناموفق قبل از بلاک شدن
+AXES_COOLOFF_TIME = 1             # بلاک شدن برای 1 ساعت
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
