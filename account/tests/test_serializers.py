@@ -10,6 +10,23 @@ from account.models import User
 
 @pytest.mark.django_db
 class TestUserSerializer:
+    """
+    Test suite for `UserSerializer`.
+
+    ---
+    **Purpose:**
+        Validates user registration data, password confirmation, and creation logic.
+
+    ### Test Cases:
+
+    1. `test_valid_data`:
+        - Ensures serializer accepts valid data with matching passwords.
+        - Checks that the user is created in the database.
+
+    2. `test_password_mismatch`:
+        - Ensures serializer rejects data when `password` and `password2` do not match.
+        - Validates that appropriate validation error is returned.
+    """
     def test_valid_data(self):
         data = {
             "email": "test@example.com",
@@ -34,6 +51,25 @@ class TestUserSerializer:
 
 @pytest.mark.django_db
 class TestLoginSerializer:
+    """
+    Test suite for `LoginSerializer`.
+
+    ---
+    **Purpose:**
+        Validates login credentials and serializer authentication logic.
+
+    ### Fixtures:
+        - `create_user`: Creates a user for authentication tests.
+
+    ### Test Cases:
+
+    1. `test_login_success`:
+        - Ensures serializer is valid with correct email and password.
+
+    2. `test_login_fail`:
+        - Ensures serializer is invalid with incorrect credentials.
+        - Validates appropriate error is raised.
+    """
     @pytest.fixture
     def create_user(self):
         return User.objects.create_user(
@@ -55,6 +91,19 @@ class TestLoginSerializer:
 
 @pytest.mark.django_db
 class TestUsersSerializer:
+    """
+    Test suite for `UsersSerializer`.
+
+    ---
+    **Purpose:**
+        Validates serialization of basic user information (id and email).
+
+    ### Test Cases:
+
+    1. `test_fields_output`:
+        - Checks that serialized data contains `id` and `email`.
+        - Ensures `email` matches the user instance.
+    """
     def test_fields_output(self):
         user = User.objects.create_user(email="abc@test.com", password="test1234")
         serializer = UsersSerializer(user)
@@ -65,6 +114,24 @@ class TestUsersSerializer:
 
 @pytest.mark.django_db
 class TestChangePasswordSerializer:
+    """
+    Test suite for `ChangePasswordSerializer`.
+
+    ---
+    **Purpose:**
+        Validates password change logic, including matching new passwords
+        and enforcing password rules.
+
+    ### Test Cases:
+
+    1. `test_password_match_and_valid`:
+        - Ensures serializer is valid when new passwords match and satisfy
+          validation requirements.
+
+    2. `test_password_mismatch`:
+        - Ensures serializer is invalid when new passwords do not match.
+        - Validates correct validation error message is returned.
+    """
     def test_password_match_and_valid(self):
         data = {
             "old_password": "OldPass123!",

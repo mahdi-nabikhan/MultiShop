@@ -12,7 +12,63 @@ User = get_user_model()
 @pytest.mark.django_db
 class TestAuthAPI:
 
-    # ---------------------- Fixtures ----------------------
+    """
+    Test suite for authentication-related API endpoints.
+
+    ---
+    **Purpose:**
+        Verifies correct behavior of user authentication, profile retrieval,
+        logout, password change, and JWT login with role-based redirects.
+
+    ### Fixtures:
+        - `api_client`: Provides a DRF APIClient instance for making requests.
+        - `create_user`: Creates a standard test user.
+        - `create_manager`: Creates a Manager linked to `create_user`.
+        - `create_store`: Creates a Store managed by `create_manager`.
+        - `create_customer`: Creates a Customer linked to `create_user`.
+        - `create_admin`: Creates an Admin linked to `create_user` and a Store.
+        - `create_manager_role`: Creates a Manager role (alternative fixture).
+        - `create_operator`: Creates an Operator linked to `create_user` and a Store.
+
+    ### Test Cases:
+
+    1. `test_login_success`:
+        - Tests successful login using valid credentials.
+        - Validates response contains `user-id` and `token`.
+        - Expected status: 200 OK
+
+    2. `test_login_invalid_credentials`:
+        - Tests login with incorrect credentials.
+        - Expected status: 400 Bad Request
+
+    3. `test_get_profile`:
+        - Tests retrieval of authenticated user's profile.
+        - Validates email in response matches the logged-in user.
+        - Expected status: 200 OK
+
+    4. `test_logout`:
+        - Tests logout endpoint by deleting the user's token.
+        - Validates response message confirms logout.
+        - Expected status: 200 OK
+
+    5. `test_change_password`:
+        - Tests password change endpoint for authenticated user.
+        - Ensures new password is correctly updated in database.
+        - Expected status: 200 OK
+
+    6. `test_jwt_login_redirect`:
+        - Parameterized test for JWT login with role-based redirect.
+        - Validates correct `redirect_url` returned for different user roles:
+            - Customer → `/website/shop/list/`
+            - Admin / Operator → `/vendor/panel`
+        - Expected status: 200 OK
+
+    ### Notes:
+        - All tests use `pytest.mark.django_db` to allow database access.
+        - `force_authenticate` is used to simulate logged-in users where needed.
+        - JWT login test assumes session cart handling is functioning correctly.
+        - Throttling, permissions, and token handling are implicitly tested through responses.
+    """
     @pytest.fixture
     def api_client(self):
         return APIClient()

@@ -18,6 +18,53 @@ from rest_framework.generics import UpdateAPIView
 from order.utils import transfer_session_cart_to_db
 from account.throttels import *
 class CustomObtainAuthToken(ObtainAuthToken):
+    """
+    Custom authentication endpoint for obtaining user tokens.
+
+    This view authenticates a user using provided credentials (username and password),
+    generates or retrieves an existing authentication token, and determines the redirect
+    URL based on the user's role in the system.
+
+    ---
+    **Request method:** `POST`
+    **Authentication required:** No
+    **Throttling:** Not applied (can be customized via `account.throttles`)
+    **Permissions:** `AllowAny`
+
+    ### Request Body:
+        {
+            "username": "string",
+            "password": "string"
+        }
+
+    ### Successful Response (HTTP 200):
+        {
+            "user-id": int,
+            "token": "string",
+            "redirect_url": "string | null"
+        }
+
+    ### Error Response (HTTP 400):
+        {
+            "non_field_errors": ["Unable to log in with provided credentials."]
+        }
+
+    ### Role-based Redirect Logic:
+        - Customer  → reverse('shop-list')
+        - Admin     → reverse('vendors:panel')
+        - Manager   → reverse('vendors:panel')
+        - Operator  → reverse('vendors:panel')
+
+    ### Notes:
+        - Uses DRF's built-in Token model (`rest_framework.authtoken.models.Token`)
+        - Uses custom `LoginSerializer` for authentication validation
+        - This endpoint should typically be mounted at `/api/v1/login/`
+        - Consider adding throttling for brute-force protection
+
+    Returns:
+        Response: A JSON response containing the user ID, authentication token,
+        and redirect URL based on user type.
+    """
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
@@ -43,6 +90,39 @@ class CustomObtainAuthToken(ObtainAuthToken):
 
 
 class ProfileApiView(APIView):
+    """
+    Retrieve the authenticated user's profile data.
+
+    ---
+    **Request method:** `GET`  
+    **Authentication required:** Yes (`IsAuthenticated`)  
+    **Permissions:** `IsAuthenticated`  
+    **Throttling:** None  
+
+    ### Description:
+        Returns serialized profile information of the currently authenticated user.
+        The user instance is taken from `request.user`, serialized using `UsersSerializer`,
+        and returned as JSON response.
+
+    ### Response (HTTP 200):
+        {
+            "id": int,
+            "username": "string",
+            "email": "string",
+            ... // other user fields defined in UsersSerializer
+        }
+
+    ### Error Responses:
+        - `401 Unauthorized` → If no valid authentication credentials are provided.
+
+    ### Notes:
+        - Uses `UsersSerializer` for serialization of the `User` model.
+        - No input parameters are required.
+        - Prints serialized user data to console (can be removed in production).
+
+    Returns:
+        Response: JSON representation of the authenticated user's profile.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -52,6 +132,42 @@ class ProfileApiView(APIView):
 
 
 class LogOutApiView(APIView):
+    """
+    Log out the currently authenticated user by deleting their authentication token.
+
+    ---
+    **Request method:** `POST`  
+    **Authentication required:** Yes (`IsAuthenticated`)  
+    **Permissions:** `IsAuthenticated`  
+    **Throttling:** None  
+
+    ### Description:
+        This endpoint invalidates the user's current authentication token,
+        effectively logging them out of the system.
+        Once the token is deleted, any subsequent requests using the same token
+        will be rejected with `401 Unauthorized`.
+
+    ### Request Body:
+        None
+
+    ### Successful Response (HTTP 200):
+        {
+            "details": "logged out successfully"
+        }
+
+    ### Error Responses:
+        - `401 Unauthorized` → If authentication credentials are missing or invalid.
+        - `500 Internal Server Error` → If token deletion fails unexpectedly.
+
+    ### Notes:
+        - This endpoint assumes the use of DRF's TokenAuthentication.
+        - If using JWT, the logout behavior must be implemented differently
+          (e.g., via token blacklisting).
+        - Token deletion occurs through `request.user.auth_token.delete()`.
+
+    Returns:
+        Response: JSON message confirming successful logout with HTTP 200 status.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -60,6 +176,65 @@ class LogOutApiView(APIView):
 
 
 class CustomeObtainPairView(TokenObtainPairView):
+    """
+    Custom JWT authentication endpoint for obtaining access and refresh tokens.
+
+    ---
+    **Request method:** `POST`  
+    **Authentication required:** No  
+    **Permissions:** `AllowAny`  
+    **Throttling:** `LoginRateThrottle`
+
+    ### Description:
+        Authenticates a user using the provided credentials and issues a pair of JWT tokens
+        (`access` and `refresh`).  
+        After successful authentication, the user's session cart is transferred to the database,
+        and role-based redirect URL is determined.  
+        Both tokens are stored as HTTP-only cookies in the response.
+
+    ### Request Body:
+        {
+            "username": "string",
+            "password": "string"
+        }
+
+    ### Successful Response (HTTP 200):
+        {
+            "user_id": int,
+            "redirect_url": "string | null"
+        }
+
+    ### Error Responses:
+        - `400 Bad Request` → Invalid credentials or serializer validation failure.
+        - `429 Too Many Requests` → If login attempts exceed the defined throttle limit.
+
+    ### Behavior:
+        - Validates user credentials using `CustomeTokenObtainPairSerializer`.
+        - Generates a JWT access token and a refresh token for the authenticated user.
+        - Transfers the user's session cart to the database using `transfer_session_cart_to_db()`.
+        - Determines the redirect URL based on user role:
+            - `Customer` → `reverse('shop-list')`
+            - `Admin` / `Manager` / `Operator` → `reverse('vendors:panel')`
+        - Sets both tokens as secure, HTTP-only cookies with `samesite='Strict'`.
+
+    ### Cookie Details:
+        - **access_token**
+            - Lifetime: 15 minutes
+            - `HttpOnly`, `Secure`, `SameSite=Strict`
+        - **refresh_token**
+            - Lifetime: 7 days
+            - `HttpOnly`, `Secure`, `SameSite=Strict`
+
+    ### Notes:
+        - Uses `rest_framework_simplejwt.tokens.RefreshToken` for token generation.
+        - Designed for clients using cookie-based authentication instead of Authorization headers.
+        - Exception handling around `transfer_session_cart_to_db` logs failures gracefully.
+        - Does not include tokens directly in response body for security reasons.
+
+    Returns:
+        Response: JSON object containing user ID and redirect URL with JWT tokens
+        stored as cookies in the response.
+    """
     serializer_class = CustomeTokenObtainPairSerializer
     throttle_classes = [LoginRateThrottle]
 

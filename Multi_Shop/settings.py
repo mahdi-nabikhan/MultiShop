@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'axes.middleware.AxesMiddleware'
+    'axes.middleware.AxesMiddleware',
 
 ]
 
@@ -167,6 +167,7 @@ AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
 
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'account.authentications.CookieJWTAuthentication'
 
 ]
