@@ -20,6 +20,7 @@ from account.throttels import *
 from django.core.mail import send_mail
 from rest_framework.generics import GenericAPIView
 import random
+from account.tasks import *
 class CustomObtainAuthToken(ObtainAuthToken):
     """
     Custom authentication endpoint for obtaining user tokens.
@@ -376,12 +377,7 @@ class SendResetCodeApiView(GenericAPIView):
         code = f"{random.randint(100000, 999999)}"
         PasswordResetCode.objects.create(user=user, code=code)
 
-        send_mail(
-            subject="Your login code",
-            message=f"Your login code is: {code}",
-            from_email="no-reply@example.com",
-            recipient_list=[email],
-        )
+        send_reset_code_email.delay(email=email,code=code)
 
         return Response({"message": "Code sent to email"})
 

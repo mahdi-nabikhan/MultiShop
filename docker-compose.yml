@@ -39,7 +39,7 @@ services:
       - ServerOptions__HostName=smtp4dev
   worker:
     build: .
-    command: celery -A Mult_Shop worker --loglevel=info
+    command: celery -A Multi_Shop worker --loglevel=info
     depends_on:
       - redis
       - backend
