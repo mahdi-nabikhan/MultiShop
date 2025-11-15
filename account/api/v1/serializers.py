@@ -9,6 +9,7 @@ from django.contrib.auth import login
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
 class LoginSerializer(serializers.Serializer):
     """
     Serializer for authenticating users using email and password credentials.
@@ -280,3 +281,26 @@ class ChangePasswordSerializer(serializers.Serializer):
         except ValidationError as e:
             raise serializers.ValidationError({'password': e.messages})  # `e.messages` is a list
         return data
+
+
+
+# serializers.py
+
+
+class SendCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class VerifyCodeSerializer(serializers.Serializer):
+    code = serializers.CharField(max_length=6)
+
+    def validate_code(self, value):
+        try:
+            obj = PasswordResetCode.objects.get(code=value)
+        except PasswordResetCode.DoesNotExist:
+            raise serializers.ValidationError("Invalid code")
+
+        if obj.is_expired():
+            raise serializers.ValidationError("Code expired")
+
+        self.user = obj.user
+        return value

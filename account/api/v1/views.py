@@ -17,6 +17,9 @@ from django.urls import reverse
 from rest_framework.generics import UpdateAPIView
 from order.utils import transfer_session_cart_to_db
 from account.throttels import *
+from django.core.mail import send_mail
+from rest_framework.generics import GenericAPIView
+import random
 class CustomObtainAuthToken(ObtainAuthToken):
     """
     Custom authentication endpoint for obtaining user tokens.
@@ -356,3 +359,45 @@ class ChangePasswordView(UpdateAPIView):
         else:
             return Response(serializer.errors)
 
+# views.py
+
+
+class SendResetCodeApiView(GenericAPIView):
+    serializer_class = SendCodeSerializer
+    permission_classes = []
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"]
+        user = User.objects.get(email=email)
+
+        code = f"{random.randint(100000, 999999)}"
+        PasswordResetCode.objects.create(user=user, code=code)
+
+        send_mail(
+            subject="Your login code",
+            message=f"Your login code is: {code}",
+            from_email="no-reply@example.com",
+            recipient_list=[email],
+        )
+
+        return Response({"message": "Code sent to email"})
+
+class VerifyResetCodeApiView(GenericAPIView):
+    serializer_class = VerifyCodeSerializer
+    permission_classes = []
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.user  # اینجا از validate_code گرفته شده
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "message": "Login successful",
+            "access": str(refresh.access_token),
+            "refresh": str(refresh)
+        })
