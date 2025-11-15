@@ -13,7 +13,7 @@ class RandomProductsApiView(APIView):
         if not products:
             
             product_ids = list(Product.objects.values_list("id", flat=True))
-            random_ids = random.sample(product_ids, min(6, len(product_ids)))
+            random_ids = random.sample(product_ids, min(5, len(product_ids)))
 
             queryset = Product.objects.filter(id__in=random_ids)
             serializer = ProductSerializer(queryset, many=True)

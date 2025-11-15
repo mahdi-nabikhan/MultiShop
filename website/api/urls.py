@@ -4,7 +4,7 @@ from .views import *
 app_name='api/v1'
 
 
-urlpatterens=[
+urlpatterns=[
     path('products/random/', RandomProductsApiView.as_view(), name='random-products'),
     
 ]
