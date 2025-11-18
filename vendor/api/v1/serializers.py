@@ -121,7 +121,7 @@ class AddImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         pk = self.context.get('pk')
         validated_data['product'] = Product.objects.get(pk=pk)
-        return validated_data
+        return ProductImages.objects.create(**validated_data)
 
 
 class AddDiscountSerializer(serializers.ModelSerializer):
