@@ -1,0 +1,2 @@
+{"__type":"$$EventMessageAudit","id":"2df41b7b-af71-4df8-9b5f-cb92d825953f","ts":"2025-11-23T14:34:09.844+00:00","eventName":"n8n.audit.workflow.created","message":"n8n.audit.workflow.created","payload":{"userId":"24fcb1ea-1608-4c00-95d8-7dbc735dd9a3","_email":"mitinabi718@gmail.com","_firstName":"mahdi","_lastName":"nabi","globalRole":"global:owner","workflowId":"QGaFUVlhwAFCXaKa","workflowName":"send_email"}}
+{"__type":"$$EventMessageConfirm","confirm":"2df41b7b-af71-4df8-9b5f-cb92d825953f","ts":"2025-11-23T14:34:09.845+00:00","source":{"id":"0","name":"eventBus"}}

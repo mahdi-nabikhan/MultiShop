@@ -49,13 +49,13 @@ services:
     image: n8nio/n8n:latest
     container_name: n8n
     ports:
-      -'5678:5678'
+      - "3487:4388"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=admin123
       - N8N_HOST=localhost
-      - N8N_PORT
+      - N8N_PORT=4388
     volumes:
       - ./n8n_data:/home/node/.n8n
     depends_on:
