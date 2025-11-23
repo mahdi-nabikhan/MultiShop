@@ -18,7 +18,7 @@ def send_welcome_email_task(self, user_email, user_name):
     """
     ارسال ایمیل خوش آمدگویی با n8n Webhook
     """
-    url = "http://localhost:4388/webhook-test/send_email"  # داخل Docker از hostname کانتینر استفاده می‌کنیم
+    url = "http://localhost:3487/webhook-test/send_email"  # داخل Docker از hostname کانتینر استفاده می‌کنیم
     data = {
         "email": user_email,
         "subject": "خوش آمدید به Multi Shop!",
