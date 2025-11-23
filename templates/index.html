@@ -432,7 +432,43 @@
     <!-- Products Start -->
     
     </div>
+    <!-- templates/landing.html -->
+</div>
+<div class="filter-buttons">
+    <button onclick="loadProducts('price_asc')">ارزان ترین</button>
+    <button onclick="loadProducts('price_desc')">گران ترین</button>
+    <button onclick="loadProducts('bestseller')">پرفروش ترین</button>
+    <button onclick="loadProducts('new')">جدیدترین</button>
+</div>
+
+<hr>
+
+<div id="product-box" class="product-grid"></div>
+
+<script>
+    function loadProducts(order) {
+        fetch(`/website/api/v1/product/filtering?order=${order}`)
+            .then(response => response.json())
+            .then(data => {
+                let productsHtml = "";
+                data.slice(0, 4).forEach(product => {
+                    productsHtml += `
+                        <div class="product-card">
+                            <img src="${product.image}" alt="${product.name}">
+                            <h4>${product.name}</h4>
+                            <p class="price">${product.price} تومان</p>
+                        </div>
+                    `;
+                });
+                document.getElementById("product-box").innerHTML = productsHtml;
+            })
+            .catch(error => console.error("Error:", error));
+    }
+</script>
+
+
     
+
     <!-- Products End -->
 
 
@@ -604,3 +640,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 .catch(err => console.error("Error fetching products:", err));
         });
         </script>
+
+
+
+
+
+            

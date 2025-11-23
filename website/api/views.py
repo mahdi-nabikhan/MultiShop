@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
+from rest_framework.generics import ListAPIView
 
 class RandomProductsApiView(APIView):
     def get(self, request):
@@ -22,3 +23,24 @@ class RandomProductsApiView(APIView):
             cache.set(cache_key, products, timeout=300)  
 
         return Response(products)
+
+
+class ProductsFilteringAPIView(ListAPIView):
+    serializer_class=ProductSerializer
+    
+    
+    
+    def get_queryset(self):
+        query_set=Product.objects.all()
+        order_param=self.request.GET.get('order')
+        
+        if order_param == 'price_asc':
+            query_set=query_set.order_by('price')
+            print('this is ',query_set)
+            
+        elif order_param == 'price_dsc':
+            query_set=query_set.order_by('-price')
+            print('this is ',query_set)
+        return query_set
+            
+            
