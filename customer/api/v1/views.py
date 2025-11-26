@@ -16,7 +16,8 @@ class CustomerRegisterApiView(GenericAPIView):
             customer = serializer.save()
             user = customer.user
             Token.objects.create(user=user)
-            send_welcome_email_task.delay(user_email=user.email,user_name='jskdiksd')
+            
+            send_welcome_email_task.delay(user_email=user.email,user_name=customer.username)
             return Response({'user': user.email, 'massage': 'customer successfully registered'},
                             status=status.HTTP_201_CREATED)
         else:

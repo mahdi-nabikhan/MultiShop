@@ -15,10 +15,8 @@ def send_reset_code_email(email, code):
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=60)
 def send_welcome_email_task(self, user_email, user_name):
-    """
-    ارسال ایمیل خوش آمدگویی با n8n Webhook
-    """
-    url = "http://0.0.0.0:4388/webhook-test/send_email"  # داخل Docker از hostname کانتینر استفاده می‌کنیم
+    url = "http://n8n:4388/webhook-test/send_email"
+
     data = {
         "email": user_email,
         "subject": "خوش آمدید به Multi Shop!",
