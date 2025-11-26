@@ -1,7 +1,7 @@
 from django.urls import path,include
 from .views import *
 
-app_name='api/v1'
+app_name = "webste_api_v1" 
 
 
 urlpatterns=[
