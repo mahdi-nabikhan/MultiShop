@@ -36,76 +36,71 @@
     </style>
 
 
-    <div class="form-container">
-        <h2 class="text-center mb-4">ثبت‌نام</h2>
-        <form id="registerForm">
-            <input class="form-control" type="email" name="email" placeholder="ایمیل" required>
-            <input class="form-control" type="password" name="password" placeholder="رمز عبور" required>
-            <input class="form-control" type="password" name="password2" placeholder="تکرار رمز عبور" required>
-            <input class="form-control" type="text" name="username" placeholder="نام کاربری" required>
-            <button type="submit" class="btn btn-primary">ثبت‌نام</button>
-        </form>
-        <div id="result"></div>
-    </div>
-
+    <form id="registerForm" method="POST">
+        <input class="form-control" type="email" name="email" placeholder="ایمیل" required>
+        <input class="form-control" type="password" name="password" placeholder="رمز عبور" required>
+        <input class="form-control" type="password" name="password2" placeholder="تکرار رمز عبور" required>
+        <input class="form-control" type="text" name="username" placeholder="نام کاربری" required>
+        <button type="submit" class="btn btn-primary">ثبت‌نام</button>
+    </form>
+    <div id="result"></div>
+    
     <script>
-        document.getElementById("registerForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-
-            let formData = {
-                username: this.username.value,
-                user: {
-                    email: this.email.value,
-                    password: this.password.value,
-                    password2: this.password2.value
-                }
-            };
-
-            try {
-                let response = await fetch("{% url 'api/v1:customer-register' %}", {   // آدرس API خودتو بذار
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": getCookie("csrftoken")
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                let data = await response.json();
-
-                if (response.ok) {
-                    document.getElementById("result").innerHTML =
-                        `<p class="text-success">✅ ثبت‌نام موفق بود 🎉 تا ۳ ثانیه دیگه به صفحه اصلی می‌رید...</p>`;
-                    
-                    setTimeout(() => {
-                        window.location.href = "{% url 'shop-list' %}";   // مسیر صفحه index
-                    }, 3000);
-                } else {
-                    document.getElementById("result").innerHTML =
-                        `<p class="text-danger">❌ خطا: ${JSON.stringify(data)}</p>`;
-                }
-            } catch (error) {
+    document.getElementById("registerForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+    
+        const formData = {
+            username: this.username.value,
+            user: {
+                email: this.email.value,
+                password: this.password.value,
+                password2: this.password2.value
+            }
+        };
+    
+        try {
+            const response = await fetch('/customer/api/v1/customer/register/', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify(formData)
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
                 document.getElementById("result").innerHTML =
-                    `<p class="text-danger">⚠️ مشکلی پیش اومد</p>`;
+                    `<p class="text-success">ثبت‌نام موفق بود 🎉</p>`;
+                setTimeout(() => {
+                    window.location.href = "{% url 'shop-list' %}";
+                }, 3000);
+            } else {
+                document.getElementById("result").innerHTML =
+                    `<p class="text-danger">خطا: ${JSON.stringify(data)}</p>`;
             }
-        });
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== "") {
-                const cookies = document.cookie.split(";");
-                for (let cookie of cookies) {
-                    cookie = cookie.trim();
-                    if (cookie.startsWith(name + "=")) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+    
+        } catch (err) {
+            document.getElementById("result").innerHTML =
+                `<p class="text-danger">⚠️ مشکلی پیش اومد</p>`;
+        }
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
             }
-            return cookieValue;
         }
+        return cookieValue;
+    }
     </script>
-
-
-
+    
 {% endblock content %}
