@@ -390,9 +390,9 @@ class VerifyResetCodeApiView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.user
-
-        refresh = RefreshToken.for_user(user)
-        access = refresh.access_token
+        data=serializer.data
+        refresh = data['refresh']
+        access = data['access']
         redirect_url = None
         if Customer.objects.filter(user=user).exists():
             redirect_url = reverse('shop-list')
