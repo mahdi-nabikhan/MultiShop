@@ -96,3 +96,8 @@ class CheckoutRedirectView(View):
      
         transfer_session_cart_to_db(request, user)
         return redirect('checkout_page')
+
+
+class SendResetPasswordTemplate(TemplateView):
+    template_name='accounts/send_resend_code_login.html'
+    

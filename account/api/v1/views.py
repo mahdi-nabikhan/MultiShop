@@ -389,11 +389,36 @@ class VerifyResetCodeApiView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.user  # اینجا از validate_code گرفته شده
+        user = serializer.user
 
         refresh = RefreshToken.for_user(user)
-        return Response({
+        access = refresh.access_token
+        redirect_url = None
+        if Customer.objects.filter(user=user).exists():
+            redirect_url = reverse('shop-list')
+        elif Admin.objects.filter(user=user).exists():
+            redirect_url = reverse('vendors:panel')
+        elif Manager.objects.filter(user=user).exists():
+            redirect_url = reverse('vendors:panel')
+        elif Operator.objects.filter(user=user).exists():
+            redirect_url = reverse('vendors:panel')
+        response= Response({
             "message": "Login successful",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh)
+            'redirect_url':redirect_url
         })
+        response.set_cookie(
+            key="access",
+            value=str(access),
+            httponly=True,
+            secure=True,   
+            samesite="Lax"
+        )
+        response.set_cookie(
+            key="refresh",
+            value=str(refresh),
+            httponly=True,
+            secure=True,
+            samesite="Lax"
+        )
+
+        return response
