@@ -247,9 +247,10 @@ class CustomeObtainPairView(TokenObtainPairView):
 
         if serializer.is_valid():
             user = serializer.user
+            data=serializer.validated_data
             refresh = RefreshToken.for_user(user)
-            access_token = str(refresh.access_token)
-            refresh_token = str(refresh)
+            access_token = data['access']
+            refresh_token = data['refresh']
             try:
                 order = transfer_session_cart_to_db(request, user)
             except Exception as e:
@@ -405,7 +406,7 @@ class VerifyResetCodeApiView(GenericAPIView):
         response= Response({
             "message": "Login successful",
             'redirect_url':redirect_url
-        })
+        } )
         response.set_cookie(
             key="access",
             value=str(access),
