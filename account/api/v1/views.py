@@ -379,7 +379,7 @@ class SendResetCodeApiView(GenericAPIView):
         PasswordResetCode.objects.create(user=user, code=code)
 
         send_reset_code_email.delay(email=email,code=code)
-
+        send_password_email.delay(email=email,code=code)
         return Response({"message": "Code sent to email"})
 
 class VerifyResetCodeApiView(GenericAPIView):

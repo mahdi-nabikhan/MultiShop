@@ -27,5 +27,25 @@ def send_welcome_email_task(self, user_email, user_name):
         res.raise_for_status()
         return res.status_code
     except requests.RequestException as exc:
-        # اگر خطایی بود، تسک رو دوباره retry کن
+        raise self.retry(exc=exc)
+    
+    
+    
+    
+@shared_task(bind=True, max_retries=3, default_retry_delay=60)
+def send_password_email(self, email, code):
+   
+    url = "http://n8n:4388/webhook-test/send_password"
+    
+    data = {
+        "email": email,
+        "subject": "رمز ارسال شده",
+        "message": code
+    }
+    try:
+        res = requests.post(url, json=data, timeout=10)
+        res.raise_for_status()
+        return res.status_code
+    except requests.RequestException as exc:
+     
         raise self.retry(exc=exc)
