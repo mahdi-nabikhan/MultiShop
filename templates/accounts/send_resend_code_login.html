@@ -63,36 +63,47 @@
     function sendCode() {
         const email = document.getElementById("email").value;
 
-        fetch("/account/api/v1/send/reset/password/", {
+        fetch("/account/api/v1/send/reset/password", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({email: email})
         })
         .then(res => res.json())
         .then(data => {
-            document.getElementById("msg").textContent = data.message;
-            document.getElementById("email-section").style.display = "none";
-            document.getElementById("code-section").style.display = "block";
+            if(data.message){
+                document.getElementById("msg").textContent = data.message;
+                document.getElementById("email-section").style.display = "none";
+                document.getElementById("code-section").style.display = "block";
+            } else {
+                document.getElementById("msg").textContent = "مشکلی پیش آمد، دوباره تلاش کنید";
+            }
+        })
+        .catch(err => {
+            document.getElementById("msg").textContent = "خطا: " + err;
         });
     }
 
     function verifyCode() {
         const code = document.getElementById("code").value;
 
-        fetch("/account/api/v1/confirm/rest/password/", {
+        fetch("/account/api/v1/confirm/rest/password", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            credentials: "include"   // بسیار مهم — این باعث ارسال و دریافت کوکی میشود
-            ,
+            credentials: "include", // بسیار مهم
             body: JSON.stringify({code: code})
         })
         .then(res => res.json())
         .then(data => {
             if (data.redirect_url) {
                 window.location.href = data.redirect_url; // ریدایرکت اتوماتیک
+            } else if (data.message) {
+                document.getElementById("msg").textContent = data.message;
             } else {
-                document.getElementById("msg").textContent = "کد صحیح است اما ریدایرکت تنظیم نشده";
+                document.getElementById("msg").textContent = "کد درست است اما ریدایرکت تنظیم نشده";
             }
+        })
+        .catch(err => {
+            document.getElementById("msg").textContent = "خطا: " + err;
         });
     }
 </script>

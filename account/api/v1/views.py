@@ -391,9 +391,10 @@ class VerifyResetCodeApiView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.user
-        data=serializer.data
-        refresh = data['refresh']
-        access = data['access']
+
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
         redirect_url = None
         if Customer.objects.filter(user=user).exists():
             redirect_url = reverse('shop-list')
@@ -408,18 +409,18 @@ class VerifyResetCodeApiView(GenericAPIView):
             'redirect_url':redirect_url
         } )
         response.set_cookie(
-            key="access",
-            value=str(access),
+            key="access_token",
+            value=str(access_token),
             httponly=True,
             secure=True,   
-            samesite="Lax"
+            samesite="Strict"
         )
         response.set_cookie(
-            key="refresh",
-            value=str(refresh),
+            key="refresh_token",
+            value=str(refresh_token),
             httponly=True,
             secure=True,
-            samesite="Lax"
+            samesite="Strict"
         )
 
         return response
