@@ -69,7 +69,7 @@ services:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m  # برای سبک شدن
     ports:
-      - "9200:9200"
+      - "59200:9200"
     volumes:
       - esdata:/usr/share/elasticsearch/data
 
