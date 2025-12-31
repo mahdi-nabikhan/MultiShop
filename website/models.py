@@ -4,7 +4,7 @@ from vendor.models import Store
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from elasticsearch import Elasticsearch
-from .models import Product
+
 
 es = Elasticsearch("http://localhost:59200")
 # Create your models here.

@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView
+from elasticsearch import Elasticsearch
+es = Elasticsearch("http://localhost:59200")
 
 class RandomProductsApiView(APIView):
     def get(self, request):
@@ -44,3 +46,59 @@ class ProductsFilteringAPIView(ListAPIView):
         return query_set
             
             
+
+class ProductSearchApi(APIView):
+    def get(self, request):
+        q = request.query_params.get("q", "")
+        category = request.query_params.get("category")
+        store = request.query_params.get("store")
+
+        must_filters = []
+        if category:
+            must_filters.append({"term": {"category": category}})
+
+        if store:
+            must_filters.append({"term": {"store": store}})
+
+        body = {
+            "query": {
+                "bool": {
+                    "must": must_filters,
+                    "should": [
+                        { "match": { "name": { "query": q, "boost": 3 } } },
+                        { "match": { "description": { "query": q } } }
+                    ]
+                }
+            }
+        }
+
+        results = es.search(index="products_index", body=body)
+
+        hits = [
+            {
+                "id": hit["_id"],
+                "score": hit["_score"],
+                **hit["_source"]
+            }
+            for hit in results["hits"]["hits"]
+        ]
+
+        return Response(hits)
+    
+class AutoCompleteApi(APIView):
+    def get(self, request):
+        q = request.query_params.get("q", "")
+
+        body = {
+            "query": {
+                "match_phrase_prefix": {
+                    "name_auto": q
+                }
+            }
+        }
+
+        results = es.search(index="products_index", body=body)
+
+        suggestions = list({hit["_source"]["name"] for hit in results["hits"]["hits"]})
+
+        return Response(suggestions)
