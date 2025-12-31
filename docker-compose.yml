@@ -27,7 +27,7 @@ services:
     container_name: smtp4dev
     restart: always
     ports:
-      - '5000:80'
+      - '5001:80'
       - '25:25'
       - '143:143'
     volumes:
@@ -62,32 +62,17 @@ services:
     depends_on:
       - redis
       - backend
-  elasticsearch:
-    image: bitnami/elastic.co/elasticsearch/elasticsearch:8.12.0
-    container_name: elasticsearch
+  elk:
+    image: sebp/elk:8.18.4
+    container_name: elk
+    ports:
+      - "9200:9200"   # Elasticsearch
+      - "5601:5601"   # Kibana
+      - "5000:5000"   # Logstash
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms2g -Xmx2g
-    ports:
-      - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-  kibana:
-    image: bitnami/elastic.co/kibana/kibana:8.12.0
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-  logstash:
-    image: bitnami/elastic.co/logstash/logstash:8.12.0
-    container_name: logstash
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-    depends_on:
-      - elasticsearch
+
+
 
 volumes:
   smtp4dev-data:
