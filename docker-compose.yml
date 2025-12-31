@@ -62,15 +62,17 @@ services:
     depends_on:
       - redis
       - backend
-  elk:
-    image: sebp/elk:8.18.4
-    container_name: elk
-    ports:
-      - "9200:9200"   # Elasticsearch
-      - "5601:5601"   # Kibana
-      - "5000:5000"   # Logstash
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.2
+    container_name: elasticsearch
     environment:
       - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m  # برای سبک شدن
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
 
 
 
