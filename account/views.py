@@ -99,5 +99,27 @@ class CheckoutRedirectView(View):
 
 
 class SendResetPasswordTemplate(TemplateView):
+    """
+    Renders the template for requesting a password reset or resending a login code.
+
+    This view serves a frontend HTML page that allows users to input their email
+    address to initiate the password reset process or request a new verification code.
+    It is typically used in combination with backend API endpoints that handle
+    sending the reset code.
+
+    Attributes:
+        template_name (str):
+            - The path to the HTML template used to render the page.
+            - In this case: 'accounts/send_resend_code_login.html'
+
+    Usage:
+        - User navigates to this page to request a password reset or resend a login code.
+        - The frontend form typically sends a request to the corresponding API endpoint.
+
+    Security Considerations:
+        - This view should not expose any user-specific information.
+        - Form submissions should be validated server-side via the API endpoint.
+
+    """
     template_name='accounts/send_resend_code_login.html'
     

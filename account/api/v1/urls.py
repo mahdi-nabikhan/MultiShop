@@ -13,43 +13,46 @@ urlpatterns = [
 
 
 ]
+
 """
-API URL Configuration for version 1 of the project.
+Authentication and account-related URL configurations.
 
-app_name = 'api/v1'
+This module defines all authentication, authorization, and account management
+API endpoints, including login mechanisms, JWT-based authentication, profile
+management, password change, logout, and password reset workflows.
 
-This module defines all REST API endpoints for user authentication,
-profile management, and password operations. Each URL is mapped to its
-corresponding view class.
+Endpoints:
+    - login/
+        Token-based authentication endpoint using a custom auth token view.
 
-### URL Patterns:
+    - profile/
+        Retrieve or update the authenticated user's profile information.
 
-1. `login/` → `CustomObtainAuthToken`
-    - Method: POST
-    - Purpose: Authenticates a user using username/email and password,
-      returns DRF Token, and role-based redirect URL.
+    - logout/
+        Invalidate user authentication and clear related session or token data.
 
-2. `profile/` → `ProfileApiView`
-    - Method: GET
-    - Purpose: Retrieves the authenticated user's profile information
-      (id, email).
+    - jwt/token/login/
+        JWT-based authentication endpoint that issues access and refresh tokens.
 
-3. `logout/` → `LogOutApiView`
-    - Method: POST
-    - Purpose: Deletes the authenticated user's token, logging them out.
+    - change/password/
+        Allow authenticated users to change their current password securely.
 
-4. `jwt/token/login/` → `CustomeObtainPairView`
-    - Method: POST
-    - Purpose: Authenticates a user, issues JWT access and refresh tokens,
-      transfers session cart to database, and returns role-based redirect URL.
-    - Throttle: `LoginRateThrottle`
+    - send/reset/password/
+        Initiates the password reset process by sending a verification code
+        to the user's registered email address.
 
-5. `change/password/` → `ChangePasswordView`
-    - Method: POST (assumed)
-    - Purpose: Allows an authenticated user to change their password.
+    - confirm/rest/password/
+        Verifies the password reset code, authenticates the user, and issues
+        JWT tokens stored in secure HTTP-only cookies.
 
-### Notes:
-- All endpoints under `api/v1` namespace.
-- Views are a mix of TokenAuthentication and JWTAuthentication.
-- Permissions and throttling are defined within individual views.
+Security Notes:
+    - JWT tokens are issued via secure HTTP-only cookies to mitigate XSS attacks.
+    - Password reset endpoints are public but protected by time-limited codes.
+    - Sensitive operations require validated serializers and strict permission handling.
+
+Naming Conventions:
+    - URL names are designed to be explicit and reusable for reverse lookups.
+    - JWT-related endpoints are grouped under the `jwt/` prefix for clarity.
+
 """
+

@@ -248,7 +248,6 @@ class CustomeObtainPairView(TokenObtainPairView):
         if serializer.is_valid():
             user = serializer.user
             data=serializer.validated_data
-            refresh = RefreshToken.for_user(user)
             access_token = data['access']
             refresh_token = data['refresh']
             try:
@@ -365,6 +364,50 @@ class ChangePasswordView(UpdateAPIView):
 
 
 class SendResetCodeApiView(GenericAPIView):
+    """
+    API endpoint for sending a password reset verification code to the user's email.
+
+    This view validates the provided email address, ensures that a user with the
+    given email exists, generates a 6-digit numeric reset code, and stores it in
+    the PasswordResetCode model. The reset code is then sent asynchronously to
+    the user's email using Celery background tasks.
+
+    Workflow:
+        1. Validate incoming request data using SendCodeSerializer.
+        2. Retrieve the user associated with the given email.
+        3. Generate a random 6-digit reset code.
+        4. Persist the reset code in the database.
+        5. Dispatch asynchronous email tasks to deliver the reset code.
+
+    Authentication:
+        - No authentication required (public endpoint).
+
+    Permissions:
+        - Open access.
+
+    Request Body:
+        {
+            "email": "user@example.com"
+        }
+
+    Responses:
+        200 OK:
+            {
+                "message": "Code sent to email"
+            }
+
+        400 Bad Request:
+            - Invalid email format
+            - Missing required fields
+
+        404 Not Found:
+            - User with the provided email does not exist
+
+    Side Effects:
+        - Creates a PasswordResetCode record in the database.
+        - Triggers Celery tasks for sending reset emails.
+
+    """
     serializer_class = SendCodeSerializer
     permission_classes = []
 
@@ -383,6 +426,70 @@ class SendResetCodeApiView(GenericAPIView):
         return Response({"message": "Code sent to email"})
 
 class VerifyResetCodeApiView(GenericAPIView):
+    """
+    API endpoint for verifying a password reset code and authenticating the user.
+
+    This view validates the submitted reset code using VerifyCodeSerializer.
+    Upon successful verification, the associated user is authenticated by
+    generating JWT access and refresh tokens. The tokens are stored securely
+    in HTTP-only cookies, and a role-based redirect URL is returned in the response.
+
+    Workflow:
+        1. Validate the reset code and retrieve the related user via serializer.
+        2. Generate JWT access and refresh tokens for the authenticated user.
+        3. Determine the user's role and resolve the appropriate redirect URL.
+        4. Set access and refresh tokens as secure HTTP-only cookies.
+        5. Return a success response with redirect information.
+
+    Authentication:
+        - No authentication required (public endpoint).
+        - Authentication is established after successful code verification.
+
+    Permissions:
+        - Open access.
+
+    Cookies:
+        - access_token:
+            * HTTP-only
+            * Secure
+            * SameSite=Strict
+        - refresh_token:
+            * HTTP-only
+            * Secure
+            * SameSite=Strict
+
+    Request Body:
+        {
+            "email": "user@example.com",
+            "code": "123456"
+        }
+
+    Responses:
+        200 OK:
+            {
+                "message": "Login successful",
+                "redirect_url": "/resolved/path/"
+            }
+
+        400 Bad Request:
+            - Invalid or expired reset code
+            - Missing required fields
+
+        404 Not Found:
+            - User or reset code not found
+
+    Role-Based Redirect Logic:
+        - Customer   → shop-list
+        - Admin      → vendors:panel
+        - Manager    → vendors:panel
+        - Operator   → vendors:panel
+
+    Security Considerations:
+        - Tokens are never exposed in the response body.
+        - Cookies are protected against XSS via HTTP-only flag.
+        - Secure flag enforces HTTPS-only transmission.
+
+    """
     serializer_class = VerifyCodeSerializer
     permission_classes = []
 

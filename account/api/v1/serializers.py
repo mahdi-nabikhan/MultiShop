@@ -288,9 +288,61 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class SendCodeSerializer(serializers.Serializer):
+    """
+    Serializer for validating email input when requesting a password reset code.
+
+    This serializer ensures that the provided email address is syntactically valid
+    and can be safely used to initiate the password reset flow. It is typically used
+    in endpoints responsible for sending verification or reset codes to users.
+
+    Fields:
+        email (EmailField):
+            - Required
+            - Must be a valid email address format
+
+    Usage:
+        - Validates incoming request data for password reset code requests.
+        - Acts as a lightweight validation layer without database interaction.
+
+    Validation Errors:
+        - Returns a validation error if the email field is missing or invalid.
+    """
     email = serializers.EmailField()
 
 class VerifyCodeSerializer(serializers.Serializer):
+    """
+    Serializer for validating a password reset verification code.
+
+    This serializer validates a 6-digit reset code against the
+    PasswordResetCode model. It ensures that the code exists and
+    has not expired. Upon successful validation, the related user
+    is attached to the serializer instance for downstream usage
+    (e.g. authentication or token generation).
+
+    Fields:
+        code (CharField):
+            - Required
+            - Maximum length: 6
+            - Represents the password reset verification code
+
+    Validation Logic:
+        - Verifies that the provided code exists in PasswordResetCode.
+        - Ensures the code has not expired.
+        - Raises a validation error for invalid or expired codes.
+
+    Side Effects:
+        - Sets `self.user` with the user associated to the valid reset code.
+          This allows views to access the authenticated user after validation
+          without performing additional database queries.
+
+    Validation Errors:
+        - "Invalid code": Code does not exist.
+        - "Code expired": Code exists but is no longer valid.
+
+    Usage:
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+    """
     code = serializers.CharField(max_length=6)
 
     def validate_code(self, value):

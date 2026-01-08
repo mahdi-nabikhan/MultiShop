@@ -68,6 +68,43 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class PasswordResetCode(models.Model):
+    """
+    Model for storing time-limited password reset verification codes.
+
+    This model represents a one-time password reset code associated with a user.
+    Each code is generated during the password reset flow and is valid only for
+    a short, predefined duration to enhance security.
+
+    Fields:
+        user (ForeignKey):
+            - Reference to the related User.
+            - Cascade deletion ensures cleanup when a user is removed.
+
+        code (CharField):
+            - 6-digit verification code.
+            - Used to confirm password reset requests.
+
+        created_at (DateTimeField):
+            - Timestamp indicating when the reset code was created.
+            - Automatically set at creation time.
+
+    Methods:
+        is_expired() -> bool:
+            Determines whether the reset code has expired.
+
+            Returns:
+                True  – if the code is older than the allowed time window.
+                False – if the code is still valid.
+
+    Expiration Policy:
+        - Reset codes are valid for 5 minutes from creation time.
+        - Expired codes must not be accepted for authentication or password reset.
+
+    Security Considerations:
+        - Codes should ideally be invalidated or deleted after successful use.
+        - Multiple active codes per user should be avoided or handled carefully
+          to prevent replay attacks.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
