@@ -7,6 +7,44 @@ from website.models import *
 
 
 class Customer(models.Model):
+    """
+    Model representing a Customer in the system.
+
+    Responsibilities
+    ----------------
+    - Links a Django User account to a Customer profile.
+    - Stores additional customer-specific information (e.g., username).
+    - Provides a flag to identify the instance as a Customer.
+
+    Fields
+    ------
+    user : OneToOneField(User)
+        - Each Customer is associated with exactly one User.
+        - on_delete=models.CASCADE ensures that deleting the User also deletes the Customer.
+    username : CharField(max_length=225, null=True, blank=True)
+        - Optional display name for the Customer.
+    is_customer : BooleanField(default=True)
+        - Flag to indicate this instance is a Customer (useful for role-based logic).
+
+    Methods
+    -------
+    __str__(self)
+        - Returns the email of the linked User for readable representation.
+
+    Usage
+    -----
+        # Creating a Customer
+        user = User.objects.create_user(email="user@example.com", password="password123")
+        customer = Customer.objects.create(user=user, username="JohnDoe")
+
+        # Accessing linked User
+        email = customer.user.email
+
+    Notes
+    -----
+    - This model is often used in conjunction with orders, addresses, comments, and ratings.
+    - Ensures a one-to-one relationship between User accounts and Customer profiles.
+    """
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     username = models.CharField(max_length=225,null=True,blank=True)
     is_customer = models.BooleanField(default=True)

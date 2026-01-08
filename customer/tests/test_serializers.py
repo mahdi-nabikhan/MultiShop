@@ -18,6 +18,54 @@ User = get_user_model()
 
 @pytest.mark.django_db
 class TestCustomerSerializers:
+    """
+Test suite for Customer-related serializers in API v1.
+
+This module contains unit tests to validate the behavior of serializers
+for Customer, Address, Comments, ProductRate, and CustomerDetail.
+
+Setup
+-----
+The `setup_data` fixture prepares the following objects for all tests:
+    - A User and associated Customer.
+    - A Category and a Store for product association.
+    - A Product linked to the Store and Category.
+    - An Order and OrderItem for testing product rating validation.
+
+Tests
+-----
+1. test_customer_register_serializer:
+    - Validates CustomerRegisterSerializer for creating a new Customer and nested User.
+    - Ensures username and email are correctly saved.
+
+2. test_address_serializer_create_and_representation:
+    - Validates AddressSerializer creation and to_representation method.
+    - Ensures that the customer is automatically assigned from request.user.
+    - Confirms that nested CustomerSerializer output is correct.
+
+3. test_comment_serializer_create_and_representation:
+    - Validates CommentSerializer creation and to_representation method.
+    - Ensures comment is associated with the correct Customer and Product.
+    - Checks that the default status is 'P'.
+    - Confirms nested user representation is correct.
+
+4. test_product_rate_serializer_validation_and_create:
+    - Validates ProductRateSerializer, ensuring only purchased products can be rated.
+    - Checks that rate value and product association are correctly saved.
+
+5. test_customer_detail_serializer:
+    - Validates CustomerDetailSerializer serialization.
+    - Confirms that username and user ID are correctly represented.
+
+General Notes
+-------------
+- All tests use `@pytest.mark.django_db` for database access.
+- `rf` (RequestFactory) is used to simulate requests where necessary for context.
+- Serializer context must include `request` (and `product` or `pk` when needed).
+- Tests ensure correct creation, validation, and serialization of nested fields.
+- Provides a foundation for testing additional edge cases, e.g., invalid input or missing context.
+"""
+
 
     @pytest.fixture
     def setup_data(self):

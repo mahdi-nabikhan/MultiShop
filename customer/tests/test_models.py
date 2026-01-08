@@ -7,6 +7,49 @@ from vendor.models import *
 
 @pytest.mark.django_db
 class TestCustomerModels:
+    """
+Test suite for Customer-related models: Customer, Address, and Comments.
+
+This module contains unit tests for validating the behavior and integrity of
+Customer, Address, and Comments models in the system.
+
+Tests included:
+
+1. TestCustomerModels.setup_data:
+    - Fixture to create initial test data for all tests.
+    - Creates a User and associated Customer.
+    - Creates a sample Category and Store for product association.
+    - Creates a sample Product.
+    - Creates a sample Address linked to the Customer.
+    - Returns a dictionary of created objects for use in tests.
+
+2. TestCustomerModels.test_customer_creation:
+    - Validates that a Customer instance is correctly created.
+    - Checks that `is_customer` flag is True.
+    - Confirms that username and associated user email are correct.
+
+3. TestCustomerModels.test_address_creation:
+    - Validates that an Address instance is correctly created.
+    - Confirms correct linkage to the Customer.
+    - Checks city and postal code fields.
+
+4. TestCustomerModels.test_comment_creation:
+    - Validates that a Comment instance is correctly created.
+    - Checks that comment is linked to the correct Customer and Product.
+    - Confirms that the default status is 'P' (Pending).
+
+5. TestCustomerModels.test_nested_comment:
+    - Validates nested comment functionality (parent/child relationship).
+    - Creates a parent comment and a child comment.
+    - Asserts that the child comment correctly references the parent.
+    - Confirms that the parent's content matches expectations.
+
+General Notes:
+- All tests run with database access (`@pytest.mark.django_db`).
+- Ensures model relationships, default field values, and data integrity.
+- Provides a foundation for testing additional edge cases in Customer, Address, and Comments models.
+- Fixtures improve reusability and reduce code duplication across tests.
+"""
 
     @pytest.fixture
     def setup_data(self):

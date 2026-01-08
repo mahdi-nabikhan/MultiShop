@@ -8,7 +8,61 @@ from vendor.models import Store, Manager
 
 @pytest.mark.django_db
 class TestCustomerAPI:
+    """
+    Test suite for Customer-related API endpoints.
 
+    This class contains integration tests for the main Customer API features,
+    including registration, address management, commenting, profile retrieval,
+    and rating eligibility for products.
+
+    Setup
+    -----
+    The `setup` fixture automatically runs before each test:
+        - Creates an authenticated User and associated Customer instance.
+        - Creates a sample Category and Store.
+        - Creates a sample Product linked to the Store and Category.
+        - Creates a sample Address linked to the Customer.
+
+    Tests
+    -----
+    test_customer_register_endpoint:
+        - Tests customer registration endpoint.
+        - Sends POST request with nested User data.
+        - Asserts response status code is 200 or 201.
+        - Checks that the response contains the 'user' field.
+
+    test_add_address:
+        - Tests the endpoint to add a new address for the authenticated customer.
+        - Sends POST request with address data.
+        - Asserts HTTP 201 Created status.
+        - Checks the success message in the response.
+
+    test_add_comment:
+        - Tests the endpoint to add a comment to a specific product.
+        - Sends POST request with comment description.
+        - Asserts HTTP 201 Created status.
+        - Checks that the comment description in the response matches input.
+
+    test_customer_detail:
+        - Tests the endpoint for retrieving authenticated customer's profile details.
+        - Sends GET request.
+        - Asserts HTTP 200 OK status.
+        - Checks that the returned username matches the setup customer.
+
+    test_can_rate_product:
+        - Tests whether a customer can rate a specific product.
+        - Creates an Order and OrderItem to simulate a purchased product.
+        - Sends GET request to check rating eligibility.
+        - Asserts HTTP 200 OK status.
+        - Checks that the 'can_rate' field is True.
+
+    Notes
+    -----
+    - All tests run with database access (`@pytest.mark.django_db`).
+    - APIClient is force-authenticated with the test user for endpoints requiring authentication.
+    - Tests ensure proper creation of related objects and validation of API responses.
+    - This suite can be expanded with additional tests for edge cases, e.g., invalid input or unauthorized access.
+    """
     @pytest.fixture(autouse=True)
     def setup(self):
         # ایجاد کاربر و مشتری
