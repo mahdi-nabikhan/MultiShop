@@ -3,6 +3,23 @@ from website.models import Product
 
 
 class CartSession:
+    """
+    Manage shopping cart using Django session.
+
+    This class allows adding, iterating, and deleting products in a cart
+    stored in the user's session.
+
+    Attributes:
+        session (SessionBase): Django session object from request.
+        cart (dict): Dictionary storing cart items with unique keys.
+
+    Methods:
+        add(product, quantity): Add a product to the cart or update quantity.
+        unique_id_generator(product_id): Generate a unique key for a product.
+        save(): Mark the session as modified to persist changes.
+        __iter__(): Iterate over cart items, attaching Product instances and total price.
+        delete(id): Remove a product from the cart by product ID.
+    """
     def __init__(self, request):
         self.session = request.session
         cart = self.session.get(CART_SESSION_ID)

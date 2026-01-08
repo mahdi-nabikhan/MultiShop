@@ -11,6 +11,34 @@ from order.api.v1.serializer import OrderSerializer, OrderItemSerializer, BillSe
 
 @pytest.mark.django_db
 class TestOrderSerializers:
+    """
+    Test suite for Order, OrderItem, and Bill serializers.
+
+    This suite covers:
+
+    1. OrderSerializer:
+       - Creating an Order instance.
+       - Ensuring the customer is set from the request context.
+       - Default status field is False.
+
+    2. OrderItemSerializer:
+       - Creating an OrderItem linked to an Order and Product.
+       - Verifies automatic calculation of total price (product.price * quantity).
+       - Ensures status is set to pending.
+       - Correct linkage to the provided Product.
+
+    3. BillSerializers:
+       - Creating a Bill linked to an Order and an Address.
+       - Ensures status is False by default.
+       - Checks the serialized representation includes nested Order details.
+
+    Notes:
+    ------
+    - All tests rely on the 'sample_data' fixture which provides:
+      Customer, Product, Order, Address, Manager, and Store instances.
+    - Decimal is used for monetary calculations to maintain precision.
+    - APIRequestFactory is used to simulate request context for serializers.
+    """
 
     @pytest.fixture
     def sample_data(self):

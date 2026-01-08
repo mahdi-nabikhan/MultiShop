@@ -9,6 +9,32 @@ from vendor.models import Manager
 
 @pytest.mark.django_db
 class TestOrderModels:
+    """
+    Test suite for Order, OrderItem, and Bill models.
+
+    This suite covers:
+
+    1. Order model:
+       - Creation of an Order instance.
+       - Default fields (status, created date) are correctly set.
+       - __str__ representation.
+
+    2. OrderItem model:
+       - Creation of OrderItem and automatic calculation of total price.
+       - get_total_price() method correctness.
+       - Saving an OrderItem updates total and status.
+
+    3. Bill model:
+       - Creation of a Bill linked to an Order and Customer address.
+       - Default status field correctness.
+       - __str__ representation.
+
+    Notes:
+    ------
+    - All tests rely on fixture 'sample_data' which provides a Customer, Product, and Address.
+    - Monetary fields are tested using Decimal for precision.
+    - Tests ensure the relationships between models (Order -> Customer, OrderItem -> Product, Bill -> Order) are correctly maintained.
+    """
 
     @pytest.fixture
     def sample_data(self):

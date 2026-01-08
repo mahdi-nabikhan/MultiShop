@@ -11,6 +11,40 @@ User = get_user_model()
 
 @pytest.mark.django_db
 class TestOrderViews:
+    """
+    Pytest test suite for Order-related API views.
+
+    This class covers all CRUD operations and key behaviors for the Order module, 
+    including:
+
+    1. OrderListApiView:
+       - POST: Create a new order for the authenticated customer.
+       - GET: List all orders for the authenticated customer.
+
+    2. OrderItem Views (OrderItemCreateApiView, OrderItemListAPIView, OrderItemDetailView):
+       - POST: Add products to an order.
+       - GET (list): Retrieve all order items for the current customer's active order.
+       - GET (detail): Retrieve details of a specific order item.
+       - PUT: Update order item quantity.
+       - DELETE: Remove an order item.
+
+    3. ShopOrderListApiView:
+       - GET: Retrieve all order items belonging to the store of the authenticated manager.
+
+    4. BillCreationApiView:
+       - POST: Create a bill associated with a specific order.
+
+    The tests use pytest fixtures to provide reusable sample data, including:
+    - Users, Manager, Store, Customer
+    - Category, Product
+    - Address
+
+    Each test verifies:
+    - Correct HTTP status codes
+    - Object creation and deletion
+    - Data consistency and relationships
+    - Updates to quantities and totals where relevant
+    """
 
     @pytest.fixture
     def setup_data(self):

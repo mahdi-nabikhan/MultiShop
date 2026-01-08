@@ -13,6 +13,35 @@ User = get_user_model()
 # Fixture آماده سازی داده‌ها
 @pytest.fixture
 def setup_data(db):
+    """
+    Fixture to set up initial test data for orders, customers, products, and stores.
+
+    Returns a dictionary containing:
+    --------------------------------
+    - 'user': User instance representing a test customer
+    - 'manager_user': User instance representing a test store manager
+    - 'customer': Customer instance linked to 'user'
+    - 'manager': Manager instance linked to 'manager_user'
+    - 'store': Store instance managed by 'manager'
+    - 'category': Product Category instance
+    - 'product': Product instance associated with 'store' and 'category'
+    - 'address': Address instance linked to 'customer'
+
+    Purpose:
+    --------
+    - Provides a consistent set of related objects for testing Order, OrderItem, and Bill API endpoints.
+    - Ensures there is at least one customer, one manager/store, one product, and one address available.
+    - Can be used in pytest test functions by passing `setup_data` as a parameter.
+
+    Example usage in a test:
+    ------------------------
+        def test_customer_order_creation(client, setup_data):
+            user = setup_data['user']
+            client.force_authenticate(user=user)
+            product = setup_data['product']
+            response = client.post(f'/api/v1/order/item/{product.id}/', {"quantity": 2})
+            assert response.status_code == 201
+    """
     # Users
     user = User.objects.create_user(email='test@gmail.com', password='pass12345')
     manager_user = User.objects.create_user(email='manager@gmail.com', password='pass12345')
@@ -51,6 +80,41 @@ def setup_data(db):
 
 @pytest.mark.django_db
 class TestOrderViews:
+    """
+    Test suite for Order, OrderItem, and Bill API endpoints.
+
+    These tests cover the following scenarios:
+
+    1. OrderListApiView (order-list)
+       - GET: List all orders for the authenticated customer.
+       - POST: Create a new order for the authenticated customer.
+
+    2. OrderItemCreateApiView / OrderItemApiView / OrderItemListAPIView (order-item-create, customer_order_item, order-item-list)
+       - POST: Add a product to an order (OrderItemCreateApiView).
+       - GET: List all active order items for the authenticated customer (OrderItemApiView).
+       - GET: List all items for a specific order (OrderItemListAPIView).
+
+    3. OrderItemDetailView (order_item_detail)
+       - GET: Retrieve a single order item.
+       - PUT/PATCH: Update quantity or details of an order item.
+       - DELETE: Remove an order item from the order.
+
+    4. ShopOrderListApiView (shop_order_item)
+       - GET: List all order items related to products managed by the authenticated store manager.
+
+    5. BillCreationApiView (bill-creation)
+       - POST: Create a bill for a specific order.
+
+    Notes
+    -----
+    - All endpoints require authentication.
+    - Fixtures (setup_data) provide pre-created users, customers, managers, store, products, and addresses.
+    - The tests simulate realistic API interactions:
+        - Customer creates orders and order items.
+        - Customer retrieves order item lists and details.
+        - Store manager views order items for managed products.
+        - Customers can create bills for completed orders.
+    """
 
     def test_order_list_create(self, setup_data):
         client = APIClient()
