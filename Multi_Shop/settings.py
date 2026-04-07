@@ -47,7 +47,10 @@ INSTALLED_APPS = [
 
     'drf_yasg',
     'rest_framework_simplejwt',
-    'axes'
+    'axes',
+    
+    'corsheaders'
+    
 
 ]
 
@@ -60,6 +63,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    
 
 ]
 
@@ -193,3 +198,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tehran'  
+
+
+
+CORS_ALLOW_ALL_ORIGINS = True
