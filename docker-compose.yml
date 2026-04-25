@@ -1,4 +1,4 @@
-version: '3.9'
+
 
 services:
   redis:
@@ -49,7 +49,7 @@ services:
     image: n8nio/n8n:latest
     container_name: n8n
     ports:
-      - "5678:4388"
+      - "8900:4388"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
@@ -71,7 +71,7 @@ services:
     ports:
       - "59200:9200"
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - esdata:/usr/share/elasticsearch/data 
   kibana:
     image: kibana:8.11.3
     container_name: kibana
@@ -88,9 +88,8 @@ services:
     ports:
       - "59202:5000"
     volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-    depends_on:
-      - elasticsearch
+      - ./logstash.conf:/usr/share/logstash/pipeline/
+      
 
 
 
