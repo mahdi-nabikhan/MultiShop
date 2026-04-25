@@ -9,6 +9,39 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch("http://localhost:59200")
 
 class RandomProductsApiView(APIView):
+    """
+    API view to return a random selection of products.
+
+    Responsibilities
+    ----------------
+    - GET: Retrieve 5 random products (or fewer if total products < 5).
+    - Caches the result for 300 seconds (5 minutes) to reduce database load.
+
+    Attributes
+    ----------
+    (No class-level attributes; caching uses a fixed key.)
+
+    Methods
+    -------
+    get(self, request)
+        - Handles GET requests.
+        - Tries to fetch cached data with key 'random_products_6'.
+        - If cache miss: collects all product IDs, selects up to 5 random ones,
+          retrieves the corresponding Product queryset, serializes with ProductSerializer,
+          stores in cache for 300 seconds.
+        - Returns serialized product data as JSON response.
+
+    Usage
+    -----
+        # Get random products
+        GET /api/v1/random-products/ -> returns list of up to 5 random products.
+
+    Notes
+    -----
+    - The cache key 'random_products_6' suggests a previous version or typo (maybe intended 5).
+    - If total products count is less than 5, returns all existing products (random.sample handles it).
+    - No authentication required.
+    """
     def get(self, request):
         cache_key = "random_products_6"
         products = cache.get(cache_key)
@@ -28,6 +61,46 @@ class RandomProductsApiView(APIView):
 
 
 class ProductsFilteringAPIView(ListAPIView):
+    """
+    API view to list products with optional sorting by price.
+
+    Responsibilities
+    ----------------
+    - GET: Return a list of all products, optionally ordered by price ascending or descending.
+
+    Attributes
+    ----------
+    serializer_class : ProductSerializer
+        - Serializer used to convert Product queryset to JSON.
+
+    Methods
+    -------
+    get_queryset(self)
+        - Returns a queryset of all products.
+        - Reads query parameter 'order' from request.GET.
+        - If order == 'price_asc': orders by price ascending.
+        - If order == 'price_dsc': orders by price descending.
+        - Otherwise returns default ordering (database order).
+        - Prints the resulting queryset to console for debugging.
+
+    Usage
+    -----
+        # List all products (default order)
+        GET /api/v1/products/
+
+        # List products sorted by price ascending
+        GET /api/v1/products/?order=price_asc
+
+        # List products sorted by price descending
+        GET /api/v1/products/?order=price_dsc
+
+    Notes
+    -----
+    - Inherits from ListAPIView, so pagination settings from DRF settings apply.
+    - No filtering other than ordering; returns all products.
+    - The print statement is for development logging.
+    """
+
     serializer_class=ProductSerializer
     
     
@@ -48,6 +121,52 @@ class ProductsFilteringAPIView(ListAPIView):
             
 
 class ProductSearchApi(APIView):
+    """
+    API view to search products using Elasticsearch with filters and boost.
+
+    Responsibilities
+    ----------------
+    - GET: Perform a full-text search on products using Elasticsearch.
+    - Supports optional filtering by category and store.
+    - Boosts matches on 'name' field (boost=3) over 'description' field.
+
+    Attributes
+    ----------
+    (Uses global `es` client instance.)
+
+    Methods
+    -------
+    get(self, request)
+        - Reads query parameters: 'q' (search term), 'category', 'store'.
+        - Builds an Elasticsearch bool query:
+            - 'must' filters: term filters for category and store (if provided).
+            - 'should' clauses: match query on 'name' with boost=3, and match on 'description'.
+        - Sends request to Elasticsearch index 'products_index'.
+        - Extracts hits, each containing '_id', '_score', and all _source fields.
+        - Returns list of hits as JSON response.
+
+    Usage
+    -----
+        # Basic search
+        GET /api/v1/search/?q=laptop
+
+        # Search within a category
+        GET /api/v1/search/?q=laptop&category=electronics
+
+        # Search with store filter
+        GET /api/v1/search/?q=laptop&store=123
+
+        # Combined filters
+        GET /api/v1/search/?q=laptop&category=electronics&store=456
+
+    Notes
+    -----
+    - Requires Elasticsearch running at "http://localhost:59200".
+    - Index name is hardcoded as 'products_index'.
+    - If no 'q' parameter is provided, the query still returns results? (Because 'q' is optional; should clause may be empty.) Actually must_filters may be empty, should clauses still run with empty query? It will match all documents? Behavior depends on ES. The code doesn't force 'q' to be required.
+    - No authentication required.
+    """
+
     def get(self, request):
         q = request.query_params.get("q", "")
         category = request.query_params.get("category")
@@ -86,6 +205,41 @@ class ProductSearchApi(APIView):
         return Response(hits)
     
 class AutoCompleteApi(APIView):
+    """
+    API view to provide autocomplete suggestions for product names.
+
+    Responsibilities
+    ----------------
+    - GET: Return a list of unique product names that match a prefix query (match_phrase_prefix) on the 'name_auto' field.
+
+    Attributes
+    ----------
+    (Uses global `es` client.)
+
+    Methods
+    -------
+    get(self, request)
+        - Reads query parameter 'q' (prefix string).
+        - Constructs Elasticsearch match_phrase_prefix query on field 'name_auto'.
+        - Executes the query on index 'products_index'.
+        - Extracts unique product names from the hits (using a set to deduplicate).
+        - Returns the list of suggestion strings as JSON response.
+
+    Usage
+    -----
+        # Get autocomplete suggestions starting with 'lap'
+        GET /api/v1/autocomplete/?q=lap -> ["laptop", "laptop bag", "lapel pin"]
+
+        # Empty query
+        GET /api/v1/autocomplete/?q= -> may return empty list or all names depending on ES.
+
+    Notes
+    -----
+    - Requires an Elasticsearch index with a 'name_auto' field analyzed for prefix matching (e.g., using edge_ngram tokenizer).
+    - Deduplicates names using set comprehension because multiple documents can have the same name.
+    - No pagination; returns all matching unique names up to the limit set by Elasticsearch's default size (usually 10).
+    - No authentication required.
+    """
     def get(self, request):
         q = request.query_params.get("q", "")
 
