@@ -287,8 +287,17 @@ class ProductListApiView(GenericAPIView):
         serializer = self.serializer_class(data=data,many=True,context={'request':requst})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
+class ProductDetailAPIView(GenericAPIView):
+    serializer_class = ProductSerializer
     
     
-
+    def get_queryset(self,pk):
+        return Product.objects.get(pk=pk)
+    
+    def get(self,request,pk):
+        data=self.get_queryset(pk)
+        serializer = self.serializer_class(data=data,many=True,context={'request':requst})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
         
         
