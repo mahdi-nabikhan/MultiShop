@@ -8,7 +8,7 @@ from rest_framework.generics import ListAPIView,GenericAPIView
 from elasticsearch import Elasticsearch
 es = Elasticsearch("http://localhost:59200")
 from vendor.models import Store
-from vendor.api.v1.serializers import StoreSerializer
+from vendor.api.v1.serializers import StoreSerializer,ProductSerializer
 from rest_framework import status
 class RandomProductsApiView(APIView):
     """
@@ -277,4 +277,18 @@ class ListStoreApiView(GenericAPIView):
     
     
     
+class ProductListApiView(GenericAPIView):
+    serializer_class =ProductSerializer
     
+    def get_queryset(self,pk):
+        return Product.objects.filter(store__pk=pk)
+    def get(self,requst,pk):
+        data = self.get_queryset(pk)
+        serializer = self.serializer_class(data=data,many=True,context={'request':requst})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    
+
+        
+        
