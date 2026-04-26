@@ -4,10 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView,GenericAPIView
 from elasticsearch import Elasticsearch
 es = Elasticsearch("http://localhost:59200")
-
+from vendor.models import Store
+from vendor.api.v1.serializers import StoreSerializer
+from rest_framework import status
 class RandomProductsApiView(APIView):
     """
     API view to return a random selection of products.
@@ -256,3 +258,23 @@ class AutoCompleteApi(APIView):
         suggestions = list({hit["_source"]["name"] for hit in results["hits"]["hits"]})
 
         return Response(suggestions)
+
+
+
+class ListStoreApiView(GenericAPIView):
+    queryset = Store.objects.all()
+    serializer_class = StoreSerializer
+    
+    
+    
+    def get(self,request):
+        serializer= self.serializer_class(data=self.queryset,many=True,context={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+
+    
+    
+    
+    
+    
