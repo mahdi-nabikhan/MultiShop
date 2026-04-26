@@ -9,4 +9,7 @@ urlpatterns=[
     path('product/filtering/',ProductsFilteringAPIView.as_view(),name='product_filter'),
     path("search/", ProductSearchApi.as_view(), name="product-search"),
     path("autocomplete/", AutoCompleteApi.as_view(), name="product-autocomplete"),
+    path('product/list/<int:pk>',ProductListApiView.as_view(),name='product-list'),
+    path('store/list',ListStoreApiView.as_view(),name='store-list'),
+    path('product/detail/<int:pk>',ProductDetailAPIView.as_view(),name='product-detail')
 ]

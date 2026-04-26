@@ -262,13 +262,14 @@ class AutoCompleteApi(APIView):
 
 
 class ListStoreApiView(GenericAPIView):
-    queryset = Store.objects.all()
+    queryset=Store.objects.all()
     serializer_class = StoreSerializer
     
     
     
     def get(self,request):
-        serializer= self.serializer_class(data=self.queryset,many=True,context={'request':request})
+        
+        serializer= self.serializer_class(instance=self.queryset,many=True,context={'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     
@@ -284,7 +285,7 @@ class ProductListApiView(GenericAPIView):
         return Product.objects.filter(store__pk=pk)
     def get(self,requst,pk):
         data = self.get_queryset(pk)
-        serializer = self.serializer_class(data=data,many=True,context={'request':requst})
+        serializer = self.serializer_class(instance=data,many=True,context={'request':requst})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 class ProductDetailAPIView(GenericAPIView):
@@ -296,7 +297,7 @@ class ProductDetailAPIView(GenericAPIView):
     
     def get(self,request,pk):
         data=self.get_queryset(pk)
-        serializer = self.serializer_class(data=data,many=True,context={'request':requst})
+        serializer = self.serializer_class(instance=data,context={'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
         
