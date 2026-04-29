@@ -10,12 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+BASE_DIR = Path(__file__).resolve().parent.parent  
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -52,8 +51,6 @@ INSTALLED_APPS = [
     'axes',
     
     'corsheaders'
-    
-
 ]
 
 MIDDLEWARE = [
@@ -66,8 +63,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    
-
 ]
 
 ROOT_URLCONF = 'Multi_Shop.urls'
@@ -75,8 +70,7 @@ ROOT_URLCONF = 'Multi_Shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -134,11 +128,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static'
+    BASE_DIR / 'static',  # اصلاح: بدون src/ چون پوشه static داخل src قرار دارد و volume آن را به /app/static نگاشت کرده
 ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -147,11 +142,9 @@ AUTH_USER_MODEL = 'account.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'account.authentications.CookieJWTAuthentication'
-
     ],
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle',
@@ -162,22 +155,18 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'login': '5/minute'
     },
-    
-
-
 }
 
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = 1             
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
 
-
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
     'django.contrib.auth.backends.ModelBackend',
     'account.authentications.CookieJWTAuthentication'
-
 ]
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -187,6 +176,7 @@ CACHES = {
         }
     }
 }
+
 EMAIL_HOST = "smtp4dev"
 EMAIL_PORT = 25
 EMAIL_USE_TLS = False
@@ -199,8 +189,6 @@ CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Tehran'  
-
-
+CELERY_TIMEZONE = 'Asia/Tehran'
 
 CORS_ALLOW_ALL_ORIGINS = True
