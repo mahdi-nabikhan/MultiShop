@@ -13,7 +13,7 @@ services:
     container_name: backend
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
-      - .:/app
+      - ./src:/app
     ports:
       - "8000:8000"
     environment:
@@ -43,7 +43,7 @@ services:
       - redis
       - backend
     volumes:
-      - .:/app
+      - ./src:/app
 
   n8n:
     image: n8nio/n8n:latest

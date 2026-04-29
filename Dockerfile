@@ -18,7 +18,7 @@ RUN pip install --upgrade pip && \
     rm -rf ~/.cache/pip
 
 
-COPY ./Multi_Shop /app
+COPY ./src /app
 
 
 EXPOSE 8000
