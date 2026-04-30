@@ -1,0 +1,113 @@
+{% extends "base/admin_panel_base.html" %}
+
+{% block content %}
+<h3>📦 Store Orders</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Product</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Total Price</th>
+            <th>Created</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="ordersTable">
+        <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+    </tbody>
+</table>
+
+<!-- ✅ Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Order Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label">Select Status:</label>
+                <select id="statusSelect" class="form-select">
+                    <option value="P">Pending</option>
+                    <option value="C">Confirmed</option>
+                </select>
+                <input type="hidden" id="orderItemId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-success" id="saveStatusBtn">Save ✅</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const tableBody = document.getElementById("ordersTable");
+
+    try {
+        const response = await fetch("/order/api/v1/shop/order/items/", {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!response.ok) throw new Error("Failed to load order items.");
+
+        const orderItems = await response.json();
+        tableBody.innerHTML = "";
+
+        if (orderItems.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No order items found</td></tr>`;
+            return;
+        }
+
+        orderItems.forEach((item, index) => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.product?.name || "-"}</td>
+                    <td>${item.order}</td>
+                    <td>${item.status === "P" ? "Pending ⏳" : "Confirmed ✅"}</td>
+                    <td>${item.total}</td>
+                    <td>${new Date(item.created).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" 
+                                onclick="openUpdateModal(${item.id}, '${item.status}')">
+                            Update
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${err.message}</td></tr>`;
+    }
+});
+
+function openUpdateModal(id, status) {
+    document.getElementById("orderItemId").value = id;
+    document.getElementById("statusSelect").value = status;
+    new bootstrap.Modal(document.getElementById("updateModal")).show();
+}
+
+document.getElementById("saveStatusBtn").addEventListener("click", async () => {
+    const id = document.getElementById("orderItemId").value;
+    const status = document.getElementById("statusSelect").value;
+
+    const response = await fetch(`/vendor/api/v1/update/orderitem/${id}/`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+    });
+
+    if (response.ok) location.reload();
+    else alert("Update failed ❌");
+});
+</script>
+{% endblock %}

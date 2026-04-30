@@ -1,0 +1,174 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>MultiShop - Online Shop Website Template</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="{% static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid">
+        <div class="row bg-secondary py-1 px-xl-5">
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="d-inline-flex align-items-center h-100">
+                    <span id="usernameDisplay">Guest</span>
+                    <a class="text-body mr-3" href="">Contact</a>
+                    <a class="text-body mr-3" href="">Help</a>
+                    <a class="text-body mr-3" href="#" id="orders-link">Orders</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="d-inline-flex align-items-center">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <button class="dropdown-item" type="button">Sign in</button>
+                            <button class="dropdown-item" type="button">Sign up</button>
+                        </div>
+                    </div>
+                    <div class="btn-group mx-2">
+                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">USD</button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <button class="dropdown-item" type="button">EUR</button>
+                            <button class="dropdown-item" type="button">GBP</button>
+                            <button class="dropdown-item" type="button">CAD</button>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">EN</button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <button class="dropdown-item" type="button">FR</button>
+                            <button class="dropdown-item" type="button">AR</button>
+                            <button class="dropdown-item" type="button">RU</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-inline-flex align-items-center d-block d-lg-none">
+                    <a href="" class="btn px-0 ml-2">
+                        <i class="fas fa-heart text-dark"></i>
+                        <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
+                    </a>
+                    <a href="" class="btn px-0 ml-2">
+                        <i class="fas fa-shopping-cart text-dark"></i>
+                        <span class="badge text-dark border border-dark rounded-circle" style="padding-bottom: 2px;">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- ... Navbar HTML ... -->
+    </div>
+
+    {% block content %}{% endblock content %}
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-secondary mt-5 pt-5">
+        <!-- ... Footer HTML ... -->
+    </div>
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+    <script src="{% static 'mail/contact.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- User Display & Logout (JWT HttpOnly Cookie) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            async function fetchProfile() {
+                try {
+                    const res = await fetch("{% url 'account:api/v1:profile' %}", {
+                        method: "GET",
+                        credentials: "include"  // 🔹 مهم برای ارسال کوکی
+                    });
+                    if (!res.ok) throw new Error("User not logged in");
+                    const data = await res.json();
+                    const usernameEl = document.getElementById("usernameDisplay");
+                    usernameEl.innerText = data.username || data.email;
+
+                    // Logout button
+                    const logoutBtn = document.createElement("button");
+                    logoutBtn.innerText = "Logout";
+                    logoutBtn.className = "btn btn-sm btn-danger ml-2";
+                    usernameEl.insertAdjacentElement("afterend", logoutBtn);
+
+                    logoutBtn.addEventListener("click", async () => {
+                        try {
+                            const resLogout = await fetch("{% url 'account:api/v1:logout' %}", {
+                                method: "POST",
+                                credentials: "include"
+                            });
+                            if (!resLogout.ok) throw new Error("Logout failed");
+                            window.location.reload();
+                        } catch(err) {
+                            console.error("Logout error:", err);
+                        }
+                    });
+
+                } catch (err) {
+                    console.log(err);
+                    document.getElementById("usernameDisplay").innerText = "Guest";
+                }
+            }
+
+            fetchProfile();
+        });
+    </script>
+<script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const ordersLink = document.getElementById("orders-link");
+        
+            ordersLink.addEventListener("click", async (e) => {
+                e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+        
+                try {
+                    // بررسی JWT / Session
+                    const res = await fetch("{% url 'account:api/v1:profile' %}", {
+                        method: "GET",
+                        credentials: "include" // ارسال کوکی HttpOnly
+                    });
+        
+                    if(res.ok){
+                        // کاربر لاگین است، بره به صفحه Orders که از session یا API پر شده
+                        window.location.href = "/order/customer/order/item/";
+                    } else {
+                        // کاربر لاگین نیست، بره صفحه login
+                        window.location.href = "{% url 'order:order-detail' %}";
+                    }
+                } catch(err){
+                    console.error(err);
+                    window.location.href = "{% url 'account:login' %}";
+                }
+            });
+        });
+</script>
+</body>
+</html>

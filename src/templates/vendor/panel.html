@@ -1,0 +1,80 @@
+{% extends "base/admin_panel_base.html" %}
+
+{% block content %}
+<h3>📦 All Products</h3>
+
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Price After Discount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="productTable"></tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+    async function loadProducts() {
+        try {
+            const response = await fetch("{% url 'vendors:api/v1:all-product-shop' %}", {
+                method: "GET",
+                credentials: "include",  // 🔹 JWT HttpOnly cookie
+                headers: { "Content-Type": "application/json" }
+            });
+
+            const tableBody = document.getElementById("productTable");
+            tableBody.innerHTML = "";
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-muted text-center">No products found</td></tr>`;
+                    return;
+                }
+
+                data.forEach((item, index) => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.name}</td>
+                            <td>${item.description}</td>
+                            <td>${item.quantity_in_stock}</td>
+                            <td>${item.price}</td>
+                            <td>${item.price_after || "-"}</td>
+                            <td>
+                                <a href="/vendor/product/detail?id=${item.id}" class="btn btn-sm btn-primary">
+                                    Details
+                                </a>
+            
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            } else if (response.status === 401) {
+                alert("Session expired. Please log in again.");
+                window.location.href = "{% url 'account:login' %}";
+            } else {
+                const errData = await response.json();
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-danger">${errData.detail || 'Failed to load products'}</td></tr>`;
+            }
+
+        } catch (err) {
+            console.error("Error fetching products:", err);
+            document.getElementById("productTable").innerHTML =
+                `<tr><td colspan="7" class="text-danger text-center">Error loading products</td></tr>`;
+        }
+    }
+
+    await loadProducts();
+});
+</script>
+{% endblock %}
