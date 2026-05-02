@@ -1,4 +1,4 @@
-# MultiShop — Multi-Vendor E-commerce Platform
+# MultiShop — Multi Shop E-commerce Platform
 
 ![MultiShop Banner](https://via.placeholder.com/1000x400?text=MultiShop+-+Multi+Vendor+Platform)
 
@@ -50,4 +50,18 @@ This project uses a hybrid approach:
 | Containerization | Docker, Docker Compose |
 | API Versioning | DRF URL versioning |
 
-## 📁 Project Structure
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+- Docker & Docker Compose
+- Python 3.10+
+- Node.js (for future React)
+- Make (optional)
+
+### Method 1: Docker (Recommended)
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/yourusername/multishop.git
+cd multishop
