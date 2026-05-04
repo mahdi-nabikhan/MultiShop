@@ -9,9 +9,11 @@ services:
     command: redis-server --save 60 1 --loglevel warning
 
   backend:
-    build: .
+    build: 
+      context : .
+      dockerfile: Dockerfile.backend
     container_name: backend
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["python", "backend/manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
       - ./src:/app
     ports:
@@ -37,13 +39,15 @@ services:
       - ServerOptions__HostName=smtp4dev
 
   worker:
-    build: .
+    build:
+      context : . 
+      dockerfile: Dockerfile.backend
     command: celery -A Multi_Shop worker --loglevel=info
     depends_on:
       - redis
       - backend
     volumes:
-      - ./src:/app
+      - ./src/backend:/app
 
   n8n:
     image: n8nio/n8n:latest
@@ -67,7 +71,7 @@ services:
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m  # برای سبک شدن
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m  
     ports:
       - "59200:9200"
     volumes:
