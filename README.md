@@ -1,55 +1,67 @@
-# AdvanceShop
+# MultiShop — Multi Shop E-commerce Platform
 
-[![Python Version](https://img.shields.io/badge/python-3.11+-blueviolet)](#) [![License](https://img.shields.io/badge/license-MIT-blue)](#)
+![MultiShop Banner](https://via.placeholder.com/1000x400?text=MultiShop+-+Multi+Vendor+Platform)
 
-> A modern and fully-featured **eCommerce platform** built with Django & Django REST Framework — combining API power with server-rendered templates for a complete shopping experience.
+A complete **multi-vendor e-commerce platform** where multiple shops can register and manage their own products, inventory, and customers — all under one umbrella.
 
----
+## 🏗 Architecture Overview
 
-## 🔎 Overview
-
-**AdvanceShop** is a scalable and modular eCommerce project designed for both learning and real-world deployment.  
-It provides APIs for user authentication, product management, cart and order handling, while also serving a front-end using Django Templates.
-
-This architecture allows easy integration with JavaScript front-ends (React, Vue, etc.) or mobile clients while maintaining full server-side functionality.
-
----
+This project uses a hybrid approach:
+- **Backend:** Django + Django REST Framework (DRF)
+- **Frontend (current):** Django Templates + Vanilla JavaScript (Fetch API)
+- **Frontend (future):** React.js (gradual migration planned)
+- **Task Queue:** Celery + Redis
+- **Search Engine:** Elasticsearch
+- **Email Orchestration:** n8n (workflow automation)
+- **Containerization:** Docker + Docker Compose
 
 ## ✨ Key Features
 
-- Full CRUD operations for users, products, carts, and orders  
-- Combined **Django Template + REST API** structure  
-- JWT-based authentication (if configured)  
-- PostgreSQL integration with Docker Compose  
-- Unit and integration tests with `pytest`  
-- Ready-to-use **Docker setup** for quick deployment  
-- Modular and extensible project layout  
+### Core Platform
+- 🏪 **Multi-vendor Support** — Each shop has its own admin panel
+- 👥 **JWT Authentication** — Secure login for shop owners and admins
+- 📦 **Product Management** — Each shop can add/edit/delete their own products
+- 🔍 **Advanced Filtering** — Filter products by category, price, shop, etc.
+- 📊 **Shop-specific Dashboards** — Separate admin panel per shop
 
----
+### Technical Features
+- 🐍 **Django AXE** — Enhanced security and vulnerability scanning
+- 🔐 **JWT Auth** — Token-based authentication
+- 📧 **Email Templates** — Beautiful email templates (HTML/CSS)
+- ⚡ **Celery** — Async email sending (non-blocking)
+- 🔌 **n8n Integration** — Email workflows and automation
+- 🎯 **Elasticsearch** — Fast, powerful product search
+- 🔄 **API Versioning** — Future-proof APIs (`/api/v1/`, `/api/v2/`)
+- 💾 **Session Management** — User sessions for hybrid rendering
+- 🐳 **Docker Ready** — Full containerization
 
-## 🧰 Tech Stack
+## 🛠 Tech Stack
 
-| Component | Technology |
-|------------|-------------|
-| Language | Python 3.11+ |
-| Framework | Django & Django REST Framework |
-| Database | PostgreSQL |
-| Testing | pytest |
-| Caching / Queue (optional) | Redis + Celery |
-| Containerization | Docker & Docker Compose |
-| Version Control | Git / GitHub |
+| Category | Technologies |
+|----------|--------------|
+| Backend | Django, Django REST Framework, Django AXE |
+| Frontend (current) | Django Templates, JavaScript (Fetch API), HTML5, CSS3 |
+| Frontend (future) | React.js |
+| Database | PostgreSQL / SQLite (configured) |
+| Search | Elasticsearch |
+| Task Queue | Celery, Redis |
+| Email Automation | n8n |
+| Auth | JWT (JSON Web Tokens) + Sessions |
+| Containerization | Docker, Docker Compose |
+| API Versioning | DRF URL versioning |
 
----
 
-## 🚀 Quick Start
+## 🚀 Installation & Setup
 
 ### Prerequisites
-- **Git**
-- **Docker & Docker Compose**
-- (Optional) Python 3.11 for local non-Docker execution
+- Docker & Docker Compose
+- Python 3.10+
+- Node.js (for future React)
+- Make (optional)
 
-### 1️⃣ Clone the repository
+### Method 1: Docker (Recommended)
 
+1. **Clone the repository:**
 ```bash
-git clone https://github.com/mahdi-nabikhan/AdvanceShop.git
-cd AdvanceShop
+git clone https://github.com/yourusername/multishop.git
+cd multishop
