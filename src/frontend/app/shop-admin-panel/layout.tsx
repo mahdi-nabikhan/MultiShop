@@ -1,7 +1,18 @@
-import React from 'react'
+import Navbar from "@/components/admin panel/Navbar/Navbar";
 
-export default function layout() {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+
   return (
-    <div>layout</div>
-  )
+    <>
+      <Navbar />
+
+      <main>
+        {children}
+      </main>
+    </>
+  );
 }
