@@ -1,5 +1,6 @@
 import Navbar from "@/components/admin panel/Navbar/Navbar";
-
+import Sidebar from "@/components/admin panel/Sidebar/Sidebar";
+import './layout.css'
 export default function AdminLayout({
   children,
 }: {
@@ -9,8 +10,8 @@ export default function AdminLayout({
   return (
     <>
       <Navbar />
-
-      <main>
+    <Sidebar/>
+      <main className="admin-content">
         {children}
       </main>
     </>
