@@ -1,9 +1,11 @@
-import React from 'react'
+import Topbar from "@/components/shop/Topbar/Topbar"
 
-function page() {
+export default function HomePage() {
   return (
-    <div>page</div>
-  )
-}
+    <>
+      <Topbar />
 
-export default page
+    
+    </>
+  );
+}

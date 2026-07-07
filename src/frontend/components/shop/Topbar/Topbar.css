@@ -1,0 +1,79 @@
+.hero{
+
+    width:min(1400px,90%);
+
+    margin:60px auto;
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:40px;
+
+    align-items:center;
+
+}
+
+.hero-image{
+
+    height:520px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+}
+
+.hero-image img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+.hero-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:25px;
+
+}
+
+.hero-content h1{
+
+    font-size:48px;
+
+    line-height:1.2;
+
+}
+
+.hero-content p{
+
+    color:var(--text-secondary);
+
+    line-height:1.8;
+
+}
+
+.hero-content button{
+
+    width:180px;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-size:16px;
+
+}
