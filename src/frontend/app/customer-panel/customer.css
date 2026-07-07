@@ -1,0 +1,11 @@
+.customer-content {
+
+    margin-left:280px;
+
+    padding:30px;
+
+    min-height:calc(100vh - 75px);
+
+    background:var(--background);
+
+}

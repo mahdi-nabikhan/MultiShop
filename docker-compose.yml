@@ -1,7 +1,6 @@
 
 
 services:
-
   db:
     image: postgres:17
     container_name: postgres-db
@@ -81,7 +80,7 @@ services:
       - redis
       - backend
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -91,7 +90,7 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data 
   kibana:
-    image: kibana:8.11.3
+    image: kibana:8.17.0
     container_name: kibana
     ports:
       - "59201:5601"
@@ -101,7 +100,7 @@ services:
       - elasticsearch
 
   logstash:
-    image: logstash:8.11.3
+    image: logstash:8.17.0
     container_name: logstash
     ports:
       - "59202:5000"
@@ -114,3 +113,6 @@ services:
 volumes:
   smtp4dev-data:
   esdata:
+  postgres_data:
+  elasticsearch_data:
+  

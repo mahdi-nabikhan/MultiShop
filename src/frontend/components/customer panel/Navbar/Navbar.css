@@ -1,0 +1,229 @@
+.customer-navbar {
+
+
+    width:100%;
+
+    height:75px;
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+
+    padding:0 40px;
+
+
+    background:
+
+    linear-gradient(
+        90deg,
+        var(--surface),
+        #172554
+    );
+
+
+    border-bottom:1px solid var(--border);
+
+}
+
+
+
+
+.customer-logo a {
+
+
+    font-size:26px;
+
+    font-weight:800;
+
+    color:var(--primary);
+
+    text-decoration:none;
+
+}
+
+
+
+
+.customer-links {
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:35px;
+
+}
+
+
+
+.customer-links a {
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+
+    color:var(--text-secondary);
+
+    text-decoration:none;
+
+
+    transition:.3s;
+
+}
+
+
+
+.customer-links a:hover {
+
+
+    color:var(--primary);
+
+}
+
+
+
+
+.customer-actions {
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+
+
+.notification-btn {
+
+
+    width:42px;
+
+    height:42px;
+
+
+    border-radius:50%;
+
+
+    border:1px solid var(--border);
+
+
+    background:var(--surface-light);
+
+
+    color:white;
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+}
+
+
+
+
+.customer-user {
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+
+
+.user-avatar {
+
+
+    width:42px;
+
+    height:42px;
+
+
+    border-radius:50%;
+
+
+    background:var(--primary);
+
+
+    color:white;
+
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+
+    font-weight:bold;
+
+}
+
+
+
+.customer-user div:last-child {
+
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+
+.customer-user span {
+
+
+    color:var(--text);
+
+    font-weight:600;
+
+}
+
+
+
+.customer-user small {
+
+
+    color:var(--text-muted);
+
+}
+
+
+
+
+.logout-btn {
+
+
+    border:none;
+
+
+    background:transparent;
+
+
+    color:var(--danger);
+
+
+    cursor:pointer;
+
+}
