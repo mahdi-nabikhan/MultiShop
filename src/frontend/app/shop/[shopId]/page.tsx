@@ -1,7 +1,18 @@
-import React from 'react'
+import ShopDetail from "@/components/shop/ShopDetail/ShopDetail";
 
-export default function page() {
+
+interface Props {
+  params: Promise<{
+    storeId: string;
+  }>;
+}
+
+export default async function StorePage({ params }: Props) {
+  const { storeId } = await params;
+
   return (
-    <div>page</div>
-  )
+    <>
+      <ShopDetail shopId={storeId} />
+    </>
+  );
 }

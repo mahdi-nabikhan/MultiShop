@@ -1,0 +1,41 @@
+.product-list {
+    margin: 70px auto;
+}
+
+.product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 35px;
+}
+
+.product-list-header h2 {
+    font-size: 30px;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.product-list-header p {
+    color: var(--text-muted);
+}
+
+.product-list-header span {
+    padding: 10px 18px;
+
+    background: var(--primary);
+    color: white;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.products-grid {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+
+    gap: 25px;
+}
