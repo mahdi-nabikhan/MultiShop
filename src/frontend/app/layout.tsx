@@ -1,7 +1,7 @@
-import "./globals.css";
 
-import Navbar from "@/components/shop/Navbar/Navbar";
-import Footer from "@/components/shop/Footer/Footer";
+
+
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -10,13 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <Navbar />
-
-        <main>{children}</main>
-
-        <Footer />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
