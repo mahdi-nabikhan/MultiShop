@@ -12,9 +12,9 @@ export default function page() {
           <div>
       <SectionHeader
         title='Shops'
-        subtitle="List Of All Shops On This Site"
+        description="List Of All Shops On This Site"
       />
-      {/* اینجا کارت‌های فروشگاه رو قرار بده */}
+      
     </div>
       <Footer/>
       </div>

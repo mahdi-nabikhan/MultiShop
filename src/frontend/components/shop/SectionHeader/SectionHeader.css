@@ -1,76 +1,51 @@
-/* components/SectionHeading.css */
-.section-heading {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+.section-header{
+
+    max-width:800px;
+
+    margin:70px auto 45px;
+
+    text-align:center;
+
 }
 
-.align-left {
-  text-align: left;
+.section-badge{
+
+    display:inline-block;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    background:rgba(59,130,246,.15);
+
+    color:#60a5fa;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    margin-bottom:18px;
+
 }
 
-.align-center {
-  text-align: center;
+.section-header h2{
+
+    color:white;
+
+    font-size:42px;
+
+    margin-bottom:18px;
+
+    font-weight:700;
+
 }
 
-.align-right {
-  text-align: right;
-}
+.section-header p{
 
-.heading-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+    color:#94a3b8;
 
-.align-center .heading-header {
-  justify-content: center;
-}
+    line-height:1.8;
 
-.align-right .heading-header {
-  justify-content: flex-end;
-}
+    font-size:17px;
 
-.heading-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 0;
-}
-
-@media (min-width: 768px) {
-  .heading-title {
-    font-size: 30px;
-  }
-}
-
-.line {
-  display: inline-block;
-  border-radius: 9999px;
-  flex-shrink: 0;
-}
-
-.line-vertical {
-  width: 4px;
-  height: 32px;
-}
-
-.line-horizontal {
-  display: block;
-  width: 64px;
-  height: 4px;
-  margin: 8px auto 0;
-}
-
-.heading-subtitle {
-  margin-top: 8px;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-@media (min-width: 768px) {
-  .heading-subtitle {
-    font-size: 16px;
-  }
 }
