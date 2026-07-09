@@ -6,7 +6,7 @@ services:
     container_name: postgres-db
     restart: always
     environment:
-      POSTGRES_DB: blog_db
+      POSTGRES_DB: multi_shop_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -26,9 +26,9 @@ services:
       context : .
       dockerfile:  docker/Dockerfile.backend
     container_name: backend
-    command: ["python", "backend/manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
-      - ./src:/app
+      - ./src/backend:/app
     ports:
       - "8000:8000"
     environment:
