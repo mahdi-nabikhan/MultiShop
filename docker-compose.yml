@@ -24,7 +24,7 @@ services:
   backend:
     build: 
       context : .
-      dockerfile: Dockerfile.backend
+      dockerfile:  docker/Dockerfile.backend
     container_name: backend
     command: ["python", "backend/manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
@@ -54,7 +54,7 @@ services:
   worker:
     build:
       context : . 
-      dockerfile: Dockerfile.backend
+      dockerfile:  docker/Dockerfile.backend
     command: celery -A Multi_Shop worker --loglevel=info
     depends_on:
       - redis
