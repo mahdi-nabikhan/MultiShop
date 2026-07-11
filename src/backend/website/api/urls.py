@@ -11,5 +11,6 @@ urlpatterns=[
     path("autocomplete/", AutoCompleteApi.as_view(), name="product-autocomplete"),
     path('product/list/<int:pk>',ProductListApiView.as_view(),name='product-list'),
     path('store/list',ListStoreApiView.as_view(),name='store-list'),
-    path('product/detail/<int:pk>',ProductDetailAPIView.as_view(),name='product-detail')
+    path('product/detail/<int:pk>',ProductDetailAPIView.as_view(),name='product-detail'),
+    path('store/detail/<int:pk>',StoreDetailApiView.as_view(),name='store-detail')
 ]
