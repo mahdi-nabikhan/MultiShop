@@ -1,4 +1,5 @@
 import Image from "next/image";
+import BACKEND_URLS from "@/utils";
 import {
     Star,
     MapPin,
@@ -9,158 +10,134 @@ import {
 } from "lucide-react";
 
 import "./ShopDetail.css";
+import axios from "axios";
+import { number } from "framer-motion";
 
 interface ShopProps {
 
     shopId: string;
 
 }
+interface IStoreAddress {
+  state: string;
+  street: string;
+}
 
-export default function ShopDetail({
+export interface IGetStoreData {
+  pk: number;
+  image: string | null;
+  description: string;
+  name: string;
+  address: IStoreAddress;
+}
+export default async function ShopDetail({
     shopId,
 }: ShopProps) {
 
-    // بعداً اطلاعات از API میاد
-    const shop = {
 
-        id: shopId,
 
-        name: "Tech World",
-
-        description:
-            "Professional electronics store with thousands of products.",
-
-        address: "Tehran",
-
-        phone: "09121234567",
-
-        rating: 4.9,
-
-        totalProducts: 125,
-
-        logo: "/images/store-logo.jpg",
-
-        cover: "/images/store-cover.jpg",
-
-    };
+    const {data:shop} = await axios.get<IGetStoreData>(
+        `${BACKEND_URLS}website/api/v1/store/detail/${shopId}`
+      );
 
     return (
+        <section className="store-page">
 
-        <section className="shop-detail">
+    <div className="container">
 
-            <div className="cover">
+        <div className="store-wrapper">
+
+            <div className="store-logo">
 
                 <Image
-                    src={shop.cover}
-                    alt="cover"
-                    fill
-                    className="cover-image"
+                    src={shop.image ?? "/images/default-store.jpg"}
+                    alt={shop.name}
+                    width={170}
+                    height={170}
                 />
 
             </div>
 
+            <div className="store-content">
 
-            <div className="shop-card container">
+                <div className="store-header">
 
-                <div className="shop-logo">
+                    <div>
 
-                    <Image
-                        src={shop.logo}
-                        alt={shop.name}
-                        width={140}
-                        height={140}
-                    />
+                        <span className="store-badge">
+                            <BadgeCheck size={16}/>
+                            Verified Store
+                        </span>
+
+                        <h1>{shop.name}</h1>
+
+                        <p>
+                            {shop.description}
+                        </p>
+
+                    </div>
+
+                    <div className="store-buttons">
+
+                        <button className="btn-primary">
+                            Follow Store
+                        </button>
+
+                        <button className="btn-secondary">
+                            View Products
+                        </button>
+
+                    </div>
 
                 </div>
 
+                <div className="store-info">
 
-                <div className="shop-info">
+                    <div className="info-card">
 
-                    <h1>{shop.name}</h1>
-
-                    <div className="rating">
-
-                        <Star
-                            size={18}
-                            fill="#FFD700"
-                            stroke="#FFD700"
-                        />
-
-                        <span>{shop.rating}</span>
-
-                    </div>
-
-
-                    <p>
-
-                        {shop.description}
-
-                    </p>
-
-
-                    <div className="shop-meta">
+                        <MapPin size={22}/>
 
                         <div>
 
-                            <Store size={18} />
+                            <span>Location</span>
 
-                            Multi Vendor Shop
+                            <strong>
 
-                        </div>
+                                {shop.address.state},
+                                {" "}
+                                {shop.address.street}
 
-
-                        <div>
-
-                            <BadgeCheck size={18} />
-
-                            Verified Seller
-
-                        </div>
-
-
-                        <div>
-
-                            <MapPin size={18} />
-
-                            {shop.address}
-
-                        </div>
-
-
-                        <div>
-
-                            <Phone size={18} />
-
-                            {shop.phone}
-
-                        </div>
-
-
-                        <div>
-
-                            <Package size={18} />
-
-                            {shop.totalProducts} Products
+                            </strong>
 
                         </div>
 
                     </div>
 
+                    <div className="info-card">
 
-                    <div className="buttons">
+                        <Package size={22}/>
 
-                        <button className="follow">
+                        <div>
 
-                            Follow Store
+                            <span>Products</span>
 
-                        </button>
+                            <strong>124</strong>
 
+                        </div>
 
-                        <button className="contact">
+                    </div>
 
-                            Contact
+                    <div className="info-card">
 
-                        </button>
+                        <Star size={22}/>
+
+                        <div>
+
+                            <span>Rating</span>
+
+                            <strong>4.9 / 5</strong>
+
+                        </div>
 
                     </div>
 
@@ -168,7 +145,13 @@ export default function ShopDetail({
 
             </div>
 
-        </section>
+        </div>
+
+    </div>
+
+</section>
+
+
 
     );
 

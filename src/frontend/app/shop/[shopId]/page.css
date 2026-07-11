@@ -1,0 +1,23 @@
+.store-page{
+
+    width:100%;
+
+    min-height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:50px;
+
+    padding-top:10px;
+
+    padding-bottom:80px;
+
+}
+
+.products-section{
+
+    margin-top:20px;
+
+}

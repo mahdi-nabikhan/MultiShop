@@ -3,18 +3,23 @@ import ProductList from "@/components/shop/ProductList/ProductList";
 
 interface Props {
   params: Promise<{
-    storeId: string;
+    shopId: string;
   }>;
 }
 
 export default async function StorePage({ params }: Props) {
-  const { storeId } = await params;
+  const { shopId } = await params;
 
   return (
     <>
-      <ShopDetail shopId={storeId} />
+      
+      <ShopDetail shopId={shopId} />
 
-      <ProductList shopId={storeId} />
+     
+
+        <ProductList shopId={shopId} />
+
+  
     </>
   );
 }

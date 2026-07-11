@@ -1,6 +1,6 @@
 import Navbar from "@/components/shop/Navbar/Navbar";
 import Footer from "@/components/shop/Footer/Footer";
-
+import './custom.css'
 
 
 export default function StoreLayout({
