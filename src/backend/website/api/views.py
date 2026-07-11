@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView, GenericAPIView
+from vendor.permissions import IsStoreOwner
 from elasticsearch import Elasticsearch
 es = Elasticsearch("http://localhost:59200")
 
@@ -275,7 +276,7 @@ class ListStoreApiView(GenericAPIView):
 
 class ProductListApiView(GenericAPIView):
     serializer_class = ProductSerializer
-
+   
     def get_queryset(self, pk):
         return Product.objects.filter(store__pk=pk)
 
@@ -308,11 +309,11 @@ class StoreDetailApiView(GenericAPIView):
     def get(self, request, pk):
         data = self.get_queryset(pk=pk)
         serializer = self.serializer_class(
-            isinstance=data, context={'request', request})
+            instance=data, context={"request", request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
-        data = self.get_queryset(pk)
+        data = self.get_queryset(pk=pk)
         data.delete()
         return Response({'msg': 'store successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
 
@@ -320,7 +321,7 @@ class StoreDetailApiView(GenericAPIView):
         obj = self.get_queryset(pk=pk)
         data = request.data
         serilaizer = self.serializer_class(
-            isinstance=obj, data=data, contex={'request': request})
+            instance=obj, data=data, contex={"request": request})
         if serilaizer.is_valid():
             serilaizer.save()
             return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
@@ -330,8 +331,8 @@ class StoreDetailApiView(GenericAPIView):
     def patch(self, request, pk):
         obj = self.get_queryset(pk=pk)
         data = request.data
-        serilaizer = self.serializer_class(isinstance=obj, data=data, contex={
-                                           'request': request}, partial=True)
+        serilaizer = self.serializer_class(instance=obj, data=data, contex={
+                                           "request": request}, partial=True)
         if serilaizer.is_valid():
             serilaizer.save()
             return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
