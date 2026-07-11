@@ -265,6 +265,30 @@ class AutoCompleteApi(APIView):
 
 
 class ListStoreApiView(GenericAPIView):
+    """
+    API endpoint for retrieving the list of all available stores.
+
+    This endpoint returns a serialized collection of every registered store
+    in the system. Each store includes its public information such as
+    name, description, image, and other fields defined in the
+    StoreSerializer.
+
+    Methods:
+        GET:
+            Returns a list of all stores.
+
+    Response:
+        200 OK:
+            [
+                {
+                    "pk": 1,
+                    "name": "Store Name",
+                    "description": "Store description",
+                    "image": "http://example.com/media/store/image.jpg",
+                    ...
+                }
+            ]
+    """
     serializer_class = StoreSerializer
 
     def get(self, request):
@@ -275,6 +299,38 @@ class ListStoreApiView(GenericAPIView):
 
 
 class ProductListApiView(GenericAPIView):
+    """
+    API endpoint for retrieving all products belonging to a specific store.
+
+    This endpoint returns a list of products associated with the provided
+    store ID. Each product is serialized using the ProductSerializer and
+    includes its public information such as name, price, image, stock,
+    and other exposed fields.
+
+    URL Parameters:
+        pk (int):
+            The primary key of the target store.
+
+    Methods:
+        GET:
+            Returns all products for the specified store.
+
+    Response:
+        200 OK:
+            [
+                {
+                    "pk": 1,
+                    "name": "Gaming Mouse",
+                    "price": 1200000,
+                    "image": "http://example.com/media/products/mouse.jpg",
+                    ...
+                }
+            ]
+
+        404 Not Found:
+            Returned if the requested store does not exist (if such validation
+            is implemented).
+    """
     serializer_class = ProductSerializer
    
     def get_queryset(self, pk):
@@ -288,6 +344,35 @@ class ProductListApiView(GenericAPIView):
 
 
 class ProductDetailAPIView(GenericAPIView):
+    """
+    API endpoint for retrieving the details of a single product.
+
+    This endpoint returns the complete public information of a specific
+    product identified by its primary key. The response is serialized
+    using the ProductSerializer.
+
+    URL Parameters:
+        pk (int):
+            The primary key of the requested product.
+
+    Methods:
+        GET:
+            Returns the details of the specified product.
+
+    Response:
+        200 OK:
+            {
+                "pk": 1,
+                "name": "Gaming Mouse",
+                "description": "High precision wireless gaming mouse.",
+                "price": 1200000,
+                "image": "http://example.com/media/products/mouse.jpg",
+                ...
+            }
+
+        404 Not Found:
+            Returned when the requested product does not exist.
+    """
     serializer_class = ProductSerializer
 
     def get_queryset(self, pk):
@@ -301,6 +386,39 @@ class ProductDetailAPIView(GenericAPIView):
 
 
 class StoreDetailApiView(GenericAPIView):
+    """
+    API endpoint for retrieving the details of a specific store.
+
+    This endpoint returns the complete public information of a store
+    identified by its primary key. In addition to the fields provided
+    by the StoreSerializer, the response includes the store's address
+    serialized using the StoreAddressSerializer.
+
+    URL Parameters:
+        pk (int):
+            The primary key of the requested store.
+
+    Methods:
+        GET:
+            Returns the details of the specified store along with its
+            associated address.
+
+    Response:
+        200 OK:
+            {
+                "pk": 1,
+                "name": "Tech Store",
+                "description": "Electronics and accessories",
+                "image": "http://example.com/media/store/logo.jpg",
+                "address": {
+                    "state": "Tehran",
+                    "street": "Valiasr Street"
+                }
+            }
+
+        404 Not Found:
+            Returned when the requested store or its address does not exist.
+    """
     serializer_class = StoreSerializer
 
     def get_queryset(self, pk):
