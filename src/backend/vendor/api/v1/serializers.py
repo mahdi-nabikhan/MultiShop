@@ -19,7 +19,7 @@ class StoreAddressSerializer(serializers.ModelSerializer):
 class StoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
-        fields = ['image', 'description', 'name']
+        fields = ['pk','image', 'description', 'name']
 
 
 class ManagerSerializer(serializers.ModelSerializer):

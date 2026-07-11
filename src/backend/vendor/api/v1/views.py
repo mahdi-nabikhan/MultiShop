@@ -3,7 +3,8 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import status
 from .serializers import *
 from rest_framework.authtoken.models import Token
-
+from ...permissions import IsStoreOwner
+from .serializers import StoreSerializer
 
 class ManagerRegisterAPIView(GenericAPIView):
     """
@@ -642,3 +643,46 @@ class OrderItemUpdateStatusApiView(GenericAPIView):
         
 
 
+class StoreDetailAndDelete(GenericAPIView):
+    permission_classes=(IsStoreOwner,)
+    serializer_class = StoreSerializer
+    
+    
+    
+      
+
+    def get_queryset(self):
+        return Store.objects.get(manager__user= self.request.user)
+
+    def get(self, request):
+        data = self.get_queryset()
+        serializer = self.serializer_class(
+            instance=data, context={"request", request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request):
+        data = self.get_queryset()
+        data.delete()
+        return Response({'msg': 'store successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+    def put(self, request):
+        obj = self.get_queryset()
+        data = request.data
+        serilaizer = self.serializer_class(
+            instance=obj, data=data, contex={"request": request})
+        if serilaizer.is_valid():
+            serilaizer.save()
+            return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request):
+        obj = self.get_queryset()
+        data = request.data
+        serilaizer = self.serializer_class(instance=obj, data=data, contex={
+                                           "request": request}, partial=True)
+        if serilaizer.is_valid():
+            serilaizer.save()
+            return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)

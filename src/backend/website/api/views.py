@@ -1,15 +1,18 @@
+from vendor.api.v1.serializers import StoreSerializer, ProductSerializer,StoreAddressSerializer
+from rest_framework import status
+from vendor.models import Store,ShopAddress
 import random
 from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
-from rest_framework.generics import ListAPIView,GenericAPIView
+from rest_framework.generics import ListAPIView, GenericAPIView
+
 from elasticsearch import Elasticsearch
 es = Elasticsearch("http://localhost:59200")
-from vendor.models import Store
-from vendor.api.v1.serializers import StoreSerializer,ProductSerializer
-from rest_framework import status
+
+
 class RandomProductsApiView(APIView):
     """
     API view to return a random selection of products.
@@ -44,20 +47,21 @@ class RandomProductsApiView(APIView):
     - If total products count is less than 5, returns all existing products (random.sample handles it).
     - No authentication required.
     """
+
     def get(self, request):
         cache_key = "random_products_6"
         products = cache.get(cache_key)
 
         if not products:
-            
+
             product_ids = list(Product.objects.values_list("id", flat=True))
             random_ids = random.sample(product_ids, min(5, len(product_ids)))
 
             queryset = Product.objects.filter(id__in=random_ids)
             serializer = ProductSerializer(queryset, many=True)
 
-            products = serializer.data  
-            cache.set(cache_key, products, timeout=300)  
+            products = serializer.data
+            cache.set(cache_key, products, timeout=300)
 
         return Response(products)
 
@@ -103,24 +107,21 @@ class ProductsFilteringAPIView(ListAPIView):
     - The print statement is for development logging.
     """
 
-    serializer_class=ProductSerializer
-    
-    
-    
+    serializer_class = ProductSerializer
+
     def get_queryset(self):
-        query_set=Product.objects.all()
-        order_param=self.request.GET.get('order')
-        
+        query_set = Product.objects.all()
+        order_param = self.request.GET.get('order')
+
         if order_param == 'price_asc':
-            query_set=query_set.order_by('price')
-            print('this is ',query_set)
-            
+            query_set = query_set.order_by('price')
+            print('this is ', query_set)
+
         elif order_param == 'price_dsc':
-            query_set=query_set.order_by('-price')
-            print('this is ',query_set)
+            query_set = query_set.order_by('-price')
+            print('this is ', query_set)
         return query_set
-            
-            
+
 
 class ProductSearchApi(APIView):
     """
@@ -186,8 +187,8 @@ class ProductSearchApi(APIView):
                 "bool": {
                     "must": must_filters,
                     "should": [
-                        { "match": { "name": { "query": q, "boost": 3 } } },
-                        { "match": { "description": { "query": q } } }
+                        {"match": {"name": {"query": q, "boost": 3}}},
+                        {"match": {"description": {"query": q}}}
                     ]
                 }
             }
@@ -205,7 +206,8 @@ class ProductSearchApi(APIView):
         ]
 
         return Response(hits)
-    
+
+
 class AutoCompleteApi(APIView):
     """
     API view to provide autocomplete suggestions for product names.
@@ -242,6 +244,7 @@ class AutoCompleteApi(APIView):
     - No pagination; returns all matching unique names up to the limit set by Elasticsearch's default size (usually 10).
     - No authentication required.
     """
+
     def get(self, request):
         q = request.query_params.get("q", "")
 
@@ -255,50 +258,61 @@ class AutoCompleteApi(APIView):
 
         results = es.search(index="products_index", body=body)
 
-        suggestions = list({hit["_source"]["name"] for hit in results["hits"]["hits"]})
+        suggestions = list({hit["_source"]["name"]
+                           for hit in results["hits"]["hits"]})
 
         return Response(suggestions)
 
 
-
 class ListStoreApiView(GenericAPIView):
-    queryset=Store.objects.all()
     serializer_class = StoreSerializer
-    
-    
-    
-    def get(self,request):
-        
-        serializer= self.serializer_class(instance=self.queryset,many=True,context={'request':request})
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-    
 
-    
-    
-    
-    
+    def get(self, request):
+        data = Store.objects.all()
+        serializer = self.serializer_class(
+            instance=data, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class ProductListApiView(GenericAPIView):
-    serializer_class =ProductSerializer
-    
-    def get_queryset(self,pk):
+    serializer_class = ProductSerializer
+   
+    def get_queryset(self, pk):
         return Product.objects.filter(store__pk=pk)
-    def get(self,requst,pk):
+
+    def get(self, requst, pk):
         data = self.get_queryset(pk)
-        serializer = self.serializer_class(instance=data,many=True,context={'request':requst})
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
+        serializer = self.serializer_class(
+            instance=data, many=True, context={'request': requst})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class ProductDetailAPIView(GenericAPIView):
     serializer_class = ProductSerializer
-    
-    
-    def get_queryset(self,pk):
+
+    def get_queryset(self, pk):
         return Product.objects.get(pk=pk)
-    
-    def get(self,request,pk):
-        data=self.get_queryset(pk)
-        serializer = self.serializer_class(instance=data,context={'request':request})
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-        
-        
+
+    def get(self, request, pk):
+        data = self.get_queryset(pk)
+        serializer = self.serializer_class(
+            instance=data, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class StoreDetailApiView(GenericAPIView):
+    serializer_class = StoreSerializer
+
+    def get_queryset(self, pk):
+        return Store.objects.get(pk=pk)
+
+    def get(self, request, pk):
+        data = self.get_queryset(pk=pk)
+        address = ShopAddress.objects.get(store__pk=pk)
+        serializer = self.serializer_class(
+            instance=data, context={"request", request})
+        response_data = serializer.data
+        response_data["address"] = StoreAddressSerializer(address).data
+        return Response(response_data, status=status.HTTP_200_OK)
+
+

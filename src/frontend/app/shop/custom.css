@@ -1,0 +1,7 @@
+.customer-content {
+    margin-left:280px;
+    padding:0 30px 30px;
+    min-height:calc(100vh - 75px);
+    background:var(--background);
+
+}

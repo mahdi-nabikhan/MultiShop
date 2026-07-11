@@ -260,13 +260,13 @@ class CustomeObtainPairView(TokenObtainPairView):
 
             redirect_url = None
             if Customer.objects.filter(user=user).exists():
-                redirect_url = reverse('shop-list')
+                redirect_url = 'shop_list'
             elif Admin.objects.filter(user=user).exists():
-                redirect_url = reverse('vendors:panel')
+                redirect_url = 'panel'
             elif Manager.objects.filter(user=user).exists():
-                redirect_url = reverse('vendors:panel')
+                redirect_url = 'panel'
             elif Operator.objects.filter(user=user).exists():
-                redirect_url = reverse('vendors:panel')
+                redirect_url = 'panel'
 
             response = Response({
                 'user_id': user.id,
