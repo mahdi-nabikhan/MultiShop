@@ -1,6 +1,6 @@
-from vendor.api.v1.serializers import StoreSerializer, ProductSerializer
+from vendor.api.v1.serializers import StoreSerializer, ProductSerializer,StoreAddressSerializer
 from rest_framework import status
-from vendor.models import Store
+from vendor.models import Store,ShopAddress
 import random
 from django.core.cache import cache
 from rest_framework.views import APIView
@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView, GenericAPIView
-from vendor.permissions import IsStoreOwner
+
 from elasticsearch import Elasticsearch
 es = Elasticsearch("http://localhost:59200")
 
@@ -308,8 +308,11 @@ class StoreDetailApiView(GenericAPIView):
 
     def get(self, request, pk):
         data = self.get_queryset(pk=pk)
+        address = ShopAddress.objects.get(store__pk=pk)
         serializer = self.serializer_class(
             instance=data, context={"request", request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = serializer.data
+        response_data["address"] = StoreAddressSerializer(address).data
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
