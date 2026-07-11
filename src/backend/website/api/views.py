@@ -262,14 +262,10 @@ class AutoCompleteApi(APIView):
 
 
 class ListStoreApiView(GenericAPIView):
-    queryset=Store.objects.all()
     serializer_class = StoreSerializer
-    
-    
-    
     def get(self,request):
-        
-        serializer= self.serializer_class(instance=self.queryset,many=True,context={'request':request})
+        data= Store.objects.all()
+        serializer= self.serializer_class(instance=data,many=True,context={'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     
