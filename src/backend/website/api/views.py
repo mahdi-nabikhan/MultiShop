@@ -312,29 +312,4 @@ class StoreDetailApiView(GenericAPIView):
             instance=data, context={"request", request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self, request, pk):
-        data = self.get_queryset(pk=pk)
-        data.delete()
-        return Response({'msg': 'store successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
 
-    def put(self, request, pk):
-        obj = self.get_queryset(pk=pk)
-        data = request.data
-        serilaizer = self.serializer_class(
-            instance=obj, data=data, contex={"request": request})
-        if serilaizer.is_valid():
-            serilaizer.save()
-            return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)
-
-    def patch(self, request, pk):
-        obj = self.get_queryset(pk=pk)
-        data = request.data
-        serilaizer = self.serializer_class(instance=obj, data=data, contex={
-                                           "request": request}, partial=True)
-        if serilaizer.is_valid():
-            serilaizer.save()
-            return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)
