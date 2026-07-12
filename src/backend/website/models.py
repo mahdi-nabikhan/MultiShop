@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from elasticsearch import Elasticsearch
 
 
-es = Elasticsearch("http://localhost:59200")
+
 # Create your models here.
 class Category(models.Model):
     """
