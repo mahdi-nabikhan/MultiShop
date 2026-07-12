@@ -1,11 +1,13 @@
+import axios from "axios";
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
+import BACKEND_URLS from "@/utils";
 
 interface ProductListProps {
   shopId: string;
 }
 
-export default function ProductList({ shopId }: ProductListProps) {
+export default async function ProductList({ shopId }: ProductListProps) {
   // بعداً از API دریافت می‌شود
   const products = [
     {
@@ -37,6 +39,7 @@ export default function ProductList({ shopId }: ProductListProps) {
       stock: 8,
     },
   ];
+  const {data} =  await axios(`${BACKEND_URLS}website/api/v1/product/list/${shopId}`)
 
   return (
     <section className="product-list container">
