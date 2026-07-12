@@ -7,40 +7,25 @@ interface ProductListProps {
   shopId: string;
 }
 
-export default async function ProductList({ shopId }: ProductListProps) {
-  // بعداً از API دریافت می‌شود
-  const products = [
-    {
-      id: 1,
-      name: "iPhone 16 Pro",
-      price: 1200,
-      image: "/images/products/iphone.jpg",
-      stock: 12,
-    },
-    {
-      id: 2,
-      name: "MacBook Pro M4",
-      price: 2400,
-      image: "/images/products/macbook.jpg",
-      stock: 5,
-    },
-    {
-      id: 3,
-      name: "AirPods Pro",
-      price: 280,
-      image: "/images/products/airpods.jpg",
-      stock: 30,
-    },
-    {
-      id: 4,
-      name: "Apple Watch",
-      price: 450,
-      image: "/images/products/watch.jpg",
-      stock: 8,
-    },
-  ];
-  const {data} =  await axios(`${BACKEND_URLS}website/api/v1/product/list/${shopId}`)
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  quantity_in_stock: number;
+  price: number;
+  price_after: number;
+  image: string | null;
+  category: number;
+  store: number;
+  
+}
 
+export default async function ProductList({ shopId }: ProductListProps) {
+
+
+  const { data: products } = await axios.get<Product[]>(
+    `${BACKEND_URLS}website/api/v1/product/list/${shopId}`
+  );
   return (
     <section className="product-list container">
       <div className="product-list-header">

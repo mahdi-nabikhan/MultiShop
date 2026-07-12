@@ -5,12 +5,16 @@ import { Star, ShoppingCart } from "lucide-react";
 
 import "./ProductCard.css";
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
-  image: string;
+  description: string;
+  quantity_in_stock: number;
   price: number;
-  stock: number;
+  price_after: number;
+  image: string | null;
+  category: number;
+  store: number;
 }
 
 interface ProductCardProps {
@@ -30,12 +34,12 @@ export default function ProductCard({
       <div className="product-image">
 
         <Image
-          src={product.image}
+          src={product.image || "/images/no-image.png"}
           alt={product.name}
           fill
         />
 
-        {product.stock === 0 && (
+        {product.quantity_in_stock === 0 && (
           <span className="out-stock">
             Out Of Stock
           </span>
