@@ -35,7 +35,7 @@ export default function LoginForm() {
       const { data } = await axios.post<LoginResponse>(
         `${BACKEND_URLS}account/api/v1/jwt/token/login/`,
         {
-          email, // اگر Serializer شما با email کار می‌کند این را به email تغییر دهید.
+          email, 
           password,
         },
         {
@@ -44,7 +44,7 @@ export default function LoginForm() {
       );
 
       if (data.redirect_url === "panel") {
-        router.push("/panel");
+        router.push("/shop-admin-panel");
       } else {
         router.push("/");
       }
