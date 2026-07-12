@@ -3,17 +3,29 @@ import BACKEND_URLS from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import './ShopList.css'
-
+import { cookies } from "next/headers";
 interface IGetStoreData {
-  pk : number,
+  pk: number,
   name: string;
   description: string;
   image: string;
 }
 
 async function ShopList() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access")?.value;
+
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const { data } = await axios.get<IGetStoreData[]>(
-    `${BACKEND_URLS}website/api/v1/store/list`
+    `${BACKEND_URLS}website/api/v1/store/list`,
+    {
+      headers,
+    }
   );
 
   return (

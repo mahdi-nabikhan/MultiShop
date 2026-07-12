@@ -1,42 +1,43 @@
+import axios from "axios";
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
+import BACKEND_URLS from "@/utils";
+import { cookies } from "next/headers";
 
 interface ProductListProps {
   shopId: string;
 }
 
-export default function ProductList({ shopId }: ProductListProps) {
-  // بعداً از API دریافت می‌شود
-  const products = [
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  quantity_in_stock: number;
+  price: number;
+  price_after: number;
+  image: string | null;
+  category: number;
+  store: number;
+
+}
+
+export default async function ProductList({ shopId }: ProductListProps) {
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access")?.value;
+
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const { data: products } = await axios.get<Product[]>(
+    `${BACKEND_URLS}website/api/v1/product/list/${shopId}`,
     {
-      id: 1,
-      name: "iPhone 16 Pro",
-      price: 1200,
-      image: "/images/products/iphone.jpg",
-      stock: 12,
-    },
-    {
-      id: 2,
-      name: "MacBook Pro M4",
-      price: 2400,
-      image: "/images/products/macbook.jpg",
-      stock: 5,
-    },
-    {
-      id: 3,
-      name: "AirPods Pro",
-      price: 280,
-      image: "/images/products/airpods.jpg",
-      stock: 30,
-    },
-    {
-      id: 4,
-      name: "Apple Watch",
-      price: 450,
-      image: "/images/products/watch.jpg",
-      stock: 8,
-    },
-  ];
+      headers,
+    }
+  );
 
   return (
     <section className="product-list container">

@@ -669,7 +669,7 @@ class StoreDetailAndDelete(GenericAPIView):
         obj = self.get_queryset()
         data = request.data
         serilaizer = self.serializer_class(
-            instance=obj, data=data, contex={"request": request})
+            instance=obj, data=data, context={"request": request})
         if serilaizer.is_valid():
             serilaizer.save()
             return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
@@ -679,7 +679,7 @@ class StoreDetailAndDelete(GenericAPIView):
     def patch(self, request):
         obj = self.get_queryset()
         data = request.data
-        serilaizer = self.serializer_class(instance=obj, data=data, contex={
+        serilaizer = self.serializer_class(instance=obj, data=data, context={
                                            "request": request}, partial=True)
         if serilaizer.is_valid():
             serilaizer.save()

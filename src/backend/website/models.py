@@ -3,10 +3,10 @@ from django.db.models import Sum
 from vendor.models import Store
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from elasticsearch import Elasticsearch
 
 
-es = Elasticsearch("http://localhost:59200")
+
+
 # Create your models here.
 class Category(models.Model):
     """
@@ -126,23 +126,23 @@ def reset_product_price_after(sender, instance, **kwargs):
         instance.products.save(update_fields=['price_after'])
 
 
-es = Elasticsearch("http://localhost:59200")
-
-@receiver(post_save, sender=Product)
-def index_product(sender, instance, **kwargs):
-    doc = {
-        "name": instance.name,
-        "name_auto": instance.name,
-        "description": instance.description,
-        "price": instance.price,
-        "price_after": instance.price_after,
-        "quantity_in_stock": instance.quantity_in_stock,
-        "category": instance.category.id,
-        "store": instance.store.id,
-    }
-    es.index(index="products_index", id=instance.id, document=doc)
 
 
-@receiver(post_delete, sender=Product)
-def delete_product(sender, instance, **kwargs):
-    es.delete(index="products_index", id=instance.id, ignore=[404])
+# @receiver(post_save, sender=Product)
+# def index_product(sender, instance, **kwargs):
+#     doc = {
+#         "name": instance.name,
+#         "name_auto": instance.name,
+#         "description": instance.description,
+#         "price": instance.price,
+#         "price_after": instance.price_after,
+#         "quantity_in_stock": instance.quantity_in_stock,
+#         "category": instance.category.id,
+#         "store": instance.store.id,
+#     }
+#     es.index(index="products_index", id=instance.id, document=doc)
+
+
+# @receiver(post_delete, sender=Product)
+# def delete_product(sender, instance, **kwargs):
+#     es.delete(index="products_index", id=instance.id, ignore=[404])
