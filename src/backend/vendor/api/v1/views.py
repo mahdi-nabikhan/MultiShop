@@ -791,10 +791,10 @@ class ManagerAndOperatorUserRoleAPIViews(GenericAPIView):
         user = request.user
         role =''
         
-        if Manager.objects.filter(user=user).exist():
+        if Manager.objects.filter(user=user).exists():
             role = 'manager'
-        if Operator.objects.filter(user=user).exist():
+        if Operator.objects.filter(user=user).exists():
             role = 'operator'
-        if Admin.objects.filter(user=user).exist():
+        if Admin.objects.filter(user=user).exists():
             role = 'admin'
         return Response({'role':role},status=status.HTTP_200_OK)        
