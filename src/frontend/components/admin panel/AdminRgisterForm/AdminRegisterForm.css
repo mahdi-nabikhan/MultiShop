@@ -1,0 +1,293 @@
+.register-container {
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+    radial-gradient(
+        circle at top,
+        #064e3b,
+        #020617 60%
+    );
+
+    padding:40px 20px;
+
+}
+
+
+
+.register-card {
+
+    width:100%;
+    max-width:420px;
+
+    padding:40px;
+
+    border-radius:24px;
+
+    background:rgba(15,23,42,.85);
+
+    backdrop-filter:blur(20px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+    0 20px 50px rgba(0,0,0,.4);
+
+}
+
+
+
+.register-header {
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+}
+
+
+
+.register-header h1 {
+
+    color:white;
+
+    font-size:32px;
+
+    font-weight:700;
+
+    margin-bottom:10px;
+
+}
+
+
+
+.register-header p {
+
+    color:#94a3b8;
+
+    font-size:15px;
+
+}
+
+
+
+
+.register-form {
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+
+
+
+.input-group {
+
+    height:52px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:0 16px;
+
+    background:#0f172a;
+
+    border:1px solid #334155;
+
+    border-radius:14px;
+
+    color:#94a3b8;
+
+    transition:.3s;
+
+}
+
+
+
+
+.input-group:focus-within {
+
+    border-color:#10b981;
+
+    box-shadow:
+
+    0 0 15px rgba(16,185,129,.2);
+
+}
+
+
+
+
+
+.input-group input {
+
+    flex:1;
+
+    height:100%;
+
+    background:transparent;
+
+    border:none;
+
+    outline:none;
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+
+
+
+.input-group input::placeholder {
+
+    color:#64748b;
+
+}
+
+
+
+
+.register-button {
+
+    height:52px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#10b981;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+
+
+.register-button:hover {
+
+    background:#059669;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+    0 10px 25px rgba(16,185,129,.25);
+
+}
+
+
+
+.register-button:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+
+
+
+.error-message{
+
+    padding:14px;
+
+    border-radius:12px;
+
+    background:rgba(239,68,68,.15);
+
+    border:1px solid rgba(239,68,68,.3);
+
+    color:#fca5a5;
+
+    font-size:14px;
+
+    text-align:center;
+
+}
+
+
+
+
+.login-link{
+
+    margin-top:25px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:8px;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+}
+
+
+
+
+.login-link a{
+
+    color:#10b981;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+
+
+
+.login-link a:hover{
+
+    text-decoration:underline;
+
+}
+
+
+
+
+@media(max-width:500px){
+
+    .register-card{
+
+        padding:30px 24px;
+
+    }
+
+    .register-header h1{
+
+        font-size:28px;
+
+    }
+
+}
