@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import {
   LayoutDashboard,
@@ -11,141 +13,190 @@ import {
   Tags,
   BarChart3,
   Settings,
-  LogOut
+  LogOut,
 } from "lucide-react";
+
+import BACKEND_URLS from "@/utils";
 
 import "./Sidebar.css";
 
+interface RoleResponse {
+  role: "manager" | "admin" | "operator";
+}
 
 const menuItems = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
-    href: "/admin-panel"
+    href: "/shop-admin-panel",
+    roles: ["manager", "admin", "operator"],
   },
 
   {
     title: "Products",
     icon: Package,
-    href: "/admin-panel/products"
+    href: "/shop-admin-panel/products",
+    roles: ["manager", "admin", "operator"],
   },
 
   {
     title: "Orders",
     icon: ShoppingCart,
-    href: "/admin-panel/orders"
+    href: "/shop-admin-panel/orders",
+    roles: ["manager", "admin", "operator"],
   },
 
   {
     title: "Customers",
     icon: Users,
-    href: "/admin-panel/customers"
+    href: "/shop-admin-panel/customers",
+    roles: ["manager", "admin"],
   },
 
   {
     title: "Stores",
     icon: Store,
-    href: "/admin-panel/stores"
+    href: "/shop-admin-panel/store",
+    roles: ["manager"],
   },
 
   {
     title: "Categories",
     icon: Tags,
-    href: "/admin-panel/categories"
+    href: "/shop-admin-panel/categories",
+    roles: ["manager"],
   },
 
   {
     title: "Reports",
     icon: BarChart3,
-    href: "/admin-panel/reports"
+    href: "/shop-admin-panel/reports",
+    roles: ["manager", "admin"],
   },
-
 ];
 
 
-export default function Sidebar(){
 
-  return (
+export default function Sidebar() {
+
+    const [role, setRole] = useState("");
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        async function getRole() {
+
+            try {
+
+                const { data } = await axios.get<RoleResponse>(
+                    `${BACKEND_URLS}vendor/api/v1/me/`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                setRole(data.role);
+
+            } catch (error) {
+
+                console.log(error);
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        }
+
+        getRole();
+
+    }, []);
+
+  if (loading) {
+    return null;
+}
+
+return (
 
     <aside className="sidebar">
 
+        <div className="sidebar-title">
 
-      <div className="sidebar-title">
+            Admin Panel
 
-        Admin Panel
+        </div>
 
-      </div>
+        <nav>
 
+            {menuItems
+                .filter((item) => item.roles.includes(role))
+                .map((item) => {
 
+                    const Icon = item.icon;
 
-      <nav>
+                    return (
 
+                        <Link
+                            key={item.title}
+                            href={item.href}
+                            className="sidebar-link"
+                        >
 
-        {menuItems.map((item)=>{
+                            <Icon size={20} />
 
-          const Icon = item.icon;
+                            <span>
 
+                                {item.title}
 
-          return (
+                            </span>
 
-            <Link
-              key={item.title}
-              href={item.href}
-              className="sidebar-link"
+                        </Link>
+
+                    );
+
+                })}
+
+        </nav>
+
+        <div className="sidebar-bottom">
+
+            {(role === "manager" || role === "admin") && (
+
+                <Link
+                    href="/shop-admin-panel/settings"
+                    className="sidebar-link"
+                >
+
+                    <Settings size={20} />
+
+                    <span>
+
+                        Settings
+
+                    </span>
+
+                </Link>
+
+            )}
+
+            <button
+                className="logout-link"
             >
 
-              <Icon size={20}/>
+                <LogOut size={20} />
 
-              <span>
-                {item.title}
-              </span>
+                <span>
 
+                    Logout
 
-            </Link>
+                </span>
 
-          )
+            </button>
 
-        })}
-
-
-      </nav>
-
-
-
-      <div className="sidebar-bottom">
-
-
-        <Link
-          href="/admin-panel/settings"
-          className="sidebar-link"
-        >
-
-          <Settings size={20}/>
-
-          <span>
-            Settings
-          </span>
-
-        </Link>
-
-
-
-        <button className="logout-link">
-
-          <LogOut size={20}/>
-
-          <span>
-            Logout
-          </span>
-
-        </button>
-
-
-      </div>
-
+        </div>
 
     </aside>
 
-  )
-
+);
 }

@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
-import { Mail, Lock, User } from "lucide-react";
+
+import { User, Mail, Lock } from "lucide-react";
 
 import BACKEND_URLS from "@/utils";
-import "./RegisterForm.css";
+import "./AdminRegisterForm.css";
 
-export default function RegisterForm() {
+export default function AdminRegisterForm() {
   const router = useRouter();
 
   const [username, setUsername] = useState("");
@@ -20,7 +21,9 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handlerSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handlerSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
 
     setLoading(true);
@@ -28,7 +31,7 @@ export default function RegisterForm() {
 
     try {
       await axios.post(
-        `${BACKEND_URLS}customer/api/v1/customer/register/`,
+        `${BACKEND_URLS}vendor/api/v1/operator/register/`,
         {
           username,
           user: {
@@ -42,94 +45,123 @@ export default function RegisterForm() {
         }
       );
 
-      router.push("/");
+      router.push("/shop-admin-panel");
+
     } catch (err) {
+
       if (axios.isAxiosError(err)) {
+
         setError(
           typeof err.response?.data === "string"
             ? err.response.data
             : JSON.stringify(err.response?.data)
         );
+
       } else {
+
         setError("Something went wrong.");
+
       }
+
     } finally {
+
       setLoading(false);
+
     }
   }
 
   return (
     <div className="register-container">
+
       <div className="register-card">
+
         <div className="register-header">
-          <h1>Create Account</h1>
-          <p>Create your MultiShop account</p>
+
+          <h1>Create Operator Account</h1>
+
+          <p>
+            Join MultiShop as an operator.
+          </p>
+
         </div>
 
-        <form className="register-form" onSubmit={handlerSubmit}>
-          {/* Username */}
+        <form
+          className="register-form"
+          onSubmit={handlerSubmit}
+        >
+
           <div className="input-group">
+
             <User size={20} />
+
             <input
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) =>
+                setUsername(e.target.value)
+              }
               required
             />
+
           </div>
 
-          {/* Email */}
           <div className="input-group">
+
             <Mail size={20} />
+
             <input
               type="email"
-              placeholder="Email address"
+              placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
               required
             />
+
           </div>
 
-          {/* Password */}
           <div className="input-group">
+
             <Lock size={20} />
+
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               required
             />
+
           </div>
 
-          {/* Confirm Password */}
           <div className="input-group">
+
             <Lock size={20} />
+
             <input
               type="password"
-              placeholder="Confirm password"
+              placeholder="Confirm Password"
               value={password2}
-              onChange={(e) => setPassword2(e.target.value)}
+              onChange={(e) =>
+                setPassword2(e.target.value)
+              }
               required
             />
+
           </div>
 
-          <label className="terms">
-            <input type="checkbox" required />
-            <span>I agree with terms and conditions</span>
-          </label>
-
           {error && (
-            <div
-              style={{
-                color: "#ef4444",
-                marginBottom: "15px",
-                textAlign: "center",
-              }}
-            >
+
+            <div className="error-message">
+
               {error}
+
             </div>
+
           )}
 
           <button
@@ -137,15 +169,33 @@ export default function RegisterForm() {
             className="register-button"
             disabled={loading}
           >
-            {loading ? "Creating Account..." : "Create Account"}
+
+            {loading
+              ? "Creating..."
+              : "Create Operator"}
+
           </button>
+
         </form>
 
         <div className="login-link">
-          <span>Already have an account?</span>
-          <Link href="/login">Login</Link>
+
+          <span>
+
+            Already have an account?
+
+          </span>
+
+          <Link href="/login">
+
+            Login
+
+          </Link>
+
         </div>
+
       </div>
+
     </div>
   );
 }

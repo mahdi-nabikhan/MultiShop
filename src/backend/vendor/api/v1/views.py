@@ -608,6 +608,30 @@ class AddProductImageAPIView(GenericAPIView):
 
 
 class AddProductsDiscountAPIView(GenericAPIView):
+    """
+    Create a new discount for a specific product.
+
+    This endpoint allows a store manager to create a discount
+    for the product identified by its primary key (pk).
+
+    URL Parameters:
+        pk (int): Product ID.
+
+    Request Body:
+        {
+            "title": "Summer Sale",
+            "discount_percent": 20,
+            "start_date": "2026-07-15",
+            "end_date": "2026-07-30"
+        }
+
+    Responses:
+        201 Created:
+            Discount created successfully.
+
+        400 Bad Request:
+            Invalid request data.
+    """
     
     serializer_class = AddDiscountSerializer
     queryset = Discount.objects.all()
@@ -628,6 +652,30 @@ class AddProductsDiscountAPIView(GenericAPIView):
 
 
 class OrderItemUpdateStatusApiView(GenericAPIView):
+    """
+    Update the status of an order item.
+
+    This endpoint allows updating the status of a specific
+    order item identified by its primary key.
+
+    URL Parameters:
+        pk (int): Order item ID.
+
+    Request Body:
+        {
+            "status": "processing"
+        }
+
+    Responses:
+        200 OK:
+            Order item status updated successfully.
+
+        400 Bad Request:
+            Invalid request data.
+
+        404 Not Found:
+            Order item does not exist.
+    """
     serializer_class=OrderItemUpdateStatusSerializer
     queryset=OrderItem.objects.all()
     
@@ -644,6 +692,34 @@ class OrderItemUpdateStatusApiView(GenericAPIView):
 
 
 class StoreDetailAndDelete(GenericAPIView):
+    """
+    Retrieve, update, or delete the authenticated manager's store.
+
+    This endpoint allows the store owner to:
+    - GET: Retrieve store details.
+    - PUT: Update all store information.
+    - PATCH: Partially update store information.
+    - DELETE: Permanently delete the store.
+
+    Permissions:
+        - Only the authenticated store owner can access this endpoint.
+
+    Responses:
+        200 OK:
+            Store retrieved or updated successfully.
+
+        202 Accepted:
+            Store updated successfully.
+
+        204 No Content:
+            Store deleted successfully.
+
+        400 Bad Request:
+            Invalid request data.
+
+        404 Not Found:
+            Store not found.
+    """
     permission_classes=(IsStoreOwner,)
     serializer_class = StoreSerializer
     
@@ -686,3 +762,39 @@ class StoreDetailAndDelete(GenericAPIView):
             return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)
+
+
+class ManagerAndOperatorUserRoleAPIViews(GenericAPIView):
+    """
+    Retrieve the role of the authenticated user.
+
+    This endpoint determines whether the authenticated user
+    is a manager, operator, or admin and returns the user's role.
+
+    Permissions:
+        - Authenticated users only.
+
+    Responses:
+        200 OK:
+            User role retrieved successfully.
+
+            Example:
+            {
+                "role": "manager"
+            }
+
+        401 Unauthorized:
+            Authentication credentials were not provided.
+    """
+
+    def get(self,request):
+        user = request.user
+        role =''
+        
+        if Manager.objects.filter(user=user).exists():
+            role = 'manager'
+        if Operator.objects.filter(user=user).exists():
+            role = 'operator'
+        if Admin.objects.filter(user=user).exists():
+            role = 'admin'
+        return Response({'role':role},status=status.HTTP_200_OK)        
