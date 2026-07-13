@@ -686,3 +686,18 @@ class StoreDetailAndDelete(GenericAPIView):
             return Response({'msg': 'store successfully Updated'}, status=status.HTTP_202_ACCEPTED)
         else:
             return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)
+
+
+class ManagerAndOperatorUserRoleAPIViews(GenericAPIView):
+
+    def get(self,request):
+        user = request.user
+        role =''
+        
+        if Manager.objects.filter(user=user).exist():
+            role = 'manager'
+        if Operator.objects.filter(user=user).exist():
+            role = 'operator'
+        if Admin.objects.filter(user=user).exist():
+            role = 'admin'
+        return Response({'role':role},status=status.HTTP_200_OK)        
