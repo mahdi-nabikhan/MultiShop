@@ -85,6 +85,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Multi_Shop.wsgi.application'
 ASGI_APPLICATION = 'Multi_Shop.asgi.application'
+CHANNEL_LAYERS = {
+    'default':{
+        "BACKEND":'chennel_redis.core.RedisChannelLayer',
+        "CONFIG":{
+            'hosts':[('localhost',6379)]
+        }
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -138,7 +146,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # اصلاح: بدون src/ چون پوشه static داخل src قرار دارد و volume آن را به /app/static نگاشت کرده
+    BASE_DIR / 'static',  
 ]
 
 MEDIA_URL = '/media/'
@@ -205,3 +213,5 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+
