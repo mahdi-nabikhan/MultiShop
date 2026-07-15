@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'channels'
 ]
 
 ROOT_URLCONF = 'Multi_Shop.urls'
@@ -83,7 +84,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Multi_Shop.wsgi.application'
-
+ASGI_APPLICATION = 'Multi_Shop.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
