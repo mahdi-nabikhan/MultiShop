@@ -3,12 +3,13 @@ from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ...models import Conversation
+from ...models import Conversation,Ticket
 from ...services import can_access_conversation
 from .serializers import (
     ConversationCreateSerializer,
     MessageCreateSerializer,
     MessageSerializer,
+    ListCreateTicketSerializers
 )
 
 
@@ -75,3 +76,22 @@ class CreateMessageAPIView(GenericAPIView):
             MessageSerializer(message).data,
             status=status.HTTP_201_CREATED,
         )
+        
+        
+class CreateAndListTicketAPIView(GenericAPIView):
+    serializer_class = ListCreateTicketSerializers
+    
+    
+    def get (self,request,pk):
+        obj =Ticket.objects.filter(customer__user= request.user)
+        serializer = self.serializer_class(instance = obj,many = True,context = {'request':request,'pk':pk})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def post (self,request,pk):
+        data = request.data 
+        serializer =  self.serializer_class(data=data,context = {'request':request,'pk':pk})
+        if serializer.is_valid():
+            serializer.save()
+            return  Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return  Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) 

@@ -10,5 +10,6 @@ urlpatterns = [
         CreateMessageAPIView.as_view(),
         name="create-message",
     ),
+    path('create/list/ticket/<int:pk>/',CreateAndListTicketAPIView.as_view(),name='create_list_ticket')
 
 ]

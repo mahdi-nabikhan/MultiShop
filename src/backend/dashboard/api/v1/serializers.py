@@ -1,7 +1,8 @@
 from rest_framework import serializers
-
-from ...models import Conversation ,Message
-
+from customer.models import Customer
+from ...models import Conversation ,Message,Ticket,ReplayTicket
+from vendor.models import Store
+from customer.api.v1.serializers import CustomerDetailSerializer
 
 class ConversationCreateSerializer(serializers.ModelSerializer):
 
@@ -66,3 +67,20 @@ class MessageSerializer(serializers.ModelSerializer):
             "created_at",
             "edited_at",
         )
+        
+class ListCreateTicketSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ('title','content','store','customer')
+        read_only_fields =('customer,store')
+        
+    def create(self, validated_data):
+        request= self.context.get('request')
+        pk=self.context.get('pk')
+        validated_data ['customer'] = Customer.objects.get(user=request.user)
+        validated_data['store'] = Store.objects.get(pk=pk)
+        return Ticket.objects.create(**validated_data)
+    def to_representation(self, instance):
+        res =  super().to_representation(instance)
+        res ['customer'] = CustomerDetailSerializer(res.customer).data
+        return res
