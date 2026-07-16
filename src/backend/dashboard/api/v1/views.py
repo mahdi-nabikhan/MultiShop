@@ -4,7 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from ...models import Conversation
-from .serializers import ConversationCreateSerializer,MessageCreateSerializer
+from .serializers import ConversationCreateSerializer, MessageCreateSerializer
+from ...services import can_access_conversation
 
 
 class CreateConversationApiView(GenericAPIView):
@@ -32,9 +33,6 @@ class CreateConversationApiView(GenericAPIView):
             },
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
-        
-
-
 
 
 class CreateMessageAPIView(GenericAPIView):
@@ -47,33 +45,14 @@ class CreateMessageAPIView(GenericAPIView):
             pk=conversation_id
         )
 
-        if request.user != conversation.customer:
-            if request.user not in (
-                conversation.store.owner,
-                conversation.store.manager,
-            ):
-                return Response(
-                    {"detail": "You don't have permission to send messages."},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-      
-        reply_to = serializer.validated_data.get("reply_to")
-
-        if reply_to and reply_to.conversation != conversation:
+        if not can_access_conversation(request.user, conversation):
             return Response(
-                {"detail": "Invalid reply message."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                {"detail": "You don't have permission to send messages."},
+                status=status.HTTP_403_FORBIDDEN)
 
-        message = serializer.save(
-            conversation=conversation,
-            sender=request.user,
-        )
-
+        serializer = self.get_serializer(data=request.data,  
+                                         context={"conversation": conversation})
+        serializer.is_valid(raise_exception=True)
         return Response(
             {
                 "id": message.id,
