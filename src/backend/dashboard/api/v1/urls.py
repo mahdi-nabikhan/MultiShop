@@ -10,6 +10,7 @@ urlpatterns = [
         CreateMessageAPIView.as_view(),
         name="create-message",
     ),
-    path('create/list/ticket/<int:pk>/',CreateAndListTicketAPIView.as_view(),name='create_list_ticket')
+    path('create/list/ticket/<int:pk>/',CreateAndListTicketAPIView.as_view(),name='create_list_ticket'),
+    path('detail/tickey/<int:pk>/',DetailTicketApiView.as_view(),name='ticket_detail')
 
 ]

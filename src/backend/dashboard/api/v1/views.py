@@ -9,7 +9,8 @@ from .serializers import (
     ConversationCreateSerializer,
     MessageCreateSerializer,
     MessageSerializer,
-    ListCreateTicketSerializers
+    ListCreateTicketSerializers,
+    DetailTicketSerializer
 )
 
 
@@ -95,3 +96,42 @@ class CreateAndListTicketAPIView(GenericAPIView):
             return  Response(serializer.data,status=status.HTTP_200_OK)
         else:
             return  Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) 
+        
+        
+class DetailTicketApiView(GenericAPIView):
+    serializer_class=DetailTicketSerializer
+    
+    def get_queryset(self,pk):
+        return Ticket.objects.get(pk=pk)
+
+    def get(self,request,pk):
+        query = self.get_queryset(pk)
+        serializer = self.serializer_class(instance=query)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+        
+    
+    def put (self,request,pk):
+        query = self.get_queryset(pk)
+        serializer = self.serializer_class(instance=query,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return  Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return  Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) 
+        
+            
+    
+    def patch(self,request,pk):
+        query = self.get_queryset(pk)
+        serializer = self.serializer_class(instance=query,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return  Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return  Response(serializer.errors,status=status.HTTP_404_NOT_FOUND) 
+        
+            
+    def delete(self,request,pk):
+        query = self.get_queryset(pk)
+        query.delete()
+        return  Response({'message':'Ticket Successfully deleted'},status=status.HTTP_200_OK)
