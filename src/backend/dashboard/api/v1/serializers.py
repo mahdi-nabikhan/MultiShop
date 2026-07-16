@@ -45,3 +45,24 @@ class MessageCreateSerializer(serializers.ModelSerializer):
                 )
 
         return attrs
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.CharField(source="sender.email", read_only=True)
+
+    class Meta:
+        model = Message
+        fields = (
+            "id",
+            "conversation",
+            "sender",
+            "text",
+            "image",
+            "file",
+            "reply_to",
+            "is_read",
+            "is_edited",
+            "is_deleted",
+            "created_at",
+            "edited_at",
+        )
