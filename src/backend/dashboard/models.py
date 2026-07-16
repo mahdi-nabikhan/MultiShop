@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
-
+from customer.models import Customer
+from vendor.models import Store
 
 class Conversation(models.Model):
 
@@ -82,3 +83,20 @@ class Message(models.Model):
 
     class Meta:
         ordering = ["created_at"]
+        
+
+
+class Ticket(models.Model):
+    title = models.CharField(max_length=50)
+    content = models.TextField()
+    
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name='customer_ticket')
+    store =  models.ForeignKey(Store,related_name='ticket_to_store',on_delete=models.CASCADE)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+
+class ReplayTicket(models.Model):
+    content = content = models.TextField()
+    replay_ticket = models.ForeignKey(Ticket,on_delete=models.CASCADE,related_name='replay_of_ticket')

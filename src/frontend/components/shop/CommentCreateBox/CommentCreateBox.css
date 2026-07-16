@@ -1,0 +1,72 @@
+.comment-create-box {
+    width: 100%;
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 24px;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #fff;
+}
+
+.comment-create-box h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.description {
+    color: #666;
+    margin: 0;
+}
+
+.comment-create-box input,
+.comment-create-box textarea,
+.comment-create-box select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+.comment-create-box textarea {
+    resize: vertical;
+    min-height: 180px;
+}
+
+.comment-create-box input:focus,
+.comment-create-box textarea:focus,
+.comment-create-box select:focus {
+    border-color: #2563eb;
+}
+
+.comment-create-box button {
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.comment-create-box button:hover {
+    background: #1d4ed8;
+}
+
+.comment-create-box button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.success {
+    color: #16a34a;
+}
+
+.error {
+    color: #dc2626;
+}
