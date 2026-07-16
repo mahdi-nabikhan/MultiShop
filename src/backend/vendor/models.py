@@ -1,7 +1,7 @@
 from account.models import *
 from django.db.models import Sum
 from django.db import models
-
+from auditlog.registry import auditlog
 
 # Create your models here.
 
@@ -37,6 +37,7 @@ class Admin(models.Model):
     def __str__(self):
         return f'{self.user.email}'
 
+auditlog.register(Admin)
 
 class Operator(models.Model):
     """
@@ -60,6 +61,7 @@ class Operator(models.Model):
     def __str__(self):
         return f'{self.user.email}'
 
+auditlog.register(Operator)
 
 class Store(models.Model):
     """

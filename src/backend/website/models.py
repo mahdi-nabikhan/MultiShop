@@ -3,6 +3,7 @@ from django.db.models import Sum
 from vendor.models import Store
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from auditlog.registry import auditlog
 
 
 
@@ -56,7 +57,7 @@ class Discount(models.Model):
         elif self.discount_type == 'percentage':
             return max(int(price * (1 - (self.value / 100))), 0)
         return price
-
+auditlog.register(Discount)
 
 class Product(models.Model):
     """
@@ -84,7 +85,7 @@ class Product(models.Model):
     def __str__(self):
         return f"{self.name} {self.description}"
 
-
+auditlog.register(Product)
 class ProductImages(models.Model):
     product_image = models.ImageField(upload_to='product_images', null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='image_for_product')
@@ -94,7 +95,7 @@ class ProductImages(models.Model):
     def __str__(self):
         return f'{self.title} {self.product.name}'
 
-
+auditlog.register(ProductImages)
 class ProductRate(models.Model):
     rate = models.PositiveIntegerField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_rate')

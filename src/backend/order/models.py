@@ -1,6 +1,7 @@
 from django.db import models
 from customer.models import *
 from website.models import *
+from auditlog.registry import auditlog
 
 
 # Create your models here.
@@ -27,7 +28,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.customer.username},"
-
+auditlog.register(Order)
 
 class OrderItem(models.Model):
     """
@@ -72,7 +73,7 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name},{self.quantity}"
-
+auditlog.register(OrderItem)
 
 class Bill(models.Model):
     """
@@ -98,3 +99,4 @@ class Bill(models.Model):
 
     def __str__(self):
         return f'{self.cart} created at {self.created_at}'
+auditlog.register(Bill)
