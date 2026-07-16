@@ -87,11 +87,11 @@ class Message(models.Model):
 
 
 class Ticket(models.Model):
-    title = models.CharField(max_length=50,min_lenght=4)
+    title = models.CharField(max_length=50)
     content = models.TextField()
     
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name='customer_ticket')
-    store =  models.ForeignKey(Store,related_name='ticket_to_store')
+    store =  models.ForeignKey(Store,related_name='ticket_to_store',on_delete=models.CASCADE)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
