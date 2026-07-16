@@ -49,8 +49,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework_simplejwt',
     'axes',
-    
+    'channels',
     'corsheaders'
+    
 ]
 
 MIDDLEWARE = [
@@ -63,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'channels'
+    
 ]
 
 ROOT_URLCONF = 'Multi_Shop.urls'
