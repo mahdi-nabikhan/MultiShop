@@ -72,7 +72,7 @@ class ListCreateTicketSerializers(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ('pk','title','content','store','customer')
-        read_only_fields =('customer,store')
+        read_only_fields =('customer','store')
         
     def create(self, validated_data):
         request= self.context.get('request')
@@ -90,7 +90,7 @@ class DetailTicketSerializer(serializers.ModelSerializer):
     class Meta :
         model=Ticket
         fields = ('pk','title','content','store','customer')
-        read_only_fields =('customer,store')
+        read_only_fields =('customer','store')
         
     def to_representation(self, instance):
         res =  super().to_representation(instance)
