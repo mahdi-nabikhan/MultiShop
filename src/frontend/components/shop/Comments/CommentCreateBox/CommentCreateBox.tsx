@@ -21,7 +21,7 @@ export default function CommentCreateBox({
   const createCommentMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(
-        `${BACKEND_URLS}/products/${productId}/comments/`,
+        `${BACKEND_URLS}customer/api/v1/add/comment/${productId}/`,
         {
           method: "POST",
           credentials: "include",
