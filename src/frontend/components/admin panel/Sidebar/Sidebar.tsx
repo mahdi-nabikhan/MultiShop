@@ -20,53 +20,56 @@ import BACKEND_URLS from "@/utils";
 
 import "./Sidebar.css";
 
+type Role = "manager" | "admin" | "operator";
+
 interface RoleResponse {
-  role: "manager" | "admin" | "operator";
+  role: Role;
 }
 
-const menuItems = [
+interface MenuItem {
+  title: string;
+  icon: React.ElementType;
+  href: string;
+  roles: Role[];
+}
+
+const menuItems: MenuItem[] = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
     href: "/shop-admin-panel",
     roles: ["manager", "admin", "operator"],
   },
-
   {
     title: "Products",
     icon: Package,
     href: "/shop-admin-panel/products",
     roles: ["manager", "admin", "operator"],
   },
-
   {
     title: "Orders",
     icon: ShoppingCart,
     href: "/shop-admin-panel/orders",
     roles: ["manager", "admin", "operator"],
   },
-
   {
     title: "Customers",
     icon: Users,
     href: "/shop-admin-panel/customers",
     roles: ["manager", "admin"],
   },
-
   {
     title: "Stores",
     icon: Store,
     href: "/shop-admin-panel/store",
     roles: ["manager"],
   },
-
   {
     title: "Categories",
     icon: Tags,
     href: "/shop-admin-panel/categories",
     roles: ["manager"],
   },
-
   {
     title: "Reports",
     icon: BarChart3,
@@ -75,128 +78,92 @@ const menuItems = [
   },
 ];
 
-
-
 export default function Sidebar() {
+  const [role, setRole] = useState<Role | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    const [role, setRole] = useState("");
-    const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const getRole = async () => {
+      try {
+        const { data } = await axios.get<RoleResponse>(
+          `${BACKEND_URLS}vendor/api/v1/store/user/roles/`,
+          {
+            withCredentials: true,
+          }
+        );
 
-    useEffect(() => {
+        console.log("API Response:", data);
 
-        async function getRole() {
+        setRole(data.role);
+      } catch (error) {
+        console.error("Sidebar Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-            try {
+    getRole();
+  }, []);
 
-                const { data } = await axios.get<RoleResponse>(
-                    `${BACKEND_URLS}vendor/api/v1/me/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
+  console.log("Current Role:", role);
 
-                setRole(data.role);
+  const filteredMenu = role
+    ? menuItems.filter((item) => item.roles.includes(role))
+    : [];
 
-            } catch (error) {
-
-                console.log(error);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-
-        }
-
-        getRole();
-
-    }, []);
+  console.log("Filtered Menu:", filteredMenu);
 
   if (loading) {
-    return null;
-}
+    return <aside className="sidebar">Loading...</aside>;
+  }
 
-return (
+  if (!role) {
+    return (
+      <aside className="sidebar">
+        <p>No role found.</p>
+      </aside>
+    );
+  }
 
+  return (
     <aside className="sidebar">
+      <div className="sidebar-title">
+        Admin Panel ({role})
+      </div>
 
-        <div className="sidebar-title">
+      <nav>
+        {filteredMenu.map((item) => {
+          const Icon = item.icon;
 
-            Admin Panel
-
-        </div>
-
-        <nav>
-
-            {menuItems
-                .filter((item) => item.roles.includes(role))
-                .map((item) => {
-
-                    const Icon = item.icon;
-
-                    return (
-
-                        <Link
-                            key={item.title}
-                            href={item.href}
-                            className="sidebar-link"
-                        >
-
-                            <Icon size={20} />
-
-                            <span>
-
-                                {item.title}
-
-                            </span>
-
-                        </Link>
-
-                    );
-
-                })}
-
-        </nav>
-
-        <div className="sidebar-bottom">
-
-            {(role === "manager" || role === "admin") && (
-
-                <Link
-                    href="/shop-admin-panel/settings"
-                    className="sidebar-link"
-                >
-
-                    <Settings size={20} />
-
-                    <span>
-
-                        Settings
-
-                    </span>
-
-                </Link>
-
-            )}
-
-            <button
-                className="logout-link"
+          return (
+            <Link
+              key={item.title}
+              href={item.href}
+              className="sidebar-link"
             >
+              <Icon size={20} />
+              <span>{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-                <LogOut size={20} />
+      <div className="sidebar-bottom">
+        {(role === "manager" || role === "admin") && (
+          <Link
+            href="/shop-admin-panel/settings"
+            className="sidebar-link"
+          >
+            <Settings size={20} />
+            <span>Settings</span>
+          </Link>
+        )}
 
-                <span>
-
-                    Logout
-
-                </span>
-
-            </button>
-
-        </div>
-
+        <button className="logout-link">
+          <LogOut size={20} />
+          <span>Logout</span>
+        </button>
+      </div>
     </aside>
-
-);
+  );
 }

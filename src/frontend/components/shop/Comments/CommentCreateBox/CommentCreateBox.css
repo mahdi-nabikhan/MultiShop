@@ -1,0 +1,141 @@
+.comment-create-box {
+
+    width: 100%;
+    max-width: 700px;
+
+    margin: 40px auto;
+
+    padding: 24px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    box-shadow: var(--shadow-sm);
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+}
+
+.comment-create-box h2 {
+
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 26px;
+
+}
+
+.description {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+}
+
+.comment-create-box input,
+.comment-create-box textarea,
+.comment-create-box select {
+
+    width: 100%;
+
+    padding: 14px;
+
+    background: var(--surface-light);
+
+    color: var(--text);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-md);
+
+    outline: none;
+
+    transition: var(--transition);
+
+}
+
+.comment-create-box textarea {
+
+    resize: vertical;
+
+    min-height: 180px;
+
+}
+
+.comment-create-box input:focus,
+.comment-create-box textarea:focus,
+.comment-create-box select:focus {
+
+    border-color: var(--primary);
+
+    box-shadow: 0 0 12px rgba(16,185,129,.2);
+
+}
+
+.comment-create-box input::placeholder,
+.comment-create-box textarea::placeholder {
+
+    color: var(--text-muted);
+
+}
+
+.comment-create-box button {
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: var(--radius-md);
+
+    background: var(--primary);
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    transition: var(--transition);
+
+}
+
+.comment-create-box button:hover {
+
+    background: var(--primary-hover);
+
+    transform: translateY(-2px);
+
+}
+
+.comment-create-box button:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+}
+
+.success {
+
+    color: var(--success);
+
+    font-weight: 500;
+
+}
+
+.error {
+
+    color: var(--danger);
+
+    font-weight: 500;
+
+}

@@ -96,5 +96,18 @@ class DetailTicketSerializer(serializers.ModelSerializer):
         res =  super().to_representation(instance)
         res ['customer'] = CustomerDetailSerializer(res.customer).data
         return res
+
+class ReplayTicketSerializer (serializers.ModelSerializer):
+    class Meta:
+        model = ReplayTicket
+        fields = ('pk','content','replay_ticket')
+        read_only_fields = ('replay_ticket',)
+        
+    def create(self, validated_data):
+        validated_data['replay_ticket']=Ticket.objects.get(pk=self.context.get('pk'))
+        return ReplayTicket.objects.create(**validated_data)
     
-    
+    def to_representation(self, instance):
+        res = super().to_representation(instance)
+        res['replay_ticket'] = DetailTicketSerializer(instance.replay_ticket).data
+        return res

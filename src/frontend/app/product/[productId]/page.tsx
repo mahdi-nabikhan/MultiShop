@@ -1,5 +1,6 @@
 import ProductDetail from "@/components/shop/ProductDetail/ProductDetail";
-import CommentCreateBox from "@/components/shop/CommentCreateBox/CommentCreateBox";
+import CommentCreateBox from "@/components/shop/Comments/CommentCreateBox/CommentCreateBox";
+import CommentList from "@/components/shop/Comments/CommentList/CommentList";
 interface Props {
   params: Promise<{
     storeId: string;
@@ -18,6 +19,7 @@ export default async function Page({ params }: Props) {
       productId={productId}
     />
     <CommentCreateBox productId={productId}/>
+    <CommentList productID={productId}/>
     
     </>
   );
