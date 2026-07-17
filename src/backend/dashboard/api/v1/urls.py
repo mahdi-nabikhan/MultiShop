@@ -11,6 +11,8 @@ urlpatterns = [
         name="create-message",
     ),
     path('create/list/ticket/<int:pk>/',CreateAndListTicketAPIView.as_view(),name='create_list_ticket'),
-    path('detail/tickey/<int:pk>/',DetailTicketApiView.as_view(),name='ticket_detail')
+    path('detail/tickey/<int:pk>/',DetailTicketApiView.as_view(),name='ticket_detail'),
+    path('replay/ticket/<int:pk>/',CreateAndListReplayTicketAPIView.as_view(),name='replay-tiket'),
+    
 
 ]
