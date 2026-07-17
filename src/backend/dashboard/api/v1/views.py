@@ -157,3 +157,42 @@ class CreateAndListReplayTicketAPIView(GenericAPIView):
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
         
         
+        
+class DetailReplayTicketAPIView(GenericAPIView):
+    serializer_class=ReplayTicketSerializer
+    
+    def get_queryset(self,pk):
+        return ReplayTicket.objects.get(pk=pk)
+    
+    def get(self, request,pk):
+        obj = self.get_queryset(pk)
+        serializer =  self.serializer_class(instance=obj,context = {'pk':pk})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk):
+        data=request.data
+        obj = self.get_queryset(pk)
+        serializer =  self.serializer_class(instance=obj,context = {'pk':pk},data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    def patch(self,request,pk):
+        data=request.data
+        obj = self.get_queryset(pk)
+        serializer =  self.serializer_class(instance=obj,context = {'pk':pk},data=data,patial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    def delete(self,request,pk):
+        obj = self.get_queryset(pk=pk)
+        obj.delete()
+        return Response({'message':'object deleted successfully '},status=status.HTTP_404_NOT_FOUND)
+        
+                
+        
+        
