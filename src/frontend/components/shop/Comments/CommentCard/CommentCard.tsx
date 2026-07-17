@@ -1,5 +1,6 @@
 import React from 'react'
 import { MessageCircle } from 'lucide-react'
+import './CommentCard.css'
 
 type User = {
     id:number;
@@ -8,7 +9,7 @@ type User = {
 }
 type Comment = {
     id:number,
-    description :string,
+    descriptions :string,
     status : string,
     customer:User,
     product:number,
@@ -20,43 +21,31 @@ type Props = {
 
 function CommentCard({comment}:Props) {
   return (
-    <div className="rounded-xl border bg-white p-5 shadow-sm">
-            {/* Header */}
-            <div className="flex items-center gap-3">
+   <div className="comment-card">
 
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
-                    {comment.customer.email[0].toUpperCase()}
-                </div>
-
-                <div>
-                    <h3 className="font-medium">
-                        {comment.customer.email}
-                    </h3>
-
-                    <span className="text-sm text-gray-500">
-                        کاربر
-                    </span>
-                </div>
-
-            </div>
-
-            {/* Body */}
-
-            <p className="mt-4 leading-7 text-gray-700">
-                {comment.description}
-            </p>
-
-            {/* Footer */}
-
-            <div className="mt-5 flex justify-end">
-
-                <button className="flex items-center gap-2 rounded-lg border px-4 py-2 transition hover:bg-gray-100">
-                    <MessageCircle size={18} />
-                    پاسخ
-                </button>
-
-            </div>
+      <div className="comment-header">
+        <div className="comment-avatar">
+          
         </div>
+
+        <div className="comment-user">
+          
+          <span>خریدار</span>
+        </div>
+      </div>
+
+      <div className="comment-body">
+        <p>{comment.descriptions}</p>
+      </div>
+
+      <div className="comment-footer">
+        <button className="reply-btn">
+          <MessageCircle size={18} />
+          پاسخ
+        </button>
+      </div>
+
+    </div>
     
   )
 }
