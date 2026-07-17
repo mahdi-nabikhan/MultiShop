@@ -1,4 +1,4 @@
-import "./ProductDetailLoading.css";
+import "./loading.css";
 
 export default function ProductDetailLoading() {
   return (
