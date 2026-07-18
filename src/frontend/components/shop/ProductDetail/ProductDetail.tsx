@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
+import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
 
 import {
   Star,
@@ -136,32 +137,11 @@ export default function ProductDetail({ productId }: Props) {
           In Stock : {product.quantity_in_stock}
         </div>
 
-        <div className="quantity">
-          <button
-            onClick={() =>
-              quantity > 1 &&
-              setQuantity(quantity - 1)
-            }
-          >
-            <Minus size={18} />
-          </button>
+        <ProductOrderBox
+    productId={product.id}
+/>
 
-          <span>{quantity}</span>
-
-          <button
-            onClick={() =>
-              quantity < product.quantity_in_stock &&
-              setQuantity(quantity + 1)
-            }
-          >
-            <Plus size={18} />
-          </button>
-        </div>
-
-        <button className="cart-btn">
-          <ShoppingCart size={20} />
-          Add To Cart
-        </button>
+        
 
         <div className="features">
           <div>

@@ -1,0 +1,41 @@
+.product-page {
+
+    width:100%;
+
+}
+
+
+.product-detail-section {
+
+    width:100%;
+
+}
+
+
+.order-box-section {
+
+    width:100%;
+
+    margin-top:30px;
+
+}
+
+
+.order-box-wrapper {
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+
+.comments-section {
+
+    width:100%;
+
+    margin-top:50px;
+
+}

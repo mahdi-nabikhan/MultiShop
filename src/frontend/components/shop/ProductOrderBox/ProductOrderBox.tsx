@@ -1,3 +1,4 @@
+'use client'
 import React, { cache } from 'react'
 import BACKEND_URLS from '@/utils'
 import { useState,useEffect } from 'react'
