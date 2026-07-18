@@ -5,6 +5,8 @@ import Image from "next/image";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
 import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
+import useCheckMe from "@/hooks/Checkme";
+import SessionProductOrderBox from "../SessionProductOrderBox/SessionProductOrderBox";
 
 import {
   Star,
@@ -36,6 +38,7 @@ interface Product {
 
 export default function ProductDetail({ productId }: Props) {
   const [product, setProduct] = useState<Product | null>(null);
+  const isAuthenticated = useCheckMe();
 
   // فعلاً تصاویر ثابت
   const images = [
@@ -138,10 +141,13 @@ export default function ProductDetail({ productId }: Props) {
           In Stock : {product.quantity_in_stock}
         </div>
 
-        <ProductOrderBox
-          productId={product.id}
-        />
-
+        {isAuthenticated === null ? (
+          <div>Loading...</div>
+        ) : isAuthenticated ? (
+          <ProductOrderBox productId={product.id} />
+        ) : (
+          <SessionProductOrderBox productId={product.id} />
+        )}
 
 
         <div className="features">
