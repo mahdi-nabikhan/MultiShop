@@ -8,9 +8,9 @@ import axios from "axios";
 import { User, Mail, Lock } from "lucide-react";
 
 import BACKEND_URLS from "@/utils";
-import "./AdminRegisterForm.css";
+import "./OperatorRegisterForm.css";
 
-export default function AdminRegisterForm() {
+export default function OperatorRegisterForm() {
   const router = useRouter();
 
   const [username, setUsername] = useState("");

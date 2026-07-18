@@ -55,7 +55,7 @@ export default function RegisterManager() {
             }
         );
 
-        router.push("/shop-admin-panel");
+        router.push("/");
 
     } catch (err) {
 

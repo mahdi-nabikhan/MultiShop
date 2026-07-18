@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
+import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
 
 import {
   Star,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 
 import "./ProductDetail.css";
+import { color } from "chart.js/helpers";
 
 interface Props {
   productId: string;
@@ -79,9 +81,8 @@ export default function ProductDetail({ productId }: Props) {
           {images.map((img, index) => (
             <div
               key={index}
-              className={`thumbnail ${
-                activeImage === img ? "active" : ""
-              }`}
+              className={`thumbnail ${activeImage === img ? "active" : ""
+                }`}
               onClick={() => setActiveImage(img)}
             >
               <Image
@@ -107,8 +108,9 @@ export default function ProductDetail({ productId }: Props) {
       {/* Product Info */}
       <div className="info">
 
-        <h1>{product.name}</h1>
-
+        <h1 style={{ color: "white" }}>
+          {product.name}
+        </h1>
         <div className="rating">
           <Star
             fill="#FFD700"
@@ -136,32 +138,11 @@ export default function ProductDetail({ productId }: Props) {
           In Stock : {product.quantity_in_stock}
         </div>
 
-        <div className="quantity">
-          <button
-            onClick={() =>
-              quantity > 1 &&
-              setQuantity(quantity - 1)
-            }
-          >
-            <Minus size={18} />
-          </button>
+        <ProductOrderBox
+          productId={product.id}
+        />
 
-          <span>{quantity}</span>
 
-          <button
-            onClick={() =>
-              quantity < product.quantity_in_stock &&
-              setQuantity(quantity + 1)
-            }
-          >
-            <Plus size={18} />
-          </button>
-        </div>
-
-        <button className="cart-btn">
-          <ShoppingCart size={20} />
-          Add To Cart
-        </button>
 
         <div className="features">
           <div>

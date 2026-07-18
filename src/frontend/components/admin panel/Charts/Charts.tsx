@@ -10,7 +10,8 @@ import {
   CartesianGrid,
 } from "recharts";
 
-import styles from "./ProductChart.module.css";
+import "./Charts.css";
+
 
 const data = [
   { name: "Laptop", sales: 120 },
@@ -19,16 +20,32 @@ const data = [
   { name: "Keyboard", sales: 70 },
 ];
 
+
 export default function ProductChart() {
+
   return (
-    <div className={styles.chartCard}>
-      <div className={styles.header}>
-        <h3>Product Sales</h3>
-        <p>Top selling products</p>
+
+    <div className="chart-card">
+
+
+      <div className="chart-header">
+
+        <h3>
+          Product Sales
+        </h3>
+
+        <p>
+          Top selling products
+        </p>
+
       </div>
 
-      <div className={styles.chart}>
+
+
+      <div className="chart-body">
+
         <ResponsiveContainer width="100%" height="100%">
+
           <BarChart
             data={data}
             margin={{
@@ -38,40 +55,74 @@ export default function ProductChart() {
               bottom: 5,
             }}
           >
+
+
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="#e5e7eb"
             />
 
+
+
             <XAxis
               dataKey="name"
-              tick={{ fill: "#64748b", fontSize: 13 }}
+              tick={{
+                fill:"#64748b",
+                fontSize:13
+              }}
               tickLine={false}
-              axisLine={{ stroke: "#e5e7eb" }}
+              axisLine={{
+                stroke:"#e5e7eb"
+              }}
             />
 
+
+
             <YAxis
-              tick={{ fill: "#64748b", fontSize: 13 }}
+              tick={{
+                fill:"#64748b",
+                fontSize:13
+              }}
               tickLine={false}
-              axisLine={{ stroke: "#e5e7eb" }}
+              axisLine={{
+                stroke:"#e5e7eb"
+              }}
             />
+
+
 
             <Tooltip
               contentStyle={{
-                borderRadius: "12px",
-                border: "1px solid #e5e7eb",
-                boxShadow: "0 10px 25px rgba(0,0,0,.08)",
+                borderRadius:"12px",
+                border:"1px solid #e5e7eb",
+                boxShadow:"0 10px 25px rgba(0,0,0,.08)"
               }}
             />
+
+
 
             <Bar
               dataKey="sales"
               fill="#4f46e5"
-              radius={[8, 8, 0, 0]}
+              radius={[
+                8,
+                8,
+                0,
+                0
+              ]}
             />
+
+
           </BarChart>
+
+
         </ResponsiveContainer>
+
+
       </div>
+
+
     </div>
+
   );
 }
