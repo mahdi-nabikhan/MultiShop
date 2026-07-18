@@ -9,7 +9,8 @@ urlpatterns = [
     path('jwt/token/login/',CustomeObtainPairView.as_view(),name='jwt_login'),
     path('change/password/',ChangePasswordView.as_view(),name='change-password'),
     path('send/reset/password',SendResetCodeApiView.as_view(),name='send_reset_code'),
-    path('confirm/rest/password',VerifyResetCodeApiView.as_view(),name='confirm_reset_password')
+    path('confirm/rest/password',VerifyResetCodeApiView.as_view(),name='confirm_reset_password'),
+    path('me/',CheckMeAPIView.as_view(),name='chech_me')
 
 
 ]

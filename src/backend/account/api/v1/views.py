@@ -531,3 +531,19 @@ class VerifyResetCodeApiView(GenericAPIView):
         )
 
         return response
+    
+    
+    
+class CheckMeAPIView(GenericAPIView):
+    serializer_class=CheckMeSerializer
+    
+    
+    def get_queryset(self):
+        return User.objects.get(pk=self.request.user.pk)
+    
+    def get(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance=obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    

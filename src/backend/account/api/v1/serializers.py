@@ -356,3 +356,11 @@ class VerifyCodeSerializer(serializers.Serializer):
 
         self.user = obj.user
         return value
+
+
+
+class CheckMeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields = ['pk','email']
+        read_only_fields =['pk','email']
