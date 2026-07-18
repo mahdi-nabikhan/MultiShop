@@ -98,5 +98,5 @@ class Ticket(models.Model):
     
 
 class ReplayTicket(models.Model):
-    content = content = models.TextField()
+    content = models.TextField()
     replay_ticket = models.ForeignKey(Ticket,on_delete=models.CASCADE,related_name='replay_of_ticket')

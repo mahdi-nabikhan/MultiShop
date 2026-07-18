@@ -1,8 +1,10 @@
 import pytest
 
 from account.models import User
-from dashboard.models import Conversation, Message
+from dashboard.models import Conversation, Message,Ticket,ReplayTicket
 from vendor.models import Manager, Store
+from customer.models import Customer
+from account.models import User
 
 
 @pytest.mark.django_db
@@ -168,3 +170,102 @@ class TestMessageModel:
 
         assert messages[0] == first
         assert messages[1] == second
+        
+        
+        
+@pytest.fixture
+def customer(db):
+    user =  User.object.create(
+            email='test1234@gmail.com',
+            password = 'test12345'
+        )
+    customer = Customer.object.create (username='testusername',user=user)
+    return customer
+@pytest.fixture
+def store(db):
+    user_manager = User.objects.create(email= 'manager@gmail.com', passwod= 'test12345')
+    manager = Manager.objects.create(
+             user=user_manager,
+             first_name='test',
+             last_name = 'test'
+        )
+    store = Store.objects.create(
+            manager=manager,
+            name="Apple Store",
+            description="Test Store",
+        )
+    return store
+    
+
+
+            
+
+@pytest.mark.django_db
+class TestTickentModel:
+    
+    def test_create_ticket (self):
+       
+        
+
+        
+        
+        ticket = Ticket.objects.create(
+            title = 'Problem with Product',
+            content = 'i have problem',
+            customer= customer,
+            store = store
+        )
+        
+        assert ticket.title == 'Problem with Product'
+        assert ticket.content == 'i have problem'
+        
+        
+    def test_ticket_created_at_auto_set(self):
+        
+        ticket = Ticket.objects.create(
+            title = 'Problem with Product',
+            content = 'i have problem',
+            customer= customer,
+            store = store
+        )
+         
+         
+        assert ticket.created_at is not None
+        assert ticket.updated_at is not None
+        
+    def test_customer_ticket_related_name (self):
+        ticket = Ticket.objects.create(
+            title = 'Problem with Product',
+            content = 'i have problem',
+            customer= customer,
+            store = store
+        )
+        
+        assert ticket.customer_ticket.count()
+
+
+
+@pytest.mark.django_db
+class TestReplayTicketModel:
+    def test_create_replay_ticket(self):
+        ticket = Ticket.objects.create(
+            title = 'Problem with Product',
+            content = 'i have problem',
+            customer= customer,
+            store = store
+        )
+        reply = ReplayTicket.objects.create(content='this is test for create',replay_ticket = ticket)
+        assert reply.content == 'this is test for create'
+        assert reply.replay_ticket == ticket
+    
+    def test_delete_ticket_delete_replay(self):
+        ticket = Ticket.objects.create(
+            title = 'Problem with Product',
+            content = 'i have problem',
+            customer= customer,
+            store = store
+        )
+        reply = ReplayTicket.objects.create(content='this is test for create',replay_ticket = ticket)
+        
+        ticket.delete()
+        assert ReplayTicket.objects.count() == 0
