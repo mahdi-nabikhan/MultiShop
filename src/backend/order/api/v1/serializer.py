@@ -194,3 +194,14 @@ class CartItemSerializer(serializers.Serializer):
     product = ProductSerializer()
     quantity = serializers.IntegerField()
     total_price = serializers.DecimalField(...)
+    
+    
+
+
+
+class CartAddSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField(
+        min_value=1,
+        default=1,
+        required=False,
+    )

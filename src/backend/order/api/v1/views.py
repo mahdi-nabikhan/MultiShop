@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import generics, status
 from .serializer import *
-
+from order.sessions import CartSession
 
 class OrderListApiView(generics.GenericAPIView):
     """
@@ -381,3 +381,49 @@ class BillCreationApiView(generics.GenericAPIView):
     
     def post(self,requesy,pk):
         pass
+    
+    
+
+
+
+class CartDetailAPIView(generics.GenericAPIView):
+    serializer_class = CartItemSerializer
+
+    def get(self, request, *args, **kwargs):
+        cart = CartSession(request)
+
+        serializer = self.get_serializer(
+            {
+                "items": list(cart),
+                "total_quantity": cart.get_total_quantity(),
+                "total_price": cart.get_total_price(),
+            }
+        )
+
+        return Response(serializer.data)
+    
+
+
+
+class CartAddAPIView(generics.GenericAPIView):
+    serializer_class = CartAddSerializer
+
+    def post(self, request, pk, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        product = get_object_or_404(Product, pk=pk)
+
+        cart = CartSession(request)
+        cart.add(
+            product=product,
+            quantity=serializer.validated_data["quantity"],
+        )
+        cart.save()
+
+        return Response(
+            CartMessageSerializer(
+                {"detail": "Product added successfully."}
+            ).data,
+            status=201,
+        )
