@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import "./ProductDetail.css";
+import { color } from "chart.js/helpers";
 
 interface Props {
   productId: string;
@@ -80,9 +81,8 @@ export default function ProductDetail({ productId }: Props) {
           {images.map((img, index) => (
             <div
               key={index}
-              className={`thumbnail ${
-                activeImage === img ? "active" : ""
-              }`}
+              className={`thumbnail ${activeImage === img ? "active" : ""
+                }`}
               onClick={() => setActiveImage(img)}
             >
               <Image
@@ -108,8 +108,9 @@ export default function ProductDetail({ productId }: Props) {
       {/* Product Info */}
       <div className="info">
 
-        <h1>{product.name}</h1>
-
+        <h1 style={{ color: "white" }}>
+          {product.name}
+        </h1>
         <div className="rating">
           <Star
             fill="#FFD700"
@@ -138,10 +139,10 @@ export default function ProductDetail({ productId }: Props) {
         </div>
 
         <ProductOrderBox
-    productId={product.id}
-/>
+          productId={product.id}
+        />
 
-        
+
 
         <div className="features">
           <div>

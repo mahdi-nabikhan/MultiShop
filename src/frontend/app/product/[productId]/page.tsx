@@ -2,6 +2,7 @@ import ProductDetail from "@/components/shop/ProductDetail/ProductDetail";
 import CommentCreateBox from "@/components/shop/Comments/CommentCreateBox/CommentCreateBox";
 import CommentList from "@/components/shop/Comments/CommentList/CommentList";
 import ProductOrderBox from "@/components/shop/ProductOrderBox/ProductOrderBox";
+import SectionHeader from "@/components/shop/SectionHeader/SectionHeader";
 import './page.css'
 interface Props {
   params: Promise<{
@@ -31,7 +32,10 @@ export default async function Page({ params }: Props) {
 
 
 </section>
-
+    <SectionHeader
+            title='Add Comments'
+            description="Add Comment for This Products"
+          />
 
       <section className="comments-section">
 
@@ -39,7 +43,10 @@ export default async function Page({ params }: Props) {
           productId={productId}
         />
 
-
+          <SectionHeader
+            title='All Comments'
+            description="All Comment For This Product"
+          />
         <CommentList
           productID={productId}
         />

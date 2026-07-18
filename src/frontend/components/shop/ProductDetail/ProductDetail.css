@@ -20,7 +20,9 @@
   gap: 15px;
 }
 
-
+.h1-color {
+    color: white;
+}
 .thumbnail {
   width: 90px;
   height: 90px;
@@ -335,8 +337,6 @@
   color: #111;
 
 }
-
-
 
 
 
