@@ -1,15 +1,15 @@
-import ShopProductDetail from '@/components/admin panel/ShopProductDetail/ShopProductDetail'
-import React from 'react'
+import ShopProductDetail from "@/components/admin panel/ShopProductDetail/ShopProductDetail";
+
 interface Props {
   params: Promise<{
-    productId: number
+    id: string;
   }>;
 }
-async function page({params}:Props) {
-    const { productId } = await params;
-  return (
-    <div><ShopProductDetail productId={productId}/></div>
-  )
-}
 
-export default page
+export default async function Page({ params }: Props) {
+  const { id } = await params;
+
+  return (
+    <ShopProductDetail productId={Number(id)} />
+  );
+}

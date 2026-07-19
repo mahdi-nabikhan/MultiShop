@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react'
-import './ShopPostDetail.css'
+import React, { useEffect } from 'react'
+import './ShopProductDetail.css'
 import axios from 'axios'
 import BACKEND_URLS from '@/utils'
 
@@ -17,7 +17,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
 interface ProductId {
-    productId: number
+    productId: number|string
 }
 interface ShopProductData {
     id: number,
@@ -34,23 +34,50 @@ interface ShopProductData {
 }
 
 
-async function ShopProductDetail({ productId }: ProductId) {
+ function ShopProductDetail({ productId }: {productId:number}) {
+    console.log("productId:", productId);
 
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
-    const { data: product } = await axios.get<ShopProductData>(
+    const [product, setProduct ] =  useState<ShopProductData | null>(null)
 
-        `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`, {
-        withCredentials: true
+    useEffect(()=>{
+        const GetProductData = async() =>{
+            try{
+                const {data} = await axios.get<ShopProductData>(
+                    `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
+                    {
+                        withCredentials:true
+                    }
+                )
+                setProduct(data)
+
+            }catch(err){
+                   console.log('this is error',err);
+
+            }
+        }
+        GetProductData()
+
+
+
+
+    },[productId])
+
+
+  if (!product) {
+        return <div>Loading...</div>;
     }
 
-    )
+    
     const images = [
         product.product_image,
         "/images/demo1.jpg",
         "/images/demo2.jpg",
         "/images/demo3.jpg",
     ];
+    
     return (
+        
         <div className="detail-body">
 
             <div className="gallery-card">
