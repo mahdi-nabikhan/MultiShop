@@ -1,206 +1,215 @@
 "use client";
 
-import React, { useEffect } from 'react'
-import './ShopProductDetail.css'
-import axios from 'axios'
-import BACKEND_URLS from '@/utils'
-
+import React, { useEffect, useState } from "react";
+import "./ShopProductDetail.css";
+import axios from "axios";
+import BACKEND_URLS from "@/utils";
+import EditProductModal from "../EditProductModal/EditProductModal";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Thumbs } from "swiper/modules";
-
-import { useState } from "react";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
-interface ProductId {
-    productId: number|string
-}
+
 interface ShopProductData {
-    id: number,
-    name: string,
-    description: string,
-    quantity_in_stock: number,
-    price: number,
-    price_after: number,
-    product_image: string | null,
-    category: number,
-    store: number
-
-
+    id: number;
+    name: string;
+    description: string;
+    quantity_in_stock: number;
+    price: number;
+    price_after: number;
+    product_image: string | null;
+    category: number;
+    store: number;
 }
 
-
- function ShopProductDetail({ productId }: {productId:number}) {
-    console.log("productId:", productId);
+function ShopProductDetail({ productId }: { productId: number }) {
 
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
-    const [product, setProduct ] =  useState<ShopProductData | null>(null)
+    const [product, setProduct] = useState<ShopProductData | null>(null);
+    const [openEditModal, setOpenEditModal] = useState(false);
 
-    useEffect(()=>{
-        const GetProductData = async() =>{
-            try{
-                const {data} = await axios.get<ShopProductData>(
-                    `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
-                    {
-                        withCredentials:true
-                    }
-                )
-                setProduct(data)
+    // 👇 این باید بیرون useEffect باشد
+    const GetProductData = async () => {
 
-            }catch(err){
-                   console.log('this is error',err);
+        try {
 
-            }
+            const { data } = await axios.get<ShopProductData>(
+                `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+            setProduct(data);
+
+        } catch (err) {
+
+            console.log(err);
+
         }
-        GetProductData()
 
+    };
 
+    // 👇 فقط فراخوانی
+    useEffect(() => {
 
+        GetProductData();
 
-    },[productId])
+    }, [productId]);
 
-
-  if (!product) {
+    if (!product) {
         return <div>Loading...</div>;
     }
 
-    
     const images = [
         product.product_image,
         "/images/demo1.jpg",
         "/images/demo2.jpg",
         "/images/demo3.jpg",
     ];
-    
+
     return (
-        
-        <div className="detail-body">
 
-            <div className="gallery-card">
 
-                <Swiper
-                    modules={[Navigation, Pagination, Thumbs]}
-                    navigation
-                    pagination={{ clickable: true }}
-                    thumbs={{ swiper: thumbsSwiper }}
-                    className="main-swiper"
-                >
-                    {images.map((image, index) => (
+        <>
+            <div className="detail-body">
 
-                        <SwiperSlide key={index}>
+                <div className="gallery-card">
 
-                            <img src={image ?? "/no-image.png"} />
-
-                        </SwiperSlide>
-
-                    ))}
-                </Swiper>
-
-                <Swiper
-                    onSwiper={setThumbsSwiper}
-                    modules={[Thumbs]}
-                    slidesPerView={4}
-                    spaceBetween={12}
-                    watchSlidesProgress
-                    className="thumb-swiper"
-                >
-                    {images.map((image, index) => (
-
-                        <SwiperSlide key={index}>
-
-                            <img src={image ?? "/no-image.png"} />
-
-                        </SwiperSlide>
-
-                    ))}
-                </Swiper>
-
-            </div>
-
-            <div className="info-card">
-
-                <div className="card-header">
-                    <h2>{product.name}</h2>
-
-                    <span
-                        className={
-                            product.quantity_in_stock > 0
-                                ? "status in-stock"
-                                : "status out-stock"
-                        }
+                    <Swiper
+                        modules={[Navigation, Pagination, Thumbs]}
+                        navigation
+                        pagination={{ clickable: true }}
+                        thumbs={{ swiper: thumbsSwiper }}
+                        className="main-swiper"
                     >
-                        {product.quantity_in_stock > 0
-                            ? "In Stock"
-                            : "Out of Stock"}
-                    </span>
-                </div>
+                        {images.map((image, index) => (
+                            <SwiperSlide key={index}>
+                                <img
+                                    src={image ?? "/no-image.png"}
+                                    alt={product.name}
+                                />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
 
-                <div className="info-grid">
-
-                    <div className="info-item">
-                        <span>Product ID</span>
-                        <strong>#{product.id}</strong>
-                    </div>
-
-                    <div className="info-item">
-                        <span>Category</span>
-                        <strong>{product.category}</strong>
-                    </div>
-
-                    <div className="info-item">
-                        <span>Price</span>
-                        <strong>${product.price}</strong>
-                    </div>
-
-                    <div className="info-item">
-                        <span>Sale Price</span>
-                        <strong className="sale-price">
-                            ${product.price_after}
-                        </strong>
-                    </div>
-
-                    <div className="info-item">
-                        <span>Stock</span>
-                        <strong>{product.quantity_in_stock}</strong>
-                    </div>
-
-                    <div className="info-item">
-                        <span>Store</span>
-                        <strong>{product.store}</strong>
-                    </div>
+                    <Swiper
+                        onSwiper={setThumbsSwiper}
+                        modules={[Thumbs]}
+                        slidesPerView={4}
+                        spaceBetween={12}
+                        watchSlidesProgress
+                        className="thumb-swiper"
+                    >
+                        {images.map((image, index) => (
+                            <SwiperSlide key={index}>
+                                <img
+                                    src={image ?? "/no-image.png"}
+                                    alt={product.name}
+                                />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
 
                 </div>
 
-                <div className="description-box">
+                <div className="info-card">
 
-                    <h3>Description</h3>
+                    <div className="card-header">
 
-                    <p>
-                        {product.description}
-                    </p>
+                        <h2>{product.name}</h2>
 
-                </div>
+                        <span
+                            className={
+                                product.quantity_in_stock > 0
+                                    ? "status in-stock"
+                                    : "status out-stock"
+                            }
+                        >
+                            {product.quantity_in_stock > 0
+                                ? "In Stock"
+                                : "Out of Stock"}
+                        </span>
 
-                <div className="action-buttons">
+                    </div>
 
-                    <button className="edit-btn">
-                        Edit Product
-                    </button>
+                    <div className="info-grid">
 
-                    <button className="delete-btn">
-                        Delete Product
-                    </button>
+                        <div className="info-item">
+                            <span>Product ID</span>
+                            <strong>#{product.id}</strong>
+                        </div>
+
+                        <div className="info-item">
+                            <span>Category</span>
+                            <strong>{product.category}</strong>
+                        </div>
+
+                        <div className="info-item">
+                            <span>Price</span>
+                            <strong>${product.price}</strong>
+                        </div>
+
+                        <div className="info-item">
+                            <span>Sale Price</span>
+                            <strong className="sale-price">
+                                ${product.price_after}
+                            </strong>
+                        </div>
+
+                        <div className="info-item">
+                            <span>Stock</span>
+                            <strong>{product.quantity_in_stock}</strong>
+                        </div>
+
+                        <div className="info-item">
+                            <span>Store</span>
+                            <strong>{product.store}</strong>
+                        </div>
+
+                    </div>
+
+                    <div className="description-box">
+
+                        <h3>Description</h3>
+
+                        <p>{product.description}</p>
+
+                    </div>
+
+                    <div className="action-buttons">
+
+                        <button
+                            className="edit-btn"
+                            onClick={() => setOpenEditModal(true)}
+                        >
+                            Edit Product
+                        </button>
+
+                        <button className="delete-btn">
+                            Delete Product
+                        </button>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
-    )
+            <EditProductModal
+                open={openEditModal}
+                onClose={() => setOpenEditModal(false)}
+                product={product}
+                refreshProduct={GetProductData}
+            />
+        </>
+
+    );
 }
 
-export default ShopProductDetail
+export default ShopProductDetail;
