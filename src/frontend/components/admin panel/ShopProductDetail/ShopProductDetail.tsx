@@ -34,7 +34,7 @@ interface ShopProductData {
 }
 
 
-async function ShopPostDetail({ productId }: ProductId) {
+async function ShopProductDetail({ productId }: ProductId) {
 
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
     const { data: product } = await axios.get<ShopProductData>(
@@ -176,4 +176,4 @@ async function ShopPostDetail({ productId }: ProductId) {
     )
 }
 
-export default ShopPostDetail
+export default ShopProductDetail
