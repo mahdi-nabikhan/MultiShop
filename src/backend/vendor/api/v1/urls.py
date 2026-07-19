@@ -14,6 +14,7 @@ urlpatterns = [
     path('add/product/discount/<int:pk>/',AddProductsDiscountAPIView.as_view(),name='add-discount-products'),
     path('update/orderitem/<int:pk>/',OrderItemUpdateStatusApiView.as_view(),name='update_orderitem_shop'),
     path('store/detail/',StoreDetailAndDelete.as_view(),name='store_detail'),
-    path('store/user/roles/',ManagerAndOperatorUserRoleAPIViews.as_view(),name='store-user-role')
+    path('store/user/roles/',ManagerAndOperatorUserRoleAPIViews.as_view(),name='store-user-role'),
+    path('shop/list/order/',ShopOrderListAPIView.as_view(),name='order_list_shop')
 
 ]

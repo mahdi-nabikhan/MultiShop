@@ -7,7 +7,8 @@ from customer.models import *
 from django.contrib.auth.password_validation import validate_password
 from account.api.v1.serializers import *
 from website.models import *
-from order.models import OrderItem
+from order.models import OrderItem,Order
+from customer.api.v1.serializers import CustomerDetailSerializer
 
 
 class StoreAddressSerializer(serializers.ModelSerializer):
@@ -155,5 +156,15 @@ class OrderItemUpdateStatusSerializer(serializers.ModelSerializer):
         return response
     
         
+class ListOrderSerialazers(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['pk','status','customer']
         
         
+    def to_representation(self, instance):
+        res =  super().to_representation(instance)
+        res['customer'] = CustomerDetailSerializer(instance.customer).data
+        return res
+    
+    
