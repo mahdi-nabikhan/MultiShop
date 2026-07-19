@@ -3,6 +3,7 @@ import './ShopProductList.css'
 import BACKEND_URLS from '@/utils'
 import { cookies } from 'next/headers'
 import axios from 'axios'
+import ProductRow from '../ProductRow/ProductRow'
 interface ShopProductListData {
   id: number,
   name: string,
@@ -33,122 +34,69 @@ async function ShopProductList() {
 
     <div className="product-header">
 
-        <div>
-            <h1>Products</h1>
-            <p>Manage all products in your store</p>
-        </div>
+      <div>
+        <h1>Products</h1>
+        <p>Manage all products in your store</p>
+      </div>
 
-        <button className="add-product-btn">
-            + Add Product
-        </button>
+      <button className="add-product-btn">
+        + Add Product
+      </button>
 
     </div>
 
     <div className="toolbar">
 
-        <input
-            type="text"
-            placeholder="Search product..."
-        />
+      <input
+        type="text"
+        placeholder="Search product..."
+      />
 
-        <select>
-            <option>All Categories</option>
-        </select>
+      <select>
+        <option>All Categories</option>
+      </select>
 
-        <select>
-            <option>All Stock</option>
-        </select>
+      <select>
+        <option>All Stock</option>
+      </select>
 
     </div>
 
     <table className="product-table">
 
-        <thead>
+      <thead>
 
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Sale Price</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
+        <tr>
 
-        </thead>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Sale Price</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Action</th>
 
-        <tbody>
+        </tr>
 
-            {products.map((product) => (
+      </thead>
 
-                <tr key={product.id}>
+      <tbody>
 
-                    <td>
+        {products.map((product) => (
 
-                        <img
-                            src={product.product_image || "/no-image.png"}
-                            alt={product.name}
-                        />
+          <ProductRow
+            key={product.id}
+            product={product}
+          />
 
-                    </td>
+        ))}
 
-                    <td>
-
-                        <div className="product-name">
-
-                            <strong>{product.name}</strong>
-
-                            <span>
-                                {product.description.slice(0, 40)}...
-                            </span>
-
-                        </div>
-
-                    </td>
-
-                    <td>${product.price}</td>
-
-                    <td>${product.price_after}</td>
-
-                    <td>{product.quantity_in_stock}</td>
-
-                    <td>
-
-                        <span
-                            className={
-                                product.quantity_in_stock > 0
-                                    ? "badge success"
-                                    : "badge danger"
-                            }
-                        >
-                            {product.quantity_in_stock > 0
-                                ? "In Stock"
-                                : "Out of Stock"}
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        <button className="edit-btn">
-                            Edit
-                        </button>
-
-                        <button className="delete-btn">
-                            Delete
-                        </button>
-
-                    </td>
-
-                </tr>
-
-            ))}
-
-        </tbody>
+      </tbody>
 
     </table>
 
-</div>
+  </div>
+   
   )
 }
 
