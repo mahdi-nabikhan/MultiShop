@@ -819,7 +819,7 @@ class ShopOrderListAPIView(GenericAPIView):
         
     def get(self,request):
         obj= self.get_queryset()
-        serializer=self.serializer_class(isinstance=obj,many=True)
+        serializer=self.serializer_class(instance=obj,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
         
