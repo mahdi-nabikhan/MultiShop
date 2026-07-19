@@ -1,0 +1,364 @@
+.product-list{
+    padding:35px;
+    min-height:100vh;
+    background:#0f172a;
+    color:#f8fafc;
+}
+
+/* ==========================
+        Header
+========================== */
+
+.product-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.product-header h1{
+    font-size:32px;
+    font-weight:700;
+    color:#f8fafc;
+}
+
+.product-header p{
+    color:#94a3b8;
+    margin-top:6px;
+}
+
+.add-product-btn{
+
+    border:none;
+    cursor:pointer;
+
+    padding:12px 22px;
+
+    border-radius:12px;
+
+    background:#10b981;
+
+    color:white;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.add-product-btn:hover{
+
+    background:#059669;
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================
+        Toolbar
+========================== */
+
+.toolbar{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-bottom:25px;
+
+}
+
+.toolbar input,
+.toolbar select{
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    color:white;
+
+    padding:12px 15px;
+
+    border-radius:10px;
+
+    outline:none;
+
+    transition:.2s;
+
+}
+
+.toolbar input{
+
+    width:320px;
+
+}
+
+.toolbar input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+.toolbar input:focus,
+.toolbar select:focus{
+
+    border-color:#10b981;
+
+    box-shadow:0 0 0 3px rgba(16,185,129,.15);
+
+}
+
+/* ==========================
+        Table
+========================== */
+
+.product-table{
+
+    width:100%;
+
+    border-collapse:separate;
+
+    border-spacing:0;
+
+    overflow:hidden;
+
+    border-radius:18px;
+
+    background:#1e293b;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.35);
+
+}
+
+.product-table thead{
+
+    background:#273449;
+
+}
+
+.product-table th{
+
+    text-align:left;
+
+    padding:18px;
+
+    color:#e2e8f0;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+}
+
+.product-table td{
+
+    padding:18px;
+
+    border-top:1px solid #334155;
+
+    color:#cbd5e1;
+
+}
+
+.product-table tbody tr{
+
+    transition:.25s;
+
+}
+
+.product-table tbody tr:hover{
+
+    background:#26364d;
+
+}
+
+/* ==========================
+        Image
+========================== */
+
+.product-table img{
+
+    width:65px;
+
+    height:65px;
+
+    object-fit:cover;
+
+    border-radius:12px;
+
+    border:2px solid #334155;
+
+}
+
+/* ==========================
+        Product Name
+========================== */
+
+.product-name{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.product-name strong{
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+.product-name span{
+
+    color:#94a3b8;
+
+    font-size:13px;
+
+}
+
+/* ==========================
+        Badge
+========================== */
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:7px 15px;
+
+    border-radius:50px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.success{
+
+    background:rgba(16,185,129,.15);
+
+    color:#34d399;
+
+}
+
+.danger{
+
+    background:rgba(239,68,68,.15);
+
+    color:#f87171;
+
+}
+
+/* ==========================
+        Buttons
+========================== */
+
+.edit-btn,
+.delete-btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    border-radius:10px;
+
+    padding:10px 16px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.edit-btn{
+
+    background:#10b981;
+
+    color:white;
+
+    margin-right:10px;
+
+}
+
+.edit-btn:hover{
+
+    background:#059669;
+
+    transform:translateY(-2px);
+
+}
+
+.delete-btn{
+
+    background:#ef4444;
+
+    color:white;
+
+}
+
+.delete-btn:hover{
+
+    background:#dc2626;
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================
+        Scrollbar
+========================== */
+
+.product-table::-webkit-scrollbar{
+
+    height:8px;
+
+}
+
+.product-table::-webkit-scrollbar-thumb{
+
+    background:#334155;
+
+    border-radius:20px;
+
+}
+
+/* ==========================
+        Responsive
+========================== */
+
+@media(max-width:992px){
+
+    .toolbar{
+
+        flex-direction:column;
+
+    }
+
+    .toolbar input{
+
+        width:100%;
+
+    }
+
+    .product-table{
+
+        display:block;
+
+        overflow-x:auto;
+
+    }
+
+}

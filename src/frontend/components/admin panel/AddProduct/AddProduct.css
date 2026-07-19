@@ -1,0 +1,223 @@
+.create-product{
+    max-width:900px;
+    margin:40px auto;
+    padding:35px;
+    border-radius:20px;
+    background:#111827;
+    border:1px solid #1f2937;
+    box-shadow:0 10px 35px rgba(0,0,0,.35);
+}
+
+/* ================= HEADER ================= */
+
+.create-header{
+    margin-bottom:35px;
+}
+
+.create-header h1{
+    font-size:32px;
+    color:#f8fafc;
+    margin-bottom:8px;
+}
+
+.create-header p{
+    color:#94a3b8;
+    font-size:15px;
+}
+
+/* ================= FORM ================= */
+
+.create-form{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+.grid-2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.form-group label{
+    color:#cbd5e1;
+    font-size:14px;
+    font-weight:600;
+}
+
+.form-group input,
+.form-group textarea{
+
+    width:100%;
+
+    background:#1e293b;
+
+    color:#f8fafc;
+
+    border:1px solid #334155;
+
+    border-radius:12px;
+
+    padding:14px 16px;
+
+    font-size:15px;
+
+    outline:none;
+
+    transition:.25s;
+}
+
+.form-group textarea{
+    resize:vertical;
+    min-height:130px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+
+    border-color:#3b82f6;
+
+    box-shadow:0 0 0 4px rgba(59,130,246,.18);
+
+}
+
+/* ================= FILE ================= */
+
+.form-group input[type="file"]{
+
+    padding:12px;
+
+    cursor:pointer;
+
+}
+
+.form-group input[type="file"]::file-selector-button{
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:10px 16px;
+
+    border-radius:8px;
+
+    margin-right:15px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.form-group input[type="file"]::file-selector-button:hover{
+
+    background:#1d4ed8;
+
+}
+
+/* ================= IMAGE ================= */
+
+.preview{
+
+    width:220px;
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    border:1px solid #334155;
+
+}
+
+.preview img{
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+/* ================= BUTTON ================= */
+
+.create-btn{
+
+    border:none;
+
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+    color:white;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.create-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 25px rgba(37,99,235,.35);
+
+}
+
+.create-btn:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+    .create-product{
+
+        padding:22px;
+        margin:20px;
+
+    }
+
+    .grid-2{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .create-header h1{
+
+        font-size:26px;
+
+    }
+
+    .preview{
+
+        width:100%;
+
+    }
+
+}

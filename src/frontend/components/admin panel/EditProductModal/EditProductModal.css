@@ -1,0 +1,355 @@
+/* ===========================
+        Overlay
+=========================== */
+
+.modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,.75);
+    backdrop-filter: blur(6px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+
+    animation: fadeIn .25s ease;
+}
+
+/* ===========================
+        Modal
+=========================== */
+
+.edit-modal{
+
+    width: 720px;
+    max-width: 95%;
+
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: #111827;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    border-radius: 18px;
+
+    box-shadow: 0 25px 60px rgba(0,0,0,.45);
+
+    animation: popup .25s ease;
+}
+
+/* ===========================
+        Header
+=========================== */
+
+.modal-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:22px 28px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.modal-header h2{
+
+    color:white;
+    font-size:24px;
+    font-weight:700;
+
+}
+
+.close-btn{
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    background:#1f2937;
+
+    color:#cbd5e1;
+
+    font-size:18px;
+
+    transition:.25s;
+
+}
+
+.close-btn:hover{
+
+    background:#ef4444;
+    color:white;
+
+}
+
+/* ===========================
+        Form
+=========================== */
+
+.edit-form{
+
+    padding:30px;
+
+}
+
+.form-group{
+
+    display:flex;
+    flex-direction:column;
+
+    margin-bottom:22px;
+
+}
+
+.form-group label{
+
+    margin-bottom:8px;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.form-group input,
+.form-group textarea{
+
+    background:#1f2937;
+
+    border:1px solid #374151;
+
+    color:white;
+
+    border-radius:12px;
+
+    padding:13px 15px;
+
+    outline:none;
+
+    transition:.25s;
+
+    font-size:15px;
+
+}
+
+.form-group textarea{
+
+    resize:vertical;
+
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+
+    border-color:#3b82f6;
+
+    box-shadow:0 0 0 3px rgba(59,130,246,.18);
+
+}
+
+/* ===========================
+        Grid
+=========================== */
+
+.grid-2{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+}
+
+/* ===========================
+        Image Preview
+=========================== */
+
+.image-preview{
+
+    width:100%;
+    height:300px;
+
+    margin-bottom:25px;
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+    border:2px dashed #334155;
+
+}
+
+.image-preview img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+/* ===========================
+        Buttons
+=========================== */
+
+.modal-actions{
+
+    display:flex;
+    justify-content:flex-end;
+
+    gap:15px;
+
+    margin-top:35px;
+
+}
+
+.cancel-btn,
+.save-btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    padding:13px 28px;
+
+    border-radius:12px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    transition:.25s;
+
+}
+
+.cancel-btn{
+
+    background:#1f2937;
+
+    color:#cbd5e1;
+
+}
+
+.cancel-btn:hover{
+
+    background:#374151;
+
+}
+
+.save-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.save-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+.save-btn:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}
+
+/* ===========================
+        Scrollbar
+=========================== */
+
+.edit-modal::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.edit-modal::-webkit-scrollbar-thumb{
+
+    background:#374151;
+
+    border-radius:20px;
+
+}
+
+/* ===========================
+        Animation
+=========================== */
+
+@keyframes popup{
+
+    from{
+
+        opacity:0;
+        transform:translateY(30px) scale(.95);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translateY(0) scale(1);
+
+    }
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+/* ===========================
+        Responsive
+=========================== */
+
+@media(max-width:768px){
+
+    .grid-2{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .modal-actions{
+
+        flex-direction:column;
+
+    }
+
+    .cancel-btn,
+    .save-btn{
+
+        width:100%;
+
+    }
+
+}

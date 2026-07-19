@@ -798,3 +798,29 @@ class ManagerAndOperatorUserRoleAPIViews(GenericAPIView):
         if Admin.objects.filter(user=user).exists():
             role = 'admin'
         return Response({'role':role},status=status.HTTP_200_OK)        
+    
+    
+class ShopOrderListAPIView(GenericAPIView):
+    serializer_class = ListOrderSerialazers
+    
+    
+    def get_queryset(self):
+        store = (
+        self.request.user.manager.store
+        if hasattr(self.request.user, "manager")
+        else self.request.user.admin.shop
+        if hasattr(self.request.user, "admin")
+        else self.request.user.operator.shop
+        )
+        return Order.objects.filter(
+            items__product__store=store
+        ).distinct()
+        
+        
+    def get(self,request):
+        obj= self.get_queryset()
+        serializer=self.serializer_class(instance=obj,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+        
+        
