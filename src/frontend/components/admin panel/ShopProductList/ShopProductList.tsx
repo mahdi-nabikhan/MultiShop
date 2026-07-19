@@ -1,6 +1,7 @@
 import React from 'react'
 import './ShopProductList.css'
 import BACKEND_URLS from '@/utils'
+import { cookies } from 'next/headers'
 import axios from 'axios'
 interface ShopProductListData {
   id: number,
@@ -17,9 +18,14 @@ interface ShopProductListData {
 }
 
 async function ShopProductList() {
+  const cookieStore = await cookies();
   const { data: products } = await axios.get<ShopProductListData[]>(
-    `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,
-    { withCredentials: true }
+    `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,{
+        headers:{
+        Cookie: cookieStore.toString(),
+        }
+    }
+    
   )
 
   return (

@@ -1,10 +1,13 @@
 .product-list{
     padding:35px;
-    background:#f8fafc;
     min-height:100vh;
+    background:#0f172a;
+    color:#f8fafc;
 }
 
-/* ================= HEADER ================= */
+/* ==========================
+        Header
+========================== */
 
 .product-header{
     display:flex;
@@ -14,83 +17,122 @@
 }
 
 .product-header h1{
-    font-size:30px;
-    color:#1f2937;
+    font-size:32px;
+    font-weight:700;
+    color:#f8fafc;
 }
 
 .product-header p{
-    color:#6b7280;
+    color:#94a3b8;
     margin-top:6px;
 }
 
 .add-product-btn{
+
     border:none;
     cursor:pointer;
 
     padding:12px 22px;
 
-    border-radius:10px;
+    border-radius:12px;
 
-    background:#2563eb;
+    background:#10b981;
+
     color:white;
 
     font-weight:600;
+
     transition:.25s;
+
 }
 
 .add-product-btn:hover{
-    background:#1d4ed8;
+
+    background:#059669;
+
+    transform:translateY(-2px);
+
 }
 
-/* ================= TOOLBAR ================= */
+/* ==========================
+        Toolbar
+========================== */
 
 .toolbar{
+
     display:flex;
+
     gap:15px;
+
     margin-bottom:25px;
+
 }
 
 .toolbar input,
 .toolbar select{
 
-    padding:11px 14px;
+    background:#1e293b;
 
-    border:1px solid #d1d5db;
+    border:1px solid #334155;
 
-    border-radius:8px;
+    color:white;
 
-    background:white;
+    padding:12px 15px;
+
+    border-radius:10px;
 
     outline:none;
 
-    font-size:15px;
+    transition:.2s;
+
 }
 
 .toolbar input{
+
     width:320px;
+
 }
 
-/* ================= TABLE ================= */
+.toolbar input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+.toolbar input:focus,
+.toolbar select:focus{
+
+    border-color:#10b981;
+
+    box-shadow:0 0 0 3px rgba(16,185,129,.15);
+
+}
+
+/* ==========================
+        Table
+========================== */
 
 .product-table{
 
     width:100%;
 
-    border-collapse:collapse;
+    border-collapse:separate;
 
-    background:white;
-
-    border-radius:14px;
+    border-spacing:0;
 
     overflow:hidden;
 
-    box-shadow:0 10px 30px rgba(0,0,0,.05);
+    border-radius:18px;
+
+    background:#1e293b;
+
+    box-shadow:0 20px 45px rgba(0,0,0,.35);
 
 }
 
 .product-table thead{
 
-    background:#f3f4f6;
+    background:#273449;
 
 }
 
@@ -100,11 +142,13 @@
 
     padding:18px;
 
-    color:#374151;
+    color:#e2e8f0;
 
-    font-size:15px;
+    font-size:14px;
 
     font-weight:700;
+
+    letter-spacing:.5px;
 
 }
 
@@ -112,41 +156,45 @@
 
     padding:18px;
 
-    border-top:1px solid #edf2f7;
+    border-top:1px solid #334155;
 
-    vertical-align:middle;
+    color:#cbd5e1;
 
 }
 
 .product-table tbody tr{
 
-    transition:.2s;
+    transition:.25s;
 
 }
 
 .product-table tbody tr:hover{
 
-    background:#f9fafb;
+    background:#26364d;
 
 }
 
-/* ================= IMAGE ================= */
+/* ==========================
+        Image
+========================== */
 
 .product-table img{
 
-    width:60px;
+    width:65px;
 
-    height:60px;
+    height:65px;
 
     object-fit:cover;
 
-    border-radius:10px;
+    border-radius:12px;
 
-    border:1px solid #e5e7eb;
+    border:2px solid #334155;
 
 }
 
-/* ================= NAME ================= */
+/* ==========================
+        Product Name
+========================== */
 
 .product-name{
 
@@ -160,7 +208,7 @@
 
 .product-name strong{
 
-    color:#111827;
+    color:white;
 
     font-size:15px;
 
@@ -168,43 +216,53 @@
 
 .product-name span{
 
-    color:#6b7280;
+    color:#94a3b8;
 
     font-size:13px;
 
 }
 
-/* ================= BADGES ================= */
+/* ==========================
+        Badge
+========================== */
 
 .badge{
 
-    padding:6px 14px;
+    display:inline-flex;
 
-    border-radius:30px;
+    align-items:center;
 
-    font-size:13px;
+    justify-content:center;
 
-    font-weight:600;
+    padding:7px 15px;
+
+    border-radius:50px;
+
+    font-size:12px;
+
+    font-weight:700;
 
 }
 
 .success{
 
-    background:#dcfce7;
+    background:rgba(16,185,129,.15);
 
-    color:#15803d;
+    color:#34d399;
 
 }
 
 .danger{
 
-    background:#fee2e2;
+    background:rgba(239,68,68,.15);
 
-    color:#dc2626;
+    color:#f87171;
 
 }
 
-/* ================= ACTIONS ================= */
+/* ==========================
+        Buttons
+========================== */
 
 .edit-btn,
 .delete-btn{
@@ -213,11 +271,11 @@
 
     cursor:pointer;
 
-    padding:8px 14px;
+    border-radius:10px;
 
-    border-radius:8px;
+    padding:10px 16px;
 
-    margin-right:8px;
+    font-size:13px;
 
     font-weight:600;
 
@@ -227,15 +285,19 @@
 
 .edit-btn{
 
-    background:#2563eb;
+    background:#10b981;
 
     color:white;
+
+    margin-right:10px;
 
 }
 
 .edit-btn:hover{
 
-    background:#1d4ed8;
+    background:#059669;
+
+    transform:translateY(-2px);
 
 }
 
@@ -251,9 +313,31 @@
 
     background:#dc2626;
 
+    transform:translateY(-2px);
+
 }
 
-/* ================= RESPONSIVE ================= */
+/* ==========================
+        Scrollbar
+========================== */
+
+.product-table::-webkit-scrollbar{
+
+    height:8px;
+
+}
+
+.product-table::-webkit-scrollbar-thumb{
+
+    background:#334155;
+
+    border-radius:20px;
+
+}
+
+/* ==========================
+        Responsive
+========================== */
 
 @media(max-width:992px){
 
