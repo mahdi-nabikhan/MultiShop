@@ -1,0 +1,280 @@
+.product-list{
+    padding:35px;
+    background:#f8fafc;
+    min-height:100vh;
+}
+
+/* ================= HEADER ================= */
+
+.product-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.product-header h1{
+    font-size:30px;
+    color:#1f2937;
+}
+
+.product-header p{
+    color:#6b7280;
+    margin-top:6px;
+}
+
+.add-product-btn{
+    border:none;
+    cursor:pointer;
+
+    padding:12px 22px;
+
+    border-radius:10px;
+
+    background:#2563eb;
+    color:white;
+
+    font-weight:600;
+    transition:.25s;
+}
+
+.add-product-btn:hover{
+    background:#1d4ed8;
+}
+
+/* ================= TOOLBAR ================= */
+
+.toolbar{
+    display:flex;
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.toolbar input,
+.toolbar select{
+
+    padding:11px 14px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    background:white;
+
+    outline:none;
+
+    font-size:15px;
+}
+
+.toolbar input{
+    width:320px;
+}
+
+/* ================= TABLE ================= */
+
+.product-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:white;
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+
+}
+
+.product-table thead{
+
+    background:#f3f4f6;
+
+}
+
+.product-table th{
+
+    text-align:left;
+
+    padding:18px;
+
+    color:#374151;
+
+    font-size:15px;
+
+    font-weight:700;
+
+}
+
+.product-table td{
+
+    padding:18px;
+
+    border-top:1px solid #edf2f7;
+
+    vertical-align:middle;
+
+}
+
+.product-table tbody tr{
+
+    transition:.2s;
+
+}
+
+.product-table tbody tr:hover{
+
+    background:#f9fafb;
+
+}
+
+/* ================= IMAGE ================= */
+
+.product-table img{
+
+    width:60px;
+
+    height:60px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+    border:1px solid #e5e7eb;
+
+}
+
+/* ================= NAME ================= */
+
+.product-name{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.product-name strong{
+
+    color:#111827;
+
+    font-size:15px;
+
+}
+
+.product-name span{
+
+    color:#6b7280;
+
+    font-size:13px;
+
+}
+
+/* ================= BADGES ================= */
+
+.badge{
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.success{
+
+    background:#dcfce7;
+
+    color:#15803d;
+
+}
+
+.danger{
+
+    background:#fee2e2;
+
+    color:#dc2626;
+
+}
+
+/* ================= ACTIONS ================= */
+
+.edit-btn,
+.delete-btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    padding:8px 14px;
+
+    border-radius:8px;
+
+    margin-right:8px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.edit-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.edit-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+.delete-btn{
+
+    background:#ef4444;
+
+    color:white;
+
+}
+
+.delete-btn:hover{
+
+    background:#dc2626;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:992px){
+
+    .toolbar{
+
+        flex-direction:column;
+
+    }
+
+    .toolbar input{
+
+        width:100%;
+
+    }
+
+    .product-table{
+
+        display:block;
+
+        overflow-x:auto;
+
+    }
+
+}
