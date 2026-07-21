@@ -1,5 +1,5 @@
 "use client";
-
+import AddDiscountModal from "../AddDiscountModal/AddDiscountModal";
 import React, { useEffect, useState } from "react";
 import "./ShopProductDetail.css";
 import axios from "axios";
@@ -32,8 +32,8 @@ function ShopProductDetail({ productId }: { productId: number }) {
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
     const [product, setProduct] = useState<ShopProductData | null>(null);
     const [openEditModal, setOpenEditModal] = useState(false);
-
-    // 👇 این باید بیرون useEffect باشد
+    const [openDiscountModal, setOpenDiscountModal] = useState(false);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const GetProductData = async () => {
 
         try {
@@ -55,7 +55,6 @@ function ShopProductDetail({ productId }: { productId: number }) {
 
     };
 
-    // 👇 فقط فراخوانی
     useEffect(() => {
 
         GetProductData();
@@ -190,6 +189,12 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         >
                             Edit Product
                         </button>
+                        <button
+                            className="primary-btn"
+                            onClick={() => setOpenDiscountModal(true)}
+                        >
+                            Add Discount
+                        </button>
 
                         <button className="delete-btn">
                             Delete Product
@@ -200,7 +205,14 @@ function ShopProductDetail({ productId }: { productId: number }) {
                 </div>
 
             </div>
-
+            <AddDiscountModal
+                open={openDiscountModal}
+                onClose={() => setOpenDiscountModal(false)}
+                productId={product.id}
+                refreshDiscounts={() => {
+                    // بعداً اینجا لیست تخفیف‌ها را دوباره دریافت می‌کنی
+                }}
+            />
             <EditProductModal
                 open={openEditModal}
                 onClose={() => setOpenEditModal(false)}
