@@ -122,8 +122,8 @@ def update_product_price_after(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=Discount)
 def reset_product_price_after(sender, instance, **kwargs):
-    if instance.product:
-        instance.products.price_after = instance.product.price
+    if instance.products:
+        instance.products.price_after = instance.products.price
         instance.products.save(update_fields=['price_after'])
 
 
