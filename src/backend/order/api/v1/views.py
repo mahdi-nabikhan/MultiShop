@@ -427,3 +427,17 @@ class CartAddAPIView(generics.GenericAPIView):
             ).data,
             status=201,
         )
+        
+class RelatedOrderItemWithOrder(generics.GenericAPIView):
+    serializer_class= OrderItemSerializer
+    
+    def get_queryset(self,pk):
+        order_obj = Order.objects.get(pk=pk)    
+        return OrderItem.objects.filter(order=order_obj)
+    
+    
+    def get(self,request,pk):
+        obj= self.get_queryset(pk)
+        serializer = self.serializer_class(instance=obj,many=True,context = {'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
