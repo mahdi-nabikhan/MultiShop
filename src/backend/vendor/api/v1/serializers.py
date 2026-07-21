@@ -128,8 +128,8 @@ class AddImageSerializer(serializers.ModelSerializer):
 class AddDiscountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Discount
-        fields = ['products', 'value', 'discount_type']
-        read_only_fields = ('products',)
+        fields = ['pk','id','products', 'value', 'discount_type']
+        read_only_fields = ('pk','id','products',)
 
     def create(self, validated_data):
         

@@ -18,7 +18,7 @@ export default function DeleteDiscountModal({
     discountId,
     refreshDiscounts,
 }: Props) {
-
+    console.log('this is discount id',discountId)
     const [loading, setLoading] = useState(false);
 
     if (!open) return null;
