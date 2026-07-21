@@ -647,7 +647,7 @@ class AddProductsDiscountAPIView(GenericAPIView):
 
     def get(self, request, pk):
         data = self.get_queryset().filter(products__pk=pk)
-        serializer = self.serializer_class(data, many=True)
+        serializer = self.serializer_class(data, many=True,context= {'request':request,'pk':pk})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
