@@ -15,6 +15,7 @@ urlpatterns = [
     path('update/orderitem/<int:pk>/',OrderItemUpdateStatusApiView.as_view(),name='update_orderitem_shop'),
     path('store/detail/',StoreDetailAndDelete.as_view(),name='store_detail'),
     path('store/user/roles/',ManagerAndOperatorUserRoleAPIViews.as_view(),name='store-user-role'),
-    path('shop/list/order/',ShopOrderListAPIView.as_view(),name='order_list_shop')
+    path('shop/list/order/',ShopOrderListAPIView.as_view(),name='order_list_shop'),
+    path('delete/discount/<int:pk>/',DeleteProductDiscount.as_view(),name = 'delete_discount')
 
 ]
