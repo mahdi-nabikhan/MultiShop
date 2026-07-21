@@ -1,0 +1,334 @@
+.orders-page {
+
+    padding: 35px;
+
+    min-height: 100vh;
+
+    background: #0f172a;
+
+}
+
+/* ===========================
+        Header
+=========================== */
+
+.orders-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 35px;
+
+}
+
+.orders-header h1 {
+
+    color: white;
+
+    font-size: 34px;
+
+    margin-bottom: 8px;
+
+}
+
+.orders-header p {
+
+    color: #94a3b8;
+
+    font-size: 15px;
+
+}
+
+/* ===========================
+        Empty
+=========================== */
+
+.empty-orders {
+
+    background: #1e293b;
+
+    border: 1px solid #334155;
+
+    border-radius: 16px;
+
+    padding: 60px;
+
+    text-align: center;
+
+}
+
+.empty-orders h2 {
+
+    color: #cbd5e1;
+
+}
+
+/* ===========================
+        Loading
+=========================== */
+
+.orders-loading {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    height: 60vh;
+
+    color: white;
+
+    font-size: 22px;
+
+}
+
+/* ===========================
+        List
+=========================== */
+
+.orders-list {
+
+    display: grid;
+
+    gap: 24px;
+
+}
+
+/* ===========================
+        Card
+=========================== */
+
+.order-card {
+
+    background: #1e293b;
+
+    border: 1px solid #334155;
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    transition: .25s;
+
+}
+
+.order-card:hover {
+
+    border-color: #2563eb;
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 15px 35px rgba(37, 99, 235, .15);
+
+}
+
+/* ===========================
+        Top
+=========================== */
+
+.order-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+}
+
+.order-top h2 {
+
+    color: white;
+
+    font-size: 22px;
+
+}
+
+/* ===========================
+        Status
+=========================== */
+
+.status {
+
+    padding: 8px 18px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+.completed {
+
+    background: rgba(34,197,94,.15);
+
+    color: #22c55e;
+
+}
+
+.pending {
+
+    background: rgba(245,158,11,.15);
+
+    color: #f59e0b;
+
+}
+
+/* ===========================
+        Body
+=========================== */
+
+.order-body {
+
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: 20px;
+
+    margin-bottom: 30px;
+
+}
+
+.order-item {
+
+    background: #0f172a;
+
+    border: 1px solid #334155;
+
+    border-radius: 12px;
+
+    padding: 18px;
+
+}
+
+.order-item span {
+
+    display: block;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+
+}
+
+.order-item strong {
+
+    color: white;
+
+    font-size: 17px;
+
+}
+
+/* ===========================
+        Buttons
+=========================== */
+
+.order-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 15px;
+
+}
+
+.view-btn {
+
+    border: none;
+
+    cursor: pointer;
+
+    background: #2563eb;
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+
+    transition: .25s;
+
+}
+
+.view-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+.confirm-btn {
+
+    border: none;
+
+    cursor: pointer;
+
+    background: #16a34a;
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+
+    transition: .25s;
+
+}
+
+.confirm-btn:hover {
+
+    background: #15803d;
+
+}
+
+/* ===========================
+        Responsive
+=========================== */
+
+@media (max-width:768px){
+
+    .order-top{
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+    .order-body{
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .order-actions{
+
+        flex-direction: column;
+
+    }
+
+    .view-btn,
+    .confirm-btn{
+
+        width:100%;
+
+    }
+
+}
