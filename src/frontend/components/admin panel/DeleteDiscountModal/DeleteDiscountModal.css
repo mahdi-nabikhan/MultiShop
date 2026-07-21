@@ -1,0 +1,126 @@
+.delete-modal-overlay{
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(15,23,42,.75);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.delete-modal{
+
+    width:430px;
+
+    background:#111827;
+
+    border:1px solid #334155;
+
+    border-radius:18px;
+
+    padding:35px;
+
+    text-align:center;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.35);
+
+}
+
+.delete-icon{
+
+    font-size:60px;
+
+    margin-bottom:20px;
+
+}
+
+.delete-modal h2{
+
+    color:white;
+
+    margin-bottom:15px;
+
+}
+
+.delete-modal p{
+
+    color:#94a3b8;
+
+    line-height:1.8;
+
+}
+
+.delete-actions{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:35px;
+
+}
+
+.cancel-btn,
+.confirm-delete-btn{
+
+    flex:1;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:13px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.cancel-btn{
+
+    background:#334155;
+
+    color:white;
+
+}
+
+.cancel-btn:hover{
+
+    background:#475569;
+
+}
+
+.confirm-delete-btn{
+
+    background:#dc2626;
+
+    color:white;
+
+}
+
+.confirm-delete-btn:hover{
+
+    background:#b91c1c;
+
+}
+
+.confirm-delete-btn:disabled,
+.cancel-btn:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+
+}

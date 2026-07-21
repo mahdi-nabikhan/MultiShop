@@ -647,7 +647,7 @@ class AddProductsDiscountAPIView(GenericAPIView):
 
     def get(self, request, pk):
         data = self.get_queryset().filter(products__pk=pk)
-        serializer = self.serializer_class(data, many=True)
+        serializer = self.serializer_class(data, many=True,context= {'request':request,'pk':pk})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -822,5 +822,20 @@ class ShopOrderListAPIView(GenericAPIView):
         serializer=self.serializer_class(instance=obj,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
+
+class DeleteProductDiscount(GenericAPIView):
+    
+    
+    def get_queryset(self,pk):
+        return Discount.objects.get(pk=pk)
+    
+    
+    def delete(self,request,pk):
+        obj = self.get_queryset(pk)
+        obj.delete()
+        return Response({'message':'discount deleted successfully'})
+    
+    
+        
         
         

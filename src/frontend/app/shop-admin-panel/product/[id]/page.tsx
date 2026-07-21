@@ -1,3 +1,4 @@
+import DiscountList from "@/components/admin panel/DiscountList/DiscountList";
 import ShopProductDetail from "@/components/admin panel/ShopProductDetail/ShopProductDetail";
 
 interface Props {
@@ -10,6 +11,11 @@ export default async function Page({ params }: Props) {
   const { id } = await params;
 
   return (
-    <ShopProductDetail productId={Number(id)} />
+    <>
+      <ShopProductDetail productId={Number(id)} />
+      
+    
+    </>
+
   );
 }

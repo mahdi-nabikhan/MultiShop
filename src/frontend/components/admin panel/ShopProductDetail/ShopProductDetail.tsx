@@ -1,10 +1,11 @@
 "use client";
-
+import AddDiscountModal from "../AddDiscountModal/AddDiscountModal";
 import React, { useEffect, useState } from "react";
 import "./ShopProductDetail.css";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
 import EditProductModal from "../EditProductModal/EditProductModal";
+import DiscountList from "../DiscountList/DiscountList";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Thumbs } from "swiper/modules";
@@ -32,8 +33,8 @@ function ShopProductDetail({ productId }: { productId: number }) {
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
     const [product, setProduct] = useState<ShopProductData | null>(null);
     const [openEditModal, setOpenEditModal] = useState(false);
-
-    // 👇 این باید بیرون useEffect باشد
+    const [openDiscountModal, setOpenDiscountModal] = useState(false);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const GetProductData = async () => {
 
         try {
@@ -55,7 +56,6 @@ function ShopProductDetail({ productId }: { productId: number }) {
 
     };
 
-    // 👇 فقط فراخوانی
     useEffect(() => {
 
         GetProductData();
@@ -190,6 +190,12 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         >
                             Edit Product
                         </button>
+                        <button
+                            className="primary-btn"
+                            onClick={() => setOpenDiscountModal(true)}
+                        >
+                            Add Discount
+                        </button>
 
                         <button className="delete-btn">
                             Delete Product
@@ -198,9 +204,16 @@ function ShopProductDetail({ productId }: { productId: number }) {
                     </div>
 
                 </div>
-
+                    <DiscountList productId={Number(productId)}/>                
             </div>
-
+            <AddDiscountModal
+                open={openDiscountModal}
+                onClose={() => setOpenDiscountModal(false)}
+                productId={product.id}
+                refreshDiscounts={() => {
+                    // بعداً اینجا لیست تخفیف‌ها را دوباره دریافت می‌کنی
+                }}
+            />
             <EditProductModal
                 open={openEditModal}
                 onClose={() => setOpenEditModal(false)}

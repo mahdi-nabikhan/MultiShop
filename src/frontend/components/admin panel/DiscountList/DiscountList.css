@@ -1,0 +1,309 @@
+.discount-container{
+
+    margin-top:35px;
+
+    padding:30px;
+
+    border-radius:18px;
+
+    background:#111827;
+
+    border:1px solid #1f2937;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+
+}
+
+/* ================= HEADER ================= */
+
+.discount-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:30px;
+
+}
+
+.discount-header h2{
+
+    color:#f8fafc;
+
+    font-size:28px;
+
+    margin-bottom:6px;
+
+}
+
+.discount-header p{
+
+    color:#94a3b8;
+
+}
+
+.add-discount-btn{
+
+    border:none;
+
+    cursor:pointer;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:10px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.add-discount-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+/* ================= LIST ================= */
+
+.discount-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+/* ================= CARD ================= */
+
+.discount-card{
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    border-radius:14px;
+
+    padding:20px;
+
+    transition:.25s;
+
+}
+
+.discount-card:hover{
+
+    border-color:#3b82f6;
+
+    transform:translateY(-2px);
+
+}
+
+/* ================= TOP ================= */
+
+.discount-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.discount-type{
+
+    color:white;
+
+    padding:7px 14px;
+
+    border-radius:999px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    text-transform:capitalize;
+
+}
+
+.discount-type.cash{
+
+    background:#22c55e;
+
+}
+
+.discount-type.percent{
+
+    background:#f59e0b;
+
+}
+
+.discount-value{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#f8fafc;
+
+}
+
+/* ================= FOOTER ================= */
+
+.discount-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    color:#94a3b8;
+
+    border-top:1px solid #334155;
+
+    padding-top:16px;
+
+}
+
+.discount-actions{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+/* ================= BUTTONS ================= */
+
+.edit-discount,
+.delete-discount{
+
+    border:none;
+
+    cursor:pointer;
+
+    padding:9px 16px;
+
+    border-radius:8px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.edit-discount{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.edit-discount:hover{
+
+    background:#1d4ed8;
+
+}
+
+.delete-discount{
+
+    background:#dc2626;
+
+    color:white;
+
+}
+
+.delete-discount:hover{
+
+    background:#b91c1c;
+
+}
+
+/* ================= EMPTY ================= */
+
+.empty-discount{
+
+    border:2px dashed #334155;
+
+    border-radius:14px;
+
+    padding:60px 20px;
+
+    text-align:center;
+
+}
+
+.empty-discount h3{
+
+    color:#f8fafc;
+
+    margin-bottom:10px;
+
+}
+
+.empty-discount p{
+
+    color:#94a3b8;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:768px){
+
+    .discount-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:18px;
+
+    }
+
+    .discount-footer{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:15px;
+
+    }
+
+    .discount-actions{
+
+        width:100%;
+
+    }
+
+    .edit-discount,
+    .delete-discount{
+
+        flex:1;
+
+    }
+
+    .discount-top{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:12px;
+
+    }
+
+}
