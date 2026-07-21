@@ -5,6 +5,7 @@ import "./ShopProductDetail.css";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
 import EditProductModal from "../EditProductModal/EditProductModal";
+import DiscountList from "../DiscountList/DiscountList";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Thumbs } from "swiper/modules";
@@ -203,7 +204,7 @@ function ShopProductDetail({ productId }: { productId: number }) {
                     </div>
 
                 </div>
-
+                    <DiscountList productId={Number(productId)}/>                
             </div>
             <AddDiscountModal
                 open={openDiscountModal}

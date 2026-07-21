@@ -13,7 +13,7 @@ export default async function Page({ params }: Props) {
   return (
     <>
       <ShopProductDetail productId={Number(id)} />
-      <DiscountList productId={Number(id)}/>
+      
     
     </>
 
