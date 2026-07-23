@@ -39,7 +39,7 @@ export default function OrderItemList ({orderId}:Props){
     const getItems = async () =>{
         try{
             const {data}= await axios.get<OrderItem[]>(
-                `${BACKEND_URLS}order/api/v1/order/item/list/${orderId}/`,
+                `${BACKEND_URLS}order/api/v1/related/order/orderitem/${orderId}/`,
                 {withCredentials:true}
             )
             setItems(data)
@@ -60,7 +60,10 @@ export default function OrderItemList ({orderId}:Props){
     }
     if (items.length ===0 ){
         return <h2>No Order Item found</h2>
-    }
+    }]\['
+         \]
+         \
+          ']
     return(
         <>
             <div className="order-item-page">
