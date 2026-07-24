@@ -1,0 +1,157 @@
+.ticket-page {
+    padding: 35px;
+    background: #f4f7fb;
+    min-height: 100vh;
+}
+
+.ticket-header {
+    margin-bottom: 30px;
+}
+
+.ticket-header h1 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.ticket-header p {
+    color: #64748b;
+    font-size: 16px;
+}
+
+/* ==========================
+        Ticket List
+========================== */
+
+.ticket-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 25px;
+}
+
+/* ==========================
+        Ticket Card
+========================== */
+
+.ticket-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, .08);
+    border: 1px solid #e2e8f0;
+    transition: .25s;
+}
+
+.ticket-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(37, 99, 235, .15);
+}
+
+.ticket-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.ticket-top h2 {
+    font-size: 22px;
+    color: #0f172a;
+    margin-bottom: 5px;
+}
+
+.ticket-top span {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.ticket-user {
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ==========================
+        Content
+========================== */
+
+.ticket-content {
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 25px;
+    min-height: 80px;
+    word-break: break-word;
+}
+
+/* ==========================
+        Footer
+========================== */
+
+.ticket-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 18px;
+}
+
+.ticket-footer span {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.ticket-footer button {
+    border: none;
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+    color: white;
+    padding: 11px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .25s;
+}
+
+.ticket-footer button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(37,99,235,.25);
+}
+
+/* ==========================
+        Responsive
+========================== */
+
+@media(max-width:900px){
+
+    .ticket-list{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .ticket-page{
+        padding:20px;
+    }
+
+    .ticket-top{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+    }
+
+    .ticket-footer{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+    }
+
+    .ticket-footer button{
+        width:100%;
+    }
+
+}
