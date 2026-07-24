@@ -60,10 +60,7 @@ export default function OrderItemList ({orderId}:Props){
     }
     if (items.length ===0 ){
         return <h2>No Order Item found</h2>
-    }]\['
-         \]
-         \
-          ']
+    }
     return(
         <>
             <div className="order-item-page">
