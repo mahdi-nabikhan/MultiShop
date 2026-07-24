@@ -108,7 +108,7 @@ export default function ProductRow({ product }: Props) {
           <button
             className="edit-btn"
             onClick={() =>
-              router.push(`/shop-admin/product/${product.id}`)
+              router.push(`/shop-admin-panel/product/${product.id}`)
             }
           >
             Detail
