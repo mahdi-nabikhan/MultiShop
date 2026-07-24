@@ -149,7 +149,7 @@ class CreateAndListReplayTicketAPIView(GenericAPIView):
     
     def post(self,request,pk):
         data = request.data
-        serializer =  self.serializer_class(sata=data,context = {'pk':pk})
+        serializer =  self.serializer_class(data=data,context = {'pk':pk})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
