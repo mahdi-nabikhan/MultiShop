@@ -1,28 +1,83 @@
-.chartCard {
-    background: var(--surface);
-    border: 1px solid var(--border);
+/* ==========================
+        Chart Card
+========================== */
+
+.chart-card {
+    width: 100%;
+    background: #1e293b;
+    border: 1px solid #334155;
     border-radius: 18px;
     padding: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .05);
+    box-shadow: 0 20px 45px rgba(0,0,0,.35);
+    margin-bottom: 30px;
 }
 
-.header {
-    margin-bottom: 20px;
+/* ==========================
+        Header
+========================== */
+
+.chart-header {
+    margin-bottom: 25px;
 }
 
-.header h3 {
+.chart-header h3 {
     margin: 0;
-    color: var(--text);
-    font-size: 22px;
+    color: #f8fafc;
+    font-size: 28px;
+    font-weight: 700;
 }
 
-.header p {
-    margin-top: 6px;
-    color: var(--text-muted);
-    font-size: 14px;
+.chart-header p {
+    margin-top: 8px;
+    color: #94a3b8;
+    font-size: 15px;
 }
 
-.chart {
+/* ==========================
+        Chart Body
+========================== */
+
+.chart-body {
     width: 100%;
-    height: 350px;
+    height: 380px;
+}
+
+/* ==========================
+        Recharts
+========================== */
+
+.recharts-cartesian-grid line {
+    stroke: #334155 !important;
+}
+
+.recharts-cartesian-axis-line {
+    stroke: #475569 !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+    fill: #cbd5e1 !important;
+}
+
+.recharts-tooltip-wrapper {
+    outline: none;
+}
+
+/* ==========================
+        Responsive
+========================== */
+
+@media (max-width:768px){
+
+    .chart-card{
+        padding:20px;
+    }
+
+    .chart-header h3{
+        font-size:24px;
+    }
+
+    .chart-body{
+        height:300px;
+    }
+
 }

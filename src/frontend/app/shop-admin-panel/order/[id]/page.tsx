@@ -3,17 +3,12 @@ import OrderItemList from "@/components/admin panel/OrderItemList/OrderItemList"
 
 interface Props {
     params: Promise<{
-        orderId: string;
+        id: string;
     }>;
 }
 
-export default async function page({ params }: Props) {
+export default async function Page({ params }: Props) {
+    const { id } = await params;
 
-    const { orderId } = await params;
-
-    return (
-        <OrderItemList
-            orderId={Number(orderId)}
-        />
-    );
+    return <OrderItemList orderId={Number(id)} />;
 }

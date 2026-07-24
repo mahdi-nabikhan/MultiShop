@@ -105,8 +105,13 @@ export default function ProductRow({ product }: Props) {
 
         <td>
 
-          <button className="edit-btn">
-            Edit
+          <button
+            className="edit-btn"
+            onClick={() =>
+              router.push(`/shop-admin-panel/product/${product.id}`)
+            }
+          >
+            Detail
           </button>
 
           <button

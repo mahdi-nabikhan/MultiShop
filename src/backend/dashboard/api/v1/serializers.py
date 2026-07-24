@@ -82,7 +82,7 @@ class ListCreateTicketSerializers(serializers.ModelSerializer):
         return Ticket.objects.create(**validated_data)
     def to_representation(self, instance):
         res =  super().to_representation(instance)
-        res ['customer'] = CustomerDetailSerializer(res.customer).data
+        res ['customer'] = CustomerDetailSerializer(instance.customer).data
         return res
     
     
@@ -94,7 +94,7 @@ class DetailTicketSerializer(serializers.ModelSerializer):
         
     def to_representation(self, instance):
         res =  super().to_representation(instance)
-        res ['customer'] = CustomerDetailSerializer(res.customer).data
+        res ['customer'] = CustomerDetailSerializer(instance.customer).data
         return res
 
 class ReplayTicketSerializer (serializers.ModelSerializer):

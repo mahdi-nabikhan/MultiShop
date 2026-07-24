@@ -41,7 +41,7 @@ const menuItems: MenuItem[] = [
     roles: ["manager", "admin", "operator"],
   },
   {
-    title: "Products",
+    title: "Chat",
     icon: Package,
     href: "/shop-admin-panel/products",
     roles: ["manager", "admin", "operator"],
@@ -53,10 +53,10 @@ const menuItems: MenuItem[] = [
     roles: ["manager", "admin", "operator"],
   },
   {
-    title: "Customers",
+    title: "Ticket",
     icon: Users,
-    href: "/shop-admin-panel/customers",
-    roles: ["manager", "admin"],
+    href: "/shop-admin-panel/ticket",
+    roles: ["manager", "admin","operator"],
   },
   {
     title: "Stores",
@@ -65,15 +65,15 @@ const menuItems: MenuItem[] = [
     roles: ["manager"],
   },
   {
-    title: "Categories",
+    title: "Register Admin",
     icon: Tags,
-    href: "/shop-admin-panel/categories",
+    href: "/shop-admin-panel/register-admin",
     roles: ["manager"],
   },
   {
-    title: "Reports",
+    title: "Register Operator",
     icon: BarChart3,
-    href: "/shop-admin-panel/reports",
+    href: "/shop-admin-panel/register-operator",
     roles: ["manager", "admin"],
   },
 ];

@@ -1,0 +1,265 @@
+/* ===========================
+        Modal Overlay
+=========================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .75);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn .25s ease;
+}
+
+/* ===========================
+        Modal
+=========================== */
+
+.reply-modal {
+    width: 100%;
+    max-width: 650px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.35);
+    animation: modalIn .25s ease;
+}
+
+.reply-modal h2 {
+    color: #f8fafc;
+    margin-bottom: 22px;
+    font-size: 28px;
+}
+
+.reply-modal p {
+    color: #cbd5e1;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+/* ===========================
+        Textarea
+=========================== */
+
+.reply-modal textarea {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+
+    background: #0f172a;
+    color: #f8fafc;
+
+    border: 1px solid #334155;
+    border-radius: 12px;
+
+    padding: 16px;
+
+    font-size: 15px;
+    line-height: 1.8;
+
+    outline: none;
+
+    transition: .25s;
+}
+
+.reply-modal textarea:focus {
+
+    border-color: #3b82f6;
+
+    box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+
+}
+
+.reply-modal textarea::placeholder {
+
+    color: #64748b;
+
+}
+
+/* ===========================
+        Buttons
+=========================== */
+
+.modal-actions {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 15px;
+
+    margin-top: 28px;
+
+}
+
+.cancel-btn,
+.save-btn,
+.delete-btn {
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: 12px 24px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: .25s;
+
+}
+
+.cancel-btn {
+
+    background: #334155;
+
+    color: white;
+
+}
+
+.cancel-btn:hover {
+
+    background: #475569;
+
+}
+
+.save-btn {
+
+    background: #2563eb;
+
+    color: white;
+
+}
+
+.save-btn:hover {
+
+    background: #1d4ed8;
+
+    box-shadow: 0 12px 28px rgba(37,99,235,.35);
+
+}
+
+.delete-btn {
+
+    background: #dc2626;
+
+    color: white;
+
+}
+
+.delete-btn:hover {
+
+    background: #b91c1c;
+
+    box-shadow: 0 12px 28px rgba(220,38,38,.35);
+
+}
+
+.cancel-btn:disabled,
+.save-btn:disabled,
+.delete-btn:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+}
+
+/* ===========================
+        Delete Modal
+=========================== */
+
+.delete-modal {
+
+    max-width: 480px;
+
+    text-align: center;
+
+}
+
+.delete-modal p {
+
+    margin-bottom: 10px;
+
+}
+
+/* ===========================
+        Animations
+=========================== */
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        opacity: 1;
+
+    }
+
+}
+
+@keyframes modalIn {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(-20px) scale(.95);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0) scale(1);
+
+    }
+
+}
+
+/* ===========================
+        Responsive
+=========================== */
+
+@media (max-width:768px){
+
+    .reply-modal{
+
+        width:95%;
+
+        padding:22px;
+
+    }
+
+    .reply-modal h2{
+
+        font-size:22px;
+
+    }
+
+    .modal-actions{
+
+        flex-direction:column;
+
+    }
+
+    .cancel-btn,
+    .save-btn,
+    .delete-btn{
+
+        width:100%;
+
+    }
+
+}

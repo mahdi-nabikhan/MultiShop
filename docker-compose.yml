@@ -1,6 +1,9 @@
 
 
 services:
+# =================================
+# POSTGESQL
+# =================================
   db:
     image: postgres:17
     container_name: postgres-db
@@ -14,13 +17,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     mem_limit: 200MB
+# =================================
+# REDIS
+# =================================    
   redis:
     container_name: redis
     image: redis:7
     ports:
       - "6379:6379"
     command: redis-server --save 60 1 --loglevel warning
-
+    mem_limit: 100MB
+# =================================
+# BACKEND
+# =================================
   backend:
     build: 
       context : .
@@ -36,7 +45,10 @@ services:
       - DEBUG=True
     depends_on:
       - redis
-
+    mem_limit: 300MB
+# =================================
+# SMTP4DEV
+# =================================
   smtp4dev:
     image: rnwood/smtp4dev:v3
     container_name: smtp4dev
@@ -50,7 +62,10 @@ services:
     environment:
       - ServerOptions__Urls=http://*:80
       - ServerOptions__HostName=smtp4dev
-
+    mem_limit: 100MB
+# =================================
+# Celery Workers
+# =================================
   worker:
     build:
       context : . 
@@ -61,7 +76,10 @@ services:
       - backend
     volumes:
       - ./src/backend:/app
-
+    mem_limit: 256MB
+# =================================
+# n8n
+# =================================
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
@@ -79,6 +97,7 @@ services:
     depends_on:
       - redis
       - backend
+    mem_limit: 255MB
   elasticsearch:
     image: mirror2.chabokan.net/elasticsearch:8.17.0
     container_name: elasticsearch
@@ -93,7 +112,9 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data
     restart: unless-stopped
     mem_limit: 700MB
-
+# =================================
+# ELK STACK (KIBANA)
+# =================================
   kibana:
     image: mirror2.chabokan.net/elastic/kibana:8.17.0
     container_name: kibana
@@ -105,7 +126,9 @@ services:
       - "5601:5601"
     restart: unless-stopped
     mem_limit: 350MB
-
+# =================================
+# ELK STACK (LOG STASH)
+# =================================
   logstash:
     image: mirror2.chabokan.net/logstash:8.17.0
     container_name: logstash
