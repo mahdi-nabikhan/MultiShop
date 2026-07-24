@@ -40,7 +40,7 @@ export default function AddReplyModal({
 
             await axios.post(
 
-                `${BACKEND_URLS}YOUR_POST_REPLY_API/${ticketId}/`,
+                `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${ticketId}/`,
 
                 {
                     content,

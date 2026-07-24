@@ -56,7 +56,7 @@ export default function EditReplyModal({
 
             await axios.patch(
 
-                `${BACKEND_URLS}YOUR_PATCH_REPLY_API/${reply.id}/`,
+                `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${reply.id}/`,
 
                 {
                     content,

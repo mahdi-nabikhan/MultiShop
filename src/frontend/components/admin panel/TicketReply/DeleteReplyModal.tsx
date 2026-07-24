@@ -30,7 +30,7 @@ export default function DeleteReplyModal({
 
             await axios.delete(
 
-                `${BACKEND_URLS}YOUR_DELETE_REPLY_API/${replyId}/`,
+                `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${replyId}/`,
 
                 {
                     withCredentials: true,

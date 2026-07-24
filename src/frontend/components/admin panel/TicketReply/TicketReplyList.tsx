@@ -51,7 +51,7 @@ export default function TicketReplyList({
 
             const { data } = await axios.get<Reply[]>(
 
-                `${BACKEND_URLS}YOUR_GET_REPLY_API/${ticketId}/`,
+                `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${ticketId}/`,
 
                 {
 
