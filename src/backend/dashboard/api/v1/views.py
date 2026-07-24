@@ -195,4 +195,13 @@ class DetailReplayTicketAPIView(GenericAPIView):
         
                 
         
-        
+class GetShopTicketAPIView(GenericAPIView):
+    serializer_class = ListCreateTicketSerializers
+    
+    def get_queryset(self):
+        return Ticket.objects.filter(store__manager__user = self.request.user)
+    
+    def get(self,request):
+        obj = self.get_queryset()
+        serializer= self.serializer_class(instance = obj,many=True,context= {'request':request})
+        return Response(serializer.data,status = status.HTTP_200_OK)
