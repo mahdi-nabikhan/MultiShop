@@ -1,69 +1,87 @@
-"use client"
-import { useEffect,useState } from "react"
-import axios from "axios"
-import BACKEND_URLS from "@/utils"
-import './OrderItemList.css'
+"use client";
 
+import { useEffect, useState } from "react";
+import axios from "axios";
+import BACKEND_URLS from "@/utils";
+import "./OrderItemList.css";
 
 interface Product {
-    id:number;
-    name:string;
-    description:string;
-    quantity_in_stock:string;
-    price:number;
-    price_after:number;
-    product_image:string;
-    category:number;
-    store : number
+    id: number;
+    name: string;
+    description: string;
+    quantity_in_stock: string;
+    price: number;
+    price_after: number;
+    product_image: string | null;
+    category: number;
+    store: number;
 }
 
-
 interface OrderItem {
-    id : number;
-    quantity:number;
-    status : string;
-    created:string;
-    total:string;
-    order:number;
-    product:Product
+    id: number;
+    quantity: number;
+    status: string;
+    created: string;
+    total: string;
+    order: number;
+    product: Product;
 }
 
 interface Props {
-    orderId:number|string
+    orderId: number | string;
 }
 
+export default function OrderItemList({ orderId }: Props) {
 
-export default function OrderItemList ({orderId}:Props){
-    const[items,setItems] = useState<OrderItem[]>([])
-    const [loading,setLoading]=useState(false)
-    const getItems = async () =>{
-        try{
-            const {data}= await axios.get<OrderItem[]>(
+    const [items, setItems] = useState<OrderItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const getItems = async () => {
+
+        try {
+
+            console.log("Order ID:", orderId);
+
+            const { data } = await axios.get<OrderItem[]>(
                 `${BACKEND_URLS}order/api/v1/related/order/orderitem/${orderId}/`,
-                {withCredentials:true}
-            )
-            setItems(data)
+                {
+                    withCredentials: true,
+                }
+            );
 
-        }catch(err){
-            console.log(err)
+            console.log("API Response:", data);
 
-        }finally{
-            setLoading(false)
+            setItems(data);
+
+        } catch (err) {
+
+            console.log("API Error:", err);
+
+        } finally {
+
+            setLoading(false);
 
         }
-        useEffect(()=>{
-            getItems()
-        },[orderId])
+
+    };
+
+    useEffect(() => {
+
+        getItems();
+
+    }, [orderId]);
+
+    if (loading) {
+        return <h2>Loading...</h2>;
     }
-    if (loading){
-        return <h2> loading</h2>
+
+    if (items.length === 0) {
+        return <h2>No Order Item Found</h2>;
     }
-    if (items.length ===0 ){
-        return <h2>No Order Item found</h2>
-    }
-    return(
-        <>
-            <div className="order-item-page">
+
+    return (
+
+        <div className="order-item-page">
 
             <div className="page-header">
 
@@ -88,21 +106,18 @@ export default function OrderItemList ({orderId}:Props){
 
                         <img
                             src={
-                                item.product.product_image ??
-                                "/no-image.png"
+                                item.product.product_image
+                                    ? `${BACKEND_URLS}${item.product.product_image}`
+                                    : "/no-image.png"
                             }
                             alt={item.product.name}
                         />
 
                         <div className="item-content">
 
-                            <h2>
-                                {item.product.name}
-                            </h2>
+                            <h2>{item.product.name}</h2>
 
-                            <p>
-                                {item.product.description}
-                            </p>
+                            <p>{item.product.description}</p>
 
                             <div className="item-grid">
 
@@ -110,9 +125,7 @@ export default function OrderItemList ({orderId}:Props){
 
                                     <span>Quantity</span>
 
-                                    <strong>
-                                        {item.quantity}
-                                    </strong>
+                                    <strong>{item.quantity}</strong>
 
                                 </div>
 
@@ -120,9 +133,7 @@ export default function OrderItemList ({orderId}:Props){
 
                                     <span>Price</span>
 
-                                    <strong>
-                                        ${item.product.price}
-                                    </strong>
+                                    <strong>${item.product.price}</strong>
 
                                 </div>
 
@@ -130,9 +141,7 @@ export default function OrderItemList ({orderId}:Props){
 
                                     <span>Sale Price</span>
 
-                                    <strong>
-                                        ${item.product.price_after}
-                                    </strong>
+                                    <strong>${item.product.price_after}</strong>
 
                                 </div>
 
@@ -140,9 +149,7 @@ export default function OrderItemList ({orderId}:Props){
 
                                     <span>Total</span>
 
-                                    <strong>
-                                        ${item.total}
-                                    </strong>
+                                    <strong>${item.total}</strong>
 
                                 </div>
 
@@ -157,11 +164,9 @@ export default function OrderItemList ({orderId}:Props){
                                             : "confirmed"
                                     }
                                 >
-                                    {
-                                        item.status === "P"
-                                            ? "Pending"
-                                            : "Confirmed"
-                                    }
+                                    {item.status === "P"
+                                        ? "Pending"
+                                        : "Confirmed"}
                                 </span>
 
                                 <button>
@@ -179,8 +184,7 @@ export default function OrderItemList ({orderId}:Props){
             </div>
 
         </div>
-        
-        </>
-    )
+
+    );
 
 }
