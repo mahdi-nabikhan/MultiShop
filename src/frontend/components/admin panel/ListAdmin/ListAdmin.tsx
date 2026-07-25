@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-import "./AdminList.css";
+import "./ListAdmin.css";
 
 interface Admin {
     username: string;
