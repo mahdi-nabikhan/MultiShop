@@ -145,7 +145,24 @@ services:
     restart: unless-stopped
     mem_limit: 284MB
       
+# ======================================
+# Load Testing
+# ======================================
 
+  master:
+    image: locustio/locust
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./Multi_Shop/locust:/mnt/locust
+    command : -f /mnt/locust/locustfile.py --master -H http://backend:8009
+  locust_worker : 
+    image: locustio/locust
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./Multi_Shop/locust:/mnt/locust
+    command : -f /mnt/locust/locustfile.py --worker --master-host master
 
 
 volumes:
