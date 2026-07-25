@@ -838,4 +838,34 @@ class DeleteProductDiscount(GenericAPIView):
     
         
         
+class ShopAdminListAPIView(GenericAPIView):
+    serializer_class = AdminsSerializer
+    def get_queryset(self):
+        store = Store.objects.get(manager__user = self.request.user)
+       
+        return Admin.objects.filter(shop=store)
+    def get(self,request):
+        
+        query = self.get_queryset()
+        serializer = self.serializer_class(instance =  query,many=True,context = {
+            "request":request
+        })
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+class ShopOperatorListApiView(GenericAPIView):
+    serializer_class = OperatorSerializer
+    
+    
+    def get_queryset(self):
+        store = Store.objects.get(manager__user = self.request.user)
+        return Operator.objects.filter(shop= store)
+    
+    def get(self,request):
+        query =  self.get_queryset()
+        serializer = self.serializer_class(instance =  query
+            ,many = True,contex = {
+            'request':request
+        })
+        return Response(serializer.data,status=status.HTTP_200_OK)
         

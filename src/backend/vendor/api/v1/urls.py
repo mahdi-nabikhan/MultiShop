@@ -16,6 +16,8 @@ urlpatterns = [
     path('store/detail/',StoreDetailAndDelete.as_view(),name='store_detail'),
     path('store/user/roles/',ManagerAndOperatorUserRoleAPIViews.as_view(),name='store-user-role'),
     path('shop/list/order/',ShopOrderListAPIView.as_view(),name='order_list_shop'),
-    path('delete/discount/<int:pk>/',DeleteProductDiscount.as_view(),name = 'delete_discount')
+    path('delete/discount/<int:pk>/',DeleteProductDiscount.as_view(),name = 'delete_discount'),
+    path('shop/admin/list/',ShopAdminListAPIView.as_view(),name='admin-list'),
+    path('shop/operator/list',ShopOperatorListApiView.as_view(),name='oprator-list')
 
 ]
