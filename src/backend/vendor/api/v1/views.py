@@ -878,16 +878,16 @@ class ShopOperatorDetailAPIView(GenericAPIView):
         return Operator.objects.get(pk=pk)
     
     
-    def get(self,pk):
+    def get(self,request,pk):
         obj = self.get_queryset(pk = pk )
-        serializer = self.serializer_class(obj)
+        serializer = self.serializer_class(obj,context = {'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
-    def put(self,pk):
+    def put(self,request,pk):
         obj =  self.get_queryset( pk = pk)
         data =self.request.data
         serializer =self.serializer_class(instance=obj , data = data , context = {
-            'request':self.request
+            'request':request
         })
         
         if serializer.is_valid():
@@ -896,11 +896,11 @@ class ShopOperatorDetailAPIView(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
-    def patch(self,pk):
+    def patch(self,request,pk):
         obj =  self.get_queryset( pk = pk)
         data =self.request.data
         serializer =self.serializer_class(instance=obj , data = data , context = {
-                'request':self.request
+                'request':request
                 })
                 
         if serializer.is_valid():
@@ -921,16 +921,16 @@ class ShopAdminDetailAPIView(GenericAPIView):
         return Admin.objects.get(pk=pk)
     
     
-    def get(self,pk):
+    def get(self,request,pk):
         obj = self.get_queryset(pk = pk )
-        serializer = self.serializer_class(obj)
+        serializer = self.serializer_class(obj,context = {'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
-    def put(self,pk):
+    def put(self,request,pk):
         obj =  self.get_queryset( pk = pk)
         data =self.request.data
         serializer =self.serializer_class(instance=obj , data = data , context = {
-            'request':self.request
+            'request':request
         })
         
         if serializer.is_valid():
@@ -939,11 +939,11 @@ class ShopAdminDetailAPIView(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
-    def patch(self,pk):
+    def patch(self,request,pk):
         obj =  self.get_queryset( pk = pk)
         data =self.request.data
         serializer =self.serializer_class(instance=obj , data = data , context = {
-                'request':self.request
+                'request':request
                 })
                 
         if serializer.is_valid():
@@ -952,7 +952,7 @@ class ShopAdminDetailAPIView(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
-    def delete(self,pk):
+    def delete(self,request,pk):
          obj =  self.get_queryset( pk = pk)
          obj.delete()
          return Response({'msg':'successfully deleted'})
