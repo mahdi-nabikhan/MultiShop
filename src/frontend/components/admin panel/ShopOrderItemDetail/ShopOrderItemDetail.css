@@ -1,0 +1,243 @@
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+
+    --surface: #ffffff;
+    --background: #f8fafc;
+
+    --border: #dbeafe;
+
+    --text: #0f172a;
+    --text-muted: #64748b;
+
+    --success: #16a34a;
+    --warning: #f59e0b;
+
+    --shadow: 0 14px 35px rgba(37, 99, 235, .08);
+}
+
+/* ==========================
+        Page
+========================== */
+
+.order-item-detail {
+    padding: 35px;
+    background: var(--background);
+    min-height: 100vh;
+}
+
+/* ==========================
+        Header
+========================== */
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.detail-header h1 {
+    color: var(--text);
+    font-size: 34px;
+    font-weight: 700;
+}
+
+/* ==========================
+        Status
+========================== */
+
+.pending,
+.confirmed {
+    color: white;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.pending {
+    background: var(--warning);
+}
+
+.confirmed {
+    background: var(--success);
+}
+
+/* ==========================
+        Card
+========================== */
+
+.detail-card {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 35px;
+
+    background: var(--surface);
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    border: 1px solid var(--border);
+
+    box-shadow: var(--shadow);
+}
+
+/* ==========================
+        Image
+========================== */
+
+.image-box {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.image-box img {
+    width: 100%;
+    max-width: 280px;
+
+    border-radius: 18px;
+
+    object-fit: cover;
+
+    border: 2px solid var(--border);
+
+    background: white;
+}
+
+/* ==========================
+        Info
+========================== */
+
+.info-box h2 {
+    color: var(--text);
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.info-box p {
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+/* ==========================
+        Grid
+========================== */
+
+.info-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 18px;
+
+}
+
+.info-grid div {
+
+    background: var(--primary-light);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    transition: .25s;
+
+}
+
+.info-grid div:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 10px 22px rgba(37,99,235,.12);
+
+}
+
+.info-grid span {
+
+    display: block;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+
+}
+
+.info-grid strong {
+
+    color: var(--text);
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    word-break: break-word;
+
+}
+
+/* ==========================
+        Responsive
+========================== */
+
+@media (max-width:950px) {
+
+    .detail-card {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .image-box {
+
+        justify-content: center;
+
+    }
+
+}
+
+@media (max-width:700px) {
+
+    .order-item-detail {
+
+        padding: 20px;
+
+    }
+
+    .detail-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+
+    }
+
+    .detail-header h1 {
+
+        font-size: 28px;
+
+    }
+
+    .info-box h2 {
+
+        font-size: 24px;
+
+    }
+
+    .info-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}

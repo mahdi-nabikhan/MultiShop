@@ -1,0 +1,305 @@
+/* ==========================
+        Page
+========================== */
+
+.operator-detail-page {
+
+    padding: 35px;
+
+    min-height: 100vh;
+
+}
+
+/* ==========================
+        Card
+========================== */
+
+.operator-detail-card {
+
+    max-width: 760px;
+
+    margin: auto;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-xl);
+
+    padding: 40px;
+
+    box-shadow: var(--shadow-md);
+
+    transition: var(--transition);
+
+}
+
+.operator-detail-card:hover {
+
+    border-color: var(--primary);
+
+}
+
+/* ==========================
+        Avatar
+========================== */
+
+.operator-avatar {
+
+    width: 95px;
+
+    height: 95px;
+
+    margin: auto;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+    color: white;
+
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-hover)
+    );
+
+    box-shadow: 0 0 25px rgba(16,185,129,.25);
+
+}
+
+/* ==========================
+        Title
+========================== */
+
+.operator-detail-card h1 {
+
+    text-align: center;
+
+    margin: 22px 0 12px;
+
+    color: var(--text);
+
+}
+
+/* ==========================
+        Badge
+========================== */
+
+.role-badge {
+
+    display: block;
+
+    width: max-content;
+
+    margin: auto;
+
+    padding: 10px 20px;
+
+    border-radius: 999px;
+
+    background: rgba(16,185,129,.15);
+
+    color: var(--primary-light);
+
+    border: 1px solid rgba(16,185,129,.35);
+
+    font-weight: 600;
+
+    margin-bottom: 35px;
+
+}
+
+/* ==========================
+        Information
+========================== */
+
+.detail-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2,1fr);
+
+    gap: 20px;
+
+}
+
+.detail-grid div {
+
+    background: var(--surface-light);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-md);
+
+    padding: 18px;
+
+    transition: var(--transition);
+
+}
+
+.detail-grid div:hover {
+
+    border-color: var(--primary);
+
+    transform: translateY(-2px);
+
+}
+
+.detail-grid span {
+
+    display: block;
+
+    color: var(--text-muted);
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
+}
+
+.detail-grid strong {
+
+    color: var(--text);
+
+    font-size: 17px;
+
+    word-break: break-word;
+
+}
+
+/* ==========================
+        Buttons
+========================== */
+
+.button-group {
+
+    display: flex;
+
+    gap: 18px;
+
+    margin-top: 40px;
+
+    flex-wrap: wrap;
+
+}
+
+.button-group button {
+
+    flex: 1;
+
+    min-width: 170px;
+
+    border: none;
+
+    padding: 15px;
+
+    border-radius: var(--radius-md);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    transition: var(--transition);
+
+}
+
+/* Update */
+
+.update-btn {
+
+    background: var(--primary);
+
+    color: white;
+
+}
+
+.update-btn:hover {
+
+    background: var(--primary-hover);
+
+    transform: translateY(-2px);
+
+}
+
+/* Password */
+
+.password-btn {
+
+    background: var(--info);
+
+    color: white;
+
+}
+
+.password-btn:hover {
+
+    filter: brightness(.9);
+
+    transform: translateY(-2px);
+
+}
+
+/* Delete */
+
+.delete-btn {
+
+    background: var(--danger);
+
+    color: white;
+
+}
+
+.delete-btn:hover {
+
+    background: #dc2626;
+
+    transform: translateY(-2px);
+
+}
+
+/* ==========================
+        Responsive
+========================== */
+
+@media(max-width:768px){
+
+    .operator-detail-page{
+
+        padding:20px;
+
+    }
+
+    .operator-detail-card{
+
+        padding:25px;
+
+    }
+
+    .detail-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .button-group{
+
+        flex-direction:column;
+
+    }
+
+    .button-group button{
+
+        width:100%;
+
+    }
+
+}
