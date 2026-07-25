@@ -869,3 +869,90 @@ class ShopOperatorListApiView(GenericAPIView):
         })
         return Response(serializer.data,status=status.HTTP_200_OK)
         
+        
+        
+class ShopOperatorDetailAPIView(GenericAPIView):
+    serializer_class= OperatorSerializer
+    
+    def get_queryset(self,pk):
+        return Operator.objects.get(pk=pk)
+    
+    
+    def get(self,pk):
+        obj = self.get_queryset(pk = pk )
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,pk):
+        obj =  self.get_queryset( pk = pk)
+        data =self.request.data
+        serializer =self.serializer_class(instance=obj , data = data , context = {
+            'request':self.request
+        })
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self,pk):
+        obj =  self.get_queryset( pk = pk)
+        data =self.request.data
+        serializer =self.serializer_class(instance=obj , data = data , context = {
+                'request':self.request
+                })
+                
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    def delete(self,pk):
+         obj =  self.get_queryset( pk = pk)
+         obj.delete()
+         return Response({'msg':'successfully deleted'})
+
+class ShopAdminDetailAPIView(GenericAPIView):
+    serializer_class= AdminsSerializer
+    
+    def get_queryset(self,pk):
+        return Admin.objects.get(pk=pk)
+    
+    
+    def get(self,pk):
+        obj = self.get_queryset(pk = pk )
+        serializer = self.serializer_class(obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,pk):
+        obj =  self.get_queryset( pk = pk)
+        data =self.request.data
+        serializer =self.serializer_class(instance=obj , data = data , context = {
+            'request':self.request
+        })
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self,pk):
+        obj =  self.get_queryset( pk = pk)
+        data =self.request.data
+        serializer =self.serializer_class(instance=obj , data = data , context = {
+                'request':self.request
+                })
+                
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    def delete(self,pk):
+         obj =  self.get_queryset( pk = pk)
+         obj.delete()
+         return Response({'msg':'successfully deleted'})
