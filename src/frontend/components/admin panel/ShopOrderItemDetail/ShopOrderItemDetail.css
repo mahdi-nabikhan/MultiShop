@@ -1,187 +1,243 @@
-"use client";
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
-import "./OrderItemDetail.css";
+    --surface: #ffffff;
+    --background: #f8fafc;
 
-interface Product {
-    id: number;
-    name: string;
-    description: string;
-    quantity_in_stock: number;
-    price: number;
-    price_after: number;
-    product_image: string | null;
-    category: number;
-    store: number;
+    --border: #dbeafe;
+
+    --text: #0f172a;
+    --text-muted: #64748b;
+
+    --success: #16a34a;
+    --warning: #f59e0b;
+
+    --shadow: 0 14px 35px rgba(37, 99, 235, .08);
 }
 
-interface OrderItem {
-    id: number;
-    quantity: number;
-    status: string;
-    created: string;
-    total: string;
-    order: number;
-    product: Product;
+/* ==========================
+        Page
+========================== */
+
+.order-item-detail {
+    padding: 35px;
+    background: var(--background);
+    min-height: 100vh;
 }
 
-interface Props {
-    orderItemId: number | string;
+/* ==========================
+        Header
+========================== */
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-export default function OrderItemDetail({ orderItemId }: Props) {
+.detail-header h1 {
+    color: var(--text);
+    font-size: 34px;
+    font-weight: 700;
+}
 
-    const [item, setItem] = useState<OrderItem | null>(null);
-    const [loading, setLoading] = useState(true);
+/* ==========================
+        Status
+========================== */
 
-    useEffect(() => {
+.pending,
+.confirmed {
+    color: white;
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+}
 
-        const getOrderItem = async () => {
+.pending {
+    background: var(--warning);
+}
 
-            try {
+.confirmed {
+    background: var(--success);
+}
 
-                const { data } = await axios.get<OrderItem>(
-                    `${BACKEND_URLS}order/api/v1/order/item/detail/${orderItemId}/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
+/* ==========================
+        Card
+========================== */
 
-                setItem(data);
+.detail-card {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 35px;
 
-            } catch (err) {
+    background: var(--surface);
 
-                console.log(err);
+    border-radius: 22px;
 
-            } finally {
+    padding: 30px;
 
-                setLoading(false);
+    border: 1px solid var(--border);
 
-            }
+    box-shadow: var(--shadow);
+}
 
-        };
+/* ==========================
+        Image
+========================== */
 
-        getOrderItem();
+.image-box {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
 
-    }, [orderItemId]);
+.image-box img {
+    width: 100%;
+    max-width: 280px;
 
-    if (loading) {
-        return <h2>Loading...</h2>;
+    border-radius: 18px;
+
+    object-fit: cover;
+
+    border: 2px solid var(--border);
+
+    background: white;
+}
+
+/* ==========================
+        Info
+========================== */
+
+.info-box h2 {
+    color: var(--text);
+    font-size: 30px;
+    margin-bottom: 12px;
+}
+
+.info-box p {
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+/* ==========================
+        Grid
+========================== */
+
+.info-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 18px;
+
+}
+
+.info-grid div {
+
+    background: var(--primary-light);
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    transition: .25s;
+
+}
+
+.info-grid div:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 10px 22px rgba(37,99,235,.12);
+
+}
+
+.info-grid span {
+
+    display: block;
+
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    margin-bottom: 8px;
+
+}
+
+.info-grid strong {
+
+    color: var(--text);
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    word-break: break-word;
+
+}
+
+/* ==========================
+        Responsive
+========================== */
+
+@media (max-width:950px) {
+
+    .detail-card {
+
+        grid-template-columns: 1fr;
+
     }
 
-    if (!item) {
-        return <h2>Order Item Not Found</h2>;
+    .image-box {
+
+        justify-content: center;
+
     }
 
-    return (
+}
 
-        <div className="order-item-detail">
+@media (max-width:700px) {
 
-            <div className="detail-header">
+    .order-item-detail {
 
-                <h1>
-                    Order Item #{item.id}
-                </h1>
+        padding: 20px;
 
-                <span
-                    className={
-                        item.status === "P"
-                            ? "pending"
-                            : "confirmed"
-                    }
-                >
-                    {item.status === "P"
-                        ? "Pending"
-                        : "Confirmed"}
-                </span>
+    }
 
-            </div>
+    .detail-header {
 
-            <div className="detail-card">
+        flex-direction: column;
 
-                <div className="image-box">
+        align-items: flex-start;
 
-                    <img
-                        src={
-                            item.product.product_image
-                                ? `${BACKEND_URLS}${item.product.product_image}`
-                                : "/no-image.png"
-                        }
-                        alt={item.product.name}
-                    />
+        gap: 15px;
 
-                </div>
+    }
 
-                <div className="info-box">
+    .detail-header h1 {
 
-                    <h2>{item.product.name}</h2>
+        font-size: 28px;
 
-                    <p>{item.product.description}</p>
+    }
 
-                    <div className="info-grid">
+    .info-box h2 {
 
-                        <div>
-                            <span>Product ID</span>
-                            <strong>{item.product.id}</strong>
-                        </div>
+        font-size: 24px;
 
-                        <div>
-                            <span>Order ID</span>
-                            <strong>{item.order}</strong>
-                        </div>
+    }
 
-                        <div>
-                            <span>Quantity</span>
-                            <strong>{item.quantity}</strong>
-                        </div>
+    .info-grid {
 
-                        <div>
-                            <span>Price</span>
-                            <strong>${item.product.price}</strong>
-                        </div>
+        grid-template-columns: 1fr;
 
-                        <div>
-                            <span>Sale Price</span>
-                            <strong>${item.product.price_after}</strong>
-                        </div>
-
-                        <div>
-                            <span>Total</span>
-                            <strong>${item.total}</strong>
-                        </div>
-
-                        <div>
-                            <span>Stock</span>
-                            <strong>{item.product.quantity_in_stock}</strong>
-                        </div>
-
-                        <div>
-                            <span>Category</span>
-                            <strong>{item.product.category}</strong>
-                        </div>
-
-                        <div>
-                            <span>Store</span>
-                            <strong>{item.product.store}</strong>
-                        </div>
-
-                        <div>
-                            <span>Created</span>
-                            <strong>
-                                {new Date(item.created).toLocaleString()}
-                            </strong>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    );
+    }
 
 }
