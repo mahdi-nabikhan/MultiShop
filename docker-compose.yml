@@ -155,7 +155,7 @@ services:
       - "8009:8009"
     volumes:
       - ./Multi_Shop/locust:/mnt/locust
-    command : -f /mnt/locust/locustfile.py --master -H http://backend:8009
+    command : -f /mnt/locust/locustfile.py --master -H http://backend:8000
   locust_worker : 
     image: locustio/locust
     ports:
