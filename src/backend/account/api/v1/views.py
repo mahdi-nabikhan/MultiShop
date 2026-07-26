@@ -547,3 +547,28 @@ class CheckMeAPIView(GenericAPIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     
+class LogoutAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+
+        refresh_token = request.COOKIES.get("refresh_token")
+
+        if refresh_token:
+            try:
+                RefreshToken(refresh_token).blacklist()
+            except Exception:
+                pass
+
+        response = Response(
+            {
+                "success": True,
+                "message": "Logout successfully."
+            },
+            status=status.HTTP_200_OK,
+        )
+
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+
+        return response
