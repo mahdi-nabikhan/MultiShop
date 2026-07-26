@@ -164,6 +164,26 @@ services:
       - ./Multi_Shop/locust:/mnt/locust
     command : -f /mnt/locust/locustfile.py --worker --master-host master
 
+# ==========================================
+# Frontend
+# ==========================================  
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: ../../docker/Dockerfile.frontend
+
+    container_name: multishop_frontend
+
+    ports:
+      - "3000:3000"
+
+    env_file:
+      - .env
+
+    restart: unless-stopped
+
+    depends_on:
+      - backend
 
 volumes:
   smtp4dev-data:
