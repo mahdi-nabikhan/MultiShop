@@ -1,63 +1,80 @@
-import Image from "next/image";
+"use client"
+
 import { Calendar, CircleDollarSign, Package } from "lucide-react";
-
+import BACKEND_URLS
+    from "@/utils";
 import "./OrderDetail.css";
+import { useState, useEffect } from "react";
+import axios
+    from "axios";
 
+
+interface Product {
+    id: number,
+    name: string,
+    description: string
+    quantity_in_stock: number
+    price: number
+    price_after: number
+    product_image: string | null
+    category: number,
+    store: number
+}
+interface OrderItem {
+    id: number,
+    quantity: number
+    status: string
+    created: string
+    total: string
+    order: number
+    product: Product
+}
 export default function OrderDetail() {
+    const [items, setItems] = useState<OrderItem[]>([])
+    const [loading, setLoading] = useState(false)
 
-    const order = {
-
-        id: 1245,
-
-        status: "Paid",
-
-        createdAt: "2026 / 07 / 09",
-
-        total: 2450,
-
-        items: [
-
-            {
-
-                id:1,
-
-                quantity:2,
-
-                price:1200,
-
-                product:{
-
-                    title:"iPhone 16 Pro",
-
-                    image:"/images/products/iphone.jpg"
-
+    useEffect(() => {
+        const getOrderItem = async () => {
+            try {
+                setLoading(true)
+                const { data } = await axios.get<OrderItem[]>(
+                    `${BACKEND_URLS}order/api/v1/order/item/`, {
+                    withCredentials: true
                 }
+                )
+                setItems(data)
 
-            },
+            } catch (err) {
+                alert(err)
 
-            {
-
-                id:2,
-
-                quantity:1,
-
-                price:50,
-
-                product:{
-
-                    title:"Apple Charger",
-
-                    image:"/images/products/charger.jpg"
-
-                }
-
+            } finally {
+                setLoading(false)
             }
 
-        ]
+
+        }
+        getOrderItem()
+    }, [])
+
+
+    if (loading) {
+
+        return <h2>Loading...</h2>;
 
     }
 
-    return(
+    if (items.length === 0) {
+
+        return <h2>No Items Found</h2>;
+
+    }
+
+    const total = items.reduce(
+        (sum, item) => sum + Number(item.total),
+        0
+    );
+
+    return (
 
         <section className="order">
 
@@ -67,15 +84,15 @@ export default function OrderDetail() {
 
                     <h2>
 
-                        Order #{order.id}
+                        Your Shopping Cart
 
                     </h2>
 
                     <span>
 
-                        <Calendar size={15}/>
+                        <Calendar size={15} />
 
-                        {order.createdAt}
+                        {new Date(items[0].created).toLocaleDateString()}
 
                     </span>
 
@@ -83,7 +100,9 @@ export default function OrderDetail() {
 
                 <div className="paid">
 
-                    {order.status}
+                    {items[0].status === "P"
+                        ? "Pending"
+                        : items[0].status}
 
                 </div>
 
@@ -93,7 +112,7 @@ export default function OrderDetail() {
 
                 {
 
-                    order.items.map(item=>(
+                    items.map(item => (
 
                         <div
                             key={item.id}
@@ -102,33 +121,38 @@ export default function OrderDetail() {
 
                             <div className="left">
 
-                                <Image
-
-                                    src={item.product.image}
-
-                                    alt={item.product.title}
-
+                                <img
+                                    src={
+                                        item.product.product_image
+                                            ? `${BACKEND_URLS.replace(/\/$/, "")}${item.product.product_image}`
+                                            : "/no-image.png"
+                                    }
+                                    alt={item.product.name}
                                     width={70}
-
                                     height={70}
-
                                 />
 
                                 <div>
 
                                     <h4>
 
-                                        {item.product.title}
+                                        {item.product.name}
 
                                     </h4>
 
                                     <p>
 
-                                        <Package size={14}/>
+                                        <Package size={14} />
 
                                         Qty : {item.quantity}
 
                                     </p>
+
+                                    <small>
+
+                                        ${item.product.price_after} each
+
+                                    </small>
 
                                 </div>
 
@@ -136,7 +160,7 @@ export default function OrderDetail() {
 
                             <strong>
 
-                                ${item.price}
+                                ${item.total}
 
                             </strong>
 
@@ -152,7 +176,7 @@ export default function OrderDetail() {
 
                 <span>
 
-                    <CircleDollarSign size={18}/>
+                    <CircleDollarSign size={18} />
 
                     Total
 
@@ -160,7 +184,7 @@ export default function OrderDetail() {
 
                 <h2>
 
-                    ${order.total}
+                    ${total.toFixed(2)}
 
                 </h2>
 
@@ -168,6 +192,6 @@ export default function OrderDetail() {
 
         </section>
 
-    )
+    );
 
 }
