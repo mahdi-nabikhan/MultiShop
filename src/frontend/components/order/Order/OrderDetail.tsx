@@ -1,5 +1,5 @@
 "use client"
-
+import DeleteOrderItemModal from "../DeleteOrderItemModal/DeleteOrderItemModal";
 import { Calendar, CircleDollarSign, Package } from "lucide-react";
 import BACKEND_URLS
     from "@/utils";
@@ -32,7 +32,9 @@ interface OrderItem {
 export default function OrderDetail() {
     const [items, setItems] = useState<OrderItem[]>([])
     const [loading, setLoading] = useState(false)
-
+    const [selectedItem, setSelectedItem] = useState<OrderItem | null>(null)
+    const [openDelete, setOpenDelete] = useState(false)
+    const [deleteLoading, setDeleteLoading] = useState(false)
     useEffect(() => {
         const getOrderItem = async () => {
             try {
@@ -55,6 +57,29 @@ export default function OrderDetail() {
         }
         getOrderItem()
     }, [])
+
+    const handleDelete = async () => {
+        console.log('delted cliekc')
+        if (!selectedItem) {
+            try {
+                setDeleteLoading(true)
+                await axios.delete(
+                    `${BACKEND_URLS}order/api/v1/order/item/detail/${selectedItem!.id}/`,
+                    { withCredentials: true }
+                )
+                setItems(perv => perv.filter(item => item.id !== selectedItem!.id))
+                setOpenDelete(false)
+                setSelectedItem(null)
+
+            } catch (err) {
+                console.log(err)
+
+            } finally {
+                setDeleteLoading(false)
+
+            }
+        }
+    }
 
 
     if (loading) {
@@ -231,7 +256,11 @@ export default function OrderDetail() {
 
                                     </button>
 
-                                    <button className="remove-btn">
+                                    <button className="remove-btn" onClick={() => {
+                                        setSelectedItem(item)
+                                        setOpenDelete(true)
+
+                                    }}>
 
                                         Remove
 
@@ -338,7 +367,27 @@ export default function OrderDetail() {
                 </div>
 
             </div>
+            <DeleteOrderItemModal
 
+                open={openDelete}
+
+                loading={deleteLoading}
+
+                productName={
+                    selectedItem?.product.name ?? ""
+                }
+
+                onClose={() => {
+
+                    setOpenDelete(false);
+
+                    setSelectedItem(null);
+
+                }}
+
+                onConfirm={handleDelete}
+
+            />
         </section>
     );
 
