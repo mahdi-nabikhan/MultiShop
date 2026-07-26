@@ -608,3 +608,35 @@ class CanRateAPIView(GenericAPIView):
         product = Product.objects.get(pk=pk)
         exists = OrderItem.objects.filter(order__customer=customer, product=product).exists()
         return Response({"can_rate": exists})
+
+
+class GetCustomerDetail(GenericAPIView):
+    serializer_class = CustomerDetailSerializer
+    
+    
+    def get_queryset(self):
+        return Customer.objects.get(user=self.request.user)
+    
+    def get(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance=obj)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(obj , data =  request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'customer successfully updated'},status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    def patch(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(obj , data =  request.data,partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message':'customer successfully updated'},status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
