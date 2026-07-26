@@ -8,34 +8,38 @@ import BACKEND_URLS from "@/utils";
 
 import "@/components/shop/Navbar/Navbar.css";
 
-interface User {
-    email: string;
+interface Customer {
+    id: number;
+    username: string;
+    is_customer: boolean;
+    user: number;
 }
 
 export default function Navbar() {
 
-    const [user, setUser] = useState<User | null>(null);
+
 
     const [loading, setLoading] = useState(true);
+    const [customer, setCustomer] = useState<Customer | null>(null);
 
     useEffect(() => {
 
-        const getUser = async () => {
+        const getCustomer = async () => {
 
             try {
 
-                const { data } = await axios.get<User>(
-                    `${BACKEND_URLS}account/api/v1/profile/`,
+                const { data } = await axios.get<Customer>(
+                    `${BACKEND_URLS}customer/api/v1/customer/detail/`,
                     {
                         withCredentials: true,
                     }
                 );
 
-                setUser(data);
+                setCustomer(data);
 
             } catch {
 
-                setUser(null);
+                setCustomer(null);
 
             } finally {
 
@@ -45,9 +49,10 @@ export default function Navbar() {
 
         };
 
-        getUser();
+        getCustomer();
 
     }, []);
+
 
     const logout = async () => {
 
@@ -61,7 +66,7 @@ export default function Navbar() {
                 }
             );
 
-            setUser(null);
+            setCustomer(null);
 
         } catch (err) {
 
@@ -118,12 +123,12 @@ export default function Navbar() {
 
                         <span>Loading...</span>
 
-                    ) : user ? (
+                    ) : customer ? (
 
                         <>
 
                             <span className="user-email">
-                                {user.email}
+                                {customer?.username}
                             </span>
 
                             <button
@@ -138,23 +143,15 @@ export default function Navbar() {
 
                         <>
 
-                            <Link href="/login">
+                            <Link href="/login" className="login-btn">
 
-                                <button>
-
-                                    Login
-
-                                </button>
+                                Login
 
                             </Link>
 
-                            <Link href="/register">
+                            <Link href="/register" className="register-btn">
 
-                                <button>
-
-                                    Register
-
-                                </button>
+                               Register
 
                             </Link>
 
