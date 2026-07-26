@@ -500,6 +500,281 @@
 
 }
 
+/* ==========================
+        Quantity Input
+========================== */
+
+.quantity-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-input {
+
+    width: 90px;
+
+    padding: 10px 14px;
+
+    border-radius: var(--radius-md);
+
+    border: 1px solid var(--border);
+
+    background: var(--surface-light);
+
+    color: var(--text);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    transition: var(--transition);
+
+    text-align: center;
+
+}
+
+.quantity-input:focus {
+
+    border-color: var(--primary);
+
+    box-shadow: 0 0 15px rgba(16,185,129,.25);
+
+}
+
+
+/* Remove default arrows */
+
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+
+    -webkit-appearance: none;
+
+    margin: 0;
+
+}
+
+.quantity-input[type=number]{
+
+    -moz-appearance:textfield;
+
+}
+
+
+/* ==========================
+        Action Buttons
+========================== */
+
+.product-actions{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:25px;
+
+}
+
+.product-actions div{
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+
+/* ==========================
+        Update Button
+========================== */
+
+.update-btn{
+
+    border:none;
+
+    padding:11px 18px;
+
+    border-radius:var(--radius-md);
+
+    background:var(--primary);
+
+    color:#fff;
+
+    font-weight:600;
+
+    transition:var(--transition);
+
+    box-shadow:0 8px 20px rgba(16,185,129,.18);
+
+}
+
+.update-btn:hover{
+
+    background:var(--primary-hover);
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 28px rgba(16,185,129,.28);
+
+}
+
+.update-btn:active{
+
+    transform:scale(.97);
+
+}
+
+
+/* ==========================
+        Remove Button
+========================== */
+
+.remove-btn{
+
+    border:none;
+
+    padding:11px 18px;
+
+    border-radius:var(--radius-md);
+
+    background:var(--danger);
+
+    color:white;
+
+    font-weight:600;
+
+    transition:var(--transition);
+
+}
+
+.remove-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 12px 25px rgba(239,68,68,.3);
+
+}
+
+
+/* ==========================
+        View Button
+========================== */
+
+.view-btn{
+
+    border:1px solid var(--border);
+
+    background:var(--surface-light);
+
+    color:var(--text);
+
+    padding:11px 18px;
+
+    border-radius:var(--radius-md);
+
+    font-weight:600;
+
+    transition:var(--transition);
+
+}
+
+.view-btn:hover{
+
+    border-color:var(--primary);
+
+    color:var(--primary);
+
+}
+
+/* ==========================
+        Quantity Field
+========================== */
+
+.product-grid input{
+    display:block;
+    width:100%;
+    margin-top:8px;
+
+    background:var(--background);
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:12px 14px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    outline:none;
+}
+
+.product-grid input:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 15px rgba(16,185,129,.25);
+}
+
+.product-grid input::-webkit-inner-spin-button,
+.product-grid input::-webkit-outer-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+}
+
+.product-grid input[type="number"]{
+    -moz-appearance:textfield;
+}
+/* ==========================
+        Responsive
+========================== */
+
+@media(max-width:768px){
+
+    .product-actions{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:18px;
+
+    }
+
+    .product-actions div{
+
+        width:100%;
+
+        flex-wrap:wrap;
+
+    }
+
+    .view-btn,
+    .update-btn,
+    .remove-btn{
+
+        flex:1;
+
+        min-width:130px;
+
+    }
+
+    .quantity-box{
+
+        width:100%;
+
+    }
+
+    .quantity-input{
+
+        width:100%;
+
+    }
+
+}
 
 /* ===============================
         Responsive

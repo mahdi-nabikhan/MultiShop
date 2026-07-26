@@ -35,6 +35,7 @@ export default function OrderDetail() {
     const [selectedItem, setSelectedItem] = useState<OrderItem | null>(null)
     const [openDelete, setOpenDelete] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
+    const [quantities, setQuantities] = useState<Record<number, number>>({});
     useEffect(() => {
         const getOrderItem = async () => {
             try {
@@ -45,6 +46,13 @@ export default function OrderDetail() {
                 }
                 )
                 setItems(data)
+                const qty: Record<number, number> = {};
+
+                data.forEach(item => {
+                    qty[item.id] = item.quantity;
+                });
+
+                setQuantities(qty);
 
             } catch (err) {
                 alert(err)
@@ -79,6 +87,57 @@ export default function OrderDetail() {
 
             }
         }
+    }
+    const updateQuantity = async (item: OrderItem) => {
+
+        try {
+
+            await axios.put(
+
+                `${BACKEND_URLS}order/api/v1/order/item/detail/${item.id}/`,
+
+                {
+
+                    quantity: quantities[item.id]
+
+                },
+
+                {
+
+                    withCredentials: true
+
+                }
+
+            );
+
+            setItems(prev =>
+
+                prev.map(orderItem =>
+
+                    orderItem.id === item.id
+
+                        ? {
+                            ...orderItem,
+                            quantity: quantities[item.id],
+                            total: String(
+                                quantities[item.id] * orderItem.product.price_after
+                            )
+                        }
+
+                        : orderItem
+
+                )
+
+            );
+
+        }
+
+        catch (err) {
+
+            console.log(err);
+
+        }
+
     }
 
 
@@ -198,7 +257,29 @@ export default function OrderDetail() {
 
                                     <span>Quantity</span>
 
-                                    <strong>{item.quantity}</strong>
+                                    <input
+
+                                        type="number"
+
+                                        min={1}
+
+                                        value={quantities[item.id] ?? item.quantity}
+
+                                        onChange={(e) => {
+
+                                            const value = Number(e.target.value);
+
+                                            setQuantities(prev => ({
+
+                                                ...prev,
+
+                                                [item.id]: value
+
+                                            }));
+
+                                        }}
+
+                                    />
 
                                 </div>
 
@@ -227,7 +308,15 @@ export default function OrderDetail() {
                                     <span>Total</span>
 
                                     <strong>
-                                        ${item.total}
+
+                                        $
+
+                                        {(
+                                            (quantities[item.id] ?? item.quantity)
+                                            *
+                                            item.product.price_after
+                                        ).toFixed(2)}
+
                                     </strong>
 
                                 </div>
@@ -253,6 +342,17 @@ export default function OrderDetail() {
                                     <button className="view-btn">
 
                                         View Product
+
+                                    </button>
+                                    <button
+
+                                        className="update-btn"
+
+                                        onClick={() => updateQuantity(item)}
+
+                                    >
+
+                                        Update
 
                                     </button>
 
