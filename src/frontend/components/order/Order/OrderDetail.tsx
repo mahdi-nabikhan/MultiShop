@@ -75,30 +75,23 @@ export default function OrderDetail() {
     );
 
     return (
+        <section className="order-page">
 
-        <section className="order">
+            {/* Header */}
 
-            <div className="order-header">
+            <div className="order-banner">
 
                 <div>
 
-                    <h2>
+                    <h1>🛒 My Shopping Cart</h1>
 
-                        Your Shopping Cart
-
-                    </h2>
-
-                    <span>
-
-                        <Calendar size={15} />
-
-                        {new Date(items[0].created).toLocaleDateString()}
-
-                    </span>
+                    <p>
+                        Manage all products before checkout
+                    </p>
 
                 </div>
 
-                <div className="paid">
+                <div className="status-badge">
 
                     {items[0].status === "P"
                         ? "Pending"
@@ -108,90 +101,245 @@ export default function OrderDetail() {
 
             </div>
 
-            <div className="order-items">
+            {/* Statistics */}
 
-                {
+            <div className="order-stats">
 
-                    items.map(item => (
+                <div className="stat-card">
 
-                        <div
-                            key={item.id}
-                            className="order-item"
-                        >
+                    <h4>Products</h4>
 
-                            <div className="left">
+                    <strong>{items.length}</strong>
 
-                                <img
-                                    src={
-                                        item.product.product_image
-                                            ? `${BACKEND_URLS.replace(/\/$/, "")}${item.product.product_image}`
-                                            : "/no-image.png"
-                                    }
-                                    alt={item.product.name}
-                                    width={70}
-                                    height={70}
-                                />
+                </div>
+
+                <div className="stat-card">
+
+                    <h4>Created</h4>
+
+                    <strong>
+                        {new Date(items[0].created).toLocaleDateString()}
+                    </strong>
+
+                </div>
+
+                <div className="stat-card">
+
+                    <h4>Total</h4>
+
+                    <strong>${total.toFixed(2)}</strong>
+
+                </div>
+
+            </div>
+
+            {/* Items */}
+
+            <div className="cart-list">
+
+                {items.map((item) => (
+
+                    <div
+                        className="cart-card"
+                        key={item.id}
+                    >
+
+                        <div className="product-image">
+
+                            <img
+                                src={
+                                    item.product.product_image
+                                        ? `${BACKEND_URLS.replace(/\/$/, "")}${item.product.product_image}`
+                                        : "/no-image.png"
+                                }
+                                alt={item.product.name}
+                            />
+
+                        </div>
+
+                        <div className="product-info">
+
+                            <h2>
+                                {item.product.name}
+                            </h2>
+
+                            <p>
+                                {item.product.description}
+                            </p>
+
+                            <div className="product-grid">
 
                                 <div>
 
-                                    <h4>
+                                    <span>Quantity</span>
 
-                                        {item.product.name}
+                                    <strong>{item.quantity}</strong>
 
-                                    </h4>
+                                </div>
 
-                                    <p>
+                                <div>
 
-                                        <Package size={14} />
+                                    <span>Price</span>
 
-                                        Qty : {item.quantity}
+                                    <strong>
+                                        ${item.product.price}
+                                    </strong>
 
-                                    </p>
+                                </div>
 
-                                    <small>
+                                <div>
 
-                                        ${item.product.price_after} each
+                                    <span>Discount Price</span>
 
-                                    </small>
+                                    <strong>
+                                        ${item.product.price_after}
+                                    </strong>
+
+                                </div>
+
+                                <div>
+
+                                    <span>Total</span>
+
+                                    <strong>
+                                        ${item.total}
+                                    </strong>
 
                                 </div>
 
                             </div>
 
-                            <strong>
+                            <div className="product-actions">
 
-                                ${item.total}
+                                <span
+                                    className={
+                                        item.status === "P"
+                                            ? "pending"
+                                            : "paid"
+                                    }
+                                >
+                                    {item.status === "P"
+                                        ? "Pending"
+                                        : item.status}
+                                </span>
 
-                            </strong>
+                                <div>
+
+                                    <button className="view-btn">
+
+                                        View Product
+
+                                    </button>
+
+                                    <button className="remove-btn">
+
+                                        Remove
+
+                                    </button>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
-                    ))
+                    </div>
 
-                }
+                ))}
 
             </div>
 
-            <div className="order-footer">
+            {/* Summary */}
 
-                <span>
-
-                    <CircleDollarSign size={18} />
-
-                    Total
-
-                </span>
+            <div className="summary-card">
 
                 <h2>
 
-                    ${total.toFixed(2)}
+                    Order Summary
 
                 </h2>
+
+                <div className="summary-row">
+
+                    <span>
+
+                        Products
+
+                    </span>
+
+                    <strong>
+
+                        {items.length}
+
+                    </strong>
+
+                </div>
+
+                <div className="summary-row">
+
+                    <span>
+
+                        Shipping
+
+                    </span>
+
+                    <strong>
+
+                        Free
+
+                    </strong>
+
+                </div>
+
+                <div className="summary-row">
+
+                    <span>
+
+                        Discount
+
+                    </span>
+
+                    <strong>
+
+                        $0.00
+
+                    </strong>
+
+                </div>
+
+                <hr />
+
+                <div className="summary-total">
+
+                    <span>Total</span>
+
+                    <h2>
+
+                        ${total.toFixed(2)}
+
+                    </h2>
+
+                </div>
+
+                <div className="summary-buttons">
+
+                    <button className="continue-btn">
+
+                        Continue Shopping
+
+                    </button>
+
+                    <button className="checkout-btn">
+
+                        Checkout
+
+                    </button>
+
+                </div>
 
             </div>
 
         </section>
-
     );
 
 }
