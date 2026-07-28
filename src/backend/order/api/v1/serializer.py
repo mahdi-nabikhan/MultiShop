@@ -188,8 +188,10 @@ class BillSerilizers(serializers.ModelSerializer):
         address = Address.objects.get(pk = self.context.get('pk'))
         validated_data['cart']=order
         validated_data['adress']=address        
-        return Bill.objects.create(**validated_data)
-    
+        bill = Bill.objects.create(**validated_data)
+        order.status=True
+        order.save(update_fields=['status'])
+        
     
 
 
