@@ -1,5 +1,6 @@
 CART_SESSION_ID = 'cart'
 from website.models import Product
+from decimal import Decimal
 
 
 class CartSession:
@@ -57,3 +58,14 @@ class CartSession:
 
         del self.cart[unique]
         self.save()
+        
+    def get_total_quantity(self):
+        return sum(item["quantity"] for item in self.cart.values())
+    
+
+
+    def get_total_price(self):
+        return sum(
+        Decimal(item["price"]) * item["quantity"]
+        for item in self.cart.values()
+    )

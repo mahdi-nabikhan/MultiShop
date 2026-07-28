@@ -172,7 +172,7 @@ class BillSerilizers(serializers.ModelSerializer):
     class Meta:
         model=Bill
         fields='__all__'
-        read_only_fields=['cart']
+        read_only_fields=['cart','address']
         
         
         
@@ -183,21 +183,38 @@ class BillSerilizers(serializers.ModelSerializer):
     
     
     def create(self, validated_data):
-        order=Order.objects.get(pk=self.context.get('pk'))
+        request = self.context.get('request')
+        order=Order.objects.get(customer__user = request.user,status=False)
+        address = Address.objects.get(pk = self.context.get('pk'))
         validated_data['cart']=order
-        return Bill.objects.create(**validated_data)
+        validated_data['address']=address        
+        bill = Bill.objects.create(**validated_data)
+        order.status=True
+        order.save(update_fields=['status'])
+        return bill
+        
     
-    
+
+
+
 
 
 class CartItemSerializer(serializers.Serializer):
     product = ProductSerializer()
     quantity = serializers.IntegerField()
-    total_price = serializers.DecimalField(max_digits=4,decimal_places=1)
-    
-    
+    total_price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
 
 
+class CartSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    total_quantity = serializers.IntegerField()
+    total_price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
 
 class CartAddSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(
@@ -205,3 +222,7 @@ class CartAddSerializer(serializers.Serializer):
         default=1,
         required=False,
     )
+    
+    
+class CartMessageSerializer(serializers.Serializer):
+    detail = serializers.CharField()

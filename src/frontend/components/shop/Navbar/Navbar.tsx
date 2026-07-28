@@ -4,9 +4,10 @@ import Link from "next/link";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+
 import BACKEND_URLS from "@/utils";
 
-import "@/components/shop/Navbar/Navbar.css";
+import "./Navbar.css";
 
 interface Customer {
     id: number;
@@ -75,96 +76,142 @@ export default function Navbar() {
         }
 
     };
-
     return (
+    <nav>
 
-        <nav>
+        <div className="container">
 
-            <div className="container">
+            {/* Logo */}
 
-                <div className="logo">
+            <div className="logo">
 
-                    <Link href="/">
-                        MultiShop
-                    </Link>
-
-                </div>
-
-                <ul className="nav-links">
-
-                    <li><Link href="/">Home</Link></li>
-
-                    <li><Link href="/products">Products</Link></li>
-
-                    <li><Link href="/stores">Stores</Link></li>
-
-                    <li><Link href="/about">About</Link></li>
-
-                    <li><Link href="/contact">Contact</Link></li>
-
-                </ul>
-
-                <form className="search-box">
-
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                    />
-
-                    <button>
-                        Search
-                    </button>
-
-                </form>
-
-                <div className="auth-buttons">
-
-                    {loading ? (
-
-                        <span>Loading...</span>
-
-                    ) : customer ? (
-
-                        <>
-
-                            <span className="user-email">
-                                {customer?.username}
-                            </span>
-
-                            <button
-                                onClick={logout}
-                            >
-                                Logout
-                            </button>
-
-                        </>
-
-                    ) : (
-
-                        <>
-
-                            <Link href="/login" className="login-btn">
-
-                                Login
-
-                            </Link>
-
-                            <Link href="/register" className="register-btn">
-
-                               Register
-
-                            </Link>
-
-                        </>
-
-                    )}
-
-                </div>
+                <Link href="/">
+                    MultiShop
+                </Link>
 
             </div>
 
-        </nav>
+            {/* Navigation */}
 
-    );
+            <ul className="nav-links">
+
+                <li>
+                    <Link href="/">
+                        Home
+                    </Link>
+                </li>
+
+                
+
+                <li>
+                    <Link href="/about">
+                        About Us
+                    </Link>
+                </li>
+
+                <li>
+                    <Link href="/contact">
+                        Contact Us
+                    </Link>
+                </li>
+
+            </ul>
+
+            {/* Search */}
+
+            <form className="search-box">
+
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                />
+
+                <button type="submit">
+                    Search
+                </button>
+
+            </form>
+
+            {/* Authentication */}
+
+            <div className="auth-buttons">
+
+                {loading ? (
+
+                    <span className="loading-user">
+                        Loading...
+                    </span>
+
+                ) : customer ? (
+
+                    <>
+
+                        <div className="user-box">
+
+                            <div className="avatar">
+
+                                {customer.username[0].toUpperCase()}
+
+                            </div>
+
+                            <div className="user-data">
+
+                                <small>
+                                    Welcome Back
+                                </small>
+
+                                <span>
+                                    {customer.username}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <Link
+                            href="/order"
+                            className="orders-btn"
+                        >
+                            Orders
+                        </Link>
+
+                        <button
+                            className="logout-btn"
+                            onClick={logout}
+                        >
+                            Logout
+                        </button>
+
+                    </>
+
+                ) : (
+
+                    <>
+
+                        <Link
+                            href="/login"
+                            className="login-btn"
+                        >
+                            Login
+                        </Link>
+
+                        <Link
+                            href="/register"
+                            className="register-btn"
+                        >
+                            Register
+                        </Link>
+
+                    </>
+
+                )}
+
+            </div>
+
+        </div>
+
+    </nav>
+);
+    
 
 }

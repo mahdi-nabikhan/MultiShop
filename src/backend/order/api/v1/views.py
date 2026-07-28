@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from .serializer import *
 from order.sessions import CartSession
-
+from django.shortcuts import get_object_or_404
 class OrderListApiView(generics.GenericAPIView):
     """
     API view to handle listing and creating Orders for the authenticated Customer.
@@ -373,23 +373,40 @@ class OrderItemApiView(generics.GenericAPIView):
         
 class BillCreationApiView(generics.GenericAPIView):
     serializer_class=BillSerilizers
+    def post(self,request,pk):
+        data = request.data 
+        serializer = self.serializer_class(data=data,context = {'request':request,'pk':pk})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
     
-    def get(self,request,pk):
-        pass
+    
+class BillListAPIView(generics.GenericAPIView):
+    serializer_class=BillSerilizers
+    
+    def get_queryset(self):
+        return Bill.objects.filter(cart__customer__user =self.request.user)
     
     
-    def post(self,requesy,pk):
-        pass
+    def get (self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance=obj,context ={'request':request},many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+class CartSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    total_quantity = serializers.IntegerField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     
     
-
-
-
+    
+    
 class CartDetailAPIView(generics.GenericAPIView):
-    serializer_class = CartItemSerializer
+    serializer_class = CartSerializer
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         cart = CartSession(request)
 
         serializer = self.get_serializer(
@@ -401,9 +418,6 @@ class CartDetailAPIView(generics.GenericAPIView):
         )
 
         return Response(serializer.data)
-    
-
-
 
 class CartAddAPIView(generics.GenericAPIView):
     serializer_class = CartAddSerializer
@@ -440,4 +454,3 @@ class RelatedOrderItemWithOrder(generics.GenericAPIView):
         obj= self.get_queryset(pk)
         serializer = self.serializer_class(instance=obj,many=True,context = {'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
-    
