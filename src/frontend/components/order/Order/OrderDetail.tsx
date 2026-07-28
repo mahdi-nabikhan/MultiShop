@@ -29,6 +29,23 @@ interface OrderItem {
     order: number
     product: Product
 }
+interface Address {
+
+    id: number;
+
+    state: string;
+
+    city: string;
+
+    postal_code: string;
+
+    customer: {
+
+        username: string;
+
+    };
+
+}
 export default function OrderDetail() {
     const [items, setItems] = useState<OrderItem[]>([])
     const [loading, setLoading] = useState(false)
@@ -36,6 +53,81 @@ export default function OrderDetail() {
     const [openDelete, setOpenDelete] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(false)
     const [quantities, setQuantities] = useState<Record<number, number>>({});
+    const [addresses, setAddresses] = useState<Address[]>([])
+    const [checkoutLoading, setCheckoutLoading] = useState(false)
+    const [selectedAddress, setSelectedAddress] = useState<number | null>(null)
+
+    const checkout = async () => {
+
+    if (!selectedAddress) {
+        alert("Please select an address.");
+        return;
+    }
+
+    try {
+
+        setCheckoutLoading(true);
+
+        const { data } = await axios.post(
+            `${BACKEND_URLS}order/api/v1/bill/create/${selectedAddress}/`,
+            {},
+            {
+                withCredentials: true,
+            }
+        );
+
+        console.log(data);
+
+        alert("Bill created successfully.");
+
+    
+
+    } catch (err) {
+
+        console.log(err);
+
+        alert("Failed to create bill.");
+
+    } finally {
+
+        setCheckoutLoading(false);
+
+    }
+
+};
+    const getAddresses = async () => {
+
+    try {
+
+        const { data } = await axios.get<Address[]>(
+
+            `${BACKEND_URLS}customer/api/v1/add/address/`,
+
+            {
+
+                withCredentials: true,
+
+            }
+
+        );
+
+        setAddresses(data);
+
+        if (data.length > 0) {
+
+            setSelectedAddress(data[0].id);
+
+        }
+
+    }
+
+    catch (err) {
+
+        console.log(err);
+
+    }
+
+}
     useEffect(() => {
         const getOrderItem = async () => {
             try {
@@ -64,6 +156,7 @@ export default function OrderDetail() {
 
         }
         getOrderItem()
+        getAddresses();
     }, [])
 
     const handleDelete = async () => {
@@ -159,69 +252,80 @@ export default function OrderDetail() {
     );
 
     return (
-        <section className="order-page">
+       <section className="order-page">
 
-            {/* Header */}
+    {/* Header */}
 
-            <div className="order-banner">
+    <div className="order-banner">
 
-                <div>
+        <div>
 
-                    <h1>🛒 My Shopping Cart</h1>
+            <h1>🛒 My Shopping Cart</h1>
 
-                    <p>
-                        Manage all products before checkout
-                    </p>
+            <p>
+                Review your products before checkout.
+            </p>
 
-                </div>
+        </div>
 
-                <div className="status-badge">
+        <button
+            className="checkout-top-btn"
+            disabled={!selectedAddress}
+        >
+            Proceed To Checkout →
+        </button>
 
-                    {items[0].status === "P"
-                        ? "Pending"
-                        : items[0].status}
+    </div>
 
-                </div>
+    {/* Statistics */}
 
-            </div>
+    <div className="order-stats">
 
-            {/* Statistics */}
+        <div className="stat-card">
 
-            <div className="order-stats">
+            <h4>Products</h4>
 
-                <div className="stat-card">
+            <strong>{items.length}</strong>
 
-                    <h4>Products</h4>
+        </div>
 
-                    <strong>{items.length}</strong>
+        <div className="stat-card">
 
-                </div>
+            <h4>Created</h4>
 
-                <div className="stat-card">
+            <strong>
 
-                    <h4>Created</h4>
+                {new Date(items[0].created).toLocaleDateString()}
 
-                    <strong>
-                        {new Date(items[0].created).toLocaleDateString()}
-                    </strong>
+            </strong>
 
-                </div>
+        </div>
 
-                <div className="stat-card">
+        <div className="stat-card">
 
-                    <h4>Total</h4>
+            <h4>Total</h4>
 
-                    <strong>${total.toFixed(2)}</strong>
+            <strong>
 
-                </div>
+                ${total.toFixed(2)}
 
-            </div>
+            </strong>
 
-            {/* Items */}
+        </div>
+
+    </div>
+
+    <div className="order-layout">
+
+        {/* LEFT */}
+
+        <div className="left-section">
+
+            {/* Products */}
 
             <div className="cart-list">
 
-                {items.map((item) => (
+                {items.map(item => (
 
                     <div
                         className="cart-card"
@@ -231,12 +335,15 @@ export default function OrderDetail() {
                         <div className="product-image">
 
                             <img
+
                                 src={
                                     item.product.product_image
                                         ? `${BACKEND_URLS.replace(/\/$/, "")}${item.product.product_image}`
                                         : "/no-image.png"
                                 }
+
                                 alt={item.product.name}
+
                             />
 
                         </div>
@@ -244,18 +351,24 @@ export default function OrderDetail() {
                         <div className="product-info">
 
                             <h2>
+
                                 {item.product.name}
+
                             </h2>
 
                             <p>
+
                                 {item.product.description}
+
                             </p>
 
                             <div className="product-grid">
 
                                 <div>
 
-                                    <span>Quantity</span>
+                                    <span>
+                                        Quantity
+                                    </span>
 
                                     <input
 
@@ -265,17 +378,15 @@ export default function OrderDetail() {
 
                                         value={quantities[item.id] ?? item.quantity}
 
-                                        onChange={(e) => {
+                                        onChange={(e)=>{
 
-                                            const value = Number(e.target.value);
-
-                                            setQuantities(prev => ({
+                                            setQuantities(prev=>({
 
                                                 ...prev,
 
-                                                [item.id]: value
+                                                [item.id]:Number(e.target.value)
 
-                                            }));
+                                            }))
 
                                         }}
 
@@ -288,17 +399,25 @@ export default function OrderDetail() {
                                     <span>Price</span>
 
                                     <strong>
+
                                         ${item.product.price}
+
                                     </strong>
 
                                 </div>
 
                                 <div>
 
-                                    <span>Discount Price</span>
+                                    <span>
+
+                                        Discount
+
+                                    </span>
 
                                     <strong>
+
                                         ${item.product.price_after}
+
                                     </strong>
 
                                 </div>
@@ -309,9 +428,7 @@ export default function OrderDetail() {
 
                                     <strong>
 
-                                        $
-
-                                        {(
+                                        ${(
                                             (quantities[item.id] ?? item.quantity)
                                             *
                                             item.product.price_after
@@ -326,41 +443,53 @@ export default function OrderDetail() {
                             <div className="product-actions">
 
                                 <span
+
                                     className={
-                                        item.status === "P"
-                                            ? "pending"
-                                            : "paid"
+                                        item.status==="P"
+                                        ?
+                                        "pending"
+                                        :
+                                        "paid"
                                     }
+
                                 >
-                                    {item.status === "P"
-                                        ? "Pending"
-                                        : item.status}
+
+                                    {item.status==="P"
+                                        ?
+                                        "Pending"
+                                        :
+                                        item.status}
+
                                 </span>
 
                                 <div>
 
-                                    <button className="view-btn">
-
+                                    <button
+                                        className="view-btn"
+                                    >
                                         View Product
-
                                     </button>
+
+                                    <button
+                                        className="update-btn"
+                                        onClick={()=>updateQuantity(item)}
+                                    >
+                                        Update
+                                    </button>
+
                                     <button
 
-                                        className="update-btn"
+                                        className="remove-btn"
 
-                                        onClick={() => updateQuantity(item)}
+                                        onClick={()=>{
+
+                                            setSelectedItem(item)
+
+                                            setOpenDelete(true)
+
+                                        }}
 
                                     >
-
-                                        Update
-
-                                    </button>
-
-                                    <button className="remove-btn" onClick={() => {
-                                        setSelectedItem(item)
-                                        setOpenDelete(true)
-
-                                    }}>
 
                                         Remove
 
@@ -378,117 +507,197 @@ export default function OrderDetail() {
 
             </div>
 
-            {/* Summary */}
+            {/* Address */}
 
-            <div className="summary-card">
+            <div className="address-section">
 
                 <h2>
 
-                    Order Summary
+                    📍 Select Shipping Address
 
                 </h2>
 
-                <div className="summary-row">
+                <p>
 
-                    <span>
+                    Choose where your order should be delivered.
 
-                        Products
+                </p>
 
-                    </span>
+                <div className="address-list">
 
-                    <strong>
+                    {addresses.map(address=>(
 
-                        {items.length}
+                        <label
 
-                    </strong>
+                            key={address.id}
 
-                </div>
+                            className={`address-card ${
+                                selectedAddress===address.id
+                                ?
+                                "active-address"
+                                :
+                                ""
+                            }`}
 
-                <div className="summary-row">
+                        >
 
-                    <span>
+                            <input
 
-                        Shipping
+                                type="radio"
 
-                    </span>
+                                checked={selectedAddress===address.id}
 
-                    <strong>
+                                onChange={()=>{
 
-                        Free
+                                    setSelectedAddress(address.id)
 
-                    </strong>
+                                }}
 
-                </div>
+                            />
 
-                <div className="summary-row">
+                            <div>
 
-                    <span>
+                                <h4>
 
-                        Discount
+                                    {address.state} / {address.city}
 
-                    </span>
+                                </h4>
 
-                    <strong>
+                                <span>
 
-                        $0.00
+                                    Postal Code :
+                                    {" "}
+                                    {address.postal_code}
 
-                    </strong>
+                                </span>
 
-                </div>
+                            </div>
 
-                <hr />
+                        </label>
 
-                <div className="summary-total">
-
-                    <span>Total</span>
-
-                    <h2>
-
-                        ${total.toFixed(2)}
-
-                    </h2>
-
-                </div>
-
-                <div className="summary-buttons">
-
-                    <button className="continue-btn">
-
-                        Continue Shopping
-
-                    </button>
-
-                    <button className="checkout-btn">
-
-                        Checkout
-
-                    </button>
+                    ))}
 
                 </div>
 
             </div>
-            <DeleteOrderItemModal
 
-                open={openDelete}
+        </div>
 
-                loading={deleteLoading}
+        {/* RIGHT */}
 
-                productName={
-                    selectedItem?.product.name ?? ""
-                }
+        <div className="summary-card">
 
-                onClose={() => {
+            <h2>
 
-                    setOpenDelete(false);
+                Order Summary
 
-                    setSelectedItem(null);
+            </h2>
 
-                }}
+            <div className="summary-row">
 
-                onConfirm={handleDelete}
+                <span>
 
-            />
-        </section>
+                    Products
+
+                </span>
+
+                <strong>
+
+                    {items.length}
+
+                </strong>
+
+            </div>
+
+            <div className="summary-row">
+
+                <span>
+
+                    Shipping
+
+                </span>
+
+                <strong>
+
+                    Free
+
+                </strong>
+
+            </div>
+
+            <div className="summary-row">
+
+                <span>
+
+                    Discount
+
+                </span>
+
+                <strong>
+
+                    $0.00
+
+                </strong>
+
+            </div>
+
+            <hr/>
+
+            <div className="summary-total">
+
+                <span>
+
+                    Total
+
+                </span>
+
+                <h2>
+
+                    ${total.toFixed(2)}
+
+                </h2>
+
+            </div>
+
+            <button
+    className="checkout-btn"
+    onClick={checkout}
+    disabled={!selectedAddress || checkoutLoading}
+>
+
+    {
+        checkoutLoading
+            ? "Creating..."
+            : "Checkout"
+    }
+
+</button>
+
+        </div>
+
+    </div>
+
+    <DeleteOrderItemModal
+
+        open={openDelete}
+
+        loading={deleteLoading}
+
+        productName={selectedItem?.product.name ?? ""}
+
+        onClose={()=>{
+
+            setOpenDelete(false)
+
+            setSelectedItem(null)
+
+        }}
+
+        onConfirm={handleDelete}
+
+    />
+
+</section>
     );
 
 }
