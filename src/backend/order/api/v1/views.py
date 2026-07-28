@@ -395,11 +395,18 @@ class BillListAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(instance=obj,context ={'request':request},many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
-
+class CartSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    total_quantity = serializers.IntegerField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    
+    
+    
+    
 class CartDetailAPIView(generics.GenericAPIView):
-    serializer_class = CartItemSerializer
+    serializer_class = CartSerializer
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         cart = CartSession(request)
 
         serializer = self.get_serializer(
@@ -411,9 +418,6 @@ class CartDetailAPIView(generics.GenericAPIView):
         )
 
         return Response(serializer.data)
-    
-
-
 
 class CartAddAPIView(generics.GenericAPIView):
     serializer_class = CartAddSerializer

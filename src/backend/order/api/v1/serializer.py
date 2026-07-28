@@ -196,14 +196,25 @@ class BillSerilizers(serializers.ModelSerializer):
     
 
 
+
+
+
 class CartItemSerializer(serializers.Serializer):
     product = ProductSerializer()
     quantity = serializers.IntegerField()
-    total_price = serializers.DecimalField(max_digits=4,decimal_places=1)
-    
-    
+    total_price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
 
 
+class CartSerializer(serializers.Serializer):
+    items = CartItemSerializer(many=True)
+    total_quantity = serializers.IntegerField()
+    total_price = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
 
 class CartAddSerializer(serializers.Serializer):
     quantity = serializers.IntegerField(
