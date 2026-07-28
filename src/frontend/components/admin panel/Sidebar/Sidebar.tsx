@@ -91,7 +91,7 @@ const menuItems: MenuItem[] = [
             },
             {
                 title: "Admins",
-                href: "/shop-admin-panel/admins",
+                href: "/shop-admin-panel/admin",
             },
         ],
     },
@@ -107,7 +107,7 @@ const menuItems: MenuItem[] = [
             },
             {
                 title: "Operators",
-                href: "/shop-admin-panel/operators",
+                href: "/shop-admin-panel/operator",
             },
         ],
     },
