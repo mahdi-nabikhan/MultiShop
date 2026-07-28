@@ -172,7 +172,7 @@ class BillSerilizers(serializers.ModelSerializer):
     class Meta:
         model=Bill
         fields='__all__'
-        read_only_fields=['cart']
+        read_only_fields=['cart','address']
         
         
         
@@ -187,10 +187,11 @@ class BillSerilizers(serializers.ModelSerializer):
         order=Order.objects.get(customer__user = request.user,status=False)
         address = Address.objects.get(pk = self.context.get('pk'))
         validated_data['cart']=order
-        validated_data['adress']=address        
+        validated_data['address']=address        
         bill = Bill.objects.create(**validated_data)
         order.status=True
         order.save(update_fields=['status'])
+        return bill
         
     
 

@@ -387,12 +387,12 @@ class BillListAPIView(generics.GenericAPIView):
     serializer_class=BillSerilizers
     
     def get_queryset(self):
-        return Bill.objects.filter(order__customer__user =self.request.user)
+        return Bill.objects.filter(cart__customer__user =self.request.user)
     
     
     def get (self,request):
         obj = self.get_queryset()
-        serializer = self.serializer_class(instance=obj,context ={'request':request})
+        serializer = self.serializer_class(instance=obj,context ={'request':request},many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
 
