@@ -213,3 +213,5 @@ class CartAddSerializer(serializers.Serializer):
     )
     
     
+class CartMessageSerializer(serializers.Serializer):
+    detail = serializers.CharField()
