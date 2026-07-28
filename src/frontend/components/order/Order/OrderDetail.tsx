@@ -147,7 +147,15 @@ export default function OrderDetail() {
                 setQuantities(qty);
 
             } catch (err) {
-                alert(err)
+                 if (axios.isAxiosError(err) && err.response?.status === 404) {
+
+        setItems([]);
+
+    } else {
+
+        console.error(err);
+
+    }
 
             } finally {
                 setLoading(false)
