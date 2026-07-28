@@ -1,97 +1,448 @@
-/* ===========================
-   User Box
-=========================== */
+/* ===========================================
+   Navbar
+=========================================== */
 
-.auth-buttons{
-    display:flex;
-    align-items:center;
-    gap:15px;
+nav{
+    width:100%;
+    position:sticky;
+    top:0;
+    z-index:999;
+
+    background:rgba(11,17,32,.88);
+
+    backdrop-filter:blur(12px);
+
+    border-bottom:1px solid var(--border);
+
+    box-shadow:0 8px 25px rgba(0,0,0,.18);
 }
 
-.user-box{
+nav .container{
+
+    height:85px;
+
     display:flex;
+
     align-items:center;
-    gap:12px;
-    padding:8px 14px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:14px;
+
+    justify-content:space-between;
+
+    gap:30px;
+
+}
+
+/* ===========================================
+   Logo
+=========================================== */
+
+.logo a{
+
+    font-size:32px;
+
+    font-weight:800;
+
+    color:var(--primary);
+
     transition:.3s;
+
+}
+
+.logo a:hover{
+
+    color:var(--primary-light);
+
+    text-shadow:0 0 15px rgba(16,185,129,.5);
+
+}
+
+/* ===========================================
+   Navigation
+=========================================== */
+
+.nav-links{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:28px;
+
+}
+
+.nav-links a{
+
+    color:var(--text-secondary);
+
+    font-weight:500;
+
+    position:relative;
+
+    transition:.25s;
+
+}
+
+.nav-links a:hover{
+
+    color:white;
+
+}
+
+.nav-links a::after{
+
+    content:"";
+
+    position:absolute;
+
+    bottom:-7px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:0;
+
+    height:2px;
+
+    background:var(--primary);
+
+    transition:.3s;
+
+}
+
+.nav-links a:hover::after{
+
+    width:100%;
+
+}
+
+/* ===========================================
+   Search
+=========================================== */
+
+.search-box{
+
+    display:flex;
+
+    align-items:center;
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    min-width:320px;
+
+}
+
+.search-box input{
+
+    border:none;
+
+    background:transparent;
+
+    color:white;
+
+    padding:14px 18px;
+
+    width:100%;
+
+}
+
+.search-box input:focus{
+
+    box-shadow:none;
+
+}
+
+.search-box button{
+
+    border:none;
+
+    background:var(--primary);
+
+    color:white;
+
+    padding:14px 22px;
+
+    font-weight:600;
+
+}
+
+.search-box button:hover{
+
+    background:var(--primary-hover);
+
+}
+
+/* ===========================================
+   Authentication
+=========================================== */
+
+.auth-buttons{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+/* ===========================================
+   User Card
+=========================================== */
+
+.user-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:8px 15px;
+
+    border-radius:14px;
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    transition:.3s;
+
 }
 
 .user-box:hover{
+
     border-color:var(--primary);
-    box-shadow:0 0 20px rgba(16,185,129,.15);
+
+    transform:translateY(-2px);
+
 }
 
 .avatar{
-    width:42px;
-    height:42px;
+
+    width:45px;
+
+    height:45px;
+
     border-radius:50%;
+
     background:linear-gradient(
         135deg,
         var(--primary),
         var(--primary-light)
     );
+
     display:flex;
+
     align-items:center;
+
     justify-content:center;
+
     color:white;
+
     font-weight:700;
+
     font-size:18px;
+
 }
 
 .user-data{
+
     display:flex;
+
     flex-direction:column;
+
 }
 
 .user-data small{
-    color:var(--text-muted);
+
     font-size:11px;
+
+    color:var(--text-muted);
+
 }
 
 .user-data span{
-    color:var(--text);
+
     font-weight:600;
+
+    color:white;
+
 }
 
-/* ===========================
-   Orders Button
-=========================== */
+/* ===========================================
+   Buttons
+=========================================== */
 
 .orders-btn{
-    padding:10px 18px;
+
+    padding:12px 18px;
+
     border-radius:10px;
+
     background:var(--surface);
+
     border:1px solid var(--border);
-    color:var(--text);
+
+    color:white;
+
     transition:.25s;
+
 }
 
 .orders-btn:hover{
+
     background:var(--primary);
-    color:white;
+
+    border-color:var(--primary);
+
 }
 
-/* ===========================
-   Logout
-=========================== */
-
 .logout-btn{
-    padding:10px 18px;
+
+    padding:12px 20px;
+
     border:none;
+
     border-radius:10px;
+
     background:var(--danger);
+
     color:white;
-    transition:.25s;
+
+    font-weight:600;
+
 }
 
 .logout-btn:hover{
+
+    background:#dc2626;
+
     transform:translateY(-2px);
-    opacity:.9;
+
+}
+
+.login-btn{
+
+    padding:12px 20px;
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+
+    background:var(--surface);
+
+    color:white;
+
+    transition:.25s;
+
+}
+
+.login-btn:hover{
+
+    background:var(--surface-hover);
+
+}
+
+.register-btn{
+
+    padding:12px 22px;
+
+    border-radius:10px;
+
+    background:var(--primary);
+
+    color:white;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.register-btn:hover{
+
+    background:var(--primary-hover);
+
+    transform:translateY(-2px);
+
 }
 
 .loading-user{
+
     color:var(--text-secondary);
+
+}
+
+/* ===========================================
+   Responsive
+=========================================== */
+
+@media(max-width:1400px){
+
+    .search-box{
+
+        min-width:240px;
+
+    }
+
+}
+
+@media(max-width:1100px){
+
+    nav .container{
+
+        flex-wrap:wrap;
+
+        height:auto;
+
+        padding:18px 0;
+
+    }
+
+    .nav-links{
+
+        width:100%;
+
+        justify-content:center;
+
+        order:3;
+
+        margin-top:10px;
+
+    }
+
+    .search-box{
+
+        flex:1;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .nav-links{
+
+        display:none;
+
+    }
+
+    .search-box{
+
+        display:none;
+
+    }
+
+    .auth-buttons{
+
+        margin-left:auto;
+
+    }
+
 }

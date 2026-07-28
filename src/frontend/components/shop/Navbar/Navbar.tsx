@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 import BACKEND_URLS from "@/utils";
 
-import "@/components/shop/Navbar/Navbar.css";
+import "./Navbar.css";
 
 interface Customer {
     id: number;
@@ -101,17 +101,7 @@ export default function Navbar() {
                     </Link>
                 </li>
 
-                <li>
-                    <Link href="/products">
-                        Products
-                    </Link>
-                </li>
-
-                <li>
-                    <Link href="/stores">
-                        Stores
-                    </Link>
-                </li>
+                
 
                 <li>
                     <Link href="/about">
