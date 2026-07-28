@@ -183,8 +183,11 @@ class BillSerilizers(serializers.ModelSerializer):
     
     
     def create(self, validated_data):
-        order=Order.objects.get(pk=self.context.get('pk'))
+        request = self.context.get('request')
+        order=Order.objects.get(customer__user = request.user)
+        address = Address.objects.get(pk = self.context.get('pk'))
         validated_data['cart']=order
+        validated_data['adress']=address        
         return Bill.objects.create(**validated_data)
     
     
@@ -205,3 +208,5 @@ class CartAddSerializer(serializers.Serializer):
         default=1,
         required=False,
     )
+    
+    

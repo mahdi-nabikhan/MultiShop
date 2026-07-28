@@ -12,7 +12,9 @@ urlpatterns = [
     path('create/bill/<int:pk>/',views.BillCreationApiView.as_view(),name='bill-creation'),
     path('sessions/cart/',views.CartDetailAPIView.as_view(),name='session-cart'),
     path('session/cart/add/<int:pk>/',view=views.CartAddAPIView.as_view(),name='sessions-cart-add'),
-    path('related/order/orderitem/<int:pk>/',view=views.RelatedOrderItemWithOrder.as_view(),name='ralated_orderitem_order')
+    path('related/order/orderitem/<int:pk>/',view=views.RelatedOrderItemWithOrder.as_view(),name='ralated_orderitem_order'),
+    path('bill/create/<int:pk>/',views.BillCreationApiView.as_view(),name='bill-creation'),
+    path('bill/list/',view=views.BillListAPIView.as_view(),name='bill-list')
 
 
 ]

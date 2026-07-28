@@ -373,18 +373,28 @@ class OrderItemApiView(generics.GenericAPIView):
         
 class BillCreationApiView(generics.GenericAPIView):
     serializer_class=BillSerilizers
+    def post(self,request,pk):
+        data = request.data 
+        serializer = self.serializer_class(data=data,context = {'request':request,'pk':pk})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
     
-    def get(self,request,pk):
-        pass
+    
+class BillListAPIView(generics.GenericAPIView):
+    serializer_class=BillSerilizers
+    
+    def get_queryset(self):
+        return Bill.objects.filter(order__customer__user =self.request.user)
     
     
-    def post(self,requesy,pk):
-        pass
+    def get (self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance=obj,context ={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
     
-    
-
-
 
 class CartDetailAPIView(generics.GenericAPIView):
     serializer_class = CartItemSerializer
@@ -440,4 +450,3 @@ class RelatedOrderItemWithOrder(generics.GenericAPIView):
         obj= self.get_queryset(pk)
         serializer = self.serializer_class(instance=obj,many=True,context = {'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
-    
