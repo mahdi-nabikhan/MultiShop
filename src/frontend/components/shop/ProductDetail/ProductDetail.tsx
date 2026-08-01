@@ -1,5 +1,5 @@
 "use client";
-
+import ProductRating from "@/components/shop/ProductRating/ProductRating";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
@@ -160,6 +160,13 @@ export default function ProductDetail({ productId }: Props) {
             <ShieldCheck size={18} />
             Warranty Included
           </div>
+        <ProductRating
+
+    productId={product.id}
+
+    isAuthenticated={!isAuthenticated}
+
+/>
         </div>
 
       </div>
