@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView, GenericAPIView
+from .pagination import WebsiteShopPaginations,WebsiteRandomProductPaginations
 
 from elasticsearch import Elasticsearch
 
@@ -47,7 +48,7 @@ class RandomProductsApiView(APIView):
     - If total products count is less than 5, returns all existing products (random.sample handles it).
     - No authentication required.
     """
-
+    paginations_class = WebsiteRandomProductPaginations
     def get(self, request):
         cache_key = "random_products_6"
         products = cache.get(cache_key)
@@ -290,9 +291,31 @@ class ListStoreApiView(GenericAPIView):
             ]
     """
     serializer_class = StoreSerializer
+    pagination_class = WebsiteShopPaginations
 
     def get(self, request):
         data = Store.objects.all()
+        page = self.paginate_queryset(data)
+
+
+        if page is not None:
+
+            serializer = self.get_serializer(
+
+                page,
+
+                many=True,
+
+                context={"request": request}
+
+            )
+
+            return self.get_paginated_response(
+
+                serializer.data
+
+            )
+
         serializer = self.serializer_class(
             instance=data, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
