@@ -155,3 +155,68 @@ class TestCustomerAPI:
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.data["can_rate"] is True
+
+
+@pytest.mark.django_db
+class TestGetCustomerDetail:
+    
+    def setup_method(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            email = 'test@gmail.com',
+            password = 'test12345'
+        )
+        
+        self.customer = Customer.objects.create(
+            user=self.user,
+            username ='test'
+            
+        )
+        self.url = reverse('customer-detail')
+        
+    def authenticate_user(self):
+        self.client.force_authenticate(
+            user=self.user
+        )
+    
+    
+    def test_get_customer_detail(self):
+        self.authenticate_user()
+        respones = self.client.get(
+            self.url
+        )
+        assert respones.status_code == 200
+        assert respones.data['id'] == self.customer.id
+    def test_get_customer_detail_without_authentications(self):
+        response = self.client.get(
+            self.url
+        )
+        assert response.status_code == 401
+        
+        
+    def test_get_customer_detail_success(self):
+        self.authenticate_user()
+        data = {
+            'username' :'updated test'
+        }
+        response = self.client.put(
+            self.url,
+            data,
+            format='json'
+        )
+        assert response.status_code == 201
+        assert response.data ['message'] == (
+            "customer successfully updated"
+        )
+    def test_patch_customer_detail_invalid_data(self):
+        self.authenticate_user()
+        data ={
+            "age":'invalid'
+        }
+        response = self.client.patch(
+                    self.url,
+                    data,
+                    format='json'
+                )
+        assert response.status_code == 404
+        
