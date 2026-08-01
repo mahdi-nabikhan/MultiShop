@@ -4,6 +4,7 @@ from account.api.v1.serializers import (
     UserSerializer,
     UsersSerializer,
     ChangePasswordSerializer,
+    CheckMeSerializer
 )
 from account.models import User
 
@@ -150,3 +151,28 @@ class TestChangePasswordSerializer:
         serializer = ChangePasswordSerializer(data=data)
         assert serializer.is_valid() is False
         assert "passwords do not match" in str(serializer.errors).lower()
+
+
+@pytest.mark.djanfo_db
+class TestChechMeSerializer:
+    
+    def setup_method(self):
+        self.user = User.objects.create_user(
+            email = "test@gmail.com",
+            password = "testpasword123"
+        )
+        
+    def test_serializer_returns_user_data(self):
+        serializer = CheckMeSerializer(instance= self.user)
+        data = serializer.data
+        assert data["pk"] ==  self.user.pk
+        assert data ["email"] == self.user.email
+        
+    def test_serializer_only_contains_expected_fields(self):
+        serializer = CheckMeSerializer(instance= self.user)
+        assert set(serializer.data.key()) =={"pk","email"}
+                     
+    def test_serializer_fields_are_read_only(self):
+        serializer = CheckMeSerializer(instance= self.user)
+        assert serializer.fields['pk'].read_only is True
+        assert serializer.fields['email'].read_only is True
