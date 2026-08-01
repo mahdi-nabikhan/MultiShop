@@ -54,7 +54,7 @@ class AdminsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Admin
-        fields = ['username', 'user']
+        fields = ['id','username', 'user']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -73,7 +73,7 @@ class OperatorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Operator
-        fields = ['username', 'user']
+        fields = ['id','username', 'user']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')

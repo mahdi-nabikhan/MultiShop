@@ -3,6 +3,7 @@ import CommentCreateBox from "@/components/shop/Comments/CommentCreateBox/Commen
 import CommentList from "@/components/shop/Comments/CommentList/CommentList";
 import ProductOrderBox from "@/components/shop/ProductOrderBox/ProductOrderBox";
 import SectionHeader from "@/components/shop/SectionHeader/SectionHeader";
+
 import './page.css'
 interface Props {
   params: Promise<{
@@ -25,6 +26,8 @@ export default async function Page({ params }: Props) {
         />
 
       </section>
+
+      
 
 
 

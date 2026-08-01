@@ -5,7 +5,35 @@ from rest_framework.authtoken.models import Token
 from django.urls import reverse
 from customer.models import Customer
 from vendor.models import Admin, Manager, Operator, Store
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 
+
+User = get_user_model()
+
+
+@pytest.fixture
+def user():
+    return User.objects.create_user(
+        username="mahdi",
+        email="mahdi@test.com",
+        password="12345678"
+    )
+
+
+@pytest.fixture
+def api_client():
+    return APIClient()
+
+
+@pytest.fixture
+def tokens(user):
+    refresh = RefreshToken.for_user(user)
+
+    return {
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+    }
 User = get_user_model()
 
 
@@ -192,3 +220,76 @@ class TestAuthAPI:
         })
         assert response.status_code == 200
         assert response.data["redirect_url"] == expected_redirect
+
+
+
+@pytest.mark.django_db
+class TestLogoutAPIView:
+
+    def test_logout_success(self, api_client, user, tokens):
+
+        api_client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
+        )
+
+        api_client.cookies["refresh_token"] = tokens["refresh"]
+
+        response = api_client.post("/api/v1/logout/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+        assert response.data["message"] == "Logout successfully."
+
+        assert "access_token" in response.cookies
+        assert response.cookies["access_token"].value == ""
+
+        assert "refresh_token" in response.cookies
+        assert response.cookies["refresh_token"].value == ""
+
+    def test_logout_without_refresh_cookie(self, api_client, user, tokens):
+
+        api_client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
+        )
+
+        response = api_client.post("/api/v1/logout/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+
+    def test_logout_unauthenticated(self, api_client):
+
+        response = api_client.post("/api/v1/logout/")
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        
+        
+
+@pytest.mark.django_db
+class TestCheckMeAPIView:
+
+    def test_authenticated_user_can_get_profile(
+        self,
+        api_client,
+        user,
+        tokens,
+    ):
+        api_client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
+        )
+
+        response = api_client.get("/api/v1/check-me/")
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data["id"] == user.id
+        assert response.data["username"] == user.username
+        assert response.data["email"] == user.email
+
+    def test_unauthenticated_user_cannot_get_profile(
+        self,
+        api_client,
+    ):
+        response = api_client.get("/api/v1/check-me/")
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

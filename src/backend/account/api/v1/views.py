@@ -572,3 +572,6 @@ class LogoutAPIView(GenericAPIView):
         response.delete_cookie("refresh_token")
 
         return response
+    
+    
+    

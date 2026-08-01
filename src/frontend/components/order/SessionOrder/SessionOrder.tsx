@@ -365,140 +365,141 @@ export default function SessionOrder() {
 
 
 
-
                     <div className="cart-content">
 
-
-
                         {/* Products List */}
-
                         <div className="cart-items">
 
+                            {cart.items.map((item) => (
 
+                                <div
+                                    className="cart-item"
+                                    key={item.product.id}
+                                >
 
-                            <div className="cart-item">
+                                    {/* Product Image */}
+                                    <div className="cart-product-image">
 
+                                        <img
+                                            src={
+                                                item.product.product_image ??
+                                                "/product.jpg"
+                                            }
+                                            alt={item.product.name}
+                                        />
 
+                                    </div>
 
-                                {/* Product Image */}
+                                    {/* Product Info */}
+                                    <div className="cart-product-info">
 
-                                <div className="cart-product-image">
+                                        <h3>
+                                            {item.product.name}
+                                        </h3>
 
-                                    <img
-                                        src="/product.jpg"
-                                        alt="Product"
-                                    />
+                                        <p>
+                                            {item.product.description}
+                                        </p>
+
+                                        <span className="product-price">
+                                            ${item.product.price_after}
+                                        </span>
+
+                                        <span className="stock">
+                                            Stock : {item.product.quantity_in_stock}
+                                        </span>
+
+                                    </div>
+
+                                    {/* Quantity */}
+                                    <div className="quantity-control">
+
+                                        <button
+                                            onClick={() =>
+                                                decreaseQuantity(item.product.id)
+                                            }
+                                        >
+                                            -
+                                        </button>
+
+                                        <input
+                                            type="number"
+                                            value={quantities[item.product.id]}
+                                            onChange={(e) =>
+                                                setQuantities(prev => ({
+                                                    ...prev,
+                                                    [item.product.id]:
+                                                        Number(e.target.value)
+                                                }))
+                                            }
+                                            min={1}
+                                        />
+
+                                        <button
+                                            onClick={() =>
+                                                increaseQuantity(item.product.id)
+                                            }
+                                        >
+                                            +
+                                        </button>
+
+                                        <button
+                                            className="update-btn"
+                                            onClick={() =>
+                                                updateQuantity(item.product.id)
+                                            }
+                                        >
+                                            Update
+                                        </button>
+
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="cart-item-actions">
+
+                                        <strong>
+                                            ${item.total_price}
+                                        </strong>
+
+                                        <button
+                                            className="delete-btn"
+                                            onClick={() => {
+
+                                                setSelectedProduct(item.product);
+
+                                                setOpenDelete(true);
+
+                                            }}
+                                        >
+                                            Remove
+                                        </button>
+
+                                    </div>
 
                                 </div>
 
-
-
-
-                                {/* Product Info */}
-
-                                <div className="cart-product-info">
-
-                                    <h3>
-                                        Gaming Keyboard
-                                    </h3>
-
-
-                                    <p>
-                                        Mechanical keyboard with RGB lighting
-                                    </p>
-
-
-                                    <span className="product-price">
-                                        $120
-                                    </span>
-
-
-                                </div>
-
-
-
-
-
-                                {/* Quantity */}
-
-                                <div className="quantity-control">
-
-
-                                    <button>
-                                        -
-                                    </button>
-
-
-                                    <input
-                                        type="number"
-                                        value="1"
-                                    />
-
-
-                                    <button>
-                                        +
-                                    </button>
-
-
-                                    <button className="update-btn">
-
-                                        Update
-
-                                    </button>
-
-
-                                </div>
-
-
-
-
-
-
-                                {/* Actions */}
-
-                                <div className="cart-item-actions">
-
-
-                                    <strong>
-                                        $120
-                                    </strong>
-
-
-
-                                    <button className="delete-btn">
-
-                                        Remove
-
-                                    </button>
-
-
-                                </div>
-
-
-
-                            </div>
-
-
-
+                            ))}
 
                         </div>
 
-
-
-
-
-
-
                         {/* Order Summary */}
-
                         <aside className="cart-summary">
-
 
                             <h2>
                                 Order Summary
                             </h2>
 
+                            <div className="summary-row">
 
+                                <span>
+                                    Total Items
+                                </span>
+
+                                <strong>
+                                    {cart.total_quantity}
+                                </strong>
+
+                            </div>
 
                             <div className="summary-row">
 
@@ -506,79 +507,58 @@ export default function SessionOrder() {
                                     Subtotal
                                 </span>
 
-
                                 <strong>
-                                    $120
+                                    ${subtotal.toFixed(2)}
                                 </strong>
-
 
                             </div>
 
-
-
-
                             <div className="summary-row">
-
 
                                 <span>
                                     Shipping
                                 </span>
 
-
                                 <strong>
-                                    Free
+                                    {shipping === 0 ? "Free" : `$${shipping}`}
                                 </strong>
-
 
                             </div>
 
-
-
-
                             <hr />
 
-
-
-
                             <div className="summary-total">
-
 
                                 <span>
                                     Total
                                 </span>
 
-
                                 <strong>
-                                    $120
+                                    ${grandTotal.toFixed(2)}
                                 </strong>
-
 
                             </div>
 
-
-
-
-                            <button className="checkout-btn">
-
-                                Proceed To Checkout
-
+                            <button
+                                className="checkout-btn"
+                                onClick={checkout}
+                                disabled={checkoutLoading}
+                            >
+                                {
+                                    checkoutLoading
+                                        ? "Loading..."
+                                        : "Proceed To Checkout"
+                                }
                             </button>
 
-
-
-
-                            <button className="continue-shopping-btn">
-
+                            <button
+                                className="continue-shopping-btn"
+                                onClick={() => router.push("/")}
+                            >
                                 Continue Shopping
-
                             </button>
-
-
 
                         </aside>
-
-
-
 
                     </div>
 
