@@ -1,19 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
 import "./ListAdmin.css";
 
 interface Admin {
+    id:number
     username: string;
     user: {
+
         email: string;
     };
 }
 
 export default function AdminList() {
-
+    const router = useRouter()
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -104,9 +107,11 @@ export default function AdminList() {
 
                             </div>
 
-                            <div className="admin-badge">
+                            <div className="admin-badge" onClick={() =>{
+                                router.push(`admin/${admin.id}`)
+                            }}>
 
-                                Admin
+                                Detail
 
                             </div>
 
