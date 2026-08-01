@@ -140,3 +140,163 @@ General Notes
         data = serializer.data
         assert data["username"] == "testuser"
         assert data["user"] == setup_data["user"].id
+
+
+
+
+
+
+@pytest.mark.django_db
+class TestCustomerDetailSerializer:
+
+
+    def setup_method(self):
+
+        self.user = User.objects.create_user(
+
+            email="test@example.com",
+
+            password="password123"
+
+        )
+
+
+        self.customer = Customer.objects.create(
+
+            user=self.user
+
+        )
+
+
+
+    def test_serializer_returns_customer_data(self):
+
+
+        serializer = CustomerDetailSerializer(
+
+            instance=self.customer
+
+        )
+
+
+        data = serializer.data
+
+
+
+        assert data["id"] == self.customer.id
+
+        assert data["user"] == self.user.id
+
+
+
+    def test_serializer_contains_all_fields(self):
+
+
+        serializer = CustomerDetailSerializer(
+
+            instance=self.customer
+
+        )
+
+
+        model_fields = {
+
+            field.name
+
+            for field in Customer._meta.fields
+
+        }
+
+
+
+        assert set(serializer.data.keys()) == model_fields
+
+
+
+
+    def test_user_field_is_read_only(self):
+
+
+        serializer = CustomerDetailSerializer()
+
+
+
+        assert serializer.fields["user"].read_only is True
+
+
+
+
+    def test_serializer_update_customer_information(self):
+
+
+        serializer = CustomerDetailSerializer(
+
+            instance=self.customer,
+
+            data={
+
+                "first_name":"Ali",
+
+                "last_name":"Ahmadi"
+
+            },
+
+            partial=True
+
+        )
+
+
+
+        assert serializer.is_valid()
+
+
+
+        updated_customer = serializer.save()
+
+
+
+        assert updated_customer.first_name == "Ali"
+
+        assert updated_customer.last_name == "Ahmadi"
+
+
+
+
+    def test_serializer_cannot_update_user_field(self):
+
+
+        new_user = User.objects.create_user(
+
+            email="new@example.com",
+
+            password="password123"
+
+        )
+
+
+
+        serializer = CustomerDetailSerializer(
+
+            instance=self.customer,
+
+            data={
+
+                "user": new_user.id
+
+            },
+
+            partial=True
+
+        )
+
+
+
+        assert serializer.is_valid()
+
+
+
+        updated_customer = serializer.save()
+
+
+
+        assert updated_customer.user == self.user
