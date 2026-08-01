@@ -201,7 +201,12 @@ export default function Navbar() {
                         >
                             Register
                         </Link>
-
+                        <Link
+                            href="/session-order"
+                            className="orders-btn"
+                        >
+                            Orders
+                        </Link>
                     </>
 
                 )}
