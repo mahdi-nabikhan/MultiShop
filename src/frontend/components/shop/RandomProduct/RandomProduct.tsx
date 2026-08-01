@@ -10,45 +10,45 @@ import "./RandomProduct.css";
 
 interface Product {
 
-    id:number;
+    id: number;
 
-    name:string;
+    name: string;
 
-    description:string;
+    description: string;
 
-    quantity_in_stock:number;
+    quantity_in_stock: number;
 
-    price:number;
+    price: number;
 
-    price_after:number;
+    price_after: number;
 
-    product_image:string | null;
+    product_image: string | null;
 
-    category:number;
+    category: number;
 
-    store:number;
+    store: number;
 
 }
 
-export default function RandomProducts(){
+export default function RandomProducts() {
 
 
-    const [products,setProducts] = useState<Product[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
 
-    const [loading,setLoading] = useState(true);
-
-
-
-    useEffect(()=>{
+    const [loading, setLoading] = useState(true);
 
 
-        async function fetchProducts(){
+
+    useEffect(() => {
 
 
-            try{
+        async function fetchProducts() {
 
 
-                const {data} = await axios.get(
+            try {
+
+
+                const { data } = await axios.get(
 
                     `${BACKEND_URLS}website/api/v1/products/random/`
 
@@ -59,12 +59,12 @@ export default function RandomProducts(){
 
 
             }
-            catch(error){
+            catch (error) {
 
                 console.log(error);
 
             }
-            finally{
+            finally {
 
                 setLoading(false);
 
@@ -77,11 +77,11 @@ export default function RandomProducts(){
         fetchProducts();
 
 
-    },[]);
+    }, []);
 
 
 
-    if(loading){
+    if (loading) {
 
         return (
 
@@ -99,7 +99,7 @@ export default function RandomProducts(){
 
 
 
-    if(products.length===0){
+    if (products.length === 0) {
 
         return null;
 
@@ -107,7 +107,7 @@ export default function RandomProducts(){
 
 
 
-    return(
+    return (
 
         <section className="random-products">
 
@@ -129,7 +129,7 @@ export default function RandomProducts(){
 
                 {
 
-                    products.map(product=>(
+                    products.map(product => (
 
 
                         <Link
@@ -146,20 +146,10 @@ export default function RandomProducts(){
                             <div className="random-product-image">
 
 
-                                <Image
-
-                                    src={
-                                        product.product_image
-                                        ?
-                                        `${BACKEND_URLS}${product.product_image}`
-                                        :
-                                        "/product.jpg"
-                                    }
-
+                                <img
+                                    src={`${BACKEND_URLS}${product.product_image}`}
                                     alt={product.name}
-
-                                    fill
-
+                                    className="product-image"
                                 />
 
 

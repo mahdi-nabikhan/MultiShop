@@ -295,6 +295,27 @@ class ListStoreApiView(GenericAPIView):
 
     def get(self, request):
         data = Store.objects.all()
+        page = self.paginate_queryset(data)
+
+
+        if page is not None:
+
+            serializer = self.get_serializer(
+
+                page,
+
+                many=True,
+
+                context={"request": request}
+
+            )
+
+            return self.get_paginated_response(
+
+                serializer.data
+
+            )
+
         serializer = self.serializer_class(
             instance=data, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
