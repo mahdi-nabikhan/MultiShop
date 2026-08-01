@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from website.models import Product
 from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView, GenericAPIView
+from .pagination import WebsiteShopPaginations
 
 from elasticsearch import Elasticsearch
 
@@ -290,6 +291,7 @@ class ListStoreApiView(GenericAPIView):
             ]
     """
     serializer_class = StoreSerializer
+    pagination_class = WebsiteShopPaginations
 
     def get(self, request):
         data = Store.objects.all()
