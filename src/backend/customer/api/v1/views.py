@@ -652,3 +652,52 @@ class GetCustomerDetail(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
+    
+class AddReplaytoCommentApiView(GenericAPIView):
+    serializer_class = CommentSerializer
+    
+    
+    def get_queryset(self,pk):
+        return Comments.objects.get(pk=pk)
+    def get(self,request,pk):
+        data = self.get_queryset(pk)
+        comment_data = Comments.objects.filter(parent=data)
+        serializers =  self.serializer_class(instance=comment_data,many=True)
+        return Response(serializers.data,status=status.HTTP_200_OK)
+    
+    
+    def post(self,request,pk):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)        
+    
+    
+    def put(self,request,pk):
+        obj = self.get_queryset(pk)
+        data= request.data
+        serializer = self.serializer_class(instance =  obj,data=data)
+        if serializer.is_valid():
+            return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    
+    def patch(self,request,pk):
+        obj = self.get_queryset(pk)
+        data= request.data
+        serializer = self.serializer_class(instance =  obj,data=data,partial=True)
+        if serializer.is_valid():
+            return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+            
+    
+    def delete(self,request,pk):
+        obj = self.get_queryset(pk)
+        data = Comments.objects.get(parent = obj)
+        if data:
+            obj.delete()
+            return Response({'message : deleted successfully'},status=status.HTTP_204_NO_CONTENT)
+    
+    
+
+
