@@ -107,7 +107,16 @@ class ProductSerializer(serializers.ModelSerializer):
             return Product.objects.create(store=store, **validated_data)
         else:
             raise ValidationError()
-    
+        
+    def get_product_image(self, obj):
+        request = self.context.get('request')
+        if obj.product_image:
+
+            return request.build_absolute_uri(
+                obj.product_image.url
+            )
+
+        return None
 
 class AddImageSerializer(serializers.ModelSerializer):
     class Meta:
