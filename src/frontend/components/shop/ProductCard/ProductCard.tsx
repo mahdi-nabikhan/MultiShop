@@ -5,79 +5,156 @@ import { Star, ShoppingCart } from "lucide-react";
 
 import "./ProductCard.css";
 
+
 export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  quantity_in_stock: number;
-  price: number;
-  price_after: number;
-  image: string | null;
-  category: number;
-  store: number;
+
+    id:number;
+
+    name:string;
+
+    description:string;
+
+    quantity_in_stock:number;
+
+    price:number;
+
+    price_after:number;
+
+    product_image:string | null;
+
+    category:number;
+
+    store:number;
+
 }
 
-interface ProductCardProps {
-  product: Product;
-  shopId: string;
+
+
+interface Props {
+
+    product: Product;
+
+    shopId:string;
+
 }
+
+
 
 export default function ProductCard({
-  product,
-  shopId,
-}: ProductCardProps) {
-  return (
-    <Link
-      href={`/store/${shopId}/product/${product.id}`}
-      className="product-card"
-    >
-      <div className="product-image">
 
-        <Image
-          src={product.image || "/images/no-image.png"}
-          alt={product.name}
-          fill
-        />
+    product,
 
-        {product.quantity_in_stock === 0 && (
-          <span className="out-stock">
-            Out Of Stock
-          </span>
-        )}
+    shopId
 
-      </div>
+}:Props){
 
-      <div className="product-content">
 
-        <h3>{product.name}</h3>
+    return (
 
-        <div className="rating">
+        <Link
 
-          <Star
-            size={16}
-            fill="#FFD700"
-            stroke="#FFD700"
-          />
+            href={`/store/${shopId}/product/${product.id}`}
 
-          <span>4.9</span>
+            className="product-card"
 
-        </div>
+        >
 
-        <div className="price">
 
-          ${product.price}
+            <div className="product-image">
 
-        </div>
 
-        <button>
+                <Image
 
-          <ShoppingCart size={18} />
+                    src={
+                        product.product_image
+                        ?
+                        product.product_image
+                        :
+                        "/images/no-image.png"
+                    }
 
-          Add To Cart
+                    alt={product.name}
 
-        </button>
+                    fill
 
-      </div>
-    </Link>
-  );
+                />
+
+
+                {
+                    product.quantity_in_stock === 0 && (
+
+                        <span className="out-stock">
+
+                            Out Of Stock
+
+                        </span>
+
+                    )
+                }
+
+
+            </div>
+
+
+
+            <div className="product-content">
+
+
+                <h3>
+
+                    {product.name}
+
+                </h3>
+
+
+
+                <div className="rating">
+
+
+                    <Star
+
+                        size={16}
+
+                        fill="#FFD700"
+
+                        stroke="#FFD700"
+
+                    />
+
+
+                    <span>
+
+                        4.9
+
+                    </span>
+
+
+                </div>
+
+
+
+                <div className="price">
+
+                    ${product.price_after}
+
+                </div>
+
+
+
+                <button>
+
+                    <ShoppingCart size={18}/>
+
+                    Add To Cart
+
+                </button>
+
+
+            </div>
+
+
+        </Link>
+
+    );
+
 }
