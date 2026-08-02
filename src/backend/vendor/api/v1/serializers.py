@@ -9,7 +9,8 @@ from account.api.v1.serializers import *
 from website.models import *
 from order.models import OrderItem,Order
 from customer.api.v1.serializers import CustomerDetailSerializer
-
+from rest_framework import serializers
+from website.models import ProductImages
 
 class StoreAddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -106,7 +107,16 @@ class ProductSerializer(serializers.ModelSerializer):
             return Product.objects.create(store=store, **validated_data)
         else:
             raise ValidationError()
+        
+    def get_product_image(self, obj):
+        request = self.context.get('request')
+        if obj.product_image:
 
+            return request.build_absolute_uri(
+                obj.product_image.url
+            )
+
+        return None
 
 class AddImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -169,4 +179,16 @@ class ListOrderSerialazers(serializers.ModelSerializer):
         res['customer'] = CustomerDetailSerializer(instance.customer).data
         return res
     
-    
+
+
+
+class ProductImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductImages
+        fields = [
+            "id",
+            "product_image",
+            "title",
+            "description"
+        ]

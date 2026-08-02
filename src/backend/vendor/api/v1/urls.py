@@ -20,7 +20,8 @@ urlpatterns = [
     path('shop/admin/list/',ShopAdminListAPIView.as_view(),name='admin-list'),
     path('shop/operator/list',ShopOperatorListApiView.as_view(),name='oprator-list'),
     path('shop/admin/detail/<int:pk>/',ShopAdminDetailAPIView.as_view(),name='admin-detail'),
-    path('shop/operator/detail/<int:pk>/',ShopOperatorDetailAPIView.as_view(),name='admin-detail')
+    path('shop/operator/detail/<int:pk>/',ShopOperatorDetailAPIView.as_view(),name='admin-detail'),
+    path('add/image/product/<int:pk>/',VendorAddProductImageApiView.as_view(),name='add-product-images')
     
 
 ]

@@ -55,6 +55,8 @@ urlpatterns = [
     path('all/products/comments/<int:pk>/',AllProductsCommentApiView.as_view(),name='products-comments'),
     path('customer/detail/',CustomerDetailApiView.as_view(),name='customer_detail'),
     path("product/<int:pk>/can-rate/", CanRateAPIView.as_view(), name="can-rate"),
-    path('customer/detail/',CustomerDetailApiView.as_view(),name='customer-detail')
+    path('customer/detail/',CustomerDetailApiView.as_view(),name='customer-detail'),
+    path('add/get/comment/repaly/<int:pk>/',AddReplaytoCommentApiView.as_view(),name='add-replay'),
+    path('reply/detail/<int:pk>',ReplyDetailApiView.as_view(),name='reply-detail')
 
 ]

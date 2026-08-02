@@ -5,10 +5,11 @@ import random
 from django.core.cache import cache
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from website.models import Product
+from website.models import Product,ProductImages
 from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView, GenericAPIView
 from .pagination import WebsiteShopPaginations,WebsiteRandomProductPaginations
+from .serializers import ProductImageSerializer
 
 from elasticsearch import Elasticsearch
 
@@ -457,3 +458,29 @@ class StoreDetailApiView(GenericAPIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
+
+
+class ListImageProductApiview (GenericAPIView):
+    serializer_class = ProductImageSerializer
+    
+    
+    
+    def get_queryset(self,pk):
+        return Product.objects.get(pk=pk)
+    
+    def get(self,request,pk):
+        product_data = self.get_queryset(pk=pk)
+        image_data = ProductImages.objects.filter(product=product_data)
+        serializer = self.serializer_class(instance=image_data,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    def post(self,request,pk):
+        data = request.data
+        product_data = self.get_queryset(pk=pk)
+        serializer =  self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save(product=product_data)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)

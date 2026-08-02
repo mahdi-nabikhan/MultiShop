@@ -6,6 +6,9 @@ import axios from "axios";
 import BACKEND_URLS from "@/utils";
 import EditProductModal from "../EditProductModal/EditProductModal";
 import DiscountList from "../DiscountList/DiscountList";
+import AddProductImageModal from "../AddImageProduct/AddImageProduct";
+
+
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Thumbs } from "swiper/modules";
@@ -29,7 +32,7 @@ interface ShopProductData {
 }
 
 function ShopProductDetail({ productId }: { productId: number }) {
-
+    const [openImageModal, setOpenImageModal] = useState(false);
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
     const [product, setProduct] = useState<ShopProductData | null>(null);
     const [openEditModal, setOpenEditModal] = useState(false);
@@ -200,11 +203,22 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         <button className="delete-btn">
                             Delete Product
                         </button>
+                        <button
+
+                            className="primary-btn"
+
+                            onClick={() => setOpenImageModal(true)}
+
+                        >
+
+                            Add Product Image
+
+                        </button>
 
                     </div>
 
                 </div>
-                    <DiscountList productId={Number(productId)}/>                
+                <DiscountList productId={Number(productId)} />
             </div>
             <AddDiscountModal
                 open={openDiscountModal}
@@ -219,6 +233,19 @@ function ShopProductDetail({ productId }: { productId: number }) {
                 onClose={() => setOpenEditModal(false)}
                 product={product}
                 refreshProduct={GetProductData}
+            />
+            <AddProductImageModal
+
+                open={openImageModal}
+
+                onClose={() => setOpenImageModal(false)}
+
+                productId={product.id}
+
+                refreshImages={() => {
+                    GetProductData();
+                }}
+
             />
         </>
 

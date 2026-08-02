@@ -5,6 +5,9 @@ from .serializers import *
 from rest_framework.authtoken.models import Token
 from ...permissions import IsStoreOwner
 from .serializers import StoreSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
+from website.api.serializers import ProductImageSerializer
+
 
 class ManagerRegisterAPIView(GenericAPIView):
     """
@@ -956,3 +959,54 @@ class ShopAdminDetailAPIView(GenericAPIView):
          obj =  self.get_queryset( pk = pk)
          obj.delete()
          return Response({'msg':'successfully deleted'})
+     
+     
+     
+
+
+
+
+
+class VendorAddProductImageApiView(GenericAPIView):
+
+    serializer_class = ProductImageSerializer
+
+    parser_classes = [
+        MultiPartParser,
+        FormParser
+    ]
+
+
+    def get_product(self, pk):
+
+        return Product.objects.get(
+            pk=pk
+        )
+
+
+    def post(self, request, pk):
+
+        product = self.get_product(pk)
+
+
+        serializer = self.serializer_class(
+            data=request.data
+        )
+
+
+        if serializer.is_valid():
+
+            serializer.save(
+                product=product
+            )
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )

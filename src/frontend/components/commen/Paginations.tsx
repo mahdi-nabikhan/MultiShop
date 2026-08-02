@@ -1,6 +1,6 @@
 "use client";
 
-import "./Pagination.css";
+import "./Paginations.css";
 
 interface PaginationProps{
 

@@ -4,6 +4,7 @@ from rest_framework import status
 from .serializers import *
 from rest_framework.authtoken.models import Token
 from account.tasks import *
+from.paginations import ProductCommentsPaginations
 
 
 class CustomerRegisterApiView(GenericAPIView):
@@ -517,9 +518,20 @@ class AllProductsCommentApiView(GenericAPIView):
     """
     serializer_class = CommentSerializer
     model=Comments
+    pagination_class = ProductCommentsPaginations
     def get(self,request,pk):
         comments_obj=self.model.objects.filter(product__pk=pk)
         context={'request':request}
+        page = self.paginate_queryset(comments_obj)
+        
+        
+        if page is not None:
+        
+            serializer = self.get_serializer(
+            page,
+            many=True,
+            context={"request": request})
+            return self.get_paginated_response(serializer.data)
         serializer=self.serializer_class(context=context,instance=comments_obj,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
@@ -640,3 +652,58 @@ class GetCustomerDetail(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
+    
+class AddReplaytoCommentApiView(GenericAPIView):
+    serializer_class = ReplyCommentSerializer
+    
+    
+    def get_queryset(self,pk):
+        return Comments.objects.get(pk=pk)
+    def get(self,request,pk):
+        data = self.get_queryset(pk)
+        comment_data = Comments.objects.filter(parent=data)
+        serializers =  self.serializer_class(instance=comment_data,many=True, context={'request':request,"pk":pk})
+        return Response(serializers.data,status=status.HTTP_200_OK)
+    
+    
+    def post(self,request,pk):
+        serializer = self.serializer_class(data=request.data, context={'request':request,"pk":pk})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)        
+    
+class ReplyDetailApiView(GenericAPIView):
+    serializer_class = ReplyCommentSerializer
+    
+    
+    def get_queryset(self, pk):
+        return Comments.objects.get(pk=pk)
+    
+    def put(self,request,pk):
+        obj = self.get_queryset(pk)
+        data= request.data
+        serializer = self.serializer_class(instance =  obj,data=data, context={'request':request,"pk":pk})
+        if serializer.is_valid():
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+    
+    
+    def patch(self,request,pk):
+        obj = self.get_queryset(pk)
+        data= request.data
+        serializer = self.serializer_class(instance =obj,data=data,partial=True, context={'request':request,"pk":pk})
+        if serializer.is_valid():
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
+            
+    
+    def delete(self,request,pk):
+        obj = self.get_queryset(pk)
+        data = Comments.objects.get(parent = obj)
+        if data:
+            obj.delete()
+            return Response({'message : deleted successfully'},status=status.HTTP_204_NO_CONTENT)
+    
+    
+
+
