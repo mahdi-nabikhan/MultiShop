@@ -4,6 +4,7 @@ from rest_framework import status
 from .serializers import *
 from rest_framework.authtoken.models import Token
 from account.tasks import *
+from.paginations import ProductCommentsPaginations
 
 
 class CustomerRegisterApiView(GenericAPIView):
@@ -517,9 +518,20 @@ class AllProductsCommentApiView(GenericAPIView):
     """
     serializer_class = CommentSerializer
     model=Comments
+    pagination_class = ProductCommentsPaginations
     def get(self,request,pk):
         comments_obj=self.model.objects.filter(product__pk=pk)
         context={'request':request}
+        page = self.paginate_queryset(comments_obj)
+        
+        
+        if page is not None:
+        
+            serializer = self.get_serializer(
+            page,
+            many=True,
+            context={"request": request})
+            return self.get_paginated_response(serializer.data)
         serializer=self.serializer_class(context=context,instance=comments_obj,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
