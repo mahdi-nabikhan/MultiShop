@@ -654,7 +654,7 @@ class GetCustomerDetail(GenericAPIView):
     
     
 class AddReplaytoCommentApiView(GenericAPIView):
-    serializer_class = CommentSerializer
+    serializer_class = ReplyCommentSerializer
     
     
     def get_queryset(self,pk):
@@ -662,12 +662,12 @@ class AddReplaytoCommentApiView(GenericAPIView):
     def get(self,request,pk):
         data = self.get_queryset(pk)
         comment_data = Comments.objects.filter(parent=data)
-        serializers =  self.serializer_class(instance=comment_data,many=True)
+        serializers =  self.serializer_class(instance=comment_data,many=True, context={'request':request,"pk":pk})
         return Response(serializers.data,status=status.HTTP_200_OK)
     
     
     def post(self,request,pk):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={'request':request,"pk":pk})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)        
@@ -677,7 +677,7 @@ class ReplyDetailApiView(GenericAPIView):
     def put(self,request,pk):
         obj = self.get_queryset(pk)
         data= request.data
-        serializer = self.serializer_class(instance =  obj,data=data)
+        serializer = self.serializer_class(instance =  obj,data=data, context={'request':request,"pk":pk})
         if serializer.is_valid():
             return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
@@ -686,7 +686,7 @@ class ReplyDetailApiView(GenericAPIView):
     def patch(self,request,pk):
         obj = self.get_queryset(pk)
         data= request.data
-        serializer = self.serializer_class(instance =  obj,data=data,partial=True)
+        serializer = self.serializer_class(instance =obj,data=data,partial=True, context={'request':request,"pk":pk})
         if serializer.is_valid():
             return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
