@@ -672,7 +672,8 @@ class AddReplaytoCommentApiView(GenericAPIView):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)        
     
-    
+class ReplyDetailApiView(GenericAPIView):
+    serializer_class = ReplyCommentSerializer
     def put(self,request,pk):
         obj = self.get_queryset(pk)
         data= request.data

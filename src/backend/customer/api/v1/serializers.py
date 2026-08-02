@@ -295,8 +295,16 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
         
         
         
-class CustomerDetailSerializer(serializers.ModelSerializer):
-    class Meta : 
-        model =  Customer
-        fields = '__all__'
-        read_only_fields=['user']
+        
+class ReplyCommentSerializer(serializers.ModelSerializer):
+    model = Comments
+    fields = '__all__'
+    read_only_fields = ['parent','user']
+    
+    def create(self, validated_data):
+        pk=self.context.get('pk')
+        parent = Comments.objects.get(pk=pk)
+        validated_data['parent'] = parent
+        validated_data['product'] = Product.objects.get(pk=parent.product.pk)
+        validated_data['user']= Customer.objects.get(user_id=self.context.get('request').user.id)
+        return Comments.objects.create(**validated_data)
