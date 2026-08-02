@@ -674,12 +674,17 @@ class AddReplaytoCommentApiView(GenericAPIView):
     
 class ReplyDetailApiView(GenericAPIView):
     serializer_class = ReplyCommentSerializer
+    
+    
+    def get_queryset(self, pk):
+        return Comments.objects.get(pk=pk)
+    
     def put(self,request,pk):
         obj = self.get_queryset(pk)
         data= request.data
         serializer = self.serializer_class(instance =  obj,data=data, context={'request':request,"pk":pk})
         if serializer.is_valid():
-            return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
     
@@ -688,7 +693,7 @@ class ReplyDetailApiView(GenericAPIView):
         data= request.data
         serializer = self.serializer_class(instance =obj,data=data,partial=True, context={'request':request,"pk":pk})
         if serializer.is_valid():
-            return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
             
     

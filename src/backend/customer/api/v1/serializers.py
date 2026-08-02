@@ -297,9 +297,10 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
         
         
 class ReplyCommentSerializer(serializers.ModelSerializer):
-    model = Comments
-    fields = '__all__'
-    read_only_fields = ['parent','user']
+    class Meta:
+        model = Comments
+        fields = '__all__'
+        read_only_fields = ['parent','user']
     
     def create(self, validated_data):
         pk=self.context.get('pk')
