@@ -13,5 +13,5 @@ urlpatterns=[
     path('store/list',ListStoreApiView.as_view(),name='store-list'),
     path('product/detail/<int:pk>',ProductDetailAPIView.as_view(),name='product-detail'),
     path('store/detail/<int:pk>',StoreDetailApiView.as_view(),name='store-detail'),
-    path('add/image/product/<int:pk>/',ListAndAddImageProductApiview.as_view(),name='add-list-image-product')
+    path('list/image/product/<int:pk>/',ListImageProductApiview.as_view(),name='add-list-image-product')
 ]

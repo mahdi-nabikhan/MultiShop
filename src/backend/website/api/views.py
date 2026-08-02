@@ -460,7 +460,7 @@ class StoreDetailApiView(GenericAPIView):
 
 
 
-class ListAndAddImageProductApiview (GenericAPIView):
+class ListImageProductApiview (GenericAPIView):
     serializer_class = ProductImageSerializer
     
     
