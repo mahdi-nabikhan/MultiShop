@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from ...permissions import IsStoreOwner
 from .serializers import StoreSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import VendorProductImageSerializer
+from website.api.serializers import ProductImageSerializer
 
 
 class ManagerRegisterAPIView(GenericAPIView):
@@ -969,7 +969,7 @@ class ShopAdminDetailAPIView(GenericAPIView):
 
 class VendorAddProductImageApiView(GenericAPIView):
 
-    serializer_class = VendorProductImageSerializer
+    serializer_class = ProductImageSerializer
 
     parser_classes = [
         MultiPartParser,
