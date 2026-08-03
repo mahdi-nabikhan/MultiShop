@@ -79,7 +79,7 @@ class Store(models.Model):
     name = models.CharField(max_length=120)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    category = models.ForeignKey('StoreCategory',null=True,blank=True)
+    category = models.ForeignKey('StoreCategory',null=True,blank=True,on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'{self.name}, {self.description}, {self.manager.user.email}'
