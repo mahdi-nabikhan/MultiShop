@@ -8,6 +8,7 @@ from .models import (
     Store,
     ShopAddress,
     ShopRate,
+    StoreCategory
 )
 
 
@@ -101,6 +102,7 @@ class StoreAdmin(admin.ModelAdmin):
         "name",
         "manager",
         "created_at",
+        'category'
     )
 
     list_filter = (
@@ -184,3 +186,35 @@ class ShopRateAdmin(admin.ModelAdmin):
 
     ordering = ("-id",)
 
+
+
+
+@admin.register(StoreCategory)
+class StoreCategoryAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "name",
+        "slug",
+        "icon",
+    )
+
+    list_display_links = (
+        "id",
+        "name",
+    )
+
+    search_fields = (
+        "name",
+        "slug",
+    )
+
+    list_filter = ()
+
+    ordering = (
+        "name",
+    )
+
+    prepopulated_fields = {
+        "slug": ("name",),
+    }
