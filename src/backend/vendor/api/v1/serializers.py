@@ -192,3 +192,10 @@ class ProductImageSerializer(serializers.ModelSerializer):
             "title",
             "description"
         ]
+        
+        
+class StoreCatgorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model =  StoreCategory
+        fields = '__all__'
+        

@@ -1010,3 +1010,42 @@ class VendorAddProductImageApiView(GenericAPIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+        
+        
+
+class ListStoreCategoryAPIView(GenericAPIView):
+    serializer_class= StoreCatgorySerializer
+    queryset=StoreCategory.objects.all()
+    
+    
+    def get(self,request):
+        query =  self.get_queryset()
+        serializer = self.serializer_class(query,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+
+
+class StoreRelatedWithCategory(GenericAPIView):
+    serializer_class = StoreSerializer
+    def get_queryset(self,pk):
+        return Store.objects.filter(category__pk=pk)
+    def get(self,request,pk):
+        query = self.get_queryset(pk)
+        serializer = self.serializer_class(query,many=True,context={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    
+class DeleteImageProductAPIView(GenericAPIView):
+    
+    
+    def get_queryset(self,pk):
+        return ProductImages.objects.get(pk=pk)
+    
+    
+    def delete(self,request,pk):
+        data = self.get_queryset(pk=pk)
+        data.delete()
+        return  Response({'message':' image deleted successfully'})
+        

@@ -1,6 +1,6 @@
 import pytest
 from account.models import User
-from vendor.models import Manager, Admin, Operator, Store, ShopAddress, ShopRate
+from vendor.models import Manager, Admin, Operator, Store, ShopAddress, ShopRate,StoreCategory
 from decimal import Decimal
 from django.db import models
 @pytest.mark.django_db
@@ -79,3 +79,23 @@ class TestShopRateModel:
         # همه rateها را بگیریم و total را محاسبه کنیم
         total = ShopRate.objects.filter(store=store).aggregate(total=models.Sum('rate'))['total']
         assert total == 8
+        
+        
+        
+        
+
+
+@pytest.mark.django_db
+class BaseStoreCategoryTest:
+
+    def create_category(
+        self,
+        name="Electronics",
+        slug="electronics",
+        icon="fa-solid fa-laptop",
+    ):
+        return StoreCategory.objects.create(
+            name=name,
+            slug=slug,
+            icon=icon,
+        )

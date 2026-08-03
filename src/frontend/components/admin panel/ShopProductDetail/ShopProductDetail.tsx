@@ -7,6 +7,8 @@ import BACKEND_URLS from "@/utils";
 import EditProductModal from "../EditProductModal/EditProductModal";
 import DiscountList from "../DiscountList/DiscountList";
 import AddProductImageModal from "../AddImageProduct/AddImageProduct";
+import ProductImageGallery from "../ProductImageGallery/ProductImageGallery";
+import DeleteImageModal from "../DeleteImageModal/DeleteImageModal";
 
 
 
@@ -18,6 +20,15 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
+interface ProductImage {
+    id: number;
+    product_image: string;
+    title: string | null;
+    description: string | null;
+    product: number;
+}
+
+
 
 interface ShopProductData {
     id: number;
@@ -38,27 +49,128 @@ function ShopProductDetail({ productId }: { productId: number }) {
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openDiscountModal, setOpenDiscountModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+    const [images, setImages] = useState<ProductImage[]>([]);
+    const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
+    const [openDeleteImageModal, setOpenDeleteImageModal] = useState(false);
+
+    const DeleteProductImage = async () => {
+
+        if (!selectedImage) return;
+
+
+        try {
+
+            await axios.delete(
+                `${BACKEND_URLS}vendor/api/v1/delete/images/${selectedImage.id}/`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+
+            setOpenDeleteImageModal(false);
+            setSelectedImage(null);
+
+            GetProductData();
+
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
     const GetProductData = async () => {
 
         try {
 
-            const { data } = await axios.get<ShopProductData>(
+            // Product Detail
+            const { data: productData } = await axios.get<ShopProductData>(
                 `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
                 {
                     withCredentials: true,
                 }
             );
 
-            setProduct(data);
+            setProduct(productData);
 
-        } catch (err) {
+            // Product Images
+            const { data: imageData } = await axios.get<ProductImage[]>(
+                `${BACKEND_URLS}website/api/v1/list/image/product/${productId}/`
+            );
+
+            const backendUrl = BACKEND_URLS.replace("/api/v1/", "");
+
+            const allImages: ProductImage[] = [];
+
+            // Main Product Image
+            if (productData.product_image) {
+
+                if (productData.product_image.startsWith("http")) {
+
+                    allImages.push({
+                        id: productData.id,
+                        product_image: productData.product_image,
+                        title: productData.name,
+                        description: productData.description,
+                        product: productData.id
+                    });;
+
+                } else {
+
+                    allImages.push({
+                        id: productData.id,
+                        product_image: productData.product_image,
+                        title: productData.name,
+                        description: productData.description,
+                        product: productData.id
+                    });;
+
+                }
+
+            }
+
+            // Extra Images
+            imageData.forEach((item) => {
+
+                if (item.product_image.startsWith("http")) {
+
+                    allImages.push({
+                        id: item.id,
+                        product_image: item.product_image,
+                        title: item.title,
+                        description: item.description,
+                        product: item.product
+                    });
+
+                } else {
+
+                    allImages.push({
+                        id: item.id,
+                        product_image: item.product_image,
+                        title: item.title,
+                        description: item.description,
+                        product: item.product
+                    });
+
+                }
+
+            });
+
+            setImages(allImages);
+
+        }
+
+        catch (err) {
 
             console.log(err);
 
         }
 
     };
-
     useEffect(() => {
 
         GetProductData();
@@ -69,12 +181,7 @@ function ShopProductDetail({ productId }: { productId: number }) {
         return <div>Loading...</div>;
     }
 
-    const images = [
-        product.product_image,
-        "/images/demo1.jpg",
-        "/images/demo2.jpg",
-        "/images/demo3.jpg",
-    ];
+
 
     return (
 
@@ -91,16 +198,60 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         thumbs={{ swiper: thumbsSwiper }}
                         className="main-swiper"
                     >
-                        {images.map((image, index) => (
-                            <SwiperSlide key={index}>
-                                <img
-                                    src={image ?? "/no-image.png"}
-                                    alt={product.name}
-                                />
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
 
+                        {
+                            images.length > 0 ? (
+
+                                images.map((image, index) => (
+
+                                    <SwiperSlide key={image.id}>
+
+
+                                        <img
+
+                                            src={
+                                                image.product_image.startsWith("http")
+                                                    ?
+                                                    image.product_image
+                                                    :
+                                                    `${BACKEND_URLS.replace("/api/v1/", "")}${image.product_image}`
+                                            }
+
+
+                                            alt={`Product Image ${index + 1}`}
+
+
+                                            onClick={() => {
+
+                                                setSelectedImage(image);
+
+                                                setOpenDeleteImageModal(true);
+
+                                            }}
+
+
+                                        />
+
+
+                                    </SwiperSlide>
+
+                                ))
+
+                            ) : (
+
+                                <SwiperSlide>
+
+                                    <img
+                                        src="/images/no-image.png"
+                                        alt="No Image"
+                                    />
+
+                                </SwiperSlide>
+
+                            )
+                        }
+
+                    </Swiper>
                     <Swiper
                         onSwiper={setThumbsSwiper}
                         modules={[Thumbs]}
@@ -109,14 +260,56 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         watchSlidesProgress
                         className="thumb-swiper"
                     >
-                        {images.map((image, index) => (
-                            <SwiperSlide key={index}>
-                                <img
-                                    src={image ?? "/no-image.png"}
-                                    alt={product.name}
-                                />
-                            </SwiperSlide>
-                        ))}
+
+                        {
+                            images.length > 0 ? (
+
+                                images.map((image, index) => (
+
+                                    <SwiperSlide key={index}>
+
+                                        <img
+
+                                            src={
+                                                image.product_image.startsWith("http")
+                                                    ?
+                                                    image.product_image
+                                                    :
+                                                    `${BACKEND_URLS.replace("/api/v1/", "")}${image.product_image}`
+                                            }
+
+
+                                            onClick={() => {
+
+                                                console.log("clicked image", image);
+
+
+                                                setSelectedImage(image);
+
+                                                setOpenDeleteImageModal(true);
+
+                                            }}
+
+                                        />
+
+                                    </SwiperSlide>
+
+                                ))
+
+                            ) : (
+
+                                <SwiperSlide>
+
+                                    <img
+                                        src="/images/no-image.png"
+                                        alt="No Image"
+                                    />
+
+                                </SwiperSlide>
+
+                            )
+                        }
+
                     </Swiper>
 
                 </div>
@@ -225,7 +418,7 @@ function ShopProductDetail({ productId }: { productId: number }) {
                 onClose={() => setOpenDiscountModal(false)}
                 productId={product.id}
                 refreshDiscounts={() => {
-                    // بعداً اینجا لیست تخفیف‌ها را دوباره دریافت می‌کنی
+
                 }}
             />
             <EditProductModal
@@ -247,6 +440,22 @@ function ShopProductDetail({ productId }: { productId: number }) {
                 }}
 
             />
+            <DeleteImageModal
+
+                open={openDeleteImageModal}
+
+                onClose={() => {
+
+                    setOpenDeleteImageModal(false);
+
+                    setSelectedImage(null);
+
+                }}
+
+                onConfirm={DeleteProductImage}
+
+            />
+
         </>
 
     );
