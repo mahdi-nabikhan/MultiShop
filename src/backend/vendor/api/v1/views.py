@@ -1010,3 +1010,17 @@ class VendorAddProductImageApiView(GenericAPIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+        
+        
+
+class ListStoreCategoryAPIView(GenericAPIView):
+    serializer_class= StoreCatgorySerializer
+    queryset=StoreCategory.objects.all()
+    
+    
+    def get(self,request):
+        query =  self.queryset
+        serializer = self.serializer_class(query,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
