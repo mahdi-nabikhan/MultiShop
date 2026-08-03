@@ -1,0 +1,190 @@
+.product-images-section {
+
+    margin-top: 30px;
+
+    background: #111827;
+
+    border: 1px solid #1F2937;
+
+    border-radius: 18px;
+
+    padding: 24px;
+
+}
+
+
+.section-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 24px;
+
+}
+
+
+.section-header h3 {
+
+    color: #fff;
+
+    font-size: 22px;
+
+    margin: 0;
+
+}
+
+
+.section-header span {
+
+    color: #9CA3AF;
+
+    font-size: 14px;
+
+}
+
+
+.product-images-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+
+    gap: 20px;
+
+}
+
+
+.image-card {
+
+    background: #1F2937;
+
+    border: 1px solid #374151;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    transition: all .25s ease;
+
+}
+
+
+.image-card:hover {
+
+    transform: translateY(-4px);
+
+    border-color: #10B981;
+
+}
+
+
+.image-wrapper {
+
+    width: 100%;
+
+    height: 180px;
+
+    background: #0B1120;
+
+}
+
+
+.image-wrapper img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+}
+
+
+.image-info {
+
+    padding: 16px;
+
+}
+
+
+.image-info h4 {
+
+    color: #fff;
+
+    font-size: 16px;
+
+    margin: 0 0 8px 0;
+
+}
+
+
+.image-info p {
+
+    color: #9CA3AF;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    margin: 0;
+
+}
+
+
+.image-actions {
+
+    padding: 16px;
+
+    border-top: 1px solid #374151;
+
+}
+
+
+.delete-image-btn {
+
+    width: 100%;
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #EF4444;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: .25s;
+
+}
+
+
+.delete-image-btn:hover {
+
+    background: #DC2626;
+
+}
+
+
+.gallery-loading,
+
+.gallery-empty {
+
+    margin-top: 30px;
+
+    padding: 40px;
+
+    text-align: center;
+
+    background: #111827;
+
+    border-radius: 16px;
+
+    color: #9CA3AF;
+
+}
