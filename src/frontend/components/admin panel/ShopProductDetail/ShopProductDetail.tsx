@@ -8,6 +8,7 @@ import EditProductModal from "../EditProductModal/EditProductModal";
 import DiscountList from "../DiscountList/DiscountList";
 import AddProductImageModal from "../AddImageProduct/AddImageProduct";
 import ProductImageGallery from "../ProductImageGallery/ProductImageGallery";
+import DeleteImageModal from "../DeleteImageModal/DeleteImageModal";
 
 
 
@@ -49,9 +50,38 @@ function ShopProductDetail({ productId }: { productId: number }) {
     const [openDiscountModal, setOpenDiscountModal] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-    const [images, setImages] = useState<string[]>([]);
+    const [images, setImages] = useState<ProductImage[]>([]);
+    const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
+    const [openDeleteImageModal, setOpenDeleteImageModal] = useState(false);
+
+    const DeleteProductImage = async () => {
+
+        if (!selectedImage) return;
 
 
+        try {
+
+            await axios.delete(
+                `${BACKEND_URLS}vendor/api/v1/delete/images/${selectedImage.id}/`,
+                {
+                    withCredentials: true,
+                }
+            );
+
+
+            setOpenDeleteImageModal(false);
+            setSelectedImage(null);
+
+            GetProductData();
+
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
 
     const GetProductData = async () => {
 
@@ -74,20 +104,30 @@ function ShopProductDetail({ productId }: { productId: number }) {
 
             const backendUrl = BACKEND_URLS.replace("/api/v1/", "");
 
-            const allImages: string[] = [];
+            const allImages: ProductImage[] = [];
 
             // Main Product Image
             if (productData.product_image) {
 
                 if (productData.product_image.startsWith("http")) {
 
-                    allImages.push(productData.product_image);
+                    allImages.push({
+                        id: productData.id,
+                        product_image: productData.product_image,
+                        title: productData.name,
+                        description: productData.description,
+                        product: productData.id
+                    });;
 
                 } else {
 
-                    allImages.push(
-                        `${backendUrl}${productData.product_image}`
-                    );
+                    allImages.push({
+                        id: productData.id,
+                        product_image: productData.product_image,
+                        title: productData.name,
+                        description: productData.description,
+                        product: productData.id
+                    });;
 
                 }
 
@@ -98,13 +138,23 @@ function ShopProductDetail({ productId }: { productId: number }) {
 
                 if (item.product_image.startsWith("http")) {
 
-                    allImages.push(item.product_image);
+                    allImages.push({
+                        id: item.id,
+                        product_image: item.product_image,
+                        title: item.title,
+                        description: item.description,
+                        product: item.product
+                    });
 
                 } else {
 
-                    allImages.push(
-                        `${backendUrl}${item.product_image}`
-                    );
+                    allImages.push({
+                        id: item.id,
+                        product_image: item.product_image,
+                        title: item.title,
+                        description: item.description,
+                        product: item.product
+                    });
 
                 }
 
@@ -154,12 +204,34 @@ function ShopProductDetail({ productId }: { productId: number }) {
 
                                 images.map((image, index) => (
 
-                                    <SwiperSlide key={index}>
+                                    <SwiperSlide key={image.id}>
+
 
                                         <img
-                                            src={image}
+
+                                            src={
+                                                image.product_image.startsWith("http")
+                                                    ?
+                                                    image.product_image
+                                                    :
+                                                    `${BACKEND_URLS.replace("/api/v1/", "")}${image.product_image}`
+                                            }
+
+
                                             alt={`Product Image ${index + 1}`}
+
+
+                                            onClick={() => {
+
+                                                setSelectedImage(image);
+
+                                                setOpenDeleteImageModal(true);
+
+                                            }}
+
+
                                         />
+
 
                                     </SwiperSlide>
 
@@ -197,8 +269,27 @@ function ShopProductDetail({ productId }: { productId: number }) {
                                     <SwiperSlide key={index}>
 
                                         <img
-                                            src={image}
-                                            alt={`Thumbnail ${index + 1}`}
+
+                                            src={
+                                                image.product_image.startsWith("http")
+                                                    ?
+                                                    image.product_image
+                                                    :
+                                                    `${BACKEND_URLS.replace("/api/v1/", "")}${image.product_image}`
+                                            }
+
+
+                                            onClick={() => {
+
+                                                console.log("clicked image", image);
+
+
+                                                setSelectedImage(image);
+
+                                                setOpenDeleteImageModal(true);
+
+                                            }}
+
                                         />
 
                                     </SwiperSlide>
@@ -349,7 +440,22 @@ function ShopProductDetail({ productId }: { productId: number }) {
                 }}
 
             />
-           
+            <DeleteImageModal
+
+                open={openDeleteImageModal}
+
+                onClose={() => {
+
+                    setOpenDeleteImageModal(false);
+
+                    setSelectedImage(null);
+
+                }}
+
+                onConfirm={DeleteProductImage}
+
+            />
+
         </>
 
     );
