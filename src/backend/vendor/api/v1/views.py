@@ -1019,7 +1019,7 @@ class ListStoreCategoryAPIView(GenericAPIView):
     
     
     def get(self,request):
-        query =  self.queryset
+        query =  self.get_queryset()
         serializer = self.serializer_class(query,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
