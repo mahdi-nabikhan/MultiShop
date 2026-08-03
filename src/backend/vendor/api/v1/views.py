@@ -1034,3 +1034,18 @@ class StoreRelatedWithCategory(GenericAPIView):
         query = self.get_queryset(pk)
         serializer = self.serializer_class(query,many=True,context={'request':request})
         return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    
+class DeleteImageProductAPIView(GenericAPIView):
+    
+    
+    def get_queryset(self,pk):
+        return ProductImages.objects.get(pk=pk)
+    
+    
+    def delete(self,request,pk):
+        data = self.get_queryset(pk=pk)
+        data.delete()
+        return  Response({'message':' image deleted successfully'})
+        
