@@ -8,7 +8,8 @@ from vendor.api.v1.serializers import (
     ProductSerializer,
     AddImageSerializer,
     AddDiscountSerializer,
-    OrderItemUpdateStatusSerializer
+    OrderItemUpdateStatusSerializer,
+    StoreCatgorySerializer
 )
 
 @pytest.fixture
@@ -121,3 +122,73 @@ class TestOrderItemUpdateStatusSerializer:
         updated_item = serializer.save()
         assert updated_item.status == "C"
         assert updated_item.product == order_item.product
+
+
+
+
+
+@pytest.mark.django_db
+class TestStoreCategorySerializer:
+
+    def test_serializer_contains_expected_fields(self):
+
+        category = StoreCategory.objects.create(
+            name="Electronics",
+            slug="electronics",
+            icon="fa-solid fa-laptop",
+        )
+
+        serializer = StoreCatgorySerializer(category)
+
+        assert set(serializer.data.keys()) == {
+            "id",
+            "name",
+            "slug",
+            "icon",
+        }
+
+    def test_serializer_data(self):
+
+        category = StoreCategory.objects.create(
+            name="Electronics",
+            slug="electronics",
+            icon="fa-solid fa-laptop",
+        )
+
+        serializer = StoreCatgorySerializer(category)
+
+        assert serializer.data["name"] == "Electronics"
+        assert serializer.data["slug"] == "electronics"
+        assert serializer.data["icon"] == "fa-solid fa-laptop"
+
+    def test_serializer_is_valid(self):
+
+        serializer = StoreCatgorySerializer(
+            data={
+                "name": "Books",
+                "slug": "books",
+                "icon": "fa-book",
+            }
+        )
+
+        assert serializer.is_valid()
+        assert serializer.errors == {}
+
+    def test_serializer_create(self):
+
+        serializer = StoreCatgorySerializer(
+            data={
+                "name": "Fashion",
+                "slug": "fashion",
+                "icon": "fa-shirt",
+            }
+        )
+
+        assert serializer.is_valid()
+
+        category = serializer.save()
+
+        assert StoreCategory.objects.count() == 1
+        assert category.name == "Fashion"
+        assert category.slug == "fashion"
+        assert category.icon == "fa-shirt"
