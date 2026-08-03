@@ -5,7 +5,7 @@ from rest_framework import status
 from django.core.files.uploadedfile import SimpleUploadedFile
 from account.models import User
 from vendor.models import Manager, Admin, Operator, Store, ShopAddress
-from website.models import Category, Product, ProductImages, Discount
+from website.models import Category, Product, ProductImages, Discount,StoreCategory
 from order.models import OrderItem
 
 # ------------------ Fixtures ------------------ #
@@ -197,3 +197,95 @@ class TestOrderItemUpdateStatusApiView:
         order_item.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         assert order_item.status == "sent"
+
+
+
+
+
+
+
+
+@pytest.mark.django_db
+class TestListStoreCategoryAPIView:
+
+    def setup_method(self):
+        self.client = APIClient()
+
+    def test_get_store_categories(self):
+
+        StoreCategory.objects.create(
+            name="Electronics",
+            slug="electronics",
+            icon="fa-laptop",
+        )
+
+        StoreCategory.objects.create(
+            name="Books",
+            slug="books",
+            icon="fa-book",
+        )
+
+        response = self.client.get("/website/api/v1/store/categories/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 2
+        
+        
+        
+
+
+
+@pytest.mark.django_db
+class TestStoreRelatedWithCategoryAPIView:
+
+    def setup_method(self):
+        self.client = APIClient()
+
+    def test_get_store_by_category(self):
+
+        category = StoreCategory.objects.create(
+            name="Electronics",
+            slug="electronics",
+            icon="fa-laptop",
+        )
+
+        Store.objects.create(
+            name="My Store",
+            category=category,
+        )
+
+        response = self.client.get(
+            f"/website/api/v1/store/category/{category.id}/"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        
+        
+        
+
+
+
+
+@pytest.mark.django_db
+class TestDeleteImageProductAPIView:
+
+    def setup_method(self):
+        self.client = APIClient()
+
+    def test_delete_product_image(self, product):
+
+        image = ProductImages.objects.create(
+            product=product,
+            product_image="products/test.jpg",
+        )
+
+        response = self.client.delete(
+            f"/vendor/api/v1/delete/images/{image.id}/"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        assert response.data["message"] == " image deleted successfully"
+
+        assert ProductImages.objects.count() == 0
