@@ -1024,3 +1024,13 @@ class ListStoreCategoryAPIView(GenericAPIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     
+
+
+class StoreRelatedWithCategory(GenericAPIView):
+    serializer_class = StoreSerializer
+    def get_queryset(self,pk):
+        return Store.objects.filter(category__pk=pk)
+    def get(self,request,pk):
+        query = self.get_queryset(pk)
+        serializer = self.serializer_class(query,many=True,context={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
