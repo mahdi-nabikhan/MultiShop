@@ -1,16 +1,21 @@
 .store-explorer {
 
-    width: 100%;
+    width: min(1400px, 90%);
 
-    margin-top: 40px;
+    margin: 50px auto;
 
-    position: relative;
+    padding: 30px;
+
+    background: var(--surface);
+
+    border-radius: var(--radius-xl);
+
+    border: 1px solid var(--border);
+
+    box-shadow: var(--shadow-md);
 
 }
 
-
-
-/* فاصله بین Category و Store */
 
 .store-explorer > section + section {
 

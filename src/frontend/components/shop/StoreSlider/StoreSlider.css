@@ -1,146 +1,105 @@
 .store-slider {
 
-    width: 100%;
+    margin-top:40px;
 
-    margin-top: 45px;
+    padding-top:35px;
 
-    animation: fadeIn .4s ease;
+    border-top:1px solid var(--border);
 
 }
+
 
 
 .store-slider h2 {
 
-    color: #ffffff;
+    color:var(--text);
 
-    font-size: 28px;
+    font-size:32px;
 
-    font-weight: 700;
-
-    margin-bottom: 25px;
+    margin-bottom:25px;
 
 }
 
 
-
-/* Horizontal Scroll */
 
 .store-row {
 
-    display: flex;
+    display:flex;
 
-    gap: 24px;
+    gap:20px;
 
-    overflow-x: auto;
+    overflow-x:auto;
 
-    padding: 10px 5px 25px;
+    padding-bottom:20px;
 
-    scroll-behavior: smooth;
+    scroll-behavior:smooth;
 
 }
 
 
-/* scrollbar */
 
 .store-row::-webkit-scrollbar {
 
-    height: 8px;
-
-}
-
-
-.store-row::-webkit-scrollbar-track {
-
-    background: #111827;
-
-    border-radius: 10px;
+    height:7px;
 
 }
 
 
 .store-row::-webkit-scrollbar-thumb {
 
-    background: #10b981;
+    background:var(--primary);
 
-    border-radius: 10px;
+    border-radius:10px;
 
 }
 
 
-
-/* Store Card */
 
 .store-card {
 
-    flex: 0 0 260px;
+    min-width:260px;
 
-    background: #111827;
+    background:var(--surface-light);
 
-    border: 1px solid #1f2937;
+    border:1px solid var(--border);
 
-    border-radius: 20px;
+    border-radius:var(--radius-lg);
 
-    padding: 25px;
+    padding:25px;
 
-    display: flex;
+    color:var(--text);
 
-    flex-direction: column;
+    display:flex;
 
-    align-items: center;
+    flex-direction:column;
 
-    text-align: center;
+    align-items:center;
 
-    color: white;
+    text-align:center;
 
-    transition: .3s ease;
+    gap:15px;
 
-    cursor: pointer;
+    transition:var(--transition);
 
 }
 
 
-
-/* hover */
 
 .store-card:hover {
 
-    transform: translateY(-8px);
+    transform:translateY(-6px);
 
-    border-color: #10b981;
+    border-color:var(--primary);
 
     box-shadow:
 
-        0 15px 35px rgba(16,185,129,.25);
+    0 0 30px rgba(16,185,129,.18);
 
 }
 
 
-
-/* Logo */
 
 .store-card img {
-
-    width: 90px;
-
-    height: 90px;
-
-    object-fit: cover;
-
-    border-radius: 50%;
-
-    border: 3px solid #10b981;
-
-    margin-bottom: 20px;
-
-}
-
-
-
-/* اگر لوگو نداشت */
-
-.store-card:not(:has(img))::before {
-
-    content: "STORE";
 
     width:90px;
 
@@ -148,21 +107,9 @@
 
     border-radius:50%;
 
-    display:flex;
+    object-fit:cover;
 
-    align-items:center;
-
-    justify-content:center;
-
-    background:#1f2937;
-
-    color:#10b981;
-
-    font-size:14px;
-
-    font-weight:700;
-
-    margin-bottom:20px;
+    border:3px solid var(--primary);
 
 }
 
@@ -170,39 +117,29 @@
 
 .store-card h3 {
 
-    font-size:20px;
+    color:var(--text);
 
-    font-weight:700;
-
-    margin-bottom:20px;
+    font-size:22px;
 
 }
 
 
 
-/* Button */
-
 .store-card button {
 
     width:100%;
 
-    padding:11px 20px;
+    padding:12px;
 
     border:none;
 
-    border-radius:12px;
+    border-radius:var(--radius-md);
 
-    background:#10b981;
+    background:var(--primary);
 
-    color:#04120d;
-
-    font-size:15px;
+    color:white;
 
     font-weight:700;
-
-    cursor:pointer;
-
-    transition:.25s;
 
 }
 
@@ -210,9 +147,7 @@
 
 .store-card button:hover {
 
-    background:#059669;
-
-    transform:scale(1.03);
+    background:var(--primary-hover);
 
 }
 
