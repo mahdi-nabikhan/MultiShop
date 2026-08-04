@@ -1,0 +1,53 @@
+.store-explorer {
+
+    width: 100%;
+
+    margin-top: 40px;
+
+    position: relative;
+
+}
+
+
+
+/* فاصله بین Category و Store */
+
+.store-explorer > section + section {
+
+    margin-top: 45px;
+
+}
+
+
+
+/* Animation وقتی StoreSlider اضافه می‌شود */
+
+.store-explorer > * {
+
+    animation: explorerFade .35s ease;
+
+}
+
+
+
+@keyframes explorerFade {
+
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(20px);
+
+    }
+
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}

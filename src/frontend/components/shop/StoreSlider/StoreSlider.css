@@ -1,0 +1,266 @@
+.store-slider {
+
+    width: 100%;
+
+    margin-top: 45px;
+
+    animation: fadeIn .4s ease;
+
+}
+
+
+.store-slider h2 {
+
+    color: #ffffff;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    margin-bottom: 25px;
+
+}
+
+
+
+/* Horizontal Scroll */
+
+.store-row {
+
+    display: flex;
+
+    gap: 24px;
+
+    overflow-x: auto;
+
+    padding: 10px 5px 25px;
+
+    scroll-behavior: smooth;
+
+}
+
+
+/* scrollbar */
+
+.store-row::-webkit-scrollbar {
+
+    height: 8px;
+
+}
+
+
+.store-row::-webkit-scrollbar-track {
+
+    background: #111827;
+
+    border-radius: 10px;
+
+}
+
+
+.store-row::-webkit-scrollbar-thumb {
+
+    background: #10b981;
+
+    border-radius: 10px;
+
+}
+
+
+
+/* Store Card */
+
+.store-card {
+
+    flex: 0 0 260px;
+
+    background: #111827;
+
+    border: 1px solid #1f2937;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+
+    color: white;
+
+    transition: .3s ease;
+
+    cursor: pointer;
+
+}
+
+
+
+/* hover */
+
+.store-card:hover {
+
+    transform: translateY(-8px);
+
+    border-color: #10b981;
+
+    box-shadow:
+
+        0 15px 35px rgba(16,185,129,.25);
+
+}
+
+
+
+/* Logo */
+
+.store-card img {
+
+    width: 90px;
+
+    height: 90px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 3px solid #10b981;
+
+    margin-bottom: 20px;
+
+}
+
+
+
+/* اگر لوگو نداشت */
+
+.store-card:not(:has(img))::before {
+
+    content: "STORE";
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#1f2937;
+
+    color:#10b981;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+
+}
+
+
+
+.store-card h3 {
+
+    font-size:20px;
+
+    font-weight:700;
+
+    margin-bottom:20px;
+
+}
+
+
+
+/* Button */
+
+.store-card button {
+
+    width:100%;
+
+    padding:11px 20px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#10b981;
+
+    color:#04120d;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+
+
+.store-card button:hover {
+
+    background:#059669;
+
+    transform:scale(1.03);
+
+}
+
+
+
+/* Animation */
+
+@keyframes fadeIn {
+
+
+    from {
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+/* Responsive */
+
+@media(max-width:768px){
+
+
+    .store-card {
+
+        flex-basis:220px;
+
+    }
+
+
+    .store-slider h2 {
+
+        font-size:24px;
+
+    }
+
+
+}

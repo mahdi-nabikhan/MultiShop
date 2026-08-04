@@ -5,6 +5,7 @@ import SectionHeader from "@/components/shop/SectionHeader/SectionHeader";
 import ShopList from "@/components/shop/ShopList/ShopList";
 import RandomProducts from "@/components/shop/RandomProduct/RandomProduct";
 import StoreCategoryList from "@/components/shop/StoreCategoryList/StoreCategoryList";
+import StoreExplorer from "@/components/shop/StoreExplore/StoreExplore";
 
 interface Props {
   searchParams: Promise<{
@@ -28,7 +29,7 @@ export default async function Page({ searchParams }: Props) {
           title="Category"
           description="Explore stores by category"
         />
-        <StoreCategoryList/>
+        <StoreExplorer/>
 
 
       <div>
