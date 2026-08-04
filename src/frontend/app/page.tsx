@@ -26,9 +26,9 @@ export default async function Page({ searchParams }: Props) {
     <div>
         <SectionHeader
           title="Category"
-          description="List of Category for stores"
+          description="Explore stores by category"
         />
-
+        <StoreCategoryList/>
 
 
       <div>
