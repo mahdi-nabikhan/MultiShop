@@ -3,42 +3,53 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import "./StoreCategoryList.css";
-
 import BACKEND_URLS from "@/utils";
+
+import "./StoreCategoryList.css";
 
 
 interface StoreCategory {
 
-    id: number;
+    id:number;
 
-    name: string;
+    name:string;
 
-    slug: string;
+    slug:string;
 
-    icon: string;
+    icon:string;
 
 }
 
 
 
-export default function StoreCategoryList() {
+interface Props {
 
+    onSelectCategory:(id:number)=>void;
 
-    const [categories, setCategories] = useState<StoreCategory[]>([]);
-
-
-    const [loading, setLoading] = useState(true);
+}
 
 
 
-    const GetStoreCategories = async () => {
+export default function StoreCategoryList({
+
+    onSelectCategory
+
+}:Props){
 
 
-        try {
+    const [categories,setCategories]=useState<StoreCategory[]>([]);
+
+    const [loading,setLoading]=useState(true);
 
 
-            const { data } = await axios.get<StoreCategory[]>(
+
+    const GetCategories = async()=>{
+
+
+        try{
+
+
+            const {data}=await axios.get<StoreCategory[]>(
 
                 `${BACKEND_URLS}vendor/api/v1/store/category/`
 
@@ -49,22 +60,14 @@ export default function StoreCategoryList() {
 
 
         }
-
-
-        catch(error) {
-
+        catch(error){
 
             console.log(error);
 
-
         }
-
-
-        finally {
-
+        finally{
 
             setLoading(false);
-
 
         }
 
@@ -76,9 +79,7 @@ export default function StoreCategoryList() {
 
     useEffect(()=>{
 
-
-        GetStoreCategories();
-
+        GetCategories();
 
     },[]);
 
@@ -88,35 +89,23 @@ export default function StoreCategoryList() {
 
     if(loading){
 
-
-        return (
-
-            <div className="category-loading">
-
-                Loading Categories...
-
-            </div>
-
-        )
+        return <div>Loading Categories...</div>
 
     }
 
 
 
 
-
     return (
-
 
         <section className="store-category-list">
 
 
-            <h2 className="category-title">
+            <h2>
 
                 Store Categories
 
             </h2>
-
 
 
 
@@ -134,6 +123,12 @@ export default function StoreCategoryList() {
 
                             className="category-card"
 
+                            onClick={()=>{
+
+                                onSelectCategory(category.id)
+
+                            }}
+
                         >
 
 
@@ -143,7 +138,7 @@ export default function StoreCategoryList() {
 
                                 dangerouslySetInnerHTML={{
 
-                                    __html: category.icon
+                                    __html:category.icon
 
                                 }}
 
@@ -162,7 +157,6 @@ export default function StoreCategoryList() {
                         </div>
 
 
-
                     ))
 
                 }
@@ -171,11 +165,8 @@ export default function StoreCategoryList() {
             </div>
 
 
-
         </section>
 
-
-    );
-
+    )
 
 }
