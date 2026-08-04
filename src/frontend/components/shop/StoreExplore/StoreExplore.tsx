@@ -26,9 +26,26 @@ export default function StoreExplorer(){
 
             <StoreCategoryList
 
-                onSelectCategory={setCategoryId}
+    onSelectCategory={(id)=>{
 
-            />
+
+        if(categoryId === id){
+
+   
+            setCategoryId(null);
+
+        }
+        else{
+
+        
+            setCategoryId(id);
+
+        }
+
+
+    }}
+
+/>
 
 
 
