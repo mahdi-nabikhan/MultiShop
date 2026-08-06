@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from customer.models import Customer
 
 from ...models import Conversation,Ticket,ReplayTicket
 from ...services import can_access_conversation
@@ -212,8 +213,8 @@ class CustomerListTicketApiView(GenericAPIView):
     serializer_class = ListCreateTicketSerializers
     
     def get_queryset(self):
-        Ticket.objects.filter(customer__user=self.request.user)
-        
+        customer= Customer.objects.get(user=self.request)
+        Ticket.objects.filter(customer= customer)
     def get(self,request):
         query = self.get_queryset()
         serializer= self.serializer_class(instance=query,context = {'request':request},many=True)
