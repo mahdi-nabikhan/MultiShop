@@ -1,0 +1,387 @@
+.customer-order-detail {
+
+    width:100%;
+
+}
+
+
+
+/* =========================
+   Header
+========================= */
+
+
+.detail-header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:32px;
+
+}
+
+
+
+.detail-header h2 {
+
+    font-size:32px;
+
+    color:var(--text);
+
+}
+
+
+
+.detail-header span {
+
+    color:var(--text-muted);
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    font-size:14px;
+
+}
+
+
+
+
+
+/* =========================
+   Main Card
+========================= */
+
+
+.detail-card {
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius-xl);
+
+    padding:30px;
+
+    display:flex;
+
+    gap:35px;
+
+    transition:var(--transition);
+
+}
+
+
+
+
+
+.detail-card:hover {
+
+    border-color:var(--primary);
+
+    box-shadow:var(--shadow-lg);
+
+}
+
+
+
+
+
+/* =========================
+   Image
+========================= */
+
+
+.detail-image {
+
+    width:320px;
+
+    height:320px;
+
+    border-radius:24px;
+
+    overflow:hidden;
+
+    background:var(--surface-light);
+
+    flex-shrink:0;
+
+}
+
+
+
+
+
+.detail-image img {
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+
+
+
+
+/* =========================
+   Content
+========================= */
+
+
+.detail-content {
+
+    flex:1;
+
+}
+
+
+
+
+
+.detail-content h1 {
+
+    font-size:38px;
+
+    margin-bottom:15px;
+
+    color:var(--text);
+
+}
+
+
+
+
+
+.description {
+
+    color:var(--text-secondary);
+
+    line-height:1.8;
+
+    margin-bottom:30px;
+
+}
+
+
+
+
+
+/* =========================
+   Information Grid
+========================= */
+
+
+.detail-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+    margin-bottom:30px;
+
+}
+
+
+
+
+
+.detail-grid div {
+
+    background:var(--surface-light);
+
+    border:1px solid var(--border);
+
+    padding:18px;
+
+    border-radius:var(--radius-md);
+
+}
+
+
+
+
+
+.detail-grid span {
+
+    display:block;
+
+    color:var(--text-muted);
+
+    font-size:14px;
+
+    margin-bottom:8px;
+
+}
+
+
+
+
+
+.detail-grid strong {
+
+    font-size:20px;
+
+    color:var(--text);
+
+}
+
+
+
+
+
+/* =========================
+   Status
+========================= */
+
+
+.detail-status {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    width:max-content;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    background:rgba(251,191,36,.15);
+
+    color:var(--warning);
+
+    font-weight:600;
+
+}
+
+
+
+
+
+/* =========================
+   Loading
+========================= */
+
+
+.order-detail-loading {
+
+
+    height:300px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:var(--text-muted);
+
+    font-size:18px;
+
+
+}
+
+
+
+
+
+/* =========================
+   Responsive
+========================= */
+
+
+@media(max-width:1000px){
+
+
+    .detail-card {
+
+        flex-direction:column;
+
+    }
+
+
+
+    .detail-image {
+
+        width:100%;
+
+        height:400px;
+
+    }
+
+
+}
+
+
+
+
+
+@media(max-width:600px){
+
+
+    .detail-header {
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:15px;
+
+    }
+
+
+
+    .detail-header h2 {
+
+        font-size:26px;
+
+    }
+
+
+
+    .detail-card {
+
+        padding:20px;
+
+    }
+
+
+
+    .detail-image {
+
+        height:280px;
+
+    }
+
+
+
+    .detail-content h1 {
+
+        font-size:30px;
+
+    }
+
+
+
+    .detail-grid {
+
+        grid-template-columns:1fr;
+
+    }
+
+
+}
