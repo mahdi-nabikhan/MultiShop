@@ -14,7 +14,8 @@ urlpatterns = [
     path('detail/ticket/<int:pk>/',DetailTicketApiView.as_view(),name='ticket_detail'),
     path('replay/ticket/<int:pk>/',CreateAndListReplayTicketAPIView.as_view(),name='replay-tiket'),
     path('detail/replay/ticket/<int:pk>/',DetailReplayTicketAPIView.as_view(),name='detail-ticket-detail'),
-    path('shop/all/ticket/',GetShopTicketAPIView.as_view(),name='shop-get-all-ticket')
+    path('shop/all/ticket/',GetShopTicketAPIView.as_view(),name='shop-get-all-ticket'),
+    path('customer/list/ticket/',CustomerListTicketApiView.as_view(),name='customer-ticket')
     
 
 ]

@@ -149,7 +149,8 @@ class CreateAndListReplayTicketAPIView(GenericAPIView):
     
     def post(self,request,pk):
         data = request.data
-        serializer =  self.serializer_class(data=data,context = {'pk':pk})
+        serializer =  self.serializer_class(data=data,context = {'pk'
+                                                                 :pk})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -204,4 +205,16 @@ class GetShopTicketAPIView(GenericAPIView):
     def get(self,request):
         obj = self.get_queryset()
         serializer= self.serializer_class(instance = obj,many=True,context= {'request':request})
-        return Response(serializer.data,status = status.HTTP_200_OK)
+        return Response(serializer.data,status = status.HTTP_200_OK) 
+
+class CustomerListTicketApiView(GenericAPIView):
+    
+    serilaizer_class = ListCreateTicketSerializers
+    
+    def get_queryset(self):
+        Ticket.objects.filter(customer__user=self.request)
+        
+    def get(self,request):
+        query = self.get_queryset()
+        serializer= self.serializer_class(instance=query,context = {'request':request},many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
