@@ -213,8 +213,8 @@ class CustomerListTicketApiView(GenericAPIView):
     serializer_class = ListCreateTicketSerializers
     
     def get_queryset(self):
-        customer= Customer.objects.get(user=self.request)
-        Ticket.objects.filter(customer= customer)
+        
+        return Ticket.objects.filter(customer__user= self.request.user)
     def get(self,request):
         query = self.get_queryset()
         serializer= self.serializer_class(instance=query,context = {'request':request},many=True)
