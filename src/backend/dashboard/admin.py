@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Conversation, Message,Ticket
+from .models import Conversation, Message,Ticket,ReplayTicket
 
 
 @admin.register(Conversation)
@@ -160,3 +160,43 @@ class TicketAdmin(admin.ModelAdmin):
             },
         ),
     )
+    
+
+
+@admin.register(ReplayTicket)
+class ReplayTicketAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "replay_ticket",
+        "short_content",
+    )
+
+    list_display_links = (
+        "id",
+        "replay_ticket",
+    )
+
+    search_fields = (
+        "content",
+        "replay_ticket__title",
+        "replay_ticket__customer__user__username",
+        "replay_ticket__customer__user__email",
+    )
+
+    list_filter = (
+        "replay_ticket__store",
+    )
+
+    autocomplete_fields = (
+        "replay_ticket",
+    )
+
+    list_per_page = 20
+
+    def short_content(self, obj):
+        if len(obj.content) > 60:
+            return obj.content[:60] + "..."
+        return obj.content
+
+    short_content.short_description = "Content"
