@@ -1,5 +1,5 @@
 "use client";
-
+import EditAddressModal from "../EditAddressModal/EditAddressModal";
 
 import { useEffect, useState } from "react";
 
@@ -21,7 +21,7 @@ import "./CustomerAddressDetail.css";
 
 interface Customer {
 
-    username:string;
+    username: string;
 
 }
 
@@ -30,15 +30,15 @@ interface Customer {
 interface Address {
 
 
-    id:number;
+    id: number;
 
-    state:string;
+    state: string;
 
-    city:string;
+    city: string;
 
-    postal_code:string;
+    postal_code: string;
 
-    customer:Customer;
+    customer: Customer;
 
 
 }
@@ -49,7 +49,7 @@ interface Address {
 
 interface Props {
 
-    addressId:number;
+    addressId: number;
 
 }
 
@@ -60,30 +60,30 @@ export default function CustomerAddressDetail({
 
     addressId
 
-}:Props){
+}: Props) {
 
 
 
-    const [address,setAddress] = useState<Address|null>(null);
+    const [address, setAddress] = useState<Address | null>(null);
+    const [openEdit, setOpenEdit] = useState(false);
 
 
 
 
-
-    const GetAddressDetail = async()=>{
-
-
-        try{
+    const GetAddressDetail = async () => {
 
 
-            const {data}=await axios.get<Address>(
+        try {
+
+
+            const { data } = await axios.get<Address>(
 
 
                 `${BACKEND_URLS}customer/api/v1/detail/address/${addressId}/`,
 
                 {
 
-                    withCredentials:true
+                    withCredentials: true
 
                 }
 
@@ -97,7 +97,7 @@ export default function CustomerAddressDetail({
         }
 
 
-        catch(error){
+        catch (error) {
 
 
             console.log(error);
@@ -114,13 +114,13 @@ export default function CustomerAddressDetail({
 
 
 
-    useEffect(()=>{
+    useEffect(() => {
 
 
         GetAddressDetail();
 
 
-    },[addressId]);
+    }, [addressId]);
 
 
 
@@ -129,7 +129,7 @@ export default function CustomerAddressDetail({
 
 
 
-    if(!address){
+    if (!address) {
 
 
         return (
@@ -195,7 +195,7 @@ export default function CustomerAddressDetail({
                 <div className="address-detail-icon">
 
 
-                    <MapPin size={35}/>
+                    <MapPin size={35} />
 
 
                 </div>
@@ -318,14 +318,34 @@ export default function CustomerAddressDetail({
 
                 </div>
 
+                <button
 
+                    className="edit-address-btn"
+
+                    onClick={() => setOpenEdit(true)}
+
+                >
+
+                    Edit Address
+
+                </button>
 
 
             </div>
 
 
 
+            <EditAddressModal
 
+                open={openEdit}
+
+                onClose={() => setOpenEdit(false)}
+
+                address={address}
+
+                refreshAddress={GetAddressDetail}
+
+            />
         </section>
 
     );
