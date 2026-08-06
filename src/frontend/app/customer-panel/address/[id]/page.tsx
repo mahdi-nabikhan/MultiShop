@@ -1,40 +1,30 @@
-"use client";
+import CustomerAddressDetail from "@/components/customer panel/CustomerAddressDetail/CustomerAddressDetail";
 
 
-import {useState} from "react";
+
+interface Props {
+
+    params:Promise<{
+        id:string
+    }>
+
+}
 
 
-import CustomerAddressCreate from "@/components/customer panel/CustomerAddressCreate/CustomerAddressCreate";
-import CustomerAddressList from "@/components/customer panel/CustomerAddressList/CustomerAddressList";
 
-export default function Page(){
+export default async function Page({params}:Props){
 
 
-    const [refresh,setRefresh]=useState(0);
-
+    const {id}=await params;
 
 
     return (
 
-        <>
+        <CustomerAddressDetail
 
+            addressId={Number(id)}
 
-            <CustomerAddressCreate
-
-                refreshAddresses={()=>setRefresh(prev=>prev+1)}
-
-            />
-
-
-            <CustomerAddressList
-
-                key={refresh}
-
-            />
-
-
-        </>
-
+        />
 
     );
 
