@@ -1,0 +1,245 @@
+.customer-addresses {
+
+
+    width:100%;
+
+
+}
+
+
+
+/* Header */
+
+
+.address-header {
+
+
+    margin-bottom:32px;
+
+
+}
+
+
+
+.address-header h2 {
+
+
+    font-size:32px;
+
+    color:var(--text);
+
+    margin-bottom:8px;
+
+
+}
+
+
+
+.address-header p {
+
+
+    color:var(--text-muted);
+
+
+}
+
+
+
+
+
+/* Grid */
+
+
+.address-grid {
+
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+
+}
+
+
+
+
+
+/* Card */
+
+
+.address-card {
+
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius-lg);
+
+    padding:24px;
+
+    display:flex;
+
+    gap:20px;
+
+    transition:var(--transition);
+
+
+}
+
+
+
+
+.address-card:hover {
+
+
+    border-color:var(--primary);
+
+    transform:translateY(-4px);
+
+    box-shadow:var(--shadow-md);
+
+
+}
+
+
+
+
+
+/* Icon */
+
+
+.address-icon {
+
+
+    width:60px;
+
+    height:60px;
+
+    border-radius:18px;
+
+    background:rgba(16,185,129,.15);
+
+    color:var(--primary);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
+
+
+}
+
+
+
+
+
+/* Content */
+
+
+.address-content {
+
+
+    flex:1;
+
+
+}
+
+
+
+
+.address-content h3 {
+
+
+    font-size:22px;
+
+    color:var(--text);
+
+    margin-bottom:8px;
+
+
+}
+
+
+
+
+.address-content p {
+
+
+    color:var(--text-secondary);
+
+    margin-bottom:15px;
+
+
+}
+
+
+
+
+
+.postal {
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    color:var(--text-muted);
+
+    font-size:14px;
+
+
+}
+
+
+
+
+
+
+/* Loading */
+
+
+.address-loading {
+
+
+    height:200px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:var(--text-muted);
+
+
+}
+
+
+
+
+
+
+/* Responsive */
+
+
+@media(max-width:800px){
+
+
+    .address-grid {
+
+
+        grid-template-columns:1fr;
+
+
+    }
+
+
+}

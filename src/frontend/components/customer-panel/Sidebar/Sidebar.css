@@ -1,0 +1,453 @@
+.customer-sidebar{
+
+
+    width:290px;
+
+
+    min-height:calc(100vh - 82px);
+
+
+    background:var(--surface);
+
+
+    border-right:1px solid var(--border);
+
+
+    padding:25px;
+
+
+    display:flex;
+
+
+    flex-direction:column;
+
+
+    gap:30px;
+
+
+}
+
+
+
+
+
+/* =========================
+   User Card
+========================= */
+
+
+.sidebar-user-card{
+
+
+    background:var(--surface-light);
+
+
+    border:1px solid var(--border);
+
+
+    border-radius:24px;
+
+
+    padding:22px;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    gap:16px;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+.sidebar-user-card:hover{
+
+
+    border-color:var(--primary);
+
+
+    box-shadow:var(--shadow-glow);
+
+
+}
+
+
+
+
+.sidebar-avatar{
+
+
+    width:58px;
+
+
+    height:58px;
+
+
+    border-radius:50%;
+
+
+    background:linear-gradient(
+
+        135deg,
+
+        var(--primary),
+
+        var(--accent)
+
+    );
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    color:white;
+
+
+    font-size:22px;
+
+
+    font-weight:800;
+
+
+}
+
+
+
+
+
+.sidebar-user-info h3{
+
+
+    font-size:18px;
+
+
+    margin-bottom:5px;
+
+
+}
+
+
+
+.sidebar-user-info p{
+
+
+    font-size:13px;
+
+
+    color:var(--text-muted);
+
+
+}
+
+
+
+
+
+/* =========================
+   Menu
+========================= */
+
+
+.sidebar-menu{
+
+
+    display:flex;
+
+
+    flex-direction:column;
+
+
+    gap:25px;
+
+
+}
+
+
+
+
+
+.sidebar-group{
+
+
+    display:flex;
+
+
+    flex-direction:column;
+
+
+    gap:8px;
+
+
+}
+
+
+
+
+
+.group-title{
+
+
+    font-size:12px;
+
+
+    text-transform:uppercase;
+
+
+    letter-spacing:1px;
+
+
+    color:var(--text-muted);
+
+
+    padding-left:12px;
+
+
+    margin-bottom:5px;
+
+
+}
+
+
+
+
+
+
+.sidebar-item{
+
+
+    height:48px;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    gap:14px;
+
+
+    padding:0 14px;
+
+
+    border-radius:14px;
+
+
+    color:var(--text-secondary);
+
+
+    transition:.25s;
+
+
+    font-weight:500;
+
+
+}
+
+
+
+
+
+.sidebar-item svg{
+
+
+    color:var(--text-muted);
+
+
+    transition:.25s;
+
+
+}
+
+
+
+
+
+.sidebar-item:hover{
+
+
+    background:var(--primary-soft);
+
+
+    color:var(--text);
+
+
+}
+
+
+
+.sidebar-item:hover svg{
+
+
+    color:var(--primary);
+
+
+}
+
+
+
+
+
+/* Active state later */
+
+
+.sidebar-item.active{
+
+
+    background:var(--primary);
+
+
+    color:white;
+
+
+}
+
+
+
+
+.sidebar-item.active svg{
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+/* =========================
+   Logout
+========================= */
+
+
+.sidebar-logout{
+
+
+    margin-top:auto;
+
+
+    height:50px;
+
+
+    border-radius:14px;
+
+
+    border:1px solid rgba(239,68,68,.3);
+
+
+    background:rgba(239,68,68,.08);
+
+
+    color:#F87171;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    gap:10px;
+
+
+    font-weight:600;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+
+
+.sidebar-logout:hover{
+
+
+    background:#EF4444;
+
+
+    color:white;
+
+
+}
+
+
+
+
+
+/* =========================
+   Responsive
+========================= */
+
+
+@media(max-width:900px){
+
+
+    .customer-sidebar{
+
+
+        position:fixed;
+
+
+        left:-320px;
+
+
+        top:82px;
+
+
+        z-index:1000;
+
+
+        transition:.3s;
+
+
+    }
+
+
+
+    .customer-sidebar.open{
+
+
+        left:0;
+
+
+    }
+
+
+}
+
+
+
+@media(max-width:500px){
+
+
+    .customer-sidebar{
+
+
+        width:270px;
+
+
+    }
+
+
+}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Conversation, Message
+from .models import Conversation, Message,Ticket,ReplayTicket
 
 
 @admin.register(Conversation)
@@ -77,3 +77,126 @@ class MessageAdmin(admin.ModelAdmin):
     )
 
     ordering = ("-created_at",)
+    
+    
+    
+    
+
+@admin.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "title",
+        "customer",
+        "store",
+        "created_at",
+        "updated_at",
+    )
+
+    list_display_links = (
+        "id",
+        "title",
+    )
+
+    search_fields = (
+        "title",
+        "content",
+        "customer__user__username",
+        "customer__user__email",
+        "store__name",
+    )
+
+    list_filter = (
+        "created_at",
+        "updated_at",
+        "store",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    autocomplete_fields = (
+        "customer",
+        "store",
+    )
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+
+    date_hierarchy = "created_at"
+
+    list_per_page = 20
+
+    fieldsets = (
+        (
+            "Ticket Information",
+            {
+                "fields": (
+                    "title",
+                    "content",
+                )
+            },
+        ),
+        (
+            "Relations",
+            {
+                "fields": (
+                    "customer",
+                    "store",
+                )
+            },
+        ),
+        (
+            "Dates",
+            {
+                "fields": (
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
+    )
+    
+
+
+@admin.register(ReplayTicket)
+class ReplayTicketAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "replay_ticket",
+        "short_content",
+    )
+
+    list_display_links = (
+        "id",
+        "replay_ticket",
+    )
+
+    search_fields = (
+        "content",
+        "replay_ticket__title",
+        "replay_ticket__customer__user__username",
+        "replay_ticket__customer__user__email",
+    )
+
+    list_filter = (
+        "replay_ticket__store",
+    )
+
+    autocomplete_fields = (
+        "replay_ticket",
+    )
+
+    list_per_page = 20
+
+    def short_content(self, obj):
+        if len(obj.content) > 60:
+            return obj.content[:60] + "..."
+        return obj.content
+
+    short_content.short_description = "Content"
