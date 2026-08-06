@@ -1,5 +1,5 @@
-import Navbar from "@/components/customer panel/Navbar/Navbar";
-import Sidebar from "@/components/customer panel/Sidebar/Sidebar";
+import Navbar from "@/components/customer-panel/Navbar/Navbar";
+import Sidebar from "@/components/customer-panel/Sidebar/Sidebar";
 
 import "./customer.css";
 
