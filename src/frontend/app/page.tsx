@@ -4,6 +4,8 @@ import Topbar from "@/components/shop/Topbar/Topbar";
 import SectionHeader from "@/components/shop/SectionHeader/SectionHeader";
 import ShopList from "@/components/shop/ShopList/ShopList";
 import RandomProducts from "@/components/shop/RandomProduct/RandomProduct";
+import StoreCategoryList from "@/components/shop/StoreCategoryList/StoreCategoryList";
+import StoreExplorer from "@/components/shop/StoreExplore/StoreExplore";
 
 interface Props {
   searchParams: Promise<{
@@ -17,10 +19,18 @@ export default async function Page({ searchParams }: Props) {
   const page = params.page ?? "1";
 
   return (
-    <div>
+    <>
+    
       <Navbar />
 
       <Topbar />
+    <div>
+        <SectionHeader
+          title="Category"
+          description="Explore stores by category"
+        />
+        <StoreExplorer/>
+
 
       <div>
         <SectionHeader
@@ -39,6 +49,6 @@ export default async function Page({ searchParams }: Props) {
       </div>
 
       <Footer />
-    </div>
+    </div></>
   );
 }

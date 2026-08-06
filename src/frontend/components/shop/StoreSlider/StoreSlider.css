@@ -1,0 +1,201 @@
+.store-slider {
+
+    margin-top:40px;
+
+    padding-top:35px;
+
+    border-top:1px solid var(--border);
+
+}
+
+
+
+.store-slider h2 {
+
+    color:var(--text);
+
+    font-size:32px;
+
+    margin-bottom:25px;
+
+}
+
+
+
+.store-row {
+
+    display:flex;
+
+    gap:20px;
+
+    overflow-x:auto;
+
+    padding-bottom:20px;
+
+    scroll-behavior:smooth;
+
+}
+
+
+
+.store-row::-webkit-scrollbar {
+
+    height:7px;
+
+}
+
+
+.store-row::-webkit-scrollbar-thumb {
+
+    background:var(--primary);
+
+    border-radius:10px;
+
+}
+
+
+
+.store-card {
+
+    min-width:260px;
+
+    background:var(--surface-light);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius-lg);
+
+    padding:25px;
+
+    color:var(--text);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    text-align:center;
+
+    gap:15px;
+
+    transition:var(--transition);
+
+}
+
+
+
+.store-card:hover {
+
+    transform:translateY(-6px);
+
+    border-color:var(--primary);
+
+    box-shadow:
+
+    0 0 30px rgba(16,185,129,.18);
+
+}
+
+
+
+.store-card img {
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:3px solid var(--primary);
+
+}
+
+
+
+.store-card h3 {
+
+    color:var(--text);
+
+    font-size:22px;
+
+}
+
+
+
+.store-card button {
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:var(--radius-md);
+
+    background:var(--primary);
+
+    color:white;
+
+    font-weight:700;
+
+}
+
+
+
+.store-card button:hover {
+
+    background:var(--primary-hover);
+
+}
+
+
+
+/* Animation */
+
+@keyframes fadeIn {
+
+
+    from {
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+/* Responsive */
+
+@media(max-width:768px){
+
+
+    .store-card {
+
+        flex-basis:220px;
+
+    }
+
+
+    .store-slider h2 {
+
+        font-size:24px;
+
+    }
+
+
+}

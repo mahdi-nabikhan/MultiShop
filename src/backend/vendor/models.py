@@ -146,5 +146,5 @@ class ShopRate(models.Model):
 class StoreCategory(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    icon = models.CharField(max_length=100)
+    icon = models.TextField()
     
