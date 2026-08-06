@@ -1,121 +1,125 @@
+"use client";
+
 import Link from "next/link";
 import {
-  User,
-  ShoppingBag,
-  Heart,
-  Bell,
-  LogOut
+    Search,
+    ShoppingCart,
+    Bell,
+    Heart,
+    ChevronDown,
+    Menu
 } from "lucide-react";
 
 import "./Navbar.css";
 
+export default function Navbar() {
 
-export default function CustomerNavbar() {
+    return (
 
-  return (
+        <header className="customer-navbar">
 
-    <header className="customer-navbar">
+            <div className="navbar-left">
 
+                <button className="mobile-menu">
 
-      <div className="customer-logo">
+                    <Menu size={24} />
 
-        <Link href="/">
+                </button>
 
-          MultiShop
+                <Link
+                    href="/"
+                    className="navbar-logo"
+                >
 
-        </Link>
+                    <span className="logo-dot"></span>
 
-      </div>
+                    MultiShop
 
+                </Link>
 
+            </div>
 
-      <nav className="customer-links">
+            <div className="navbar-search">
 
+                <Search size={18} />
 
-        <Link href="/profile">
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                />
 
-          <User size={18}/>
+            </div>
 
-          Profile
+            <div className="navbar-right">
 
-        </Link>
+                <button className="navbar-icon">
 
+                    <Heart size={20} />
 
-        <Link href="/orders">
+                    <span className="badge">
 
-          <ShoppingBag size={18}/>
+                        2
 
-          Orders
+                    </span>
 
-        </Link>
+                </button>
 
+                <button className="navbar-icon">
 
-        <Link href="/wishlist">
+                    <ShoppingCart size={20} />
 
-          <Heart size={18}/>
+                    <span className="badge">
 
-          Wishlist
+                        4
 
-        </Link>
+                    </span>
 
+                </button>
 
+                <button className="navbar-icon">
 
-      </nav>
+                    <Bell size={20} />
 
+                    <span className="badge">
 
+                        1
 
+                    </span>
 
-      <div className="customer-actions">
+                </button>
 
+                <button className="customer-profile">
 
-        <button className="notification-btn">
+                    <div className="profile-avatar">
 
-          <Bell size={20}/>
+                        M
 
-        </button>
+                    </div>
 
+                    <div className="profile-info">
 
+                        <span>
 
-        <div className="customer-user">
+                            Mahdi
 
+                        </span>
 
-          <div className="user-avatar">
+                        <small>
 
-            M
+                            Premium Member
 
-          </div>
+                        </small>
 
+                    </div>
 
+                    <ChevronDown size={18} />
 
-          <div>
+                </button>
 
-            <span>
-              Mahdi
-            </span>
+            </div>
 
-            <small>
-              Customer
-            </small>
+        </header>
 
-          </div>
+    );
 
-
-        </div>
-
-
-
-        <button className="logout-btn">
-
-          <LogOut size={18}/>
-
-        </button>
-
-
-      </div>
-
-
-
-    </header>
-
-  );
 }

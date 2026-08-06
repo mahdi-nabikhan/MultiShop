@@ -3,155 +3,231 @@
 import Link from "next/link";
 
 import {
-  User,
-  ShoppingBag,
-  Heart,
-  MapPin,
-  CreditCard,
-  Shield,
-  Settings,
-  LogOut
+    User,
+    ShoppingBag,
+    Heart,
+    MapPin,
+    CreditCard,
+    Shield,
+    Settings,
+    LogOut,
+    Package
 } from "lucide-react";
 
 import "./Sidebar.css";
 
 
-const menuItems = [
-  {
-    title: "Profile",
-    href: "/profile",
-    icon: User,
-  },
+const menuGroups = [
 
-  {
-    title: "My Orders",
-    href: "/orders",
-    icon: ShoppingBag,
-  },
+    {
+        title:"Shopping",
 
-  {
-    title: "Wishlist",
-    href: "/wishlist",
-    icon: Heart,
-  },
+        items:[
 
-  {
-    title: "Addresses",
-    href: "/addresses",
-    icon: MapPin,
-  },
+            {
+                title:"My Orders",
+                href:"/customer-panel/orders",
+                icon:ShoppingBag
+            },
 
-  {
-    title: "Payments",
-    href: "/payments",
-    icon: CreditCard,
-  },
+            {
+                title:"Wishlist",
+                href:"/customer-panel/wishlist",
+                icon:Heart
+            },
 
-  {
-    title: "Security",
-    href: "/security",
-    icon: Shield,
-  },
+            {
+                title:"Payments",
+                href:"/customer-panel/payments",
+                icon:CreditCard
+            }
 
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
-  },
+        ]
+
+    },
+
+
+    {
+        title:"Account",
+
+        items:[
+
+            {
+                title:"Profile",
+                href:"/customer-panel/profile",
+                icon:User
+            },
+
+
+            {
+                title:"Addresses",
+                href:"/customer-panel/addresses",
+                icon:MapPin
+            },
+
+
+            {
+                title:"Security",
+                href:"/customer-panel/security",
+                icon:Shield
+            },
+
+
+            {
+                title:"Settings",
+                href:"/customer-panel/settings",
+                icon:Settings
+            }
+
+        ]
+
+    }
+
 ];
 
 
-export default function CustomerSidebar() {
+
+export default function CustomerSidebar(){
 
 
-  return (
+    return (
 
-    <aside className="customer-sidebar">
-
-
-      {/* User Card */}
-
-      <div className="customer-card">
+        <aside className="customer-sidebar">
 
 
-        <div className="customer-avatar">
+            {/* User Card */}
 
-          M
-
-        </div>
+            <div className="sidebar-user-card">
 
 
-        <h3>
-          Mahdi
-        </h3>
+                <div className="sidebar-avatar">
+
+                    M
+
+                </div>
 
 
-        <p>
-          Premium Customer
-        </p>
+                <div className="sidebar-user-info">
+
+                    <h3>
+
+                        Mahdi
+
+                    </h3>
 
 
-      </div>
+                    <p>
+
+                        Premium Member
+
+                    </p>
 
 
+                </div>
 
 
-      {/* Menu */}
-
-      <nav className="customer-menu">
-
-
-        {
-          menuItems.map((item)=>{
-
-
-            const Icon = item.icon;
-
-
-            return (
-
-              <Link
-                href={item.href}
-                key={item.title}
-                className="customer-menu-item"
-              >
-
-                <Icon size={20}/>
-
-                <span>
-                  {item.title}
-                </span>
-
-
-              </Link>
-
-            )
-
-
-          })
-        }
-
-
-      </nav>
+            </div>
 
 
 
-      {/* Logout */}
 
-      <button className="customer-logout">
-
-
-        <LogOut size={20}/>
+            {/* Menu */}
 
 
-        Logout
+            <nav className="sidebar-menu">
 
 
-      </button>
+                {
+
+                    menuGroups.map((group)=>(
+
+
+                        <div
+                            className="sidebar-group"
+                            key={group.title}
+                        >
+
+
+                            <span className="group-title">
+
+                                {group.title}
+
+                            </span>
 
 
 
-    </aside>
+                            {
 
-  );
+                                group.items.map((item)=>{
+
+
+                                    const Icon=item.icon;
+
+
+
+                                    return (
+
+                                        <Link
+
+                                            href={item.href}
+
+                                            className="sidebar-item"
+
+                                            key={item.title}
+
+                                        >
+
+
+                                            <Icon size={20}/>
+
+
+                                            <span>
+
+                                                {item.title}
+
+                                            </span>
+
+
+                                        </Link>
+
+                                    )
+
+                                })
+
+                            }
+
+
+                        </div>
+
+
+                    ))
+
+                }
+
+
+            </nav>
+
+
+
+
+            {/* Logout */}
+
+
+            <button className="sidebar-logout">
+
+
+                <LogOut size={20}/>
+
+
+                Logout
+
+
+            </button>
+
+
+
+        </aside>
+
+    )
+
 }
