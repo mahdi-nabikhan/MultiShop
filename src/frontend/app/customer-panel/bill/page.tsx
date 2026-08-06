@@ -1,4 +1,4 @@
-import CustomerBillList from "@/components/customer panel/CustomerBillList/CustomerBillList";
+import CustomerBillList from "@/components/customer-panel/CustomerBillList/CustomerBillList";
 
 
 export default function BillsPage(){

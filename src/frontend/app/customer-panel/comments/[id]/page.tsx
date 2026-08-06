@@ -1,4 +1,4 @@
-import CustomerCommentDetail from "@/components/customer panel/CustomerCommentDetail/CustomerCommentDetail";
+import CustomerCommentDetail from "@/components/customer-panel/CustomerCommentDetail/CustomerCommentDetail";
 
 
 interface Props {

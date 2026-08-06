@@ -1,4 +1,4 @@
-import CustomerAddressDetail from "@/components/customer panel/CustomerAddressDetail/CustomerAddressDetail";
+import CustomerAddressDetail from "@/components/customer-panel/CustomerAddressDetail/CustomerAddressDetail";
 
 
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import CustomerTicketList from '@/components/customer panel/CustomerTicketList/CustomerTicketList'
+import CustomerTicketList from '@/components/customer-panel/CustomerTicketList/CustomerTicketList'
 function page() {
   return (
     <>

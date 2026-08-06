@@ -1,4 +1,4 @@
-import CustomerOrderItemList from "../../../../components/customer panel/CustomerOrderItemList/CustomerOrderItemList";
+import CustomerOrderItemList from "../../../../components/customer-panel/CustomerOrderItemList/CustomerOrderItemList";
 
 
 interface Props {
