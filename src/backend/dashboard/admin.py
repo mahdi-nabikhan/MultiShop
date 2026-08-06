@@ -77,3 +77,86 @@ class MessageAdmin(admin.ModelAdmin):
     )
 
     ordering = ("-created_at",)
+    
+    
+    
+    
+
+@admin.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "title",
+        "customer",
+        "store",
+        "created_at",
+        "updated_at",
+    )
+
+    list_display_links = (
+        "id",
+        "title",
+    )
+
+    search_fields = (
+        "title",
+        "content",
+        "customer__user__username",
+        "customer__user__email",
+        "store__name",
+    )
+
+    list_filter = (
+        "created_at",
+        "updated_at",
+        "store",
+    )
+
+    ordering = (
+        "-created_at",
+    )
+
+    autocomplete_fields = (
+        "customer",
+        "store",
+    )
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+
+    date_hierarchy = "created_at"
+
+    list_per_page = 20
+
+    fieldsets = (
+        (
+            "Ticket Information",
+            {
+                "fields": (
+                    "title",
+                    "content",
+                )
+            },
+        ),
+        (
+            "Relations",
+            {
+                "fields": (
+                    "customer",
+                    "store",
+                )
+            },
+        ),
+        (
+            "Dates",
+            {
+                "fields": (
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
+    )

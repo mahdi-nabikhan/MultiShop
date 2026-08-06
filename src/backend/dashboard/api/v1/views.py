@@ -209,10 +209,10 @@ class GetShopTicketAPIView(GenericAPIView):
 
 class CustomerListTicketApiView(GenericAPIView):
     
-    serilaizer_class = ListCreateTicketSerializers
+    serializer_class = ListCreateTicketSerializers
     
     def get_queryset(self):
-        Ticket.objects.filter(customer__user=self.request)
+        Ticket.objects.filter(customer__user=self.request.user)
         
     def get(self,request):
         query = self.get_queryset()
