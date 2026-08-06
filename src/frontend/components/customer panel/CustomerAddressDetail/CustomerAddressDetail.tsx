@@ -1,5 +1,6 @@
 "use client";
 import EditAddressModal from "../EditAddressModal/EditAddressModal";
+import DeleteAddressModal from "../DeleteAddressModal/DeleteAddressModal";
 
 import { useEffect, useState } from "react";
 
@@ -66,6 +67,7 @@ export default function CustomerAddressDetail({
 
     const [address, setAddress] = useState<Address | null>(null);
     const [openEdit, setOpenEdit] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
 
 
 
@@ -329,6 +331,17 @@ export default function CustomerAddressDetail({
                     Edit Address
 
                 </button>
+                <button
+
+                    className="delete-address-btn"
+
+                    onClick={() => setOpenDelete(true)}
+
+                >
+
+                    Delete Address
+
+                </button>
 
 
             </div>
@@ -344,6 +357,16 @@ export default function CustomerAddressDetail({
                 address={address}
 
                 refreshAddress={GetAddressDetail}
+
+
+            />
+            <DeleteAddressModal
+
+                open={openDelete}
+
+                onClose={() => setOpenDelete(false)}
+
+                addressId={address.id}
 
             />
         </section>
