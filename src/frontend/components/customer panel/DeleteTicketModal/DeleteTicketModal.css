@@ -1,0 +1,236 @@
+.delete-ticket-overlay{
+
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.7);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:3000;
+
+
+}
+
+
+
+
+
+
+.delete-ticket-modal{
+
+
+    width:430px;
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius-xl);
+
+    padding:35px;
+
+    text-align:center;
+
+    position:relative;
+
+    box-shadow:var(--shadow-lg);
+
+
+}
+
+
+
+
+
+
+.delete-close{
+
+
+    position:absolute;
+
+    right:20px;
+
+    top:20px;
+
+    background:none;
+
+    border:none;
+
+    color:var(--text-muted);
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+
+.delete-ticket-icon{
+
+
+    width:75px;
+
+    height:75px;
+
+    margin:0 auto 20px;
+
+    border-radius:50%;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    background:rgba(239,68,68,.15);
+
+    color:var(--danger);
+
+
+}
+
+
+
+
+
+
+.delete-ticket-modal h2{
+
+
+    color:var(--text);
+
+    margin-bottom:15px;
+
+    font-size:28px;
+
+
+}
+
+
+
+
+
+
+.delete-ticket-modal p{
+
+
+    color:var(--text-secondary);
+
+    line-height:1.7;
+
+    margin-bottom:30px;
+
+
+}
+
+
+
+
+
+
+.delete-ticket-actions{
+
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+
+}
+
+
+
+
+
+
+
+.cancel-delete-ticket{
+
+
+    padding:12px 25px;
+
+    border-radius:var(--radius-md);
+
+    background:transparent;
+
+    border:1px solid var(--border);
+
+    color:var(--text);
+
+
+}
+
+
+
+
+
+
+.confirm-delete-ticket{
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:12px 25px;
+
+    border:none;
+
+    border-radius:var(--radius-md);
+
+    background:var(--danger);
+
+    color:white;
+
+    font-weight:600;
+
+
+}
+
+
+
+
+
+
+.confirm-delete-ticket:hover{
+
+
+    opacity:.85;
+
+
+}
+
+
+
+
+
+
+@media(max-width:600px){
+
+
+    .delete-ticket-modal{
+
+
+        width:90%;
+
+
+    }
+
+
+}
