@@ -1,0 +1,163 @@
+.delete-comment-overlay{
+
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.7);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:2000;
+
+
+}
+
+
+
+
+
+.delete-comment-modal{
+
+
+    width:420px;
+
+    background:var(--surface);
+
+    border:1px solid var(--border);
+
+    border-radius:var(--radius-xl);
+
+    padding:35px;
+
+    text-align:center;
+
+
+}
+
+
+
+
+
+.delete-icon{
+
+
+    width:70px;
+
+    height:70px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    background:rgba(239,68,68,.15);
+
+    color:var(--danger);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+
+.delete-comment-modal h2{
+
+
+    color:var(--text);
+
+    margin-bottom:12px;
+
+
+}
+
+
+
+
+
+.delete-comment-modal p{
+
+
+    color:var(--text-secondary);
+
+    margin-bottom:25px;
+
+
+}
+
+
+
+
+
+.delete-buttons{
+
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+
+}
+
+
+
+
+
+.cancel-btn{
+
+
+    padding:12px 25px;
+
+    border-radius:var(--radius-md);
+
+    background:transparent;
+
+    border:1px solid var(--border);
+
+    color:var(--text);
+
+
+}
+
+
+
+
+
+.delete-btn{
+
+
+    padding:12px 25px;
+
+    border:none;
+
+    border-radius:var(--radius-md);
+
+    background:var(--danger);
+
+    color:white;
+
+
+}
+
+
+.delete-btn:hover{
+
+
+    opacity:.85;
+
+
+}
