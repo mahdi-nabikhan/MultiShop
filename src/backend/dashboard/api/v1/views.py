@@ -1,5 +1,6 @@
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, get_object_or_404
+from rest_framework.generics import GenericAPIView, get_object_or_404,ListAPIView
+from django.core.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from customer.models import Customer
@@ -219,3 +220,24 @@ class CustomerListTicketApiView(GenericAPIView):
         query = self.get_queryset()
         serializer= self.serializer_class(instance=query,context = {'request':request},many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    
+class ConversationMessagesAPIView(ListAPIView):
+    
+    permission_classes = [IsAuthenticated]
+
+    serializer_class = MessageSerializer
+
+
+    def get_queryset(self):
+
+        conversation = get_object_or_404(
+            Conversation,
+            pk=self.kwargs["conversation_id"],
+        )
+
+        if not can_access_conversation(self.request.user, conversation):
+            raise PermissionDenied()
+
+        return conversation.messages.select_related("sender")
