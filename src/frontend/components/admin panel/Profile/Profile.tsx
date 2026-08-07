@@ -1,5 +1,5 @@
 "use client";
-
+import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 import axios from "axios";
 import { useState } from "react";
 import {
@@ -20,13 +20,9 @@ export default function Profile() {
 
 
     const queryClient = useQueryClient();
-
-
     const [editMode, setEditMode] = useState(false);
+    const [passwordModal, setPasswordModal] = useState(false);
 
-
-
-    // گرفتن رول کاربر
     const roleQuery = useQuery<Role>({
 
         queryKey: ["user-role"],
@@ -100,7 +96,7 @@ export default function Profile() {
     const updateMutation = useMutation({
 
 
-        mutationFn: async (data:any) => {
+        mutationFn: async (data: any) => {
 
 
             const response = await axios.put(
@@ -113,7 +109,7 @@ export default function Profile() {
 
 
                 {
-                    withCredentials:true
+                    withCredentials: true
                 }
 
             );
@@ -126,12 +122,12 @@ export default function Profile() {
 
 
 
-        onSuccess:()=>{
+        onSuccess: () => {
 
 
             queryClient.invalidateQueries({
 
-                queryKey:[
+                queryKey: [
                     "profile",
                     roleQuery.data
                 ]
@@ -152,7 +148,7 @@ export default function Profile() {
 
 
 
-    if(roleQuery.isPending)
+    if (roleQuery.isPending)
 
         return (
 
@@ -165,7 +161,7 @@ export default function Profile() {
 
 
 
-    if(roleQuery.isError)
+    if (roleQuery.isError)
 
         return (
 
@@ -179,7 +175,7 @@ export default function Profile() {
 
 
 
-    if(profileQuery.isPending)
+    if (profileQuery.isPending)
 
         return (
 
@@ -193,7 +189,7 @@ export default function Profile() {
 
 
 
-    if(profileQuery.isError)
+    if (profileQuery.isError)
 
         return (
 
@@ -310,14 +306,24 @@ export default function Profile() {
 
                             className="edit-profile-btn"
 
-                            onClick={()=>setEditMode(true)}
+                            onClick={() => setEditMode(true)}
 
                         >
 
                             Edit Profile
 
                         </button>
+                        <button
 
+                            className="change-password-btn"
+
+                            onClick={() => setPasswordModal(true)}
+
+                        >
+
+                            Change Password
+
+                        </button>
 
 
                     </div>
@@ -343,7 +349,7 @@ export default function Profile() {
 
                             className="back-profile-btn"
 
-                            onClick={()=>setEditMode(false)}
+                            onClick={() => setEditMode(false)}
 
                         >
 
@@ -367,7 +373,7 @@ export default function Profile() {
 
 
 
-                            onSubmit={(values)=>{
+                            onSubmit={(values) => {
 
                                 updateMutation.mutate(values);
 
@@ -385,7 +391,13 @@ export default function Profile() {
             }
 
 
+            <ChangePasswordModal
 
+                isOpen={passwordModal}
+
+                onClose={() => setPasswordModal(false)}
+
+            />
         </div>
 
     );
