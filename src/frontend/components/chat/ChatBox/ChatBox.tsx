@@ -1,89 +1,409 @@
+"use client";
+
+import {useEffect,useRef,useState} from "react";
+
+import axios from "axios";
+
+import BACKEND_URLS from "@/utils";
+
 import ChatMessage from "../ChatMessage/ChatMessage";
+import ChatInput from "../ChatInput/ChatInput";
 
 import "./ChatBox.css";
 
-export default function ChatBox() {
 
-    const messages = [
+interface Message{
 
-        {
-            id:1,
-            sender:"seller",
-            message:"Hello 👋 Welcome to our store.",
-            time:"10:30"
-        },
+    id:number;
 
-        {
-            id:2,
-            sender:"customer",
-            message:"Hi, Is this laptop still available?",
-            time:"10:31"
-        },
+    text:string;
 
-        {
-            id:3,
-            sender:"seller",
-            message:"Yes, it's available.",
-            time:"10:31"
-        },
+    image:string|null;
 
-        {
-            id:4,
-            sender:"customer",
-            message:"Perfect. Thank you ❤️",
-            time:"10:32"
+    file:string|null;
+
+    created_at:string;
+
+    sender:number;
+
+    sender_name:string;
+
+    is_read:boolean;
+
+}
+
+
+interface Props{
+
+    storeId:number;
+
+    currentUserId:number;
+
+}
+
+
+
+export default function ChatBox({
+
+    storeId,
+
+    currentUserId
+
+}:Props){
+
+
+    const [conversationId,setConversationId]=useState<number|null>(null);
+
+    const [messages,setMessages]=useState<Message[]>([]);
+
+    const [loading,setLoading]=useState(true);
+
+    const messagesEndRef=useRef<HTMLDivElement>(null);
+
+
+
+
+    const CreateConversation=async()=>{
+
+
+        try{
+
+
+            const {data}=await axios.post(
+
+                `${BACKEND_URLS}dashboard/api/v1/chat/conversations/`,
+
+                {
+
+                    store:storeId
+
+                },
+
+                {
+
+                    withCredentials:true
+
+                }
+
+            );
+
+
+            setConversationId(data.conversation_id);
+
+
         }
 
-    ] as const;
+        catch(error){
 
-    return (
+            console.log(error);
+
+        }
+
+
+    };
+
+
+
+
+
+    const GetMessages=async(id:number)=>{
+
+
+        try{
+
+
+            const {data}=await axios.get(
+
+                `${BACKEND_URLS}dashboard/api/v1/conversations/${id}/messages/list/`,
+
+                {
+
+                    withCredentials:true
+
+                }
+
+            );
+
+
+            setMessages(data);
+
+
+        }
+
+        catch(error){
+
+            console.log(error);
+
+        }
+
+        finally{
+
+            setLoading(false);
+
+        }
+
+
+    };
+
+
+
+
+
+    const SendMessage=async(text:string)=>{
+
+
+        if(!conversationId) return;
+
+
+        try{
+
+
+            await axios.post(
+
+                `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/`,
+
+                {
+
+                    text
+
+                },
+
+                {
+
+                    withCredentials:true
+
+                }
+
+            );
+
+
+            GetMessages(conversationId);
+
+
+        }
+
+        catch(error){
+
+            console.log(error);
+
+        }
+
+
+    };
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        CreateConversation();
+
+
+    },[]);
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        if(conversationId){
+
+            GetMessages(conversationId);
+
+        }
+
+
+    },[conversationId]);
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        messagesEndRef.current?.scrollIntoView({
+
+            behavior:"smooth"
+
+        });
+
+
+    },[messages]);
+
+
+
+
+
+
+    useEffect(()=>{
+
+
+        if(!conversationId) return;
+
+
+        const interval=setInterval(()=>{
+
+
+            GetMessages(conversationId);
+
+
+        },3000);
+
+
+
+        return()=>clearInterval(interval);
+
+
+    },[conversationId]);
+
+
+
+
+
+
+
+    if(loading){
+
+        return(
+
+            <section className="chatbox">
+
+                Loading...
+
+            </section>
+
+        );
+
+    }
+
+
+
+
+
+
+    return(
 
         <section className="chatbox">
 
+
+
             <div className="chat-header">
+
 
                 <div className="seller-info">
 
+
                     <div className="avatar">
 
-                        T
+                        S
 
                     </div>
+
+
 
                     <div>
 
-                        <h3>Tech World</h3>
 
-                        <span>Online</span>
+                        <h3>
+
+                            Store Chat
+
+                        </h3>
+
+
+                        <span>
+
+                            Online
+
+                        </span>
+
 
                     </div>
 
+
+
                 </div>
 
+
+
             </div>
+
+
+
+
 
             <div className="chat-body">
 
-                {messages.map((item)=>(
 
-                    <ChatMessage
+                {
 
-                        key={item.id}
+                    messages.map(message=>(
 
-                        message={item.message}
 
-                        sender={item.sender}
+                        <ChatMessage
 
-                        time={item.time}
+                            key={message.id}
 
-                    />
+                            text={message.text}
 
-                ))}
+                            image={message.image}
+
+                            file={message.file}
+
+                            sender={
+
+                                message.sender===currentUserId
+
+                                ?
+
+                                "customer"
+
+                                :
+
+                                "seller"
+
+                            }
+
+                            createdAt={message.created_at}
+
+                            isRead={message.is_read}
+
+                        />
+
+
+                    ))
+
+                }
+
+
+                <div ref={messagesEndRef}></div>
+
 
             </div>
+
+
+
+
+
+            <ChatInput
+
+                onSend={SendMessage}
+
+            />
+
+
 
         </section>
 
     );
+
 
 }

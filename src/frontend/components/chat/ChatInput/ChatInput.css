@@ -1,0 +1,51 @@
+.chat-input-container {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 16px;
+
+    background:var(--surface-light);
+
+    border-top:1px solid var(--border);
+
+}
+
+
+
+.chat-input-container input {
+
+    flex:1;
+
+}
+
+
+
+.chat-icon-btn {
+
+    color:var(--text-muted);
+
+}
+
+
+
+.chat-icon-btn:hover {
+
+    color:var(--primary);
+
+}
+
+
+
+.chat-send-btn {
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}

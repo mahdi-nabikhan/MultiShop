@@ -11,20 +11,33 @@ class ConversationCreateSerializer(serializers.ModelSerializer):
         fields = ("id", "store")
         read_only_fields = ("id",)
         
-        
+
+    
+    
 
 
 
 class MessageCreateSerializer(serializers.ModelSerializer):
     
     class Meta:
+    
         model = Message
-        fields = (
+
+        fields = [
             "text",
             "image",
             "file",
             "reply_to",
-        )
+        ]
+
+        extra_kwargs = {
+
+            "reply_to":{
+                "required":False,
+                "allow_null":True
+            }
+
+        }  
 
     def validate(self, attrs):
         text = attrs.get("text")

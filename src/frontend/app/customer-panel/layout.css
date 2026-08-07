@@ -1,0 +1,8 @@
+.customer-content {
+    margin-top: 70px;
+    margin-left: 260px;
+
+    padding: 30px;
+
+    min-height: calc(100vh - 70px);
+}

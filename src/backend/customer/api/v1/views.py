@@ -536,52 +536,7 @@ class AllProductsCommentApiView(GenericAPIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     
-    
-    
-class CustomerDetailApiView(GenericAPIView):
-    """
-    API endpoint for retrieving details of the authenticated customer.
 
-    This view allows a logged-in user to fetch their own customer profile
-    information. The data is retrieved from the Customer model and serialized
-    using CustomerDetailSerializer.
-
-    Attributes:
-        serializer_class (CustomerDetailSerializer):
-            Serializer responsible for serializing customer profile data.
-        model (Customer):
-            The Customer model used for querying customer instances.
-
-    Methods:
-        get_queryset():
-            - Retrieves the Customer instance associated with the authenticated user.
-
-        GET:
-            - Fetches the customer's profile data.
-            - Serializes the data using CustomerDetailSerializer.
-            - Returns HTTP 200 OK with serialized customer details.
-
-    Responses:
-        200 OK:
-            - Serialized data of the authenticated customer's profile.
-
-    Security Considerations:
-        - Only the authenticated user can access their own profile details.
-        - No sensitive fields (e.g., passwords) should be exposed via the serializer.
-        - Proper authentication and permission handling is required.
-    """
-    serializer_class=CustomerDetailSerializer
-    model=Customer
-    
-    def get_queryset(self):
-        return self.model.objects.get(user=self.request.user) 
-    
-    def get(self,request):
-        obj=self.get_queryset()
-        serializer=self.serializer_class(obj)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    
-    
     
     
 class CanRateAPIView(GenericAPIView):

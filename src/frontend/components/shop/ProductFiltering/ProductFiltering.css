@@ -1,0 +1,218 @@
+.product-filter-container {
+    width: 100%;
+}
+
+
+/* =========================
+   Filter Buttons
+========================= */
+
+.filter-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+}
+
+
+.filter-buttons button {
+
+    background: #111827;
+    color: #d1d5db;
+
+    border: 1px solid #374151;
+
+    padding: 12px 24px;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all .3s ease;
+
+}
+
+
+.filter-buttons button:hover {
+
+    border-color: #10b981;
+
+    color: #10b981;
+
+    transform: translateY(-2px);
+
+}
+
+
+
+.filter-buttons button.active {
+
+    background: #10b981;
+
+    color: #04130d;
+
+    border-color: #10b981;
+
+    box-shadow:
+        0 8px 25px rgba(16,185,129,.25);
+
+}
+
+
+/* =========================
+   Product Grid
+========================= */
+
+
+.product-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill,minmax(240px,1fr));
+
+    gap: 25px;
+
+}
+
+
+
+/* =========================
+   Product Card
+========================= */
+
+
+.product-card {
+
+    background: #111827;
+
+    border: 1px solid #1f2937;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    overflow: hidden;
+
+    transition:
+        transform .3s ease,
+        border-color .3s ease,
+        box-shadow .3s ease;
+
+}
+
+
+
+.product-card:hover {
+
+    transform: translateY(-8px);
+
+    border-color: #10b981;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.35);
+
+}
+
+
+
+
+.product-card img {
+
+    width:100%;
+
+    height:220px;
+
+    object-fit:cover;
+
+    border-radius:14px;
+
+    margin-bottom:15px;
+
+}
+
+
+
+
+.product-card h3 {
+
+    color:#f9fafb;
+
+    font-size:18px;
+
+    margin-bottom:10px;
+
+}
+
+
+
+
+.product-card p {
+
+    color:#10b981;
+
+    font-size:17px;
+
+    font-weight:700;
+
+}
+
+
+
+
+/* =========================
+   Loading
+========================= */
+
+
+.product-loading {
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:50px;
+
+    color:#10b981;
+
+    font-size:18px;
+
+}
+
+
+
+/* =========================
+   Responsive
+========================= */
+
+
+@media(max-width:768px){
+
+
+    .filter-buttons {
+
+        justify-content:center;
+
+    }
+
+
+    .filter-buttons button {
+
+        width:100%;
+
+    }
+
+
+    .product-grid {
+
+        grid-template-columns:
+        repeat(auto-fill,minmax(180px,1fr));
+
+    }
+
+}

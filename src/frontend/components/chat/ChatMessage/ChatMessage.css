@@ -1,129 +1,130 @@
 .chat-message {
 
-    display: flex;
+    display:flex;
 
-    margin-bottom: 22px;
-
-    animation: fadeIn .25s ease;
+    width:100%;
 
 }
+
+
 
 .chat-message.customer {
 
-    justify-content: flex-end;
+    justify-content:flex-end;
 
 }
+
+
 
 .chat-message.seller {
 
-    justify-content: flex-start;
+    justify-content:flex-start;
 
 }
 
-/* ================= Bubble ================= */
 
-.message-content {
 
-    max-width: 70%;
 
-    padding: 14px 18px;
 
-    border-radius: 18px;
+.message-bubble {
 
-    word-break: break-word;
+    max-width:65%;
 
-    box-shadow: 0 8px 20px rgba(0,0,0,.18);
+    padding:12px 15px;
 
-}
+    border-radius:18px;
 
-/* ================= Seller ================= */
+    background:var(--surface-light);
 
-.seller .message-content {
-
-    background: #1f2937;
-
-    color: #f9fafb;
-
-    border: 1px solid #374151;
-
-    border-bottom-left-radius: 6px;
+    border:1px solid var(--border);
 
 }
 
-/* ================= Customer ================= */
 
-.customer .message-content {
 
-    background: linear-gradient(135deg,#2563eb,#3b82f6);
+.customer .message-bubble {
 
-    color: #ffffff;
+    background:var(--primary);
 
-    border-bottom-right-radius: 6px;
+    color:white;
 
-}
-
-/* ================= Message ================= */
-
-.message-content p {
-
-    margin: 0;
-
-    font-size: 15px;
-
-    line-height: 1.7;
+    border-bottom-right-radius:5px;
 
 }
 
-/* ================= Time ================= */
 
-.message-content span {
 
-    display: block;
+.seller .message-bubble {
 
-    margin-top: 8px;
-
-    font-size: 11px;
-
-    opacity: .75;
-
-    text-align: right;
+    border-bottom-left-radius:5px;
 
 }
 
-/* رنگ ساعت برای پیام مشتری */
 
-.customer .message-content span {
 
-    color: rgba(255,255,255,.8);
+
+.message-bubble p {
+
+    margin:0;
+
+    color:inherit;
+
+    line-height:1.6;
+
+    word-break:break-word;
 
 }
 
-/* رنگ ساعت برای پیام فروشنده */
 
-.seller .message-content span {
 
-    color: #9ca3af;
+
+
+.message-footer {
+
+    margin-top:8px;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:center;
+
+    gap:5px;
+
+    font-size:11px;
+
+    opacity:.7;
 
 }
 
-/* ================= Animation ================= */
 
-@keyframes fadeIn {
 
-    from {
 
-        opacity: 0;
+.message-image {
 
-        transform: translateY(8px);
+    margin-top:10px;
 
-    }
+    max-width:250px;
 
-    to {
+    border-radius:12px;
 
-        opacity: 1;
+}
 
-        transform: translateY(0);
 
-    }
+
+
+.message-file {
+
+    margin-top:10px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:inherit;
+
+    font-size:14px;
 
 }
