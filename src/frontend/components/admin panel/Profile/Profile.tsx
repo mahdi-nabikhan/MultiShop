@@ -19,7 +19,7 @@ export default function Profile() {
         queryFn: async () => {
 
             const response = await axios.get(
-                `${BACKEND_URLS}account/api/v1/user-role/`,
+                `localhost:8000/vendor/api/v1/store/user/roles/`,
                 {
                     withCredentials: true,
                 }
@@ -29,7 +29,7 @@ export default function Profile() {
         },
     });
 
-    // گرفتن پروفایل
+
     const profileQuery = useQuery({
         queryKey: ["profile", roleQuery.data],
         enabled: !!roleQuery.data,
@@ -37,7 +37,7 @@ export default function Profile() {
         queryFn: () => getProfile(roleQuery.data!),
     });
 
-    // بروزرسانی
+
     const updateMutation = useMutation({
 
         mutationFn: (data: any) =>
