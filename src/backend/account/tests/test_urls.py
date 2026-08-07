@@ -1,13 +1,15 @@
 import pytest
 from django.urls import reverse, resolve
 
-from account.views import LoginView, JwtLogin
+
 from account.api.v1.views import (
+    CustomeObtainPairView,
     CustomObtainAuthToken,
     ProfileApiView,
     LogOutApiView,
     CustomeObtainPairView,
-    ChangePasswordView
+    ChangePasswordView,
+    
 )
 
 
@@ -35,11 +37,11 @@ class TestAccountURLs:
     #_______________________ Template View ___________________
     def test_login_url_resolves(self):
         url = reverse('account:login')
-        assert resolve(url).func.view_class == LoginView
+        assert resolve(url).func.view_class == CustomeObtainPairView
 
     def test_jwt_login_url_resolves(self):
         url = reverse('account:jwt_login')
-        assert resolve(url).func.view_class == JwtLogin
+        assert resolve(url).func.view_class == CustomeObtainPairView
 
 
 class TestAccountAPIURLs:

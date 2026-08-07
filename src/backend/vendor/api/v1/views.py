@@ -1049,3 +1049,78 @@ class DeleteImageProductAPIView(GenericAPIView):
         data.delete()
         return  Response({'message':' image deleted successfully'})
         
+        
+
+
+class ManagerDetailApiView(GenericAPIView):
+    serializer_class = ManagerRegisterAPIView
+    
+    def get_queryset(self):
+        return Manager.objects.get(user= self.request.user)
+    
+    
+    def get(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance =  obj,context={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request):
+        obj = self.get_queryset()
+        data = request.data
+        serializer = self.serializer_class(data=data,instance = obj,context= {'request':request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)    
+    
+    
+class AdminDetaiApiView(GenericAPIView):
+    
+    
+    serializer_class = AdminsSerializer
+    
+    
+    
+    def get_queryset(self):
+        return Admin.objects.get(user=self.request.user)
+    
+    def get(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance =  obj,context={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request):
+        obj = self.get_queryset()
+        data = request.data
+        serializer = self.serializer_class(data=data,instance = obj,context= {'request':request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)  
+    
+    
+    
+class OperatorDetailApiView(GenericAPIView):
+    serializer_class =  OperatorSerializer
+    
+    
+    def get_queryset(self):
+        return Operator.objects.get(user=self.request.user)
+    
+    def get(self,request):
+        obj = self.get_queryset()
+        serializer = self.serializer_class(instance =  obj,context={'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request):
+        obj = self.get_queryset()
+        data = request.data
+        serializer = self.serializer_class(data=data,instance = obj,context= {'request':request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)    
+    

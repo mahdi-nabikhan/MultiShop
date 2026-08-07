@@ -24,7 +24,10 @@ urlpatterns = [
     path('add/image/product/<int:pk>/',VendorAddProductImageApiView.as_view(),name='add-product-images'),
     path('store/category/',ListStoreCategoryAPIView.as_view(),name='list-category'),
     path('list/category/store/<int:pk>/',StoreRelatedWithCategory.as_view(),name='store-related-catgory'),
-    path('delete/images/<int:pk>/',DeleteImageProductAPIView.as_view(),name='delete-product')
+    path('delete/images/<int:pk>/',DeleteImageProductAPIView.as_view(),name='delete-product'),
+    path('manager/detail/',ManagerDetailApiView.as_view(),name='manager-deatil'),
+    path('admin/detail/',AdminDetaiApiView.as_view(),name='admin-detail'),
+    path('operator/detail/',OperatorDetailApiView.as_view(),name='operator-detail')
     
 
 ]
