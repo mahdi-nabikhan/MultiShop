@@ -1053,7 +1053,7 @@ class DeleteImageProductAPIView(GenericAPIView):
 
 
 class ManagerDetailApiView(GenericAPIView):
-    serializer_class = ManagerRegisterAPIView
+    serializer_class = ManagerSerializer
     
     def get_queryset(self):
         return Manager.objects.get(user= self.request.user)
