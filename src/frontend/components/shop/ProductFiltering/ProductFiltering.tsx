@@ -1,20 +1,29 @@
 "use client";
 
-
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-
 import BACKEND_URLS from "@/utils";
+import './ProductFiltering.css'
+
+const filters = [
+    {
+        title: "Lowest Price",
+        value: "price_asc",
+    },
+
+    {
+        title: "Highest Price",
+        value: "price_dsc",
+    },
+];
 
 
-interface Props {
-    filters?: Record<string, any>;
-}
+export default function ProductFilterList() {
 
 
-export default function ProductList({
-    filters = {},
-}: Props) {
+    const [order, setOrder] = useState("");
+
 
 
     const {
@@ -24,9 +33,9 @@ export default function ProductList({
 
     } = useQuery({
 
-        queryKey: [
+        queryKey:[
             "products",
-            filters
+            order
         ],
 
 
@@ -35,8 +44,9 @@ export default function ProductList({
             const response = await axios.get(
                 `${BACKEND_URLS}website/api/v1/product/filtering/`,
                 {
-                    params: filters,
-                    withCredentials:true,
+                    params:{
+                        order: order
+                    }
                 }
             );
 
@@ -49,75 +59,116 @@ export default function ProductList({
 
 
 
-    if(isLoading)
-        return (
-            <div>
-                Loading products...
-            </div>
-        );
-
-
-
     if(isError)
         return (
-            <div>
+            <p>
                 Error loading products
-            </div>
+            </p>
         );
 
 
 
     return (
 
-        <div className="product-grid">
+        <div>
 
 
-            {
-                products?.map((product:any)=>(
+            {/* Filter Buttons */}
 
-                    <div
-                        key={product.id}
-                        className="product-card"
-                    >
+            <div className="filter-buttons">
 
 
-                        <img
-                            src={product.product_image}
-                            alt={product.name}
-                        />
+                {
+                    filters.map((filter)=>(
+
+                        <button
+
+                            key={filter.value}
+
+                            onClick={()=>{
+                                setOrder(filter.value)
+                            }}
 
 
-                        <h3>
-                            {product.name}
-                        </h3>
-
-
-                        <p>
-                            {product.description}
-                        </p>
-
-
-                        <div>
-
-                            {
-                                product.price_after
+                            className={
+                                order === filter.value
                                 ?
-                                product.price_after
+                                "active"
                                 :
-                                product.price
+                                ""
                             }
 
-                        </div>
+                        >
+
+                            {filter.title}
+
+                        </button>
+
+                    ))
+                }
 
 
-                    </div>
+            </div>
 
-                ))
+
+
+            {/* Products */}
+
+            {
+                isLoading
+
+                ?
+
+                <p>
+                    Loading products...
+                </p>
+
+
+                :
+
+
+                <div className="product-grid">
+
+
+                    {
+                        products?.map((product:any)=>(
+
+                            <div
+                                key={product.id}
+                                className="product-card"
+                            >
+
+
+                                <img
+                                    src={product.product_image}
+                                    alt={product.name}
+                                />
+
+
+                                <h3>
+                                    {product.name}
+                                </h3>
+
+
+                                <p>
+                                    {
+                                        product.price_after
+                                    }
+                                </p>
+
+
+                            </div>
+
+                        ))
+                    }
+
+
+                </div>
+
             }
 
 
         </div>
 
     );
-
 }

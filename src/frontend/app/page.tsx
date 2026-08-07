@@ -6,7 +6,7 @@ import ShopList from "@/components/shop/ShopList/ShopList";
 import RandomProducts from "@/components/shop/RandomProduct/RandomProduct";
 import StoreCategoryList from "@/components/shop/StoreCategoryList/StoreCategoryList";
 import StoreExplorer from "@/components/shop/StoreExplore/StoreExplore";
-import ProductList from "@/components/shop/ProductFiltering/ProductFiltering";
+import ProductFilterList from "@/components/shop/ProductFiltering/ProductFiltering";
 
 interface Props {
   searchParams: Promise<{
@@ -53,7 +53,7 @@ export default async function Page({ searchParams }: Props) {
           title="Filter Products"
           description="Find products based on your preferences"
         />
-        <ProductList/>
+        <ProductFilterList/>
       </div>
 
       <Footer />
