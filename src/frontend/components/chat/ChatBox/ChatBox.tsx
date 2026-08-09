@@ -1,7 +1,6 @@
 "use client";
 
-import {useEffect,useRef,useState} from "react";
-
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
 import BACKEND_URLS from "@/utils";
@@ -11,268 +10,251 @@ import ChatInput from "../ChatInput/ChatInput";
 
 import "./ChatBox.css";
 
-
-interface Message{
-
-    id:number;
-
-    text:string;
-
-    image:string|null;
-
-    file:string|null;
-
-    created_at:string;
-
-    sender:number;
-
-    sender_name:string;
-
-    is_read:boolean;
-
+interface Message {
+    id: number;
+    conversation: number;
+    text: string;
+    image: string | null;
+    file: string | null;
+    created_at: string;
+    sender: string;
+    is_read: boolean;
 }
 
-
-interface Props{
-
-    storeId:number;
-
-    currentUserId:number;
-
+interface Props {
+    storeId: number;
+    currentUserEmail: string;
 }
-
-
 
 export default function ChatBox({
-
     storeId,
+    currentUserEmail,
+}: Props) {
 
-    currentUserId
+    const [conversationId, setConversationId] =
+        useState<number | null>(null);
 
-}:Props){
+    const [messages, setMessages] =
+        useState<Message[]>([]);
 
+    const [loading, setLoading] =
+        useState(true);
 
-    const [conversationId,setConversationId]=useState<number|null>(null);
-
-    const [messages,setMessages]=useState<Message[]>([]);
-
-    const [loading,setLoading]=useState(true);
-
-    const messagesEndRef=useRef<HTMLDivElement>(null);
-
-
-
-
-    const CreateConversation=async()=>{
+    const messagesEndRef =
+        useRef<HTMLDivElement>(null);
 
 
-        try{
+    /* =========================
+       CREATE / GET CONVERSATION
+    ========================= */
 
+    const CreateConversation = async () => {
 
-            const {data}=await axios.post(
+        try {
+
+            console.log("STORE ID:", storeId);
+            console.log("STORE ID TYPE:", typeof storeId);
+
+            const { data } = await axios.post(
 
                 `${BACKEND_URLS}dashboard/api/v1/chat/conversations/`,
 
                 {
-
-                    store:storeId
-
+                    store: storeId,
                 },
 
                 {
-
-                    withCredentials:true
-
+                    withCredentials: true,
                 }
 
             );
 
+            setConversationId(
+                data.conversation_id
+            );
 
-            setConversationId(data.conversation_id);
+        } catch (error: any) {
 
+            console.log(
+                "CREATE CONVERSATION STATUS:",
+                error.response?.status
+            );
+
+            console.log(
+                "CREATE CONVERSATION DATA:",
+                error.response?.data
+            );
+
+            console.log(
+                "CREATE CONVERSATION ERROR:",
+                error
+            );
 
         }
-
-        catch(error){
-
-            console.log(error);
-
-        }
-
 
     };
 
 
+    /* =========================
+       GET MESSAGES
+    ========================= */
 
+    const GetMessages = async (
+        id: number
+    ) => {
 
+        try {
 
-    const GetMessages=async(id:number)=>{
-
-
-        try{
-
-
-            const {data}=await axios.get(
+            const { data } = await axios.get(
 
                 `${BACKEND_URLS}dashboard/api/v1/conversations/${id}/messages/list/`,
 
                 {
-
-                    withCredentials:true
-
+                    withCredentials: true,
                 }
 
             );
 
-
             setMessages(data);
 
+        } catch (error) {
 
-        }
+            console.log(
+                "GET MESSAGES ERROR:",
+                error
+            );
 
-        catch(error){
-
-            console.log(error);
-
-        }
-
-        finally{
+        } finally {
 
             setLoading(false);
 
         }
 
-
     };
 
 
+    /* =========================
+       SEND MESSAGE
+    ========================= */
 
+    const SendMessage = async (
+        text: string
+    ) => {
 
+        if (!conversationId) {
+            return;
+        }
 
-    const SendMessage=async(text:string)=>{
-
-
-        if(!conversationId) return;
-
-
-        try{
-
+        try {
 
             await axios.post(
 
                 `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/`,
 
                 {
-
-                    text
-
+                    text,
                 },
 
                 {
-
-                    withCredentials:true
-
+                    withCredentials: true,
                 }
 
             );
 
+            await GetMessages(
+                conversationId
+            );
 
-            GetMessages(conversationId);
+        } catch (error) {
 
+            console.log(
+                "SEND MESSAGE ERROR:",
+                error
+            );
 
         }
-
-        catch(error){
-
-            console.log(error);
-
-        }
-
 
     };
 
 
+    /* =========================
+       CREATE CONVERSATION
+    ========================= */
 
-
-
-
-    useEffect(()=>{
-
+    useEffect(() => {
 
         CreateConversation();
 
-
-    },[]);
-
+    }, [storeId]);
 
 
+    /* =========================
+       LOAD MESSAGES
+    ========================= */
 
+    useEffect(() => {
 
+        if (conversationId) {
 
-    useEffect(()=>{
-
-
-        if(conversationId){
-
-            GetMessages(conversationId);
+            GetMessages(
+                conversationId
+            );
 
         }
 
-
-    },[conversationId]);
-
+    }, [conversationId]);
 
 
+    /* =========================
+       AUTO SCROLL
+    ========================= */
 
-
-
-    useEffect(()=>{
-
+    useEffect(() => {
 
         messagesEndRef.current?.scrollIntoView({
 
-            behavior:"smooth"
+            behavior: "smooth",
 
         });
 
-
-    },[messages]);
-
+    }, [messages]);
 
 
+    /* =========================
+       AUTO REFRESH
+    ========================= */
+
+    useEffect(() => {
+
+        if (!conversationId) {
+            return;
+        }
+
+        const interval =
+            setInterval(() => {
+
+                GetMessages(
+                    conversationId
+                );
+
+            }, 3000);
+
+        return () => {
+
+            clearInterval(interval);
+
+        };
+
+    }, [conversationId]);
 
 
+    /* =========================
+       LOADING
+    ========================= */
 
-    useEffect(()=>{
+    if (loading) {
 
-
-        if(!conversationId) return;
-
-
-        const interval=setInterval(()=>{
-
-
-            GetMessages(conversationId);
-
-
-        },3000);
-
-
-
-        return()=>clearInterval(interval);
-
-
-    },[conversationId]);
-
-
-
-
-
-
-
-    if(loading){
-
-        return(
+        return (
 
             <section className="chatbox">
 
@@ -285,21 +267,20 @@ export default function ChatBox({
     }
 
 
+    /* =========================
+       RENDER
+    ========================= */
 
-
-
-
-    return(
+    return (
 
         <section className="chatbox">
 
 
+            {/* HEADER */}
 
             <div className="chat-header">
 
-
                 <div className="seller-info">
-
 
                     <div className="avatar">
 
@@ -307,10 +288,7 @@ export default function ChatBox({
 
                     </div>
 
-
-
                     <div>
-
 
                         <h3>
 
@@ -318,92 +296,104 @@ export default function ChatBox({
 
                         </h3>
 
-
                         <span>
 
                             Online
 
                         </span>
 
-
                     </div>
 
-
-
                 </div>
-
-
 
             </div>
 
 
-
-
+            {/* MESSAGES */}
 
             <div className="chat-body">
 
+                {messages.map((message) => {
 
-                {
+                    /*
+                     * API sender:
+                     *
+                     * customer1@gmail.com
+                     * manager1@gmail.com
+                     *
+                     * currentUserEmail:
+                     *
+                     * customer1@gmail.com
+                     */
 
-                    messages.map(message=>(
+                    const isCurrentUser =
+                        message.sender
+                            ?.trim()
+                            .toLowerCase() ===
+                        currentUserEmail
+                            ?.trim()
+                            .toLowerCase();
 
+
+                    return (
 
                         <ChatMessage
 
                             key={message.id}
 
-                            text={message.text}
+                            text={
+                                message.text || ""
+                            }
 
-                            image={message.image}
+                            image={
+                                message.image
+                            }
 
-                            file={message.file}
+                            file={
+                                message.file
+                            }
 
                             sender={
 
-                                message.sender===currentUserId
+                                isCurrentUser
 
-                                ?
+                                    ? "customer"
 
-                                "customer"
-
-                                :
-
-                                "seller"
+                                    : "seller"
 
                             }
 
-                            createdAt={message.created_at}
+                            createdAt={
+                                message.created_at
+                            }
 
-                            isRead={message.is_read}
+                            isRead={
+                                message.is_read
+                            }
 
                         />
 
+                    );
 
-                    ))
-
-                }
+                })}
 
 
-                <div ref={messagesEndRef}></div>
-
+                <div
+                    ref={messagesEndRef}
+                />
 
             </div>
 
 
-
-
+            {/* INPUT */}
 
             <ChatInput
-
                 onSend={SendMessage}
-
             />
-
 
 
         </section>
 
     );
-
 
 }

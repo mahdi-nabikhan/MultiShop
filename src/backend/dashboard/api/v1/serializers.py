@@ -124,3 +124,26 @@ class ReplayTicketSerializer (serializers.ModelSerializer):
         res = super().to_representation(instance)
         res['replay_ticket'] = DetailTicketSerializer(instance.replay_ticket).data
         return res
+    
+    
+    
+    
+class ConversationListSerializer(serializers.ModelSerializer):
+    
+    customer_name = serializers.CharField(
+        source="customer.email",
+        read_only=True
+    )
+
+    class Meta:
+        model = Conversation
+        fields = [
+            "id",
+            "customer",
+            "customer_name",
+            "store",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
