@@ -11,8 +11,14 @@ import "./StoreProfile.css";
 interface StoreData {
     pk: number;
     image: string | null;
-    description: string;
+    description?: string;
+    name?: string;
+}
+
+
+interface StoreFormData {
     name: string;
+    description: string;
 }
 
 
@@ -24,7 +30,7 @@ export default function StoreProfile() {
 
 
     const [formData, setFormData] =
-        useState({
+        useState<StoreFormData>({
             name: "",
             description: "",
         });
@@ -48,7 +54,6 @@ export default function StoreProfile() {
 
     const [success, setSuccess] =
         useState("");
-
 
 
     /* =========================
@@ -75,6 +80,12 @@ export default function StoreProfile() {
             );
 
 
+            console.log(
+                "STORE RESPONSE:",
+                response.data
+            );
+
+
             const data = response.data;
 
 
@@ -83,16 +94,21 @@ export default function StoreProfile() {
 
             setFormData({
 
-                name: data.name,
+                name: data.name ?? "",
 
-                description: data.description,
+                description:
+                    data.description ?? "",
 
             });
 
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "GET STORE ERROR:",
+                error
+            );
+
 
             setError(
                 "Failed to load store information."
@@ -105,7 +121,6 @@ export default function StoreProfile() {
         }
 
     }
-
 
 
     useEffect(() => {
@@ -122,7 +137,8 @@ export default function StoreProfile() {
 
     function handleChange(
         e: React.ChangeEvent<
-            HTMLInputElement | HTMLTextAreaElement
+            HTMLInputElement |
+            HTMLTextAreaElement
         >
     ) {
 
@@ -166,16 +182,23 @@ export default function StoreProfile() {
             setSuccess("");
 
 
-            const response = await axios.put<StoreData>(
+            const response =
+                await axios.put<StoreData>(
 
-                `${BACKEND_URLS}vendor/api/v1/store/detail/`,
+                    `${BACKEND_URLS}vendor/api/v1/store/detail/`,
 
-                formData,
+                    formData,
 
-                {
-                    withCredentials: true,
-                }
+                    {
+                        withCredentials: true,
+                    }
 
+                );
+
+
+            console.log(
+                "UPDATED STORE:",
+                response.data
             );
 
 
@@ -183,15 +206,39 @@ export default function StoreProfile() {
                 response.data;
 
 
-            setStore(updatedStore);
+            /*
+             * Merge کردن اطلاعات جدید
+             * با اطلاعات قبلی
+             */
+
+            setStore(
+                (prev) => ({
+
+                    ...prev,
+
+                    ...updatedStore,
+
+                    name:
+                        updatedStore.name ??
+                        formData.name,
+
+                    description:
+                        updatedStore.description ??
+                        formData.description,
+
+                })
+            );
 
 
             setFormData({
 
-                name: updatedStore.name,
+                name:
+                    updatedStore.name ??
+                    formData.name,
 
                 description:
-                    updatedStore.description,
+                    updatedStore.description ??
+                    formData.description,
 
             });
 
@@ -206,19 +253,60 @@ export default function StoreProfile() {
 
         } catch (error: any) {
 
-            console.error(error);
+            console.error(
+                "UPDATE STORE ERROR:",
+                error
+            );
 
 
             if (
                 error.response?.data
             ) {
 
-                setError(
-                    typeof error.response.data ===
-                        "string"
-                        ? error.response.data
-                        : "Failed to update store."
-                );
+                const data =
+                    error.response.data;
+
+
+                if (
+                    typeof data === "string"
+                ) {
+
+                    setError(data);
+
+                } else if (
+                    typeof data === "object"
+                ) {
+
+                    /*
+                     * اگر Django/DRF
+                     * validation error بدهد
+                     */
+
+                    const messages =
+                        Object.entries(data)
+                            .map(
+                                ([field, value]) =>
+                                    `${field}: ${
+                                        Array.isArray(value)
+                                            ? value.join(", ")
+                                            : value
+                                    }`
+                            )
+                            .join(" | ");
+
+
+                    setError(
+                        messages ||
+                        "Failed to update store."
+                    );
+
+                } else {
+
+                    setError(
+                        "Failed to update store."
+                    );
+
+                }
 
             } else {
 
@@ -251,9 +339,11 @@ export default function StoreProfile() {
 
         setFormData({
 
-            name: store.name,
+            name:
+                store.name ?? "",
 
-            description: store.description,
+            description:
+                store.description ?? "",
 
         });
 
@@ -313,6 +403,27 @@ export default function StoreProfile() {
 
 
 
+    /*
+     * مقادیر امن برای جلوگیری
+     * از undefined
+     */
+
+    const storeName =
+        store.name ?? "Unnamed Store";
+
+
+    const storeDescription =
+        store.description ??
+        "No description provided.";
+
+
+    const storeInitial =
+        storeName
+            .charAt(0)
+            .toUpperCase() || "S";
+
+
+
     /* =========================
        RENDER
     ========================= */
@@ -344,9 +455,15 @@ export default function StoreProfile() {
                     <button
                         type="button"
                         className="store-edit-button"
-                        onClick={() =>
-                            setEditing(true)
-                        }
+                        onClick={() => {
+
+                            setEditing(true);
+
+                            setSuccess("");
+
+                            setError("");
+
+                        }}
                     >
 
                         Edit Store
@@ -359,9 +476,10 @@ export default function StoreProfile() {
 
 
 
-            {/* IMAGE */}
+            {/* STORE IMAGE */}
 
             <div className="store-image-section">
+
 
                 <div className="store-image">
 
@@ -369,15 +487,13 @@ export default function StoreProfile() {
 
                         <img
                             src={store.image}
-                            alt={store.name}
+                            alt={storeName}
                         />
 
                     ) : (
 
                         <span>
-                            {store.name
-                                .charAt(0)
-                                .toUpperCase()}
+                            {storeInitial}
                         </span>
 
                     )}
@@ -385,17 +501,20 @@ export default function StoreProfile() {
                 </div>
 
 
+
                 <div>
 
                     <h3>
-                        {store.name}
+                        {storeName}
                     </h3>
+
 
                     <span>
                         Store ID: #{store.pk}
                     </span>
 
                 </div>
+
 
             </div>
 
@@ -414,7 +533,9 @@ export default function StoreProfile() {
                 <div className="store-form-group">
 
                     <label htmlFor="store-name">
+
                         Store Name
+
                     </label>
 
 
@@ -426,13 +547,14 @@ export default function StoreProfile() {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
+                            required
                         />
 
                     ) : (
 
                         <div className="store-value">
 
-                            {store.name}
+                            {storeName}
 
                         </div>
 
@@ -447,7 +569,9 @@ export default function StoreProfile() {
                 <div className="store-form-group">
 
                     <label htmlFor="store-description">
+
                         Description
+
                     </label>
 
 
@@ -467,8 +591,7 @@ export default function StoreProfile() {
 
                         <div className="store-value store-description">
 
-                            {store.description ||
-                                "No description provided."}
+                            {storeDescription}
 
                         </div>
 
@@ -478,7 +601,7 @@ export default function StoreProfile() {
 
 
 
-                {/* MESSAGES */}
+                {/* ERROR */}
 
                 {error && (
 
@@ -490,6 +613,9 @@ export default function StoreProfile() {
 
                 )}
 
+
+
+                {/* SUCCESS */}
 
                 {success && (
 
