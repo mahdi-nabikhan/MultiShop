@@ -263,7 +263,7 @@ class ListConversationCustomerApiView(GenericAPIView):
     model = Conversation
     
     def get_queryset(self):
-        return self.model.objects.filter(customer__user=self.request.user)
+        return self.model.objects.filter(customer=self.request.user)
     
     def get(self,request):
         query = self.get_queryset()
