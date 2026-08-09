@@ -258,3 +258,17 @@ class ListConversationStoreAPIView(GenericAPIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     
+class ListConversationCustomerApiView(GenericAPIView):
+    serializer_class = ConversationListSerializer
+    model = Conversation
+    
+    def get_queryset(self):
+        return self.model.objects.filter(customer__user=self.request.user)
+    
+    def get(self,request):
+        query = self.get_queryset()
+        serializer = self.serializer_class(instance=query,many=True,context = {'request':request})
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+    
+    

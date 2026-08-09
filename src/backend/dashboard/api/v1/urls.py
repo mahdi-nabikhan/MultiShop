@@ -21,7 +21,8 @@ urlpatterns = [
     path('detail/replay/ticket/<int:pk>/',DetailReplayTicketAPIView.as_view(),name='detail-ticket-detail'),
     path('shop/all/ticket/',GetShopTicketAPIView.as_view(),name='shop-get-all-ticket'),
     path('customer/list/ticket/',CustomerListTicketApiView.as_view(),name='customer-ticket'),
-    path('list/store/conversations/',ListConversationStoreAPIView.as_view(),name='list-store')
+    path('list/store/conversations/',ListConversationStoreAPIView.as_view(),name='list-store-conversation'),
+    path('list/customer/conversation/',ListConversationCustomerApiView.as_view(),name='list-cutsomer-converstion')
     
 
 ]
