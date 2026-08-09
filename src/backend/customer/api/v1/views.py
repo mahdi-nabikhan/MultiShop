@@ -520,7 +520,7 @@ class AllProductsCommentApiView(GenericAPIView):
     model=Comments
     pagination_class = ProductCommentsPaginations
     def get(self,request,pk):
-        comments_obj=self.model.objects.filter(product__pk=pk)
+        comments_obj=self.model.objects.filter(product__pk=pk,parent__isnull=True)
         context={'request':request}
         page = self.paginate_queryset(comments_obj)
         
