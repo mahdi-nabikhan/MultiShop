@@ -1,0 +1,523 @@
+/* =========================================
+   CUSTOMER CHAT BOX
+========================================= */
+
+.customer-chatbox {
+    width: 100%;
+    height: 100%;
+    min-height: 650px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #0b1120;
+
+    border: 1px solid #1f2937;
+    border-radius: 16px;
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.customer-chat-header {
+    height: 72px;
+
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+
+    background: #111827;
+
+    border-bottom: 1px solid #1f2937;
+}
+
+
+.customer-chat-user {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.customer-chat-avatar {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #10b981;
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+.customer-chat-user h3 {
+    margin: 0;
+
+    color: #f9fafb;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+.customer-chat-user span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* =========================================
+   BODY
+========================================= */
+
+.customer-chat-body {
+    flex: 1;
+
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    overflow-y: auto;
+
+    background: #0b1120;
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.customer-message {
+    width: 100%;
+
+    display: flex;
+}
+
+
+/* CUSTOMER = RIGHT */
+
+.customer-message-sent {
+    justify-content: flex-end;
+}
+
+
+/* STORE / ADMIN = LEFT */
+
+.customer-message-received {
+    justify-content: flex-start;
+}
+
+
+/* =========================================
+   BUBBLE
+========================================= */
+
+.customer-message-bubble {
+    max-width: 65%;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+
+    word-break: break-word;
+
+    color: #e5e7eb;
+
+    background: #1f2937;
+}
+
+
+/* CUSTOMER */
+
+.customer-message-sent
+.customer-message-bubble {
+
+    border-bottom-right-radius: 4px;
+
+    background: #10b981;
+
+    color: #ffffff;
+}
+
+
+/* STORE */
+
+.customer-message-received
+.customer-message-bubble {
+
+    border-bottom-left-radius: 4px;
+}
+
+
+/* =========================================
+   SENDER
+========================================= */
+
+.customer-message-sender {
+    display: block;
+
+    margin-bottom: 4px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    opacity: 0.7;
+}
+
+
+/* =========================================
+   TEXT
+========================================= */
+
+.customer-message-bubble p {
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   IMAGE
+========================================= */
+
+.customer-message-image {
+    display: block;
+
+    max-width: 280px;
+    max-height: 300px;
+
+    margin-top: 8px;
+
+    border-radius: 10px;
+
+    object-fit: cover;
+}
+
+
+/* =========================================
+   FILE
+========================================= */
+
+.customer-message-file {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 8px;
+
+    padding: 8px 10px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.customer-message-footer {
+    margin-top: 6px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 4px;
+
+    font-size: 10px;
+
+    opacity: 0.65;
+}
+
+
+/* =========================================
+   STATES
+========================================= */
+
+.customer-chat-loading,
+.customer-chat-no-messages,
+.customer-chat-error {
+
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+.customer-chat-error {
+    color: #ef4444;
+}
+
+
+/* =========================================
+   SEND ERROR
+========================================= */
+
+.customer-chat-send-error {
+    padding: 8px 16px;
+
+    color: #fca5a5;
+
+    background: #450a0a;
+
+    border-top: 1px solid #7f1d1d;
+
+    font-size: 13px;
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.customer-chat-input {
+
+    min-height: 68px;
+
+    padding: 12px 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    background: #111827;
+
+    border-top: 1px solid #1f2937;
+}
+
+
+.customer-chat-input input {
+
+    flex: 1;
+
+    height: 44px;
+
+    padding: 0 14px;
+
+    outline: none;
+
+    border: 1px solid #374151;
+
+    border-radius: 10px;
+
+    background: #0b1120;
+
+    color: #f9fafb;
+
+    font-size: 14px;
+}
+
+
+.customer-chat-input input::placeholder {
+    color: #6b7280;
+}
+
+
+.customer-chat-input input:focus {
+    border-color: #10b981;
+}
+
+
+/* =========================================
+   SEND BUTTON
+========================================= */
+
+.customer-chat-input button {
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #10b981;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.customer-chat-input button:hover:not(:disabled) {
+    background: #059669;
+}
+
+
+.customer-chat-input button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.customer-chatbox.empty {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.customer-chat-empty {
+
+    max-width: 350px;
+
+    padding: 40px;
+
+    text-align: center;
+}
+
+
+.customer-chat-empty-icon {
+
+    margin-bottom: 15px;
+
+    font-size: 42px;
+}
+
+
+.customer-chat-empty h2 {
+
+    margin: 0 0 8px;
+
+    color: #f9fafb;
+
+    font-size: 20px;
+}
+
+
+.customer-chat-empty p {
+
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.customer-chat-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+
+.customer-chat-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.customer-chat-body::-webkit-scrollbar-thumb {
+
+    background: #374151;
+
+    border-radius: 10px;
+}
+
+
+.customer-chat-body::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .customer-chatbox {
+
+        min-height: 550px;
+
+        border-radius: 12px;
+    }
+
+
+    .customer-chat-body {
+
+        padding: 16px;
+    }
+
+
+    .customer-message-bubble {
+
+        max-width: 80%;
+    }
+
+
+    .customer-chat-header {
+
+        padding: 0 15px;
+    }
+
+
+    .customer-chat-input {
+
+        padding: 10px;
+    }
+
+}
