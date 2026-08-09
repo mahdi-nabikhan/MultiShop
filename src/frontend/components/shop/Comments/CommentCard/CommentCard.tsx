@@ -1,6 +1,12 @@
-import React from "react";
+"use client";
+
+import { useState } from "react";
 import { MessageCircle } from "lucide-react";
+
 import "./CommentCard.css";
+
+import ReplyList from "../ReplyList/ReplyList";
+import ReplyForm from "../ReplyForm/ReplyForm";
 
 
 type User = {
@@ -10,31 +16,44 @@ type User = {
 
 
 type Comment = {
-
     id: number;
-
     descriptions: string;
-
     status: string;
-
     user: User;
-
     product: number;
-
     parent: number | null;
-
 };
 
 
 type Props = {
-
     comment: Comment;
-
+    productID: number | string;
 };
 
 
+function CommentCard({
+    comment,
+    productID,
+}: Props) {
 
-function CommentCard({ comment }: Props) {
+
+    const [showReplyForm, setShowReplyForm] =
+        useState(false);
+
+
+    const [replyRefresh, setReplyRefresh] =
+        useState(0);
+
+
+
+    function handleReplyCreated() {
+
+        setReplyRefresh(
+            (prev: number) => prev + 1
+        );
+
+    }
+
 
 
     return (
@@ -42,12 +61,18 @@ function CommentCard({ comment }: Props) {
         <div className="comment-card">
 
 
+            {/* =========================
+                Comment Header
+            ========================= */}
+
             <div className="comment-header">
 
 
                 <div className="comment-avatar">
 
-                    {comment.user.email.charAt(0).toUpperCase()}
+                    {comment.user.email
+                        .charAt(0)
+                        .toUpperCase()}
 
                 </div>
 
@@ -73,6 +98,10 @@ function CommentCard({ comment }: Props) {
 
 
 
+            {/* =========================
+                Comment Body
+            ========================= */}
+
             <div className="comment-body">
 
                 <p>
@@ -83,14 +112,35 @@ function CommentCard({ comment }: Props) {
 
 
 
+            {/* =========================
+                Comment Footer
+            ========================= */}
+
             <div className="comment-footer">
 
 
-                <button className="reply-btn">
+                <button
+
+                    type="button"
+
+                    className="reply-btn"
+
+                    onClick={() =>
+                        setShowReplyForm(
+                            (prev: boolean) =>
+                                !prev
+                        )
+                    }
+
+                >
 
                     <MessageCircle size={18} />
 
-                    پاسخ
+
+                    {showReplyForm
+                        ? "لغو پاسخ"
+                        : "پاسخ"
+                    }
 
                 </button>
 
@@ -98,10 +148,45 @@ function CommentCard({ comment }: Props) {
             </div>
 
 
+
+            {/* =========================
+                Reply Form
+            ========================= */}
+
+            {showReplyForm && (
+
+                <ReplyForm
+
+                    productID={productID}
+
+                    commentID={comment.id}
+
+                    onReplyCreated={
+                        handleReplyCreated
+                    }
+
+                />
+
+            )}
+
+
+
+            {/* =========================
+                Replies
+            ========================= */}
+
+            <ReplyList
+
+                key={replyRefresh}
+
+                commentID={comment.id}
+
+            />
+
+
         </div>
 
     );
-
 }
 
 
