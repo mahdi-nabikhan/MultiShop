@@ -1,54 +1,92 @@
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 
-import { Send, FileText, Check, CheckCheck } from "lucide-react";
+import {
+    Send,
+    FileText,
+    Check,
+    CheckCheck,
+} from "lucide-react";
 
 import BACKEND_URLS from "@/utils";
 
 import "./AdminChatBox.css";
 
+
 interface Message {
+
     id: number;
-    text: string;
+
+    conversation: number;
+
+    sender: string | null;
+
+    text: string | null;
+
     image: string | null;
+
     file: string | null;
-    created_at: string;
-    sender: number;
-    sender_name?: string;
+
+    reply_to: number | null;
+
     is_read: boolean;
-    reply_to?: number | null;
+
+    is_edited: boolean;
+
+    is_deleted: boolean;
+
+    created_at: string;
+
+    edited_at: string | null;
+
 }
+
 
 interface Props {
+
     conversationId: number | null;
-    currentUserId: number;
+
+    currentUserEmail: string;
+
 }
 
+
 export default function AdminChatBox({
+
     conversationId,
-    currentUserId,
+
+    currentUserEmail,
+
 }: Props) {
+
 
     const [messages, setMessages] =
         useState<Message[]>([]);
 
+
     const [loading, setLoading] =
         useState(false);
+
 
     const [sending, setSending] =
         useState(false);
 
+
     const [text, setText] =
         useState("");
+
 
     const [error, setError] =
         useState("");
 
+
     const messagesEndRef =
         useRef<HTMLDivElement>(null);
+
 
 
     /* =========================
@@ -61,23 +99,35 @@ export default function AdminChatBox({
             return;
         }
 
+
         try {
 
             setLoading(true);
+
             setError("");
 
-            const response = await axios.get<Message[]>(
-                `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/list/`,
-                {
-                    withCredentials: true,
-                }
-            );
+
+            const response =
+                await axios.get<Message[]>(
+
+                    `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/list/`,
+
+                    {
+                        withCredentials: true,
+                    }
+
+                );
+
 
             setMessages(response.data);
 
+
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "GET MESSAGES ERROR:",
+                error
+            );
 
             setError(
                 "Failed to load messages."
@@ -92,19 +142,26 @@ export default function AdminChatBox({
     };
 
 
+
     /* =========================
-       LOAD WHEN CONVERSATION CHANGES
+       CONVERSATION CHANGE
     ========================= */
 
     useEffect(() => {
 
         setMessages([]);
 
+        setError("");
+
+
         if (conversationId) {
+
             getMessages();
+
         }
 
     }, [conversationId]);
+
 
 
     /* =========================
@@ -117,11 +174,14 @@ export default function AdminChatBox({
             return;
         }
 
-        const interval = setInterval(() => {
 
-            getMessages();
+        const interval =
+            setInterval(() => {
 
-        }, 3000);
+                getMessages();
+
+            }, 3000);
+
 
         return () => {
 
@@ -130,6 +190,7 @@ export default function AdminChatBox({
         };
 
     }, [conversationId]);
+
 
 
     /* =========================
@@ -145,6 +206,7 @@ export default function AdminChatBox({
     }, [messages]);
 
 
+
     /* =========================
        SEND MESSAGE
     ========================= */
@@ -155,21 +217,29 @@ export default function AdminChatBox({
             return;
         }
 
-        if (!text.trim()) {
+
+        const cleanText =
+            text.trim();
+
+
+        if (!cleanText) {
             return;
         }
+
 
         try {
 
             setSending(true);
+
             setError("");
+
 
             await axios.post(
 
                 `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/`,
 
                 {
-                    text: text.trim(),
+                    text: cleanText,
                 },
 
                 {
@@ -178,13 +248,20 @@ export default function AdminChatBox({
 
             );
 
+
             setText("");
+
 
             await getMessages();
 
+
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "SEND MESSAGE ERROR:",
+                error
+            );
+
 
             setError(
                 "Failed to send message."
@@ -199,8 +276,9 @@ export default function AdminChatBox({
     };
 
 
+
     /* =========================
-       ENTER KEY
+       ENTER
     ========================= */
 
     const handleKeyDown = (
@@ -221,8 +299,9 @@ export default function AdminChatBox({
     };
 
 
+
     /* =========================
-       NO CONVERSATION
+       EMPTY
     ========================= */
 
     if (!conversationId) {
@@ -255,18 +334,24 @@ export default function AdminChatBox({
     }
 
 
+
     /* =========================
-       RENDER
+       CURRENT USER
     ========================= */
+
+    const normalizedCurrentUser =
+        (currentUserEmail || "")
+            .trim()
+            .toLowerCase();
+
+
 
     return (
 
         <section className="admin-chatbox">
 
 
-            {/* =========================
-                HEADER
-            ========================= */}
+            {/* HEADER */}
 
             <header className="admin-chat-header">
 
@@ -279,11 +364,11 @@ export default function AdminChatBox({
                     <div>
 
                         <h3>
-                            Customer #{conversationId}
+                            Customer
                         </h3>
 
                         <span>
-                            Conversation
+                            Conversation #{conversationId}
                         </span>
 
                     </div>
@@ -293,9 +378,8 @@ export default function AdminChatBox({
             </header>
 
 
-            {/* =========================
-                BODY
-            ========================= */}
+
+            {/* BODY */}
 
             <div className="admin-chat-body">
 
@@ -303,51 +387,92 @@ export default function AdminChatBox({
                 {loading && messages.length === 0 ? (
 
                     <div className="admin-chat-loading">
-
                         Loading messages...
-
                     </div>
 
-                ) : error ? (
+                ) : error && messages.length === 0 ? (
 
                     <div className="admin-chat-error">
-
                         {error}
-
                     </div>
 
                 ) : messages.length === 0 ? (
 
                     <div className="admin-chat-no-messages">
-
                         <p>
                             No messages yet.
                         </p>
-
                     </div>
 
                 ) : (
 
                     messages.map((message) => {
 
+
+                        /*
+                         * API example:
+                         *
+                         * customer:
+                         * customer1@gmail.com
+                         *
+                         * manager:
+                         * manager1@gmail.com
+                         */
+
+
+                        const sender =
+                            (message.sender || "")
+                                .trim()
+                                .toLowerCase();
+
+
                         const isAdmin =
-                            message.sender === currentUserId;
+                            sender === normalizedCurrentUser;
+
+
+                        console.log(
+                            "MESSAGE:",
+                            message.id,
+                            "SENDER:",
+                            sender,
+                            "CURRENT:",
+                            normalizedCurrentUser,
+                            "IS ADMIN:",
+                            isAdmin
+                        );
 
 
                         return (
 
                             <div
+
                                 key={message.id}
+
                                 className={
-                                    `admin-message ${
-                                        isAdmin
-                                            ? "admin-message-sent"
-                                            : "admin-message-received"
-                                    }`
+
+                                    isAdmin
+
+                                        ? "admin-message admin-message-sent"
+
+                                        : "admin-message admin-message-received"
+
                                 }
+
                             >
 
                                 <div className="admin-message-bubble">
+
+
+                                    {/* SENDER */}
+
+                                    <span className="admin-message-sender">
+
+                                        {isAdmin
+                                            ? "You"
+                                            : message.sender || "Customer"}
+
+                                    </span>
+
 
 
                                     {/* TEXT */}
@@ -361,17 +486,23 @@ export default function AdminChatBox({
                                     )}
 
 
+
                                     {/* IMAGE */}
 
                                     {message.image && (
 
                                         <img
+
                                             src={message.image}
+
                                             alt="Message"
+
                                             className="admin-message-image"
+
                                         />
 
                                     )}
+
 
 
                                     {/* FILE */}
@@ -379,9 +510,13 @@ export default function AdminChatBox({
                                     {message.file && (
 
                                         <Link
+
                                             href={message.file}
+
                                             target="_blank"
+
                                             className="admin-message-file"
+
                                         >
 
                                             <FileText
@@ -393,6 +528,7 @@ export default function AdminChatBox({
                                         </Link>
 
                                     )}
+
 
 
                                     {/* FOOTER */}
@@ -434,6 +570,7 @@ export default function AdminChatBox({
 
                                     </div>
 
+
                                 </div>
 
                             </div>
@@ -452,22 +589,20 @@ export default function AdminChatBox({
             </div>
 
 
+
             {/* ERROR */}
 
             {error && messages.length > 0 && (
 
                 <div className="admin-chat-send-error">
-
                     {error}
-
                 </div>
 
             )}
 
 
-            {/* =========================
-                INPUT
-            ========================= */}
+
+            {/* INPUT */}
 
             <div className="admin-chat-input">
 
@@ -503,15 +638,9 @@ export default function AdminChatBox({
 
                 >
 
-                    {sending ? (
-
-                        "..."
-
-                    ) : (
-
-                        <Send size={18} />
-
-                    )}
+                    {sending
+                        ? "..."
+                        : <Send size={18} />}
 
                 </button>
 
@@ -523,3 +652,4 @@ export default function AdminChatBox({
     );
 
 }
+

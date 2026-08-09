@@ -43,7 +43,7 @@ export default function ConversationList({
             setError("");
 
             const response = await axios.get<Conversation[]>(
-                `${BACKEND_URLS}dashboard/api/v1/chat/conversations/list/`,
+                `${BACKEND_URLS}dashboard/api/v1/list/store/conversations/`,
                 {
                     withCredentials: true,
                 }
