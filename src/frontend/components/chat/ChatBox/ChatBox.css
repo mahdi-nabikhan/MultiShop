@@ -1,263 +1,500 @@
+
+/* =========================================
+   CUSTOMER CHAT BOX
+========================================= */
+
 .chatbox {
+    width: 100%;
+    height: 100%;
+    min-height: 650px;
 
-    width:100%;
+    display: flex;
+    flex-direction: column;
 
-    height:700px;
+    background: #0b1120;
 
-    display:flex;
+    border: 1px solid #1f2937;
+    border-radius: 16px;
 
-    flex-direction:column;
-
-    background:var(--surface);
-
-    border:1px solid var(--border);
-
-    border-radius:var(--radius-lg);
-
-    overflow:hidden;
-
-    box-shadow:var(--shadow-md);
-
+    overflow: hidden;
 }
 
 
-
-/* =========================
-   Header
-========================= */
-
+/* =========================================
+   HEADER
+========================================= */
 
 .chat-header {
+    height: 72px;
+    padding: 0 20px;
 
-    padding:18px 22px;
+    display: flex;
+    align-items: center;
 
-    background:var(--surface-light);
+    background: #111827;
 
-    border-bottom:1px solid var(--border);
-
+    border-bottom: 1px solid #1f2937;
 }
-
 
 
 .seller-info {
+    display: flex;
+    align-items: center;
 
-    display:flex;
-
-    align-items:center;
-
-    gap:14px;
-
+    gap: 12px;
 }
-
 
 
 .avatar {
+    width: 42px;
+    height: 42px;
 
-    width:45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    height:45px;
+    border-radius: 50%;
 
-    border-radius:50%;
+    background: #10b981;
 
-    background:var(--primary);
+    color: #ffffff;
 
-    color:white;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:20px;
-
-    font-weight:700;
-
+    font-size: 16px;
+    font-weight: 700;
 }
-
 
 
 .seller-info h3 {
+    margin: 0;
 
-    font-size:18px;
+    color: #f9fafb;
 
-    margin:0;
-
+    font-size: 15px;
+    font-weight: 600;
 }
-
 
 
 .seller-info span {
+    display: block;
 
-    color:var(--success);
+    margin-top: 3px;
 
-    font-size:13px;
+    color: #6b7280;
 
+    font-size: 12px;
 }
 
 
-
-
-
-/* =========================
-   Messages
-========================= */
-
+/* =========================================
+   CHAT BODY
+========================================= */
 
 .chat-body {
+    flex: 1;
 
-    flex:1;
+    padding: 24px;
 
-    padding:20px;
+    display: flex;
+    flex-direction: column;
 
-    overflow-y:auto;
+    gap: 12px;
 
-    display:flex;
+    overflow-y: auto;
 
-    flex-direction:column;
-
-    gap:14px;
-
+    background: #0b1120;
 }
 
 
+/* =========================================
+   MESSAGE WRAPPER
+========================================= */
+
+.chat-message {
+    width: 100%;
+
+    display: flex;
+}
+
+
+/* =========================================
+   CUSTOMER / CURRENT USER
+   RIGHT
+========================================= */
+
+.chat-message.customer {
+    justify-content: flex-end;
+}
+
+
+/* =========================================
+   SELLER / ADMIN
+   LEFT
+========================================= */
+
+.chat-message.seller {
+    justify-content: flex-start;
+}
+
+
+/* =========================================
+   MESSAGE BUBBLE
+========================================= */
+
+.message-bubble {
+    max-width: 65%;
+
+    padding: 11px 14px;
+
+    border-radius: 14px;
+
+    word-break: break-word;
+
+    color: #e5e7eb;
+
+    background: #1f2937;
+}
+
+
+/* =========================================
+   CUSTOMER BUBBLE
+========================================= */
+
+.chat-message.customer .message-bubble {
+    background: #10b981;
+
+    color: #ffffff;
+
+    border-bottom-right-radius: 4px;
+}
+
+
+/* =========================================
+   SELLER BUBBLE
+========================================= */
+
+.chat-message.seller .message-bubble {
+    background: #1f2937;
+
+    color: #e5e7eb;
+
+    border-bottom-left-radius: 4px;
+}
+
+
+/* =========================================
+   MESSAGE TEXT
+========================================= */
+
+.message-bubble p {
+    margin: 0;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+}
+
+
+/* =========================================
+   MESSAGE IMAGE
+========================================= */
+
+.message-image {
+    display: block;
+
+    max-width: 280px;
+    max-height: 300px;
+
+    margin-top: 8px;
+
+    border-radius: 10px;
+
+    object-fit: cover;
+}
+
+
+/* =========================================
+   MESSAGE FILE
+========================================= */
+
+.message-file {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 8px;
+
+    padding: 8px 10px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    font-size: 13px;
+
+    transition: 0.2s ease;
+}
+
+
+.message-file:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+
+/* =========================================
+   MESSAGE FOOTER
+========================================= */
+
+.message-footer {
+    margin-top: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 4px;
+
+    font-size: 10px;
+
+    opacity: 0.65;
+}
+
+
+/* =========================================
+   CUSTOMER CHECK ICON
+========================================= */
+
+.chat-message.customer .message-footer svg {
+    color: #ffffff;
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.chatbox > .loading {
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   CHAT INPUT
+========================================= */
+
+.chat-input-container {
+    min-height: 68px;
+
+    padding: 12px 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    background: #111827;
+
+    border-top: 1px solid #1f2937;
+}
+
+
+.chat-input-container input {
+    flex: 1;
+
+    height: 44px;
+
+    padding: 0 14px;
+
+    outline: none;
+
+    border: 1px solid #374151;
+
+    border-radius: 10px;
+
+    background: #0b1120;
+
+    color: #f9fafb;
+
+    font-size: 14px;
+
+    transition: 0.2s ease;
+}
+
+
+.chat-input-container input::placeholder {
+    color: #6b7280;
+}
+
+
+.chat-input-container input:focus {
+    border-color: #10b981;
+
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.08);
+}
+
+
+/* =========================================
+   ICON BUTTONS
+========================================= */
+
+.chat-icon-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #9ca3af;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.chat-icon-btn:hover {
+    background: #1f2937;
+
+    color: #f9fafb;
+}
+
+
+/* =========================================
+   SEND BUTTON
+========================================= */
+
+.chat-send-btn {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #10b981;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.chat-send-btn:hover:not(:disabled) {
+    background: #059669;
+
+    transform: translateY(-1px);
+}
+
+
+.chat-send-btn:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
 
 .chat-body::-webkit-scrollbar {
+    width: 6px;
+}
 
-    width:6px;
 
+.chat-body::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 
 .chat-body::-webkit-scrollbar-thumb {
+    background: #374151;
 
-    background:var(--border-light);
-
-    border-radius:10px;
-
+    border-radius: 10px;
 }
 
 
-
-
-
-/* =========================
-   Input
-========================= */
-
-
-.chat-input-container {
-
-    height:70px;
-
-    padding:12px 18px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    background:var(--surface-light);
-
-    border-top:1px solid var(--border);
-
+.chat-body::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
 }
 
 
+/* =========================================
+   RESPONSIVE
+========================================= */
 
-.chat-input-container input {
+@media (max-width: 768px) {
 
-    flex:1;
+    .chatbox {
+        min-height: 550px;
 
-    height:45px;
-
-    background:var(--background);
-
-    border:1px solid var(--border);
-
-    color:var(--text);
-
-    border-radius:var(--radius-md);
-
-    padding:0 15px;
-
-}
+        border-radius: 12px;
+    }
 
 
-
-.chat-icon-btn {
-
-
-    width:42px;
-
-    height:42px;
-
-    border:none;
-
-    background:transparent;
-
-    color:var(--text-secondary);
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-}
+    .chat-body {
+        padding: 16px;
+    }
 
 
-
-.chat-icon-btn:hover {
-
-    color:var(--primary);
-
-}
+    .message-bubble {
+        max-width: 80%;
+    }
 
 
+    .chat-header {
+        padding: 0 15px;
+    }
 
 
-
-.chat-send-btn {
-
-    width:45px;
-
-    height:45px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:var(--primary);
-
-    color:white;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-}
+    .chat-input-container {
+        padding: 10px;
+    }
 
 
-
-.chat-send-btn:hover {
-
-    background:var(--primary-hover);
-
-    transform:scale(1.05);
-
-}
+    .chat-icon-btn {
+        width: 38px;
+        height: 38px;
+    }
 
 
-
-
-.chat-send-btn:disabled {
-
-    opacity:.5;
-
-    cursor:not-allowed;
+    .chat-send-btn {
+        width: 42px;
+        height: 42px;
+    }
 
 }

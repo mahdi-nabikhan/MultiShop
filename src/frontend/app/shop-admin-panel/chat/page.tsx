@@ -15,11 +15,7 @@ export default function ChatPage() {
         useState<number | null>(null);
 
 
-    /*
-     * فعلاً برای تست
-     * بعداً این مقدار را از API پروفایل
-     * کاربر لاگین شده دریافت می‌کنیم.
-     */
+
 
     const currentUserEmail =
         "manager1@gmail.com";
