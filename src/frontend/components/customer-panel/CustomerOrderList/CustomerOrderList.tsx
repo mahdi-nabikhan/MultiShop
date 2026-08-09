@@ -1,9 +1,8 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
-
 import axios from "axios";
+import Link from "next/link";
 
 import BACKEND_URLS from "@/utils";
 
@@ -11,105 +10,76 @@ import {
     Package,
     Clock,
     CheckCircle,
-    XCircle
+    XCircle,
 } from "lucide-react";
 
 import "./CustomerOrderList.css";
 
 
-
 interface Order {
 
+    id: number;
 
-    id:number;
+    status: boolean;
 
-    status:boolean;
+    created: string;
 
-    created:string;
-
-    customer:number;
-
+    customer: number;
 
 }
 
 
+export default function CustomerOrderList() {
 
-export default function CustomerOrderList(){
+    const [orders, setOrders] =
+        useState<Order[]>([]);
 
-
-
-    const [orders,setOrders] = useState<Order[]>([]);
-
-    const [loading,setLoading] = useState(true);
-
+    const [loading, setLoading] =
+        useState(true);
 
 
+    const GetOrders = async () => {
 
+        try {
 
-    const GetOrders = async()=>{
+            const { data } =
+                await axios.get<Order[]>(
 
+                    `${BACKEND_URLS}order/api/v1/orders/`,
 
-        try{
+                    {
+                        withCredentials: true,
+                    }
 
-
-            const {data} = await axios.get<Order[]>(
-
-                `${BACKEND_URLS}order/api/v1/orders/`,
-
-                {
-
-                    withCredentials:true
-
-                }
-
-            );
-
+                );
 
             setOrders(data);
 
-
         }
 
-
-        catch(error){
-
+        catch (error) {
 
             console.log(error);
 
-
         }
 
-
-        finally{
-
+        finally {
 
             setLoading(false);
 
-
         }
-
 
     };
 
 
-
-
-
-    useEffect(()=>{
-
+    useEffect(() => {
 
         GetOrders();
 
-
-    },[]);
-
+    }, []);
 
 
-
-
-
-    if(loading){
-
+    if (loading) {
 
         return (
 
@@ -119,212 +89,140 @@ export default function CustomerOrderList(){
 
             </div>
 
-        )
+        );
 
     }
 
 
-
-
-
     return (
-
 
         <section className="customer-orders">
 
 
-
             <div className="orders-header">
-
 
                 <div>
 
-
                     <h2>
-
                         My Orders
-
                     </h2>
 
-
                     <p>
-
                         Track and manage your purchases
-
                     </p>
-
 
                 </div>
 
-
             </div>
-
-
-
 
 
             <div className="orders-list">
 
 
+                {orders.length > 0 ? (
 
-                {
-
-
-                    orders.length > 0 ?
-
-
-                    orders.map((order)=>(
-
-
+                    orders.map((order) => (
 
                         <div
-
                             className="order-card"
-
                             key={order.id}
-
                         >
-
 
 
                             <div className="order-icon">
 
-
-                                <Package size={28}/>
-
+                                <Package size={28} />
 
                             </div>
-
-
-
 
 
                             <div className="order-info">
 
-
                                 <h3>
-
                                     Order #{order.id}
-
                                 </h3>
-
 
                                 <span>
 
-                                    {new Date(order.created)
-                                    .toLocaleDateString()}
+                                    {new Date(
+                                        order.created
+                                    ).toLocaleDateString()}
 
                                 </span>
 
-
                             </div>
-
-
-
 
 
                             <div
-
                                 className={
-
                                     order.status
-
-                                    ?
-
-                                    "order-status completed"
-
-                                    :
-
-                                    "order-status pending"
-
+                                        ? "order-status completed"
+                                        : "order-status pending"
                                 }
-
                             >
 
-
-
-                                {
-
-                                    order.status ?
+                                {order.status ? (
 
                                     <>
 
-                                    <CheckCircle size={18}/>
+                                        <CheckCircle
+                                            size={18}
+                                        />
 
-                                    Completed
+                                        Completed
 
                                     </>
 
-                                    :
+                                ) : (
 
                                     <>
 
-                                    <Clock size={18}/>
+                                        <Clock
+                                            size={18}
+                                        />
 
-                                    Pending
+                                        Pending
 
                                     </>
 
-                                }
-
+                                )}
 
                             </div>
 
 
-
-
-
-                            <button className="view-order-btn">
-
+                            <Link
+                                href={`/customer-panel/orderitem/${order.id}`}
+                                className="view-order-btn"
+                            >
 
                                 View Details
 
-
-                            </button>
-
+                            </Link>
 
 
                         </div>
-
-
 
                     ))
 
+                ) : (
 
-                    :
+                    <div className="empty-orders">
 
+                        <XCircle size={40} />
 
-                    (
+                        <p>
+                            You don't have any orders yet
+                        </p>
 
-                        <div className="empty-orders">
+                    </div>
 
-
-                            <XCircle size={40}/>
-
-
-                            <p>
-
-                                You don't have any orders yet
-
-                            </p>
-
-
-                        </div>
-
-                    )
-
-                }
-
-
+                )}
 
             </div>
 
 
-
         </section>
 
-
     );
-
 
 }

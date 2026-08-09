@@ -1,142 +1,130 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
-
 import axios from "axios";
 
 import BACKEND_URLS from "@/utils";
 
-import "./CustomerOrderItemList.css";
+import "./CustomerOrderOtemList.css";
 
-import {
-    Package
-} from "lucide-react";
-
+import { Package } from "lucide-react";
 
 
 interface Product {
 
-    id:number;
+    id: number;
 
-    name:string;
+    name: string;
 
-    description:string;
+    description: string;
 
-    product_image:string;
+    product_image: string;
 
-    price:number;
+    price: number;
 
 }
-
 
 
 interface OrderItem {
 
-    id:number;
+    id: number;
 
-    quantity:number;
+    quantity: number;
 
-    status:string;
+    status: string;
 
-    created:string;
+    created: string;
 
-    total:string;
+    total: string;
 
-    order:number;
+    order: number;
 
-    product:Product;
+    product: Product;
 
 }
-
 
 
 interface Props {
 
-    orderId:number;
+    orderId: number;
 
 }
 
 
-
 export default function CustomerOrderItemList({
-
-    orderId
-
-}:Props){
+    orderId,
+}: Props) {
 
 
-
-    const [items,setItems] = useState<OrderItem[]>([]);
-
-    const [loading,setLoading] = useState(true);
+    const [items, setItems] =
+        useState<OrderItem[]>([]);
 
 
+    const [loading, setLoading] =
+        useState(true);
 
 
-
-    const GetOrderItems = async()=>{
-
-
-        try{
+    const [error, setError] =
+        useState("");
 
 
-            const {data} = await axios.get<OrderItem[]>(
+    const GetOrderItems = async () => {
 
-                `${BACKEND_URLS}order/item/list/${orderId}/`,
+        try {
 
-                {
-                    withCredentials:true
-                }
+            setLoading(true);
 
-            );
+            setError("");
+
+
+            const { data } =
+                await axios.get<OrderItem[]>(
+
+                    `${BACKEND_URLS}order/api/v1/order/item/list/${orderId}/`,
+
+                    {
+                        withCredentials: true,
+                    }
+
+                );
 
 
             setItems(data);
 
 
-        }
+        } catch (error) {
 
-        catch(error){
+            console.error(
+                "GET ORDER ITEMS ERROR:",
+                error
+            );
+
+            setError(
+                "Failed to load order items."
+            );
 
 
-            console.log(error);
-
-
-        }
-
-        finally{
-
+        } finally {
 
             setLoading(false);
 
-
         }
-
 
     };
 
 
+    useEffect(() => {
 
-
-
-
-    useEffect(()=>{
-
+        if (!orderId) {
+            return;
+        }
 
         GetOrderItems();
 
-
-    },[orderId]);
-
+    }, [orderId]);
 
 
-
-
-
-
-    if(loading){
-
+    if (loading) {
 
         return (
 
@@ -146,12 +134,24 @@ export default function CustomerOrderItemList({
 
             </div>
 
-        )
+        );
 
     }
 
 
+    if (error) {
 
+        return (
+
+            <div className="order-error">
+
+                {error}
+
+            </div>
+
+        );
+
+    }
 
 
     return (
@@ -159,145 +159,140 @@ export default function CustomerOrderItemList({
         <section className="customer-order-items">
 
 
-
             <div className="order-items-header">
 
+                <div>
 
-                <h2>
+                    <h2>
+                        Order #{orderId}
+                    </h2>
 
-                    Order #{orderId}
+                    <p>
+                        Products in this order
+                    </p>
 
-                </h2>
+                </div>
 
 
-                <p>
+                <div className="order-items-count">
 
-                    Products in this order
+                    <Package size={18} />
 
-                </p>
+                    <span>
+                        {items.length} Items
+                    </span>
 
+                </div>
 
             </div>
-
-
 
 
 
             <div className="order-items-list">
 
 
+                {items.length === 0 ? (
 
-                {
+                    <div className="empty-order-items">
 
-                    items.map((item)=>(
+                        <Package size={40} />
 
+                        <p>
+                            No products found in this order.
+                        </p>
 
+                    </div>
+
+                ) : (
+
+                    items.map((item) => (
 
                         <div
-
                             className="order-item-card"
-
                             key={item.id}
-
                         >
-
 
 
                             <div className="product-image">
 
-
                                 <img
-
                                     src={
-
                                         `${BACKEND_URLS.replace(
                                             "/api/v1/",
                                             ""
                                         )}${item.product.product_image}`
-
                                     }
-
                                     alt={item.product.name}
-
                                 />
 
-
                             </div>
-
-
-
 
 
 
                             <div className="product-info">
 
-
                                 <h3>
-
                                     {item.product.name}
-
                                 </h3>
 
 
-
                                 <p>
-
-                                    Quantity:
-                                    {item.quantity}
-
+                                    Quantity: {item.quantity}
                                 </p>
-
 
 
                                 <span>
 
                                     Status:
-                                    {
-                                        item.status === "P"
-                                        ?
-                                        " Pending"
-                                        :
-                                        item.status
-                                    }
+
+                                    {item.status === "P"
+                                        ? " Pending"
+                                        : ` ${item.status}`}
 
                                 </span>
-
-
 
                             </div>
 
 
 
+                            <div className="product-price">
+
+                                <span>
+                                    Unit Price
+                                </span>
+
+                                <strong>
+                                    ${item.product.price}
+                                </strong>
+
+                            </div>
 
 
 
                             <div className="product-total">
 
+                                <span>
+                                    Total
+                                </span>
 
-                                ${item.total}
-
+                                <strong>
+                                    ${item.total}
+                                </strong>
 
                             </div>
 
 
-
-
                         </div>
-
 
                     ))
 
-                }
-
-
+                )}
 
             </div>
-
 
 
         </section>
 
     );
-
 
 }

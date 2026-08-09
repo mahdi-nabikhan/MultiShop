@@ -1,17 +1,18 @@
+
 "use client";
 
 import Link from "next/link";
 
 import {
     User,
-    ShoppingBag,
-    Heart,
+    MessageCircle,
     MapPin,
     CreditCard,
-    Shield,
-    Settings,
+    ShoppingBag,
+    Package,
+    FileText,
+    Ticket,
     LogOut,
-    Package
 } from "lucide-react";
 
 import "./Sidebar.css";
@@ -20,85 +21,94 @@ import "./Sidebar.css";
 const menuGroups = [
 
     {
-        title:"Shopping",
+        title: "Shopping",
 
-        items:[
+        items: [
 
             {
-                title:"My Orders",
-                href:"/customer-panel/orders",
-                icon:ShoppingBag
+                title: "My Orders",
+                href: "/customer-panel/order",
+                icon: ShoppingBag,
             },
 
             {
-                title:"Wishlist",
-                href:"/customer-panel/wishlist",
-                icon:Heart
+                title: "Order Items",
+                href: "/customer-panel/orderitem",
+                icon: Package,
             },
 
             {
-                title:"Payments",
-                href:"/customer-panel/payments",
-                icon:CreditCard
-            }
+                title: "Bills",
+                href: "/customer-panel/bill",
+                icon: CreditCard,
+            },
 
-        ]
-
+        ],
     },
 
 
     {
-        title:"Account",
+        title: "Communication",
 
-        items:[
+        items: [
 
             {
-                title:"Profile",
-                href:"/customer-panel/profile",
-                icon:User
+                title: "Messages",
+                href: "/customer-panel/chat",
+                icon: MessageCircle,
             },
 
-
             {
-                title:"Addresses",
-                href:"/customer-panel/addresses",
-                icon:MapPin
+                title: "Comments",
+                href: "/customer-panel/comments",
+                icon: FileText,
             },
 
-
             {
-                title:"Security",
-                href:"/customer-panel/security",
-                icon:Shield
+                title: "Tickets",
+                href: "/customer-panel/ticket",
+                icon: Ticket,
             },
 
+        ],
+    },
+
+
+    {
+        title: "Account",
+
+        items: [
 
             {
-                title:"Settings",
-                href:"/customer-panel/settings",
-                icon:Settings
-            }
+                title: "Profile",
+                href: "/customer-panel/profile",
+                icon: User,
+            },
 
-        ]
+            {
+                title: "Addresses",
+                href: "/customer-panel/address",
+                icon: MapPin,
+            },
 
-    }
+        ],
+    },
 
 ];
 
 
-
-export default function CustomerSidebar(){
-
+export default function CustomerSidebar() {
 
     return (
 
         <aside className="customer-sidebar">
 
 
-            {/* User Card */}
+            {/* =========================
+                USER CARD
+            ========================= */}
 
             <div className="sidebar-user-card">
-
 
                 <div className="sidebar-avatar">
 
@@ -110,124 +120,91 @@ export default function CustomerSidebar(){
                 <div className="sidebar-user-info">
 
                     <h3>
-
                         Mahdi
-
                     </h3>
 
-
                     <p>
-
-                        Premium Member
-
+                        Customer
                     </p>
 
-
                 </div>
-
 
             </div>
 
 
 
-
-            {/* Menu */}
-
+            {/* =========================
+                MENU
+            ========================= */}
 
             <nav className="sidebar-menu">
 
+                {menuGroups.map((group) => (
 
-                {
+                    <div
+                        className="sidebar-group"
+                        key={group.title}
+                    >
 
-                    menuGroups.map((group)=>(
-
-
-                        <div
-                            className="sidebar-group"
-                            key={group.title}
-                        >
-
-
-                            <span className="group-title">
-
-                                {group.title}
-
-                            </span>
+                        <span className="group-title">
+                            {group.title}
+                        </span>
 
 
+                        {group.items.map((item) => {
 
-                            {
-
-                                group.items.map((item)=>{
-
-
-                                    const Icon=item.icon;
+                            const Icon = item.icon;
 
 
+                            return (
 
-                                    return (
+                                <Link
+                                    href={item.href}
+                                    className="sidebar-item"
+                                    key={item.title}
+                                >
 
-                                        <Link
+                                    <Icon size={20} />
 
-                                            href={item.href}
+                                    <span>
+                                        {item.title}
+                                    </span>
 
-                                            className="sidebar-item"
+                                </Link>
 
-                                            key={item.title}
+                            );
 
-                                        >
+                        })}
 
+                    </div>
 
-                                            <Icon size={20}/>
-
-
-                                            <span>
-
-                                                {item.title}
-
-                                            </span>
-
-
-                                        </Link>
-
-                                    )
-
-                                })
-
-                            }
-
-
-                        </div>
-
-
-                    ))
-
-                }
-
+                ))}
 
             </nav>
 
 
 
+            {/* =========================
+                LOGOUT
+            ========================= */}
 
-            {/* Logout */}
+            <button
+                type="button"
+                className="sidebar-logout"
+            >
 
+                <LogOut size={20} />
 
-            <button className="sidebar-logout">
-
-
-                <LogOut size={20}/>
-
-
-                Logout
-
+                <span>
+                    Logout
+                </span>
 
             </button>
 
 
-
         </aside>
 
-    )
+    );
 
 }
+
