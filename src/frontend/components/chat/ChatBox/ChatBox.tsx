@@ -67,7 +67,8 @@ export default function ChatBox({
 
 
         try{
-
+        console.log("STORE ID:", storeId);
+        console.log("STORE ID TYPE:", typeof storeId);
 
             const {data}=await axios.post(
 
@@ -93,9 +94,10 @@ export default function ChatBox({
 
         }
 
-        catch(error){
-
-            console.log(error);
+        catch(error:any){
+        console.log("STATUS:", error.response?.status);
+        console.log("DATA:", error.response?.data);
+        console.log("ERROR:", error);
 
         }
 
