@@ -1,0 +1,256 @@
+.conversation-list {
+    width: 340px;
+    height: 100%;
+    min-height: 650px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #111827;
+
+    border: 1px solid #1f2937;
+    border-radius: 16px;
+
+    overflow: hidden;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.conversation-list-header {
+    padding: 22px;
+
+    border-bottom: 1px solid #1f2937;
+}
+
+.conversation-list-header h2 {
+    margin: 0;
+
+    color: #f9fafb;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.conversation-list-header span {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   ITEMS
+========================= */
+
+.conversation-items {
+    flex: 1;
+
+    overflow-y: auto;
+}
+
+
+/* =========================
+   CONVERSATION
+========================= */
+
+.conversation-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 17px 18px;
+
+    background: transparent;
+
+    border: none;
+    border-bottom: 1px solid #1f2937;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.conversation-item:hover {
+    background: #1f2937;
+}
+
+
+/* =========================
+   AVATAR
+========================= */
+
+.conversation-avatar {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #10b981;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   INFO
+========================= */
+
+.conversation-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.conversation-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.conversation-top strong {
+    overflow: hidden;
+
+    color: #f3f4f6;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.conversation-top span {
+    flex-shrink: 0;
+
+    color: #6b7280;
+
+    font-size: 11px;
+}
+
+.conversation-bottom {
+    margin-top: 6px;
+}
+
+.conversation-bottom span {
+    color: #10b981;
+
+    font-size: 12px;
+
+    text-transform: capitalize;
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty-conversations {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 200px;
+
+    padding: 20px;
+
+    color: #6b7280;
+
+    text-align: center;
+}
+
+.empty-conversations p {
+    margin: 0;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.conversation-loading {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 200px;
+
+    color: #9ca3af;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.conversation-error {
+    padding: 25px;
+
+    color: #f87171;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+.conversation-items::-webkit-scrollbar {
+    width: 5px;
+}
+
+.conversation-items::-webkit-scrollbar-track {
+    background: #111827;
+}
+
+.conversation-items::-webkit-scrollbar-thumb {
+    background: #374151;
+
+    border-radius: 10px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+    .conversation-list {
+        width: 100%;
+        min-height: 500px;
+    }
+
+}
