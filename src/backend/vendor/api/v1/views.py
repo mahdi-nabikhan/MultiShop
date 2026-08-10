@@ -8,10 +8,7 @@ from .serializers import StoreSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from website.api.serializers import ProductImageSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from .permissions import (IsManagerPermissions,IsAdminPermissions,
-                          IsOperatorPermissions,IsManagerOrAdminPermissions,
-                          IsVendorStaffPermissions
-                          )
+from .permissions import *
 
 
 
@@ -332,7 +329,7 @@ class ProductDetailAPIView(GenericAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     model = Product
-    permission_classes = [IsManagerOrAdminPermissions]
+    permission_classes = [IsManagerOrAdminPermissions,IsProductOwner]
     def get(self, request, pk):
         """
         Retrieve product details by ID.
@@ -594,7 +591,7 @@ class AddProductImageAPIView(GenericAPIView):
 
     serializer_class = AddImageSerializer
     model = Product
-    permission_classes = [IsManagerOrAdminPermissions]
+    permission_classes = [IsManagerOrAdminPermissions,IsProductOwner]
     def post(self, request, pk):
         """
         Handle image upload for a specific product.
@@ -645,7 +642,7 @@ class AddProductsDiscountAPIView(GenericAPIView):
     
     serializer_class = AddDiscountSerializer
     queryset = Discount.objects.all()
-    permission_classes = [IsVendorStaffPermissions]
+    permission_classes = [IsVendorStaffPermissions,IsProductOwner]
     def post(self, request, pk):
         data = request.data
         serializer = self.serializer_class(data=data, context={'request': request, 'pk': pk})
@@ -730,7 +727,7 @@ class StoreDetailAndDelete(GenericAPIView):
         404 Not Found:
             Store not found.
     """
-    permission_classes=(IsStoreOwner,)
+    permission_classes=(IsStoreOwner,IsManagerPermissions)
     serializer_class = StoreSerializer
     
     
@@ -836,7 +833,7 @@ class ShopOrderListAPIView(GenericAPIView):
 
 
 class DeleteProductDiscount(GenericAPIView):
-    permission_classes = [IsVendorStaffPermissions]
+    permission_classes = [IsVendorStaffPermissions,IsDiscountOwner]
     
     def get_queryset(self,pk):
         return Discount.objects.get(pk=pk)
