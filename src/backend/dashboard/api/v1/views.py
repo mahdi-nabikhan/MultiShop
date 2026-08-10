@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from customer.models import Customer
+from ...permissions import IsConversationParticipant,IsReplayTicketOwner,IsTicketOwner
 
 from ...models import Conversation,Ticket,ReplayTicket
 from ...services import can_access_conversation
@@ -85,6 +86,7 @@ class CreateMessageAPIView(GenericAPIView):
         
 class CreateAndListTicketAPIView(GenericAPIView):
     serializer_class = ListCreateTicketSerializers
+    permission_classes= [IsAuthenticated]
     
     
     def get (self,request,pk):
@@ -104,6 +106,7 @@ class CreateAndListTicketAPIView(GenericAPIView):
         
 class DetailTicketApiView(GenericAPIView):
     serializer_class=DetailTicketSerializer
+    permission_classes = [IsAuthenticated,IsTicketOwner]
     
     def get_queryset(self,pk):
         return Ticket.objects.get(pk=pk)
@@ -144,7 +147,7 @@ class DetailTicketApiView(GenericAPIView):
     
 class CreateAndListReplayTicketAPIView(GenericAPIView):
     serializer_class = ReplayTicketSerializer
-    
+    permission_classes = [IsAuthenticated]    
     def get(self,request,pk):
         obj = ReplayTicket.objects.filter(replay_ticket__pk=pk)
         serializer =  self.serializer_class(instance=obj,many=True,context = {'pk':pk})
@@ -164,7 +167,7 @@ class CreateAndListReplayTicketAPIView(GenericAPIView):
         
 class DetailReplayTicketAPIView(GenericAPIView):
     serializer_class=ReplayTicketSerializer
-    
+    permission_classes = [IsAuthenticated,IsReplayTicketOwner]    
     def get_queryset(self,pk):
         return ReplayTicket.objects.get(pk=pk)
     
@@ -201,7 +204,7 @@ class DetailReplayTicketAPIView(GenericAPIView):
         
 class GetShopTicketAPIView(GenericAPIView):
     serializer_class = ListCreateTicketSerializers
-    
+    permission_classes = [IsAuthenticated]    
     def get_queryset(self):
         return Ticket.objects.filter(store__manager__user = self.request.user)
     
@@ -213,7 +216,7 @@ class GetShopTicketAPIView(GenericAPIView):
 class CustomerListTicketApiView(GenericAPIView):
     
     serializer_class = ListCreateTicketSerializers
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         
         return Ticket.objects.filter(customer__user= self.request.user)
@@ -249,6 +252,7 @@ class ConversationMessagesAPIView(ListAPIView):
 class ListConversationStoreAPIView(GenericAPIView):
     serializer_class = ConversationListSerializer
     model = Conversation
+    permission_classes=[IsAuthenticated]
     
     def get_queryset(self):
         return self.model.objects.filter(store__manager__user= self.request.user)
@@ -261,7 +265,7 @@ class ListConversationStoreAPIView(GenericAPIView):
 class ListConversationCustomerApiView(GenericAPIView):
     serializer_class = ConversationListSerializer
     model = Conversation
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return self.model.objects.filter(customer=self.request.user)
     
