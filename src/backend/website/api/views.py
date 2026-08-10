@@ -10,7 +10,7 @@ from vendor.api.v1.serializers import ProductSerializer
 from rest_framework.generics import ListAPIView, GenericAPIView
 from .pagination import WebsiteShopPaginations,WebsiteRandomProductPaginations
 from .serializers import ProductImageSerializer
-
+from rest_framework.permissions import AllowAny
 from elasticsearch import Elasticsearch
 
 
@@ -49,6 +49,7 @@ class RandomProductsApiView(APIView):
     - If total products count is less than 5, returns all existing products (random.sample handles it).
     - No authentication required.
     """
+    permission_classes =[AllowAny]
     paginations_class = WebsiteRandomProductPaginations
     def get(self, request):
         cache_key = "random_products_6"
@@ -69,6 +70,7 @@ class RandomProductsApiView(APIView):
 
 
 class ProductsFilteringAPIView(ListAPIView):
+    
     """
     API view to list products with optional sorting by price.
 
@@ -108,7 +110,7 @@ class ProductsFilteringAPIView(ListAPIView):
     - No filtering other than ordering; returns all products.
     - The print statement is for development logging.
     """
-
+    permission_classes =[AllowAny]
     serializer_class = ProductSerializer
 
     def get_queryset(self):
@@ -293,7 +295,7 @@ class ListStoreApiView(GenericAPIView):
     """
     serializer_class = StoreSerializer
     pagination_class = WebsiteShopPaginations
-
+    permission_classes =[AllowAny]
     def get(self, request):
         data = Store.objects.all()
         page = self.paginate_queryset(data)
@@ -356,7 +358,8 @@ class ProductListApiView(GenericAPIView):
             is implemented).
     """
     serializer_class = ProductSerializer
-   
+    permission_classes =[AllowAny]
+    
     def get_queryset(self, pk):
         return Product.objects.filter(store__pk=pk)
 
@@ -398,7 +401,8 @@ class ProductDetailAPIView(GenericAPIView):
             Returned when the requested product does not exist.
     """
     serializer_class = ProductSerializer
-
+    permission_classes =[AllowAny]
+    
     def get_queryset(self, pk):
         return Product.objects.get(pk=pk)
 
@@ -444,7 +448,8 @@ class StoreDetailApiView(GenericAPIView):
             Returned when the requested store or its address does not exist.
     """
     serializer_class = StoreSerializer
-
+    permission_classes =[AllowAny]
+    
     def get_queryset(self, pk):
         return Store.objects.get(pk=pk)
 

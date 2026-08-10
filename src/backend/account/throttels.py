@@ -28,3 +28,24 @@ class LoginRateThrottle(AnonRateThrottle):
         - Authenticated users are not affected by this throttle.
     """
     scope = 'login'
+
+
+
+
+
+class RegisterRateThrottle(AnonRateThrottle):
+    scope = "register"
+
+
+class StaffRegisterRateThrottle(UserRateThrottle):
+    scope = "staff_register"
+    
+    
+    
+class ResetCodeVerifyRateThrottle(AnonRateThrottle):
+    scope = "reset_code_veri"
+    
+    
+    
+class PasswordResetRequestThrottle(AnonRateThrottle):
+    scope = 'password_reset'

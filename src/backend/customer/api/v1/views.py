@@ -5,6 +5,9 @@ from .serializers import *
 from rest_framework.authtoken.models import Token
 from account.tasks import *
 from.paginations import ProductCommentsPaginations
+from rest_framework.permissions import IsAuthenticated,AllowAny
+from...permissions import IsCustomerOwner,IsCommentOwner
+from account.throttels import RegisterRateThrottle
 
 
 class CustomerRegisterApiView(GenericAPIView):
@@ -53,6 +56,7 @@ class CustomerRegisterApiView(GenericAPIView):
         - Triggers a Celery task to send a welcome email.
     """
     serializer_class = CustomerRegisterSerializer
+    throttle_classes = [RegisterRateThrottle]
 
     def post(self, request):
         data = request.data
@@ -124,7 +128,7 @@ class AddAddressApiView(GenericAPIView):
     """
     serializer_class = AddressSerializer
     model = Address
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return self.model.objects.filter(customer__user_id=self.request.user.id)
 
@@ -207,34 +211,39 @@ class DetailAddressApiView(GenericAPIView):
     """
     serializer_class = AddressSerializer
     model = Address
-
+    permission_classes = [IsAuthenticated,IsCustomerOwner]
+    
+    
+    def get_queryset(self):
+        return self.model.objects.filter(customer__user =self.request.user )
+    
     def get(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
-        serializer = AddressSerializer(obj)
+        obj = self.get_object()
+        serializer = self.serializer_class(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         data = request.data
         serializer = self.serializer_class(data=data, instance=obj)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         data = request.data
-        serializer = self.serializer_class(data=data, instance=obj, initial=True)
+        serializer = self.serializer_class(data=data, instance=obj,  partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         obj.delete()
         return Response({'massage': 'address successfully deleted'})
 
@@ -272,7 +281,7 @@ class CustomerCommentsApiView(GenericAPIView):
     """
     serializer_class = CommentSerializer
     model = Comments
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return Comments.objects.filter(user__user__id=self.request.user.id)
 
@@ -325,7 +334,7 @@ class CustomerAddCommentsApiView(GenericAPIView):
     """
     serializer_class = CommentSerializer
     model = Comments
-
+    permission_classes=[IsAuthenticated]
     def post(self, request, pk):
         data = request.data
         product = Product.objects.get(pk=pk)
@@ -402,14 +411,15 @@ class CommentDetailApiView(GenericAPIView):
     serializer_class = CommentSerializer
     model = Comments
     queryset = Comments.objects.all()
+    permission_classes = [ IsAuthenticated, IsCommentOwner, ]
 
     def get(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         serializer = self.serializer_class(obj, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         data = request.data
         serializer = self.serializer_class(data=data, instance=obj)
         if serializer.is_valid():
@@ -419,7 +429,7 @@ class CommentDetailApiView(GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         data = request.data
         serializer = self.serializer_class(data=data, instance=obj, partial=True)
         if serializer.is_valid():
@@ -429,7 +439,7 @@ class CommentDetailApiView(GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        self.model.objects.get(pk=pk).delete()
+        self.get_object().delete()
         return Response({'massage': 'comment successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -473,6 +483,7 @@ class AddProductRateAPIView(GenericAPIView):
         - Validation ensures that invalid or unauthorized ratings cannot be submitted.
     """
     serializer_class = ProductRateSerializer
+    permission_classes = [IsAuthenticated,]
 
     def post(self, request, pk):
         serializer = self.serializer_class(data=request.data, context={'request': request, 'pk': pk})
@@ -519,6 +530,7 @@ class AllProductsCommentApiView(GenericAPIView):
     serializer_class = CommentSerializer
     model=Comments
     pagination_class = ProductCommentsPaginations
+    permission_classes=[AllowAny]
     def get(self,request,pk):
         comments_obj=self.model.objects.filter(product__pk=pk,parent__isnull=True)
         context={'request':request}
@@ -570,6 +582,7 @@ class CanRateAPIView(GenericAPIView):
         - Ensures that only customers who have purchased the product can rate it.
         - Prevents unauthorized or fake ratings by enforcing a purchase check.
     """
+    permission_classes =[IsAuthenticated]
     def get(self, request, pk):
         customer = Customer.objects.get(user=request.user)
         product = Product.objects.get(pk=pk)
@@ -579,7 +592,7 @@ class CanRateAPIView(GenericAPIView):
 
 class GetCustomerDetail(GenericAPIView):
     serializer_class = CustomerDetailSerializer
-    
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         return Customer.objects.get(user=self.request.user)
@@ -610,7 +623,7 @@ class GetCustomerDetail(GenericAPIView):
     
 class AddReplaytoCommentApiView(GenericAPIView):
     serializer_class = ReplyCommentSerializer
-    
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self,pk):
         return Comments.objects.get(pk=pk)

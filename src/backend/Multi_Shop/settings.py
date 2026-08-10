@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent  
 
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
 
     'drf_yasg',
     'rest_framework_simplejwt',
+    "rest_framework_simplejwt.token_blacklist",
+    
     'axes',
     'channels',
     'corsheaders',
@@ -173,7 +175,11 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'user': '1000/day',
         'anon': '1000/day',
-        'login': '5/minute'
+        'login': '5/minute',
+        'register' : '1000/day',
+        'staff_register': '1000/day',
+        "reset_code_veri":'1000/day',
+        "password_reset":"1000/day"
     },
 }
 
@@ -217,3 +223,15 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME":timedelta(days=7),
+    
+    "ROTATE_REFRESH_TOKENS":True,
+    "BLACKLIST_AFTER_ROTATION":True
+}
+
+
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024

@@ -11,7 +11,8 @@ urlpatterns = [
     path('send/reset/password',SendResetCodeApiView.as_view(),name='send_reset_code'),
     path('confirm/rest/password',VerifyResetCodeApiView.as_view(),name='confirm_reset_password'),
     path('me/',CheckMeAPIView.as_view(),name='chech_me'),
-     path("logout/",LogoutAPIView.as_view(),name="logout"),
+    path("logout/",LogoutAPIView.as_view(),name="logout"),
+    path('refresh/token/',CustomTokenRefreshApiView.as_view(),name='refresh-token')
 
 
 ]

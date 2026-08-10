@@ -31,7 +31,7 @@ class Admin(models.Model):
             - Inherits all authentication and permission logic from User.
         """
     user=models.OneToOneField(User,on_delete=models.CASCADE)
-    shop = models.ForeignKey('Store', on_delete=models.CASCADE)
+    shop = models.ForeignKey('Store', on_delete=models.CASCADE,related_name='admins')
     username=models.CharField(max_length=256)
 
     def __str__(self):
@@ -55,7 +55,7 @@ class Operator(models.Model):
             - Inherits all authentication and permission logic from User.
         """
     user=models.OneToOneField(User,on_delete=models.CASCADE)
-    shop = models.ForeignKey('Store', on_delete=models.CASCADE)
+    shop = models.ForeignKey('Store', on_delete=models.CASCADE,related_name='operators')
     username = models.CharField(max_length=256)
 
     def __str__(self):

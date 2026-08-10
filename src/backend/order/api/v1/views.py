@@ -1,7 +1,9 @@
 from rest_framework.response import Response
 from rest_framework import generics, status
 from .serializer import *
+from rest_framework.permissions import IsAuthenticated
 from order.sessions import CartSession
+from ...permissions import IsBillOwner,IsOrderItemOwner,IsOrderOwner
 from django.shortcuts import get_object_or_404
 class OrderListApiView(generics.GenericAPIView):
     """
@@ -58,7 +60,7 @@ class OrderListApiView(generics.GenericAPIView):
     """
     model = Order
     serializer_class = OrderSerializer
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return Order.objects.filter(customer__user=self.request.user)
 
@@ -118,7 +120,7 @@ class OrderItemCreateApiView(generics.GenericAPIView):
     - Typically used in Customer-facing APIs for building orders dynamically.
     """
     serializer_class = OrderItemSerializer
-
+    permission_classes = [IsAuthenticated,IsOrderOwner]
     def post(self, request, pk):
         serializer = self.serializer_class(data=request.data, context={'request': request, 'pk': pk})
         if serializer.is_valid():
@@ -166,7 +168,7 @@ class OrderItemListAPIView(generics.GenericAPIView):
     """
     serializer_class = OrderItemSerializer
     queryset = OrderItem.objects.all()
-
+    permission_classes = [IsAuthenticated,IsOrderOwner]
     def get(self, request, pk):
         obj = self.queryset.filter(order__pk=pk)
         serializer = self.serializer_class(obj, many=True)
@@ -242,7 +244,7 @@ class OrderItemDetailView(generics.GenericAPIView):
     """
     serializer_class = OrderItemSerializer
     queryset = OrderItem.objects.all()
-
+    permission_classes = [IsAuthenticated,IsOrderItemOwner]
     def get(self, request, pk):
         obj = self.queryset.get(pk=pk)
         serializer = self.serializer_class(obj)
@@ -312,7 +314,7 @@ class ShopOrderListApiView(generics.GenericAPIView):
     - If no orders exist for the store, returns an empty list.
     """
     serializer_class = OrderItemSerializer
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return OrderItem.objects.filter(product__store__manager__user=self.request.user)
 
@@ -361,7 +363,7 @@ class OrderItemApiView(generics.GenericAPIView):
     - Intended for building shopping cart or checkout interfaces for customers.
     """
     serializer_class=OrderItemSerializer
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         order_obj=Order.objects.get(customer__user=self.request.user,status=False)
         return OrderItem.objects.filter(order=order_obj)
@@ -373,6 +375,7 @@ class OrderItemApiView(generics.GenericAPIView):
         
 class BillCreationApiView(generics.GenericAPIView):
     serializer_class=BillSerilizers
+    permission_classes = [IsAuthenticated,IsOrderOwner]
     def post(self,request,pk):
         data = request.data 
         serializer = self.serializer_class(data=data,context = {'request':request,'pk':pk})
@@ -385,7 +388,7 @@ class BillCreationApiView(generics.GenericAPIView):
     
 class BillListAPIView(generics.GenericAPIView):
     serializer_class=BillSerilizers
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return Bill.objects.filter(cart__customer__user =self.request.user)
     
@@ -394,13 +397,6 @@ class BillListAPIView(generics.GenericAPIView):
         obj = self.get_queryset()
         serializer = self.serializer_class(instance=obj,context ={'request':request},many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
-    
-class CartSerializer(serializers.Serializer):
-    items = CartItemSerializer(many=True)
-    total_quantity = serializers.IntegerField()
-    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    
-    
     
     
 class CartDetailAPIView(generics.GenericAPIView):
@@ -444,7 +440,10 @@ class CartAddAPIView(generics.GenericAPIView):
         
 class RelatedOrderItemWithOrder(generics.GenericAPIView):
     serializer_class= OrderItemSerializer
-    
+    permission_classes = [
+    IsAuthenticated,
+    IsOrderOwner,
+]
     def get_queryset(self,pk):
         order_obj = Order.objects.get(pk=pk)    
         return OrderItem.objects.filter(order=order_obj)
