@@ -9,7 +9,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from website.api.serializers import ProductImageSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from .permissions import *
-
+from account.throttels import StaffRegisterRateThrottle
 
 
 class ManagerRegisterAPIView(GenericAPIView):
@@ -47,6 +47,7 @@ class ManagerRegisterAPIView(GenericAPIView):
     serializer_class = ManagerSerializer
     queryset = Manager.objects.all()
     permission_classes = [AllowAny]
+    throttle_classes = [StaffRegisterRateThrottle]
     def post(self, request):
         """
         Handle manager registration request.
@@ -103,6 +104,7 @@ class AdminRegisterAPIView(GenericAPIView):
     """
     serializer_class = AdminsSerializer
     permission_classes = [IsManagerPermissions]
+    throttle_classes = [StaffRegisterRateThrottle]
     def post(self, request):
         """
         Handle admin registration request.
@@ -161,6 +163,7 @@ class OperatorRegisterAPIView(GenericAPIView):
     """
     serializer_class = OperatorSerializer
     permission_classes =[IsManagerOrAdminPermissions]
+    throttle_classes = [StaffRegisterRateThrottle]
     def post(self, request):
         """
         Handle operator registration request.

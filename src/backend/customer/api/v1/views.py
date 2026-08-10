@@ -7,6 +7,7 @@ from account.tasks import *
 from.paginations import ProductCommentsPaginations
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from...permissions import IsCustomerOwner,IsCommentOwner
+from account.throttels import RegisterRateThrottle
 
 
 class CustomerRegisterApiView(GenericAPIView):
@@ -55,6 +56,7 @@ class CustomerRegisterApiView(GenericAPIView):
         - Triggers a Celery task to send a welcome email.
     """
     serializer_class = CustomerRegisterSerializer
+    throttle_classes = [RegisterRateThrottle]
 
     def post(self, request):
         data = request.data
