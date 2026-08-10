@@ -126,7 +126,7 @@ class AddAddressApiView(GenericAPIView):
     """
     serializer_class = AddressSerializer
     model = Address
-    
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return self.model.objects.filter(customer__user_id=self.request.user.id)
 
@@ -279,7 +279,7 @@ class CustomerCommentsApiView(GenericAPIView):
     """
     serializer_class = CommentSerializer
     model = Comments
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         return Comments.objects.filter(user__user__id=self.request.user.id)
 
@@ -332,7 +332,7 @@ class CustomerAddCommentsApiView(GenericAPIView):
     """
     serializer_class = CommentSerializer
     model = Comments
-
+    permission_classes=[IsAuthenticated]
     def post(self, request, pk):
         data = request.data
         product = Product.objects.get(pk=pk)
@@ -580,6 +580,7 @@ class CanRateAPIView(GenericAPIView):
         - Ensures that only customers who have purchased the product can rate it.
         - Prevents unauthorized or fake ratings by enforcing a purchase check.
     """
+    permission_classes =[IsAuthenticated]
     def get(self, request, pk):
         customer = Customer.objects.get(user=request.user)
         product = Product.objects.get(pk=pk)
@@ -620,7 +621,7 @@ class GetCustomerDetail(GenericAPIView):
     
 class AddReplaytoCommentApiView(GenericAPIView):
     serializer_class = ReplyCommentSerializer
-    
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self,pk):
         return Comments.objects.get(pk=pk)
