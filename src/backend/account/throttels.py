@@ -39,3 +39,13 @@ class RegisterRateThrottle(AnonRateThrottle):
 
 class StaffRegisterRateThrottle(UserRateThrottle):
     scope = "staff_register"
+    
+    
+    
+class ResetCodeVerifyRateThrottle(AnonRateThrottle):
+    scope = "reset_code_veri"
+    
+    
+    
+class PasswordResetRequestThrottle(AnonRateThrottle):
+    scope = 'password_reset'

@@ -495,7 +495,8 @@ class VerifyResetCodeApiView(GenericAPIView):
     """
     serializer_class = VerifyCodeSerializer
     permission_classes = []
-
+    throttle_classes = [ResetCodeVerifyRateThrottle]
+    
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -178,6 +178,8 @@ REST_FRAMEWORK = {
         'login': '5/minute',
         'register' : '1000/day',
         'staff_register': '1000/day',
+        "reset_code_veri":'1000/day',
+        "password_reset":"1000/day"
     },
 }
 
