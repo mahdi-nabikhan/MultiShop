@@ -467,7 +467,7 @@ class StoreDetailApiView(GenericAPIView):
 
 class ListImageProductApiview (GenericAPIView):
     serializer_class = ProductImageSerializer
-    permission_classes =[AllowAny]
+    
     
     
     def get_queryset(self,pk):

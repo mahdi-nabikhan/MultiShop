@@ -7,6 +7,12 @@ from ...permissions import IsStoreOwner
 from .serializers import StoreSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from website.api.serializers import ProductImageSerializer
+from rest_framework.permissions import IsAuthenticated,AllowAny
+from .permissions import (IsManagerPermissions,IsAdminPermissions,
+                          IsOperatorPermissions,IsManagerOrAdminPermissions,
+                          IsVendorStaffPermissions
+                          )
+
 
 
 class ManagerRegisterAPIView(GenericAPIView):
@@ -43,7 +49,7 @@ class ManagerRegisterAPIView(GenericAPIView):
 
     serializer_class = ManagerSerializer
     queryset = Manager.objects.all()
-
+    permission_classes = [AllowAny]
     def post(self, request):
         """
         Handle manager registration request.
@@ -99,7 +105,7 @@ class AdminRegisterAPIView(GenericAPIView):
             Validation errors in submitted data.
     """
     serializer_class = AdminsSerializer
-
+    permission_classes = [IsManagerPermissions]
     def post(self, request):
         """
         Handle admin registration request.
@@ -157,7 +163,7 @@ class OperatorRegisterAPIView(GenericAPIView):
             Validation errors in submitted data.
     """
     serializer_class = OperatorSerializer
-
+    permission_classes =[IsManagerOrAdminPermissions]
     def post(self, request):
         """
         Handle operator registration request.
@@ -221,7 +227,7 @@ class AddProductAPIView(GenericAPIView):
 
     serializer_class = ProductSerializer
     model = Product
-
+    permission_classes = [IsManagerOrAdminPermissions]
     def get_queryset(self):
         """
         Return products related to the authenticated user's role.
@@ -326,7 +332,7 @@ class ProductDetailAPIView(GenericAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     model = Product
-
+    permission_classes = [IsManagerOrAdminPermissions]
     def get(self, request, pk):
         """
         Retrieve product details by ID.
@@ -427,7 +433,7 @@ class StoreUpdateApiView(GenericAPIView):
     """
 
     serializer_class = StoreSerializer
-
+    permission_classes = [IsManagerPermissions]
     def get_queryset(self):
         """
         Retrieve the store associated with the authenticated manager.
@@ -489,6 +495,7 @@ class StoreUpdateApiView(GenericAPIView):
 
 
 class AllProductShopApiView(GenericAPIView):
+    
     """
     API endpoint for retrieving all products of a shop.
 
@@ -515,7 +522,7 @@ class AllProductShopApiView(GenericAPIView):
     
     serializer_class = ProductSerializer
     model = Product
-
+    permission_classes = [IsVendorStaffPermissions]
     def get_queryset(self):
         """
         Return all products related to the authenticated user's shop.
@@ -587,7 +594,7 @@ class AddProductImageAPIView(GenericAPIView):
 
     serializer_class = AddImageSerializer
     model = Product
-
+    permission_classes = [IsManagerOrAdminPermissions]
     def post(self, request, pk):
         """
         Handle image upload for a specific product.
@@ -638,7 +645,7 @@ class AddProductsDiscountAPIView(GenericAPIView):
     
     serializer_class = AddDiscountSerializer
     queryset = Discount.objects.all()
-
+    permission_classes = [IsVendorStaffPermissions]
     def post(self, request, pk):
         data = request.data
         serializer = self.serializer_class(data=data, context={'request': request, 'pk': pk})
@@ -681,7 +688,7 @@ class OrderItemUpdateStatusApiView(GenericAPIView):
     """
     serializer_class=OrderItemUpdateStatusSerializer
     queryset=OrderItem.objects.all()
-    
+    permission_classes = [IsVendorStaffPermissions]
     
     def put(self,request,pk):
         obj=self.queryset.get(pk=pk)
@@ -789,7 +796,7 @@ class ManagerAndOperatorUserRoleAPIViews(GenericAPIView):
         401 Unauthorized:
             Authentication credentials were not provided.
     """
-
+    permission_classes = [IsVendorStaffPermissions]
     def get(self,request):
         user = request.user
         role =''
@@ -805,7 +812,7 @@ class ManagerAndOperatorUserRoleAPIViews(GenericAPIView):
     
 class ShopOrderListAPIView(GenericAPIView):
     serializer_class = ListOrderSerialazers
-    
+    permission_classes = [IsVendorStaffPermissions]
     
     def get_queryset(self):
         store = (
@@ -813,6 +820,8 @@ class ShopOrderListAPIView(GenericAPIView):
         if hasattr(self.request.user, "manager")
         else self.request.user.admin.shop
         if hasattr(self.request.user, "admin")
+        else self.request.user.operator.shop
+        if hasattr(self.request.user, "operator")
         else self.request.user.operator.shop
         )
         return Order.objects.filter(
@@ -827,7 +836,7 @@ class ShopOrderListAPIView(GenericAPIView):
 
 
 class DeleteProductDiscount(GenericAPIView):
-    
+    permission_classes = [IsVendorStaffPermissions]
     
     def get_queryset(self,pk):
         return Discount.objects.get(pk=pk)
@@ -843,9 +852,9 @@ class DeleteProductDiscount(GenericAPIView):
         
 class ShopAdminListAPIView(GenericAPIView):
     serializer_class = AdminsSerializer
+    permission_classes = [IsManagerPermissions]
     def get_queryset(self):
         store = Store.objects.get(manager__user = self.request.user)
-       
         return Admin.objects.filter(shop=store)
     def get(self,request):
         
@@ -858,7 +867,7 @@ class ShopAdminListAPIView(GenericAPIView):
     
 class ShopOperatorListApiView(GenericAPIView):
     serializer_class = OperatorSerializer
-    
+    permission_classes = [IsManagerOrAdminPermissions]
     
     def get_queryset(self):
         store = Store.objects.get(manager__user = self.request.user)
@@ -876,7 +885,7 @@ class ShopOperatorListApiView(GenericAPIView):
         
 class ShopOperatorDetailAPIView(GenericAPIView):
     serializer_class= OperatorSerializer
-    
+    permission_classes = [IsVendorStaffPermissions]
     def get_queryset(self,pk):
         return Operator.objects.get(pk=pk)
     
@@ -919,7 +928,7 @@ class ShopOperatorDetailAPIView(GenericAPIView):
 
 class ShopAdminDetailAPIView(GenericAPIView):
     serializer_class= AdminsSerializer
-    
+    permission_classes = [IsManagerOrAdminPermissions]
     def get_queryset(self,pk):
         return Admin.objects.get(pk=pk)
     
@@ -968,7 +977,7 @@ class ShopAdminDetailAPIView(GenericAPIView):
 
 
 class VendorAddProductImageApiView(GenericAPIView):
-
+    permission_classes =[IsVendorStaffPermissions]
     serializer_class = ProductImageSerializer
 
     parser_classes = [
@@ -1038,7 +1047,7 @@ class StoreRelatedWithCategory(GenericAPIView):
     
     
 class DeleteImageProductAPIView(GenericAPIView):
-    
+    permission_classes = [IsVendorStaffPermissions]
     
     def get_queryset(self,pk):
         return ProductImages.objects.get(pk=pk)
@@ -1054,7 +1063,7 @@ class DeleteImageProductAPIView(GenericAPIView):
 
 class ManagerDetailApiView(GenericAPIView):
     serializer_class = ManagerSerializer
-    
+    permission_classes = [IsManagerPermissions]
     def get_queryset(self):
         return Manager.objects.get(user= self.request.user)
     
@@ -1076,7 +1085,7 @@ class ManagerDetailApiView(GenericAPIView):
     
     
 class AdminDetaiApiView(GenericAPIView):
-    
+    permission_classes=[IsManagerOrAdminPermissions]
     
     serializer_class = AdminsSerializer
     
@@ -1104,6 +1113,7 @@ class AdminDetaiApiView(GenericAPIView):
     
 class OperatorDetailApiView(GenericAPIView):
     serializer_class =  OperatorSerializer
+    permission_classes = [IsVendorStaffPermissions]
     
     
     def get_queryset(self):
