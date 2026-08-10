@@ -342,7 +342,7 @@ class ProductDetailAPIView(GenericAPIView):
             Response:
                 200 OK with serialized product data.
         """
-        obj = self.model.objects.get(pk=pk)
+        obj = self.get_object()
         serializer = self.serializer_class(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

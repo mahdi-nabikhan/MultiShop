@@ -63,7 +63,7 @@ class IsProductOwner(permissions.BasePermission):
 
         return (
             obj.store.manager.user == user
-            or obj.store.admin.user == user
+            or obj.store.admins.filter(user=user).exists()
         )
 
 
@@ -76,7 +76,7 @@ class IsProductImageOwner(permissions.BasePermission):
 
         return (
             product.store.manager.user == user
-            or product.store.admin.user == user
+            or  obj.store.admins.filter(user=user).exists()
         )
 
 
@@ -93,7 +93,7 @@ class IsDiscountOwner(permissions.BasePermission):
 
         return (
             product.store.manager.user == user
-            or product.store.admin.user == user
+            or  obj.store.admins.filter(user=user).exists()
         )
 
 
@@ -106,5 +106,5 @@ class IsProductRateOwner(permissions.BasePermission):
 
         return (
             product.store.manager.user == user
-            or product.store.admin.user == user
+            or  obj.store.admins.filter(user=user).exists()
         )
