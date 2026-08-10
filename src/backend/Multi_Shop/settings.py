@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent  
 
@@ -48,6 +48,8 @@ INSTALLED_APPS = [
 
     'drf_yasg',
     'rest_framework_simplejwt',
+    "rest_framework_simplejwt.token_blacklist",
+    
     'axes',
     'channels',
     'corsheaders',
@@ -216,4 +218,12 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME":timedelta(days=7),
+    
+    "ROTATE_REFRESH_TOKENS":True,
+    "BLACKLIST_AFTER_ROTATION":True
+}
 

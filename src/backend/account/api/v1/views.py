@@ -21,6 +21,9 @@ from django.core.mail import send_mail
 from rest_framework.generics import GenericAPIView
 import random
 from account.tasks import *
+from rest_framework_simplejwt.views import TokenRefreshView
+
+from rest_framework_simplejwt.exceptions import TokenError
 class CustomObtainAuthToken(ObtainAuthToken):
     """
     Custom authentication endpoint for obtaining user tokens.
@@ -556,10 +559,12 @@ class LogoutAPIView(GenericAPIView):
 
         if refresh_token:
             try:
-                RefreshToken(refresh_token).blacklist()
-            except Exception:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except TokenError:
+                # Token is invalid, expired, or already blacklisted. 
+                #  Logout should still succeed.
                 pass
-
         response = Response(
             {
                 "success": True,
@@ -568,10 +573,55 @@ class LogoutAPIView(GenericAPIView):
             status=status.HTTP_200_OK,
         )
 
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
+        response.delete_cookie("access_token",path='/')
+        response.delete_cookie("refresh_token",path='/')
 
         return response
     
+    
+class CustomTokenRefreshApiView(TokenRefreshView):
+    
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token :
+            return Response(
+                {
+                    'success':False,
+                    'message':'Refresh token not found'
+                },status=status.HTTP_401_UNAUTHORIZED
+            )
+        request.data['refresh'] = refresh_token
+        response = super().post(request,*args,**kwargs)
+        
+        if response.status_code != status.HTTP_200_OK:
+            return response
+        
+        access_token = response.data.get('access')
+        refresh_token = response.data.get('refresh')
+        
+        response.data = {
+            'success':True,
+            'message':'token refreshed successfully'
+        }
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite='Strict',
+            max_age=60*15,
+            path='/')
+        if refresh_token : 
+            response.set_cookie(
+                        key='refresh_token',
+                        value=refresh_token,
+                        httponly=True,
+                        secure=True,
+                        samesite='Strict',
+                        max_age=60*60*24*7,
+                        path='/')
+        return response
+            
+        
     
     
