@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     'axes',
     'channels',
     'corsheaders',
-    'auditlog'
+    'auditlog',
+    
+    'django_elasticsearch_dsl'
     
 ]
 
@@ -235,3 +237,11 @@ SIMPLE_JWT = {
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+
+
+ELASTICSEARCH_DSL = {
+    'default' : {
+        'hosts':'http://elasticsearch:9200',
+    }
+}
