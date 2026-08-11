@@ -4,7 +4,7 @@ from .models import Store
 
 
 @registry.register_document
-class ProductDocument(Document):
+class StoreDocument(Document):
     class Index : 
         name = 'products'
         settings = {
