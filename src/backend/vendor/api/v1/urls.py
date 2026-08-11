@@ -27,7 +27,8 @@ urlpatterns = [
     path('delete/images/<int:pk>/',DeleteImageProductAPIView.as_view(),name='delete-product'),
     path('manager/detail/',ManagerDetailApiView.as_view(),name='manager-deatil'),
     path('admin/detail/',AdminDetaiApiView.as_view(),name='admin-detail'),
-    path('operator/detail/',OperatorDetailApiView.as_view(),name='operator-detail')
+    path('operator/detail/',OperatorDetailApiView.as_view(),name='operator-detail'),
+    path('search/store/',StoreSearchApi.as_view(),name = 'search-store')
     
 
 ]

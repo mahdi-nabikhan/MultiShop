@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import axios from "axios";
+import SearchBox from "../SearchBox/SearchBox";
 import { useEffect, useState } from "react";
 
 
@@ -119,18 +120,7 @@ export default function Navbar() {
 
             {/* Search */}
 
-            <form className="search-box">
-
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                />
-
-                <button type="submit">
-                    Search
-                </button>
-
-            </form>
+            <SearchBox/>
 
             {/* Authentication */}
 

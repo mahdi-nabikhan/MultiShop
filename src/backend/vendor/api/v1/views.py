@@ -10,7 +10,7 @@ from website.api.serializers import ProductImageSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from .permissions import *
 from account.throttels import StaffRegisterRateThrottle
-
+from ...index import StoreDocument
 
 class ManagerRegisterAPIView(GenericAPIView):
     """
@@ -1134,3 +1134,64 @@ class OperatorDetailApiView(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)    
     
+    
+    
+
+
+class StoreSearchApi(GenericAPIView):
+
+    def get(self, request):
+        q = request.query_params.get('q')
+
+        if not q:
+            return Response(
+                {
+                    'success': False,
+                    'message': 'Search query is required.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        search = StoreDocument.search()
+
+        search = search.query(
+            'bool',
+            should=[
+                {
+                    'match': {
+                        'name': {
+                            'query': q,
+                            'boost': 3
+                        }
+                    }
+                },
+                {
+                    'match': {
+                        'description': {
+                            'query': q
+                        }
+                    }
+                }
+            ],
+            minimum_should_match=1
+        )
+
+        results = search.execute()
+
+        data = [
+            {
+                'id': hit.meta.id,
+                'score': hit.meta.score,
+                **hit.to_dict()
+            }
+            for hit in results
+        ]
+
+        return Response(
+            {
+                'success': True,
+                'count': len(data),
+                'results': data
+            },
+            status=status.HTTP_200_OK
+        )

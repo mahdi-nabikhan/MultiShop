@@ -12,7 +12,7 @@ from .pagination import WebsiteShopPaginations,WebsiteRandomProductPaginations
 from .serializers import ProductImageSerializer
 from rest_framework.permissions import AllowAny
 from elasticsearch import Elasticsearch
-
+from ..index import ProductDocument
 
 
 class RandomProductsApiView(APIView):
@@ -127,90 +127,63 @@ class ProductsFilteringAPIView(ListAPIView):
         return query_set
 
 
-# class ProductSearchApi(APIView):
-#     """
-#     API view to search products using Elasticsearch with filters and boost.
+class ProductSearchApi(GenericAPIView):
+    
+    def get(self, request):
+        q = request.query_params.get("q")
 
-#     Responsibilities
-#     ----------------
-#     - GET: Perform a full-text search on products using Elasticsearch.
-#     - Supports optional filtering by category and store.
-#     - Boosts matches on 'name' field (boost=3) over 'description' field.
+        if not q:
+            return Response(
+                {
+                    "success": False,
+                    "message": "Search query is required."
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-#     Attributes
-#     ----------
-#     (Uses global `es` client instance.)
+        search = ProductDocument.search()
 
-#     Methods
-#     -------
-#     get(self, request)
-#         - Reads query parameters: 'q' (search term), 'category', 'store'.
-#         - Builds an Elasticsearch bool query:
-#             - 'must' filters: term filters for category and store (if provided).
-#             - 'should' clauses: match query on 'name' with boost=3, and match on 'description'.
-#         - Sends request to Elasticsearch index 'products_index'.
-#         - Extracts hits, each containing '_id', '_score', and all _source fields.
-#         - Returns list of hits as JSON response.
+        search = search.query(
+            "bool",
+            should=[
+                {
+                    "match": {
+                        "name": {
+                            "query": q,
+                            "boost": 3
+                        }
+                    }
+                },
+                {
+                    "match": {
+                        "description": {
+                            "query": q
+                        }
+                    }
+                }
+            ],
+            minimum_should_match=1
+        )
 
-#     Usage
-#     -----
-#         # Basic search
-#         GET /api/v1/search/?q=laptop
+        results = search.execute()
 
-#         # Search within a category
-#         GET /api/v1/search/?q=laptop&category=electronics
+        data = [
+            {
+                "id": hit.meta.id,
+                "score": hit.meta.score,
+                **hit.to_dict()
+            }
+            for hit in results
+        ]
 
-#         # Search with store filter
-#         GET /api/v1/search/?q=laptop&store=123
-
-#         # Combined filters
-#         GET /api/v1/search/?q=laptop&category=electronics&store=456
-
-#     Notes
-#     -----
-#     - Requires Elasticsearch running at "http://localhost:59200".
-#     - Index name is hardcoded as 'products_index'.
-#     - If no 'q' parameter is provided, the query still returns results? (Because 'q' is optional; should clause may be empty.) Actually must_filters may be empty, should clauses still run with empty query? It will match all documents? Behavior depends on ES. The code doesn't force 'q' to be required.
-#     - No authentication required.
-#     """
-
-#     def get(self, request):
-#         q = request.query_params.get("q", "")
-#         category = request.query_params.get("category")
-#         store = request.query_params.get("store")
-
-#         must_filters = []
-#         if category:
-#             must_filters.append({"term": {"category": category}})
-
-#         if store:
-#             must_filters.append({"term": {"store": store}})
-
-#         body = {
-#             "query": {
-#                 "bool": {
-#                     "must": must_filters,
-#                     "should": [
-#                         {"match": {"name": {"query": q, "boost": 3}}},
-#                         {"match": {"description": {"query": q}}}
-#                     ]
-#                 }
-#             }
-#         }
-
-#         results = es.search(index="products_index", body=body)
-
-#         hits = [
-#             {
-#                 "id": hit["_id"],
-#                 "score": hit["_score"],
-#                 **hit["_source"]
-#             }
-#             for hit in results["hits"]["hits"]
-#         ]
-
-#         return Response(hits)
-
+        return Response(
+            {
+                "success": True,
+                "count": len(data),
+                "results": data
+            },
+            status=status.HTTP_200_OK
+        )
 
 # class AutoCompleteApi(APIView):
 #     """
