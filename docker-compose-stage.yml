@@ -183,6 +183,11 @@ services:
     depends_on :
       - 'redis'
       - 'backend'
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./src/backend/staticfiles:/app/staticfiles
+      - ./src/backend/media:/app/media
+
 
 
 volumes:
