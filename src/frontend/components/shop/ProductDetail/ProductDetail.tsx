@@ -563,7 +563,7 @@ export default function ProductDetail({
           productId={product.id}
 
 
-          isAuthenticated={isAuthenticated}
+          isAuthenticated={isAuthenticated??false}
 
 
 

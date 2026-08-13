@@ -1,35 +1,58 @@
 # ==============================
 # Build Stage
 # ==============================
-FROM node:22-alpine AS builder
+
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package files
+COPY package.json package-lock.json ./
 
-RUN npm install
+# Use official npm registry
+RUN npm config set registry https://registry.npmjs.org/ \
+    && npm config set fetch-retries 10 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 120000 \
+    && npm config set fetch-timeout 600000 \
+    && npm ci
 
+# Copy source code
 COPY . .
 
+# Build Next.js application
 RUN npm run build
+
 
 # ==============================
 # Production Stage
 # ==============================
-FROM node:22-alpine
+
+FROM node:24-alpine AS production
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY package*.json ./
+# Copy package files
+COPY package.json package-lock.json ./
 
-RUN npm install --omit=dev
+# Install production dependencies
+RUN npm config set registry https://registry.npmjs.org/ \
+    && npm config set fetch-retries 10 \
+    && npm config set fetch-retry-mintimeout 20000 \
+    && npm config set fetch-retry-maxtimeout 120000 \
+    && npm config set fetch-timeout 600000 \
+    && npm ci --omit=dev
 
+# Copy Next.js build
 COPY --from=builder /app/.next ./.next
+
+# Copy public files
 COPY --from=builder /app/public ./public
+
+# Copy Next.js configuration
 COPY --from=builder /app/next.config.ts ./next.config.ts
-COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 

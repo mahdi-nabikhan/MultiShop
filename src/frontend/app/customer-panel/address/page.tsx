@@ -4,8 +4,8 @@
 import {useState} from "react";
 
 
-import CustomerAddressCreate from "@/components/customer panel/CustomerAddressCreate/CustomerAddressCreate";
-import CustomerAddressList from "@/components/customer panel/CustomerAddressList/CustomerAddressList";
+import CustomerAddressCreate from "@/components/customer-panel/CustomerAddressCreate/CustomerAddressCreate";
+import CustomerAddressList from "@/components/customer-panel/CustomerAddressList/CustomerAddressList";
 
 export default function Page(){
 
