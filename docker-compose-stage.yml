@@ -44,6 +44,8 @@ services:
       "
     volumes:
       - ./src/backend:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
     ports:
       - "8000:8000"
     environment:
@@ -184,9 +186,9 @@ services:
       - 'redis'
       - 'backend'
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./src/backend/staticfiles:/app/staticfiles
-      - ./src/backend/media:/app/media
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:r
 
 
 
@@ -195,4 +197,6 @@ volumes:
   esdata:
   postgres_data:
   elasticsearch_data:
+  static_volume:
+  media_volume:
   
