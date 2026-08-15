@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.auth import login
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from account.models import User
 
 
 class LoginSerializer(serializers.Serializer):
@@ -59,7 +60,7 @@ class LoginSerializer(serializers.Serializer):
     Returns:
         dict: Validated attributes containing the authenticated user.
     """
-    email = serializers.CharField(label=_("Email"), write_only=True)
+    email = serializers.EmailField(label=_("Email"), write_only=True)
     password = serializers.CharField(
         label=_("Password"),
         style={'input_type': 'password'},
@@ -70,18 +71,11 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, attrs):
         email = attrs['email']
         password = attrs['password']
-        if email and password:
-            user = authenticate(request=self.context.get('request'), username=email, password=password)
-            if not user:
-                if not user:
-                    msg = _('Unable to log in with provided credentials.')
-                    raise serializers.ValidationError()
-        else:
-            msg = _('Must include "email" and "password".')
-            raise serializers.ValidationError({'non_field_errors': [msg]})
+    
+        user = authenticate(request=self.context.get('request'), username=email, password=password)
+        if not user:
+            raise serializers.ValidationError()
         attrs['user'] = user
-
-
         return attrs
 
 
@@ -158,12 +152,13 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             validate_password(password1)
         except ValidationError as e:
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError({'password':e.message})
         return attrs
 
     def create(self, validated_data):
         validated_data.pop('password2')
         return User.objects.create_user(**validated_data)
+
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -268,23 +263,40 @@ class ChangePasswordSerializer(serializers.Serializer):
         Use this serializer to validate and update the user's password in password
         change endpoints.
         """
-    old_password = serializers.CharField(max_length=255, required=True)
-    new_password = serializers.CharField(max_length=255, required=True)
-    new_password1 = serializers.CharField(max_length=255, required=True)
+    old_password = serializers.CharField(max_length=255, required=True,write_only = True,trim_whitespace=False)
+    new_password = serializers.CharField(max_length=255, required=True,write_only = True,trim_whitespace=False)
+    new_password1 = serializers.CharField(max_length=255, required=True,write_only = True,trim_whitespace=False)
 
     def validate(self, data):
-        if data['new_password'] != data['new_password1']:
-            raise serializers.ValidationError({'password': 'Passwords do not match'})
-
+        user = self.context['request'].user
+        old_password=data['old_password']
+        new_password=data['new_password']
+        new_password1 = data['new_password1']
+        
+        
+        if not user.check_password(old_password):
+            raise serializers.ValidationError({
+                'old_password':'Your current password is incorrect.'
+            })
+        
+        if new_password != new_password1:
+            raise serializers.ValidationError({
+                "new_password1": _("Passwords do not match.")
+            })
+            
+        if old_password == new_password :
+             raise serializers.ValidationError({
+                "new_password": _("New password must be different from the current password.")
+            })
         try:
-            validate_password(data.get('new_password'))
-        except ValidationError as e:
-            raise serializers.ValidationError({'password': e.messages})  # `e.messages` is a list
-        return data
+            validate_password(password=new_password,user=user)
+            
+        except ValidationError as e :
+             raise serializers.ValidationError({
+                "new_password": e.messages
+            }) 
 
 
-
-# serializers.py
 
 
 class SendCodeSerializer(serializers.Serializer):
@@ -343,20 +355,29 @@ class VerifyCodeSerializer(serializers.Serializer):
         serializer.is_valid(raise_exception=True)
         user = serializer.user
     """
-    code = serializers.CharField(max_length=6)
+    email = serializers.EmailField()
+    code = serializers.RegexField(
+    regex=r"^\d{6}$",
+    write_only=True)
 
-    def validate_code(self, value):
+    def validate(self, attrs):
+        email = attrs['email']
+        code = attrs['code']
+        
         try:
-            obj = PasswordResetCode.objects.get(code=value)
+            obj = PasswordResetCode.objects.select_related(
+                'user'
+                ).get(user__email=email,code=code)
         except PasswordResetCode.DoesNotExist:
-            raise serializers.ValidationError("Invalid code")
-
+            raise serializers.ValidationError({
+                "code": "Invalid code."
+            }) 
         if obj.is_expired():
-            raise serializers.ValidationError("Code expired")
-
+            raise serializers.ValidationError({
+                "code": "Code expired."
+            })
         self.user = obj.user
-        return value
-
+        return attrs
 
 
 class CheckMeSerializer(serializers.ModelSerializer):
