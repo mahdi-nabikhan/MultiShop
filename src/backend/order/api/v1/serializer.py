@@ -5,6 +5,7 @@ from website.models import *
 from vendor.api.v1.serializers import ProductSerializer
 
 
+
 class OrderSerializer(serializers.ModelSerializer):
     """
     Serializer for the Order model, used for creating and representing customer orders.
