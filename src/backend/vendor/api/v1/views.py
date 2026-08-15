@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated,AllowAny
 from .permissions import *
 from account.throttels import StaffRegisterRateThrottle
 from ...index import StoreDocument
+from django.shortcuts import get_object_or_404
 
 class ManagerRegisterAPIView(GenericAPIView):
     """
@@ -65,7 +66,7 @@ class ManagerRegisterAPIView(GenericAPIView):
         serializer = self.serializer_class(data=data, context={'request': request})
         if serializer.is_valid():
             manager = serializer.save()
-            Token.objects.create(user=manager.user)
+            Token.objects.get_or_create(user=manager.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -122,9 +123,9 @@ class AdminRegisterAPIView(GenericAPIView):
         serializer = self.serializer_class(data=data, context={'request': request})
         if serializer.is_valid():
             admin = serializer.save()
-            Token.objects.create(user=admin.user)
+            Token.objects.get_or_create(user=admin.user)
             return Response(
-                {'email': serializer.validated_data.get('email'), 'massage': 'admin successfully registered'},
+                {'email': admin.user.email, 'message': 'admin successfully registered'},
                 status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -180,10 +181,11 @@ class OperatorRegisterAPIView(GenericAPIView):
         data = request.data
         serializer = self.serializer_class(data=data, context={'request': request})
         if serializer.is_valid():
-            admin = serializer.save()
-            Token.objects.create(user=admin.user)
+            operator = serializer.save()
+            Token.objects.get_or_create(
+            user=operator.user)
             return Response(
-                {'email': serializer.validated_data.get('email'), 'massage': 'admin successfully registered'},
+                {'email': operator.user.email, 'massage': 'admin successfully registered'},
                 status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -243,14 +245,17 @@ class AddProductAPIView(GenericAPIView):
             NotFound:
                 If the user is not associated with any valid role.
         """
-        my_manager = Manager.objects.filter(user=self.request.user).exists()
-        my_admin = Admin.objects.filter(user=self.request.user).exists()
-        if my_manager:
-            obj = self.model.objects.filter(store__manager__user=self.request.user)
-            return obj
-        elif my_admin:
-            obj = self.model.objects.filter(store__admin__user=self.request.user)
-            return obj
+        user = self.request.user
+        Manager.objects.filter(user=user).exists()
+        Admin.objects.filter(user=user).exists()
+        if Manager.objects.filter(user=user).exists():
+            return self.model.objects.filter(
+                store__manager__user=user
+            )
+        elif Admin.objects.filter(user=user).exists():
+            return self.model.objects.filter(
+            store__admins__user=user
+        )
         else:
             return Response('no such user', status=status.HTTP_404_NOT_FOUND)
 
@@ -267,7 +272,7 @@ class AddProductAPIView(GenericAPIView):
                 - 404 NOT FOUND if the user has no valid role.
         """
         obj = self.get_queryset()
-        serializer = self.serializer_class(obj, many=True)
+        serializer = self.serializer_class(obj, many=True,context={'request':request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -346,7 +351,7 @@ class ProductDetailAPIView(GenericAPIView):
                 200 OK with serialized product data.
         """
         obj = self.get_object()
-        serializer = self.serializer_class(obj)
+        serializer = self.serializer_class(obj,context={'request':request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
@@ -366,7 +371,7 @@ class ProductDetailAPIView(GenericAPIView):
         """
         obj = self.model.objects.get(pk=pk)
         data = request.data
-        serializer = self.serializer_class(instance=obj, data=data)
+        serializer = self.serializer_class(instance=obj, data=data,context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -390,7 +395,7 @@ class ProductDetailAPIView(GenericAPIView):
         """
         data = request.data
         obj = self.model.objects.get(pk=pk)
-        serializer = self.serializer_class(obj, data=data, partial=True)
+        serializer = self.serializer_class(obj, data=data, partial=True,context={'request':request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -434,7 +439,7 @@ class StoreUpdateApiView(GenericAPIView):
 
     serializer_class = StoreSerializer
     permission_classes = [IsManagerPermissions]
-    def get_queryset(self):
+    def get_store(self):
         """
         Retrieve the store associated with the authenticated manager.
 
@@ -446,8 +451,10 @@ class StoreUpdateApiView(GenericAPIView):
             DoesNotExist:
                 If no store is associated with the current user.
         """
-        store = Store.objects.get(manager__user=self.request.user)
-        return store
+        return get_object_or_404(
+            Store,
+            manager__user=self.request.user
+        )
 
     def put(self, request):
         """
@@ -461,9 +468,9 @@ class StoreUpdateApiView(GenericAPIView):
                 200 OK with updated store data on success.
                 400 BAD REQUEST with validation errors on failure.
         """
-        data = request.data
-        store = self.get_queryset()
-        serializer = self.serializer_class(instance=store, data=data)
+        
+        store = self.get_store()
+        serializer = self.serializer_class(instance=store, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -485,7 +492,7 @@ class StoreUpdateApiView(GenericAPIView):
                 400 BAD REQUEST with validation errors on failure.
         """
         data = request.data
-        store = self.get_queryset()
+        store = self.get_store()
         serializer = self.serializer_class(instance=store, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -524,28 +531,15 @@ class AllProductShopApiView(GenericAPIView):
     model = Product
     permission_classes = [IsVendorStaffPermissions]
     def get_queryset(self):
-        """
-        Return all products related to the authenticated user's shop.
+        user = self.request.user
 
-        The queryset is filtered based on whether the current user
-        is associated with a store as a Manager or an Admin.
+        return self.queryset.filter(
+            models.Q(store__manager__user=user) |
+            models.Q(store__admins__user=user)
+        ).select_related(
+            'store'
+        )
 
-        Returns:
-            QuerySet:
-                Products related to the user's store.
-            dict:
-                {'not found'} if the user has no associated store.
-        """
-        
-        if Store.objects.filter(manager__user=self.request.user).exists():
-            print('this is you products -----------------------------',
-                  self.model.objects.filter(store__manager__user=self.request.user), 'this  your user',
-                  self.request.user)
-            return self.model.objects.filter(store__manager__user=self.request.user)
-        elif Store.objects.filter(admin__user=self.request.user).exists():
-            return self.model.objects.filter(store__admin__user=self.request.user)
-        else:
-            return {'not found'}
 
     def get(self, request):
         """
@@ -559,7 +553,7 @@ class AllProductShopApiView(GenericAPIView):
                 200 OK with serialized product data.
         """
         obj = self.get_queryset()
-        serializer = self.serializer_class(obj, many=True)
+        serializer = self.serializer_class(obj, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -642,10 +636,16 @@ class AddProductsDiscountAPIView(GenericAPIView):
         400 Bad Request:
             Invalid request data.
     """
+
     
     serializer_class = AddDiscountSerializer
-    queryset = Discount.objects.all()
     permission_classes = [IsVendorStaffPermissions,IsProductOwner]
+    
+    def get_queryset(self):
+            return self.queryset.filter(
+            products__pk=self.kwargs["pk"]
+        )
+    
     def post(self, request, pk):
         data = request.data
         serializer = self.serializer_class(data=data, context={'request': request, 'pk': pk})
@@ -656,7 +656,7 @@ class AddProductsDiscountAPIView(GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, pk):
-        data = self.get_queryset().filter(products__pk=pk)
+        data = self.get_queryset()
         serializer = self.serializer_class(data, many=True,context= {'request':request,'pk':pk})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -691,8 +691,11 @@ class OrderItemUpdateStatusApiView(GenericAPIView):
     permission_classes = [IsVendorStaffPermissions]
     
     def put(self,request,pk):
-        obj=self.queryset.get(pk=pk)
-        serializer=self.serializer_class(data=request.data, instance=obj)
+        obj = get_object_or_404(
+            self.get_queryset(),
+            pk=pk
+        )
+        serializer=self.serializer_class(data=request.data, instance=obj,context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
@@ -737,22 +740,22 @@ class StoreDetailAndDelete(GenericAPIView):
     
       
 
-    def get_queryset(self):
+    def get_store(self):
         return Store.objects.get(manager__user= self.request.user)
 
     def get(self, request):
-        data = self.get_queryset()
+        data = self.get_store()
         serializer = self.serializer_class(
             instance=data, context={"request", request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request):
-        data = self.get_queryset()
+        data = self.get_store()
         data.delete()
         return Response({'msg': 'store successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request):
-        obj = self.get_queryset()
+        obj = self.get_store()
         data = request.data
         serilaizer = self.serializer_class(
             instance=obj, data=data, context={"request": request})
@@ -763,7 +766,7 @@ class StoreDetailAndDelete(GenericAPIView):
             return Response(serilaizer.errors, status=status.HTTP_404_NOT_FOUND)
 
     def patch(self, request):
-        obj = self.get_queryset()
+        obj = self.get_store()
         data = request.data
         serilaizer = self.serializer_class(instance=obj, data=data, context={
                                            "request": request}, partial=True)
@@ -815,18 +818,26 @@ class ShopOrderListAPIView(GenericAPIView):
     permission_classes = [IsVendorStaffPermissions]
     
     def get_queryset(self):
-        store = (
-        self.request.user.manager.store
-        if hasattr(self.request.user, "manager")
-        else self.request.user.admin.shop
-        if hasattr(self.request.user, "admin")
-        else self.request.user.operator.shop
-        if hasattr(self.request.user, "operator")
-        else self.request.user.operator.shop
+        user = self.request.user
+
+        if hasattr(user, "manager"):
+            store = user.manager.store
+        elif hasattr(user, "admin"):
+            store = user.admin.shop
+        elif hasattr(user, "operator"):
+            store = user.operator.shop
+        else:
+            return Order.objects.none()
+
+        return (
+            Order.objects
+            .filter(items__product__store=store)
+            .select_related("customer")
+            .distinct()
         )
-        return Order.objects.filter(
-            items__product__store=store
-        ).distinct()
+
+        
+        
         
         
     def get(self,request):
@@ -854,8 +865,11 @@ class ShopAdminListAPIView(GenericAPIView):
     serializer_class = AdminsSerializer
     permission_classes = [IsManagerPermissions]
     def get_queryset(self):
-        store = Store.objects.get(manager__user = self.request.user)
-        return Admin.objects.filter(shop=store)
+        return (
+            Admin.objects
+            .filter(shop__manager__user=self.request.user)
+            .select_related("user", "shop")
+        )
     def get(self,request):
         
         query = self.get_queryset()
@@ -870,8 +884,11 @@ class ShopOperatorListApiView(GenericAPIView):
     permission_classes = [IsManagerOrAdminPermissions]
     
     def get_queryset(self):
-        store = Store.objects.get(manager__user = self.request.user)
-        return Operator.objects.filter(shop= store)
+        return (
+            Operator.objects
+            .filter(shop__manager__user=self.request.user)
+            .select_related("user", "shop")
+        )
     
     def get(self,request):
         query =  self.get_queryset()
@@ -887,7 +904,14 @@ class ShopOperatorDetailAPIView(GenericAPIView):
     serializer_class= OperatorSerializer
     permission_classes = [IsVendorStaffPermissions]
     def get_queryset(self,pk):
-        return Operator.objects.get(pk=pk)
+        return (
+        Operator.objects
+        .select_related("user", "shop")
+        .get(
+            pk=pk,
+            shop__manager__user=self.request.user,
+        )
+    )
     
     
     def get(self,request,pk):
@@ -911,7 +935,7 @@ class ShopOperatorDetailAPIView(GenericAPIView):
     def patch(self,request,pk):
         obj =  self.get_queryset( pk = pk)
         data =self.request.data
-        serializer =self.serializer_class(instance=obj , data = data , context = {
+        serializer =self.serializer_class(partial=True,instance=obj , data = data , context = {
                 'request':request
                 })
                 
@@ -921,17 +945,20 @@ class ShopOperatorDetailAPIView(GenericAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
-    def delete(self,pk):
+    def delete(self,request,pk):
          obj =  self.get_queryset( pk = pk)
          obj.delete()
-         return Response({'msg':'successfully deleted'})
+         return Response({'msg':'successfully deleted'},status=status.HTTP_204_NO_CONTENT)
 
 class ShopAdminDetailAPIView(GenericAPIView):
     serializer_class= AdminsSerializer
     permission_classes = [IsManagerOrAdminPermissions]
     def get_queryset(self,pk):
-        return Admin.objects.get(pk=pk)
-    
+        return (
+            Admin.objects
+            .select_related("user", "shop")
+            .get(pk=pk)
+        )
     
     def get(self,request,pk):
         obj = self.get_queryset(pk = pk )
@@ -956,7 +983,7 @@ class ShopAdminDetailAPIView(GenericAPIView):
         data =self.request.data
         serializer =self.serializer_class(instance=obj , data = data , context = {
                 'request':request
-                })
+                },partial=True)
                 
         if serializer.is_valid():
             serializer.save()
@@ -988,10 +1015,11 @@ class VendorAddProductImageApiView(GenericAPIView):
 
     def get_product(self, pk):
 
-        return Product.objects.get(
-            pk=pk
+        return (
+            Product.objects
+            .select_related("store")
+            .get(pk=pk)
         )
-
 
     def post(self, request, pk):
 
@@ -1065,7 +1093,17 @@ class ManagerDetailApiView(GenericAPIView):
     serializer_class = ManagerSerializer
     permission_classes = [IsManagerPermissions]
     def get_queryset(self):
-        return Manager.objects.get(user= self.request.user)
+        return (
+            Manager.objects
+            .select_related(
+                "user",
+                "store",
+            )
+            .prefetch_related(
+                "store__shopaddress_set",
+            )
+            .get(user=self.request.user)
+        )
     
     
     def get(self,request):
@@ -1092,7 +1130,11 @@ class AdminDetaiApiView(GenericAPIView):
     
     
     def get_queryset(self):
-        return Admin.objects.get(user=self.request.user)
+        return (
+            Admin.objects
+            .select_related("user", "shop")
+            .get(user=self.request.user)
+        )
     
     def get(self,request):
         obj = self.get_queryset()
@@ -1117,7 +1159,11 @@ class OperatorDetailApiView(GenericAPIView):
     
     
     def get_queryset(self):
-        return Operator.objects.get(user=self.request.user)
+        return (
+            Operator.objects
+            .select_related("user", "shop")
+            .get(user=self.request.user)
+        )
     
     def get(self,request):
         obj = self.get_queryset()

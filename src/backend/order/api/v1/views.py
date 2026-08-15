@@ -243,17 +243,30 @@ class OrderItemDetailView(generics.GenericAPIView):
     - Returns 404 NOT FOUND if the OrderItem does not exist or validation fails.
     """
     serializer_class = OrderItemSerializer
-    queryset = OrderItem.objects.all()
     permission_classes = [IsAuthenticated,IsOrderItemOwner]
+    
+    def get_queryset(self):
+        return OrderItem.objects.select_related(
+            "product",
+            "order",
+        )
+
+    
     def get(self, request, pk):
-        obj = self.queryset.get(pk=pk)
+        obj = obj = get_object_or_404(
+            self.get_queryset(),
+            pk=pk,
+        )
         serializer = self.serializer_class(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, pk):
-        data = request.data
-        obj = self.queryset.get(pk=pk)
-        serializer = self.serializer_class(data=data, instance=obj)
+        
+        obj =  get_object_or_404(
+            self.get_queryset(),
+            pk=pk,
+        )
+        serializer = self.serializer_class(data=request.data, instance=obj)
         if serializer.is_valid():
             
             serializer.save(total=obj.product.price * obj.quantity)
@@ -262,9 +275,12 @@ class OrderItemDetailView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
     def patch(self, request, pk):
-        data = request.data
-        obj = self.queryset.get(pk=pk)
-        serializer = self.serializer_class(data=data, instance=obj, partial=True)
+        
+        obj =  get_object_or_404(
+            self.get_queryset(),
+            pk=pk,
+        )
+        serializer = self.serializer_class(data=request.data, instance=obj, partial=True)
         if serializer.is_valid():
             
             serializer.save(total=obj.product.price * obj.quantity)
@@ -273,7 +289,10 @@ class OrderItemDetailView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk):
-        self.queryset.get(pk=pk).delete()
+        obj = get_object_or_404(
+            self.get_queryset(),
+            pk=pk,
+        ).delete()
         return Response({'details': 'object deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -316,7 +335,12 @@ class ShopOrderListApiView(generics.GenericAPIView):
     serializer_class = OrderItemSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        return OrderItem.objects.filter(product__store__manager__user=self.request.user)
+        return OrderItem.objects.select_related(
+            "product",
+            "order",
+        ).filter(
+            product__store__manager__user=self.request.user
+        )
 
     def get(self,request):
         obj=self.get_queryset()
@@ -365,8 +389,13 @@ class OrderItemApiView(generics.GenericAPIView):
     serializer_class=OrderItemSerializer
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        order_obj=Order.objects.get(customer__user=self.request.user,status=False)
-        return OrderItem.objects.filter(order=order_obj)
+        return OrderItem.objects.select_related(
+            "product",
+            "order",
+        ).filter(
+            order__customer__user=self.request.user,
+            order__status=False,
+        )
     
     def get(self,request):
         order_item=self.get_queryset()
@@ -445,8 +474,13 @@ class RelatedOrderItemWithOrder(generics.GenericAPIView):
     IsOrderOwner,
 ]
     def get_queryset(self,pk):
-        order_obj = Order.objects.get(pk=pk)    
-        return OrderItem.objects.filter(order=order_obj)
+        return OrderItem.objects.filter(
+        order__pk=pk,
+        order__customer__user=self.request.user,
+    ).select_related(
+        "product",
+        "order",
+    )
     
     
     def get(self,request,pk):

@@ -13,7 +13,7 @@ from .serializers import ProductImageSerializer
 from rest_framework.permissions import AllowAny
 from elasticsearch import Elasticsearch
 from ..index import ProductDocument
-
+from django.shortcuts import get_object_or_404
 
 class RandomProductsApiView(APIView):
     """
@@ -55,12 +55,19 @@ class RandomProductsApiView(APIView):
         cache_key = "random_products_6"
         products = cache.get(cache_key)
 
-        if not products:
+        if  products is None:
 
-            product_ids = list(Product.objects.values_list("id", flat=True))
+            product_ids = list(
+                Product.objects.values_list("id", flat=True)
+            )
             random_ids = random.sample(product_ids, min(5, len(product_ids)))
 
-            queryset = Product.objects.filter(id__in=random_ids)
+            queryset = Product.objects.filter(
+                id__in=random_ids
+            ).select_related(
+                "category",
+                "store",
+            )
             serializer = ProductSerializer(queryset, many=True)
 
             products = serializer.data
@@ -115,7 +122,7 @@ class ProductsFilteringAPIView(ListAPIView):
 
     def get_queryset(self):
         query_set = Product.objects.all()
-        order_param = self.request.GET.get('order')
+        order_param = self.request.query_params.get('order')
 
         if order_param == 'price_asc':
             query_set = query_set.order_by('price')
@@ -423,14 +430,14 @@ class StoreDetailApiView(GenericAPIView):
     serializer_class = StoreSerializer
     permission_classes =[AllowAny]
     
-    def get_queryset(self, pk):
-        return Store.objects.get(pk=pk)
+    def get_address(self, pk):
+        return get_object_or_404(ShopAddress, store_id=pk)
 
     def get(self, request, pk):
-        data = self.get_queryset(pk=pk)
-        address = ShopAddress.objects.get(store__pk=pk)
+        store = get_object_or_404(Store, pk=pk)
+        address = self.get_address(pk)
         serializer = self.serializer_class(
-            instance=data, context={"request", request})
+            instance=store, context={"request", request})
         response_data = serializer.data
         response_data["address"] = StoreAddressSerializer(address).data
         return Response(response_data, status=status.HTTP_200_OK)
@@ -444,11 +451,10 @@ class ListImageProductApiview (GenericAPIView):
     
     
     def get_queryset(self,pk):
-        return Product.objects.get(pk=pk)
+        return ProductImages.objects.filter(product_id=pk)
     
     def get(self,request,pk):
-        product_data = self.get_queryset(pk=pk)
-        image_data = ProductImages.objects.filter(product=product_data)
+        image_data = self.get_queryset(pk=pk)
         serializer = self.serializer_class(instance=image_data,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     

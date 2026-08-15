@@ -90,7 +90,9 @@ class CreateAndListTicketAPIView(GenericAPIView):
     
     
     def get (self,request,pk):
-        obj =Ticket.objects.filter(customer__user= request.user)
+        obj = Ticket.objects.filter(
+            customer__user=request.user
+            ).select_related('customer__user')
         serializer = self.serializer_class(instance = obj,many = True,context = {'request':request,'pk':pk})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
@@ -108,17 +110,19 @@ class DetailTicketApiView(GenericAPIView):
     serializer_class=DetailTicketSerializer
     permission_classes = [IsAuthenticated,IsTicketOwner]
     
-    def get_queryset(self,pk):
-        return Ticket.objects.get(pk=pk)
+    def get_ticket(self, pk):
+            return Ticket.objects.select_related(
+            'customer__user'
+        ).get(pk=pk)
 
     def get(self,request,pk):
-        query = self.get_queryset(pk)
+        query = self.get_ticket(pk)
         serializer = self.serializer_class(instance=query)
         return Response(serializer.data,status=status.HTTP_200_OK)
         
     
     def put (self,request,pk):
-        query = self.get_queryset(pk)
+        query = self.get_ticket(pk)
         serializer = self.serializer_class(instance=query,data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -129,7 +133,7 @@ class DetailTicketApiView(GenericAPIView):
             
     
     def patch(self,request,pk):
-        query = self.get_queryset(pk)
+        query = self.get_ticket(pk)
         serializer = self.serializer_class(instance=query,data=request.data,partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -139,7 +143,7 @@ class DetailTicketApiView(GenericAPIView):
         
             
     def delete(self,request,pk):
-        query = self.get_queryset(pk)
+        query = self.get_ticket(pk)
         query.delete()
         return  Response({'message':'Ticket Successfully deleted'},status=status.HTTP_200_OK)
     
@@ -149,7 +153,13 @@ class CreateAndListReplayTicketAPIView(GenericAPIView):
     serializer_class = ReplayTicketSerializer
     permission_classes = [IsAuthenticated]    
     def get(self,request,pk):
-        obj = ReplayTicket.objects.filter(replay_ticket__pk=pk)
+        obj = (
+            ReplayTicket.objects
+            .filter(replay_ticket_id=pk)
+            .select_related(
+                'replay_ticket__customer__user'
+            )
+        )
         serializer =  self.serializer_class(instance=obj,many=True,context = {'pk':pk})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
@@ -168,17 +178,22 @@ class CreateAndListReplayTicketAPIView(GenericAPIView):
 class DetailReplayTicketAPIView(GenericAPIView):
     serializer_class=ReplayTicketSerializer
     permission_classes = [IsAuthenticated,IsReplayTicketOwner]    
-    def get_queryset(self,pk):
-        return ReplayTicket.objects.get(pk=pk)
-    
+    def get_reply(self, pk):
+        return (
+            ReplayTicket.objects
+            .select_related(
+                'replay_ticket__customer__user'
+            )
+            .get(pk=pk)
+        )
     def get(self, request,pk):
-        obj = self.get_queryset(pk)
+        obj = self.get_reply(pk)
         serializer =  self.serializer_class(instance=obj,context = {'pk':pk})
         return Response(serializer.data,status=status.HTTP_200_OK)
     
     def put(self,request,pk):
         data=request.data
-        obj = self.get_queryset(pk)
+        obj = self.get_reply(pk)
         serializer =  self.serializer_class(instance=obj,context = {'pk':pk},data=data)
         if serializer.is_valid():
             serializer.save()
@@ -187,7 +202,7 @@ class DetailReplayTicketAPIView(GenericAPIView):
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     def patch(self,request,pk):
         data=request.data
-        obj = self.get_queryset(pk)
+        obj = self.get_reply(pk)
         serializer =  self.serializer_class(instance=obj,context = {'pk':pk},data=data,patial=True)
         if serializer.is_valid():
             serializer.save()
@@ -196,7 +211,7 @@ class DetailReplayTicketAPIView(GenericAPIView):
             return Response(serializer.errors,status=status.HTTP_404_NOT_FOUND)
     
     def delete(self,request,pk):
-        obj = self.get_queryset(pk=pk)
+        obj = self.get_reply(pk)
         obj.delete()
         return Response({'message':'object deleted successfully '},status=status.HTTP_404_NOT_FOUND)
         
@@ -206,7 +221,11 @@ class GetShopTicketAPIView(GenericAPIView):
     serializer_class = ListCreateTicketSerializers
     permission_classes = [IsAuthenticated]    
     def get_queryset(self):
-        return Ticket.objects.filter(store__manager__user = self.request.user)
+        return (
+            Ticket.objects
+            .filter(store__manager__user=self.request.user)
+            .select_related('customer__user')
+        )
     
     def get(self,request):
         obj = self.get_queryset()
@@ -219,7 +238,12 @@ class CustomerListTicketApiView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
         
-        return Ticket.objects.filter(customer__user= self.request.user)
+        return (
+            Ticket.objects
+            .filter(customer__user=self.request.user)
+            .select_related('customer__user')
+        )
+        
     def get(self,request):
         query = self.get_queryset()
         serializer= self.serializer_class(instance=query,context = {'request':request},many=True)
@@ -255,7 +279,11 @@ class ListConversationStoreAPIView(GenericAPIView):
     permission_classes=[IsAuthenticated]
     
     def get_queryset(self):
-        return self.model.objects.filter(store__manager__user= self.request.user)
+        return (
+    Conversation.objects
+    .filter(store__manager__user=self.request.user)
+    .select_related("customer")
+)
     def get(self,request):
         query = self.get_queryset()
         serializer = self.serializer_class(instance=query,many=True,context = {'request':request})
@@ -267,8 +295,11 @@ class ListConversationCustomerApiView(GenericAPIView):
     model = Conversation
     permission_classes = [IsAuthenticated]
     def get_queryset(self):
-        return self.model.objects.filter(customer=self.request.user)
-    
+        return (
+            Conversation.objects
+            .filter(customer=self.request.user)
+            .select_related("customer")
+        )
     def get(self,request):
         query = self.get_queryset()
         serializer = self.serializer_class(instance=query,many=True,context = {'request':request})
