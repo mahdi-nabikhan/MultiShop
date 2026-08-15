@@ -8,6 +8,7 @@ from customer.models import *
 from django.contrib.auth.password_validation import validate_password
 from account.api.v1.serializers import *
 from order.models import *
+from django.db import transaction
 
 
 class CustomerRegisterSerializer(serializers.ModelSerializer):
@@ -47,7 +48,7 @@ class CustomerRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = ['username', 'user']
-
+    @transaction.atomic
     def create(self, validated_data):
         user_data = validated_data.pop('user')
 
@@ -79,7 +80,15 @@ class CustomerSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Customer
-        fields = ['username']
+        fields = ['username','user']
+        read_only_fields = ['user']
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = {
+            'id': instance.user.id,
+            'email': instance.user.email,
+        }
+        return representation
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -121,11 +130,12 @@ class AddressSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Address
-        fields = ['id','state', 'state', 'city', 'postal_code', 'customer']
+        fields = ['id', 'state', 'city', 'postal_code', 'customer']
         read_only_fields = ['customer','id']
 
     def create(self, validated_data):
-        validated_data['customer'] = Customer.objects.get(user_id=self.context.get('request').user.id)
+        request = self.context['request']
+        validated_data['customer'] = Customer.objects.get(user_id=request.user.id)
         return super().create(validated_data)
 
     def to_representation(self, instance):
@@ -187,7 +197,8 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ['user','product','status']
 
     def create(self, validated_data):
-        validated_data['user'] = Customer.objects.get(user_id=self.context.get('request').user.id)
+        request = self.context['request']
+        validated_data['user'] = Customer.objects.get(user_id=request.user.id)
         validated_data['product'] = self.context.get('product')
         return super().create(validated_data)
     
@@ -196,6 +207,22 @@ class CommentSerializer(serializers.ModelSerializer):
         rep['user']=UsersSerializer(instance.user.user).data
         return rep
     
+    def validate_parent(self, value):
+        if value is None :
+            return value
+        
+        product =  self.context.get('product')
+        
+        if value.product_id != product.id:
+            raise serializers.ValidationError(
+            'Parent comment must belong to the same product.')
+            
+        if value.parent_id is not None:
+            raise serializers.ValidationError(
+            'You cannot reply to a reply.')
+
+        return value
+            
 class ProductRateSerializer(serializers.ModelSerializer):
     """
     Serializer for ProductRate model used to validate and create product ratings.
@@ -246,11 +273,14 @@ class ProductRateSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         request = self.context.get('request')
+        product_id = self.context['pk']
         customer = Customer.objects.get(user=request.user)
-        product = Product.objects.get(pk=self.context.get('pk'))
+        product = Product.objects.get(pk=product_id)
+        
+        
+        has_purchased = OrderItem.objects.filter(order__customer=customer, product=product).exists()
 
-
-        if not OrderItem.objects.filter(order__customer=customer, product=product).exists():
+        if not has_purchased:
             raise serializers.ValidationError("You can rate only purchased products!")
 
         return attrs
@@ -301,11 +331,28 @@ class ReplyCommentSerializer(serializers.ModelSerializer):
         model = Comments
         fields = '__all__'
         read_only_fields = ['parent','user']
+        
+        
+    def validate(self, attrs):
+        pk =self.context['pk']
+        try : 
+            parent = Comments.objects.get (pk=pk)
+        except Comments.DoesNotExist:
+            raise serializers.ValidationError(
+                {'parent': 'Parent comment does not exist.'}
+            )
+        if parent.parent_id is not None:
+            raise serializers.ValidationError(
+                {'parent': 'You cannot reply to a reply.'}
+            )
+        self.parent_comment = parent
+        return attrs
     
     def create(self, validated_data):
         pk=self.context.get('pk')
         parent = Comments.objects.get(pk=pk)
+        request = self.context['request']
         validated_data['parent'] = parent
-        validated_data['product'] = Product.objects.get(pk=parent.product.pk)
-        validated_data['user']= Customer.objects.get(user_id=self.context.get('request').user.id)
+        validated_data['product'] = parent.product
+        validated_data['user']=request.user.customer
         return Comments.objects.create(**validated_data)
