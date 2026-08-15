@@ -22,7 +22,7 @@ from rest_framework.generics import GenericAPIView
 import random
 from account.tasks import *
 from rest_framework_simplejwt.views import TokenRefreshView
-
+import logging
 from rest_framework_simplejwt.exceptions import TokenError
 class CustomObtainAuthToken(ObtainAuthToken):
     """
@@ -256,8 +256,8 @@ class CustomeObtainPairView(TokenObtainPairView):
             try:
                 order = transfer_session_cart_to_db(request, user)
             except Exception as e:
-                import logging
-                logging.exception("خطا در انتقال سبد از سشن به سفارش: %s", e)
+          
+                logging.exception("Failed to transfer session cart for user %s", e)
                 order = None
 
 
@@ -274,9 +274,9 @@ class CustomeObtainPairView(TokenObtainPairView):
             response = Response({
                 'user_id': user.id,
                 'redirect_url': redirect_url,
-                # 'access_token':access_token,
-                # 'refresh_token':refresh_token
-            }, status=200)
+                
+
+            }, status=status.HTTP_200_OK)
 
 
             response.set_cookie(
@@ -293,7 +293,7 @@ class CustomeObtainPairView(TokenObtainPairView):
                 httponly=True,
                 secure=True,
                 samesite='Strict',
-                max_age=60*60*24*7  # 7 روز
+                max_age=60*60*24*7  
             )
 
             return response
@@ -339,8 +339,8 @@ class ChangePasswordView(UpdateAPIView):
     def get_object(self):
 
         """Returns the current authenticated user object."""
-        obj = self.request.user
-        return obj
+        
+        return self.request.user
 
     def update(self, request, *args, **kwargs):
         """
@@ -353,17 +353,15 @@ class ChangePasswordView(UpdateAPIView):
                     - 400 Bad Request on validation failure
                 """
         self.object = self.get_object()
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data,context = {'request':request})
         if serializer.is_valid():
-            if not self.object.check_password(serializer.data.get('old_password')):
-                return Response({'old password': 'your password is wrong'}, status=status.HTTP_400_BAD_REQUEST)
-            self.object.set_password(serializer.data.get('new_password'))
-            self.object.save()
+            self.object.set_password(serializer.validated_data['new_password'])
+            self.object.save(update_fields=['password'])
             return Response({'massage': 'password changed successfully'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors)
 
-# views.py
+
 
 
 class SendResetCodeApiView(GenericAPIView):
@@ -419,15 +417,50 @@ class SendResetCodeApiView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         email = serializer.validated_data["email"]
-        user = User.objects.get(email=email)
+
+        user = User.objects.filter(email=email).first()
+
+        # Same response for existing and non-existing emails
+        if not user:
+            return Response(
+                {
+                    "message": (
+                        "If the email exists, "
+                        "a reset code will be sent."
+                    )
+                },
+                status=status.HTTP_200_OK,
+            )
 
         code = f"{random.randint(100000, 999999)}"
-        PasswordResetCode.objects.create(user=user, code=code)
 
-        send_reset_code_email.delay(email=email,code=code)
-        send_password_email.delay(email=email,code=code)
-        return Response({"message": "Code sent to email"})
+        # Invalidate previous reset codes
+        PasswordResetCode.objects.filter(user=user).delete()
 
+        PasswordResetCode.objects.create(
+            user=user,
+            code=code,
+        )
+
+        send_reset_code_email.delay(
+            email=email,
+            code=code,
+        )
+
+        send_password_email.delay(
+            email=email,
+            code=code,
+        )
+
+        return Response(
+            {
+                "message": (
+                    "If the email exists, "
+                    "a reset code will be sent."
+                )
+            },
+            status=status.HTTP_200_OK,
+        )
 class VerifyResetCodeApiView(GenericAPIView):
     """
     API endpoint for verifying a password reset code and authenticating the user.
@@ -508,15 +541,16 @@ class VerifyResetCodeApiView(GenericAPIView):
         refresh_token = str(refresh)
         redirect_url = None
         if Customer.objects.filter(user=user).exists():
-            redirect_url = reverse('shop-list')
+            redirect_url = 'shop_list'
         elif Admin.objects.filter(user=user).exists():
-            redirect_url = reverse('vendors:panel')
+            redirect_url = 'panel'
         elif Manager.objects.filter(user=user).exists():
-            redirect_url = reverse('vendors:panel')
+            redirect_url = 'panel'
         elif Operator.objects.filter(user=user).exists():
-            redirect_url = reverse('vendors:panel')
+            redirect_url = "panel"
         response= Response({
             "message": "Login successful",
+            "user_id":user.id,
             'redirect_url':redirect_url
         } )
         response.set_cookie(
@@ -574,8 +608,8 @@ class LogoutAPIView(GenericAPIView):
             status=status.HTTP_200_OK,
         )
 
-        response.delete_cookie("access_token",path='/')
-        response.delete_cookie("refresh_token",path='/')
+        response.delete_cookie("access_token",path='/',samesite = 'Strict')
+        response.delete_cookie("refresh_token",path='/',samesite = 'Strict')
 
         return response
     
