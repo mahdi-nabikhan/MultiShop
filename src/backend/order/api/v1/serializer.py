@@ -121,7 +121,28 @@ class OrderItemSerializer(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['product'] = ProductSerializer(instance.product).data
         return rep
+    
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                "Quantity must be greater than zero."
+            )
 
+        product = Product.objects.filter(
+            pk=self.context.get("pk")
+        ).first()
+
+        if not product:
+            raise serializers.ValidationError(
+                "Product does not exist."
+            )
+
+        if value > product.quantity_in_stock:
+            raise serializers.ValidationError(
+                "Requested quantity exceeds available stock."
+            )
+
+        return value
 
 class BillSerilizers(serializers.ModelSerializer):
     """
@@ -174,7 +195,49 @@ class BillSerilizers(serializers.ModelSerializer):
         fields='__all__'
         read_only_fields=['cart','address']
         
-        
+    def validate(self, attrs):
+        request = self.context.get("request")
+        address_pk = self.context.get("pk")
+
+        if not request or not request.user.is_authenticated:
+            raise serializers.ValidationError(
+                "Authentication is required."
+            )
+
+        if not address_pk:
+            raise serializers.ValidationError(
+                {"address": "Address is required."}
+            )
+
+        order = Order.objects.filter(
+            customer__user=request.user,
+            status=False
+        ).first()
+
+        if not order:
+            raise serializers.ValidationError(
+                {"order": "You don't have an active order."}
+            )
+
+        address = Address.objects.filter(
+            pk=address_pk,
+            customer__user=request.user
+        ).first()
+
+        if not address:
+            raise serializers.ValidationError(
+                {"address": "Address does not exist or does not belong to you."}
+            )
+
+        if not order.items.exists():
+            raise serializers.ValidationError(
+                {"order": "Cannot create a bill for an empty order."}
+            )
+
+        self.order = order
+        self.address = address
+
+        return attrs     
         
     def to_representation(self, instance):
         response=super().to_representation(instance)
