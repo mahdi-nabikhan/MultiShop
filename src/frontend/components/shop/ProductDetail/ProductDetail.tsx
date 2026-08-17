@@ -4,7 +4,7 @@ import ProductRating from "@/components/shop/ProductRating/ProductRating";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-
+import Link from "next/link";
 import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
 import useCheckMe from "@/hooks/Checkme";
 import SessionProductOrderBox from "../SessionProductOrderBox/SessionProductOrderBox";
@@ -483,7 +483,8 @@ export default function ProductDetail({
 
           ?
 
-          (
+          (<>
+         
 
             <ProductOrderBox
 
@@ -491,6 +492,14 @@ export default function ProductDetail({
 
             />
 
+
+    <Link
+      href={`/chatbox/${product.store}`}
+      className="chat-link"
+    >
+      Chat with seller
+    </Link>
+    </>
           )
 
 

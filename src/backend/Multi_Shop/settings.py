@@ -188,9 +188,10 @@ AXES_COOLOFF_TIME = 1
 AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
 
 AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesBackend',
+    
     'django.contrib.auth.backends.ModelBackend',
-    'account.authentications.CookieJWTAuthentication'
+    'account.authentications.CookieJWTAuthentication',
+    'axes.backends.AxesBackend'
 ]
 
 CACHES = {

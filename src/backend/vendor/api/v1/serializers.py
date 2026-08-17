@@ -281,3 +281,9 @@ class StoreCatgorySerializer(serializers.ModelSerializer):
         model =  StoreCategory
         fields = '__all__'
         
+
+
+class GetAdminDataSeralizer(serializers.ModelSerializer):
+    class Meta : 
+        model = Admin
+        fields = ['username']

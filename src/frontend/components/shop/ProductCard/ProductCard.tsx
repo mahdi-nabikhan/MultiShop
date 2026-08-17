@@ -53,7 +53,7 @@ export default function ProductCard({
 
     <Link
 
-      href={`/store/${shopId}/product/${product.id}`}
+      href={`/product/${product.id}`}
 
       className="product-card"
 
@@ -143,7 +143,7 @@ export default function ProductCard({
 
           <ShoppingCart size={18} />
 
-          Add To Cart
+          Show Details
 
         </button>
 

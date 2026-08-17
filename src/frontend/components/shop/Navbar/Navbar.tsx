@@ -6,6 +6,7 @@ import SearchBox from "../SearchBox/SearchBox";
 import { useEffect, useState } from "react";
 
 
+
 import BACKEND_URLS from "@/utils";
 
 import "./Navbar.css";
@@ -138,11 +139,7 @@ export default function Navbar() {
 
                         <div className="user-box">
 
-                            <div className="avatar">
-
-                                {customer.username[0].toUpperCase()}
-
-                            </div>
+                            <Link href="customer-panel" className="avatar">{customer.username[0].toUpperCase()}</Link>
 
                             <div className="user-data">
 

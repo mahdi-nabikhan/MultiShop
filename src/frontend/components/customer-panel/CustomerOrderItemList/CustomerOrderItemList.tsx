@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -156,42 +156,44 @@ export default function CustomerOrderItemList({
 
     return (
 
-        <section className="customer-order-items">
+    <section className="customer-order-items">
 
 
-            <div className="order-items-header">
+        <div className="order-items-header">
 
-                <div>
+            <div>
 
-                    <h2>
-                        Order #{orderId}
-                    </h2>
+                <h2>
+                    Order #{orderId}
+                </h2>
 
-                    <p>
-                        Products in this order
-                    </p>
-
-                </div>
-
-
-                <div className="order-items-count">
-
-                    <Package size={18} />
-
-                    <span>
-                        {items.length} Items
-                    </span>
-
-                </div>
+                <p>
+                    Products in this order
+                </p>
 
             </div>
 
 
+            <div className="order-items-count">
 
-            <div className="order-items-list">
+                <Package size={18} />
+
+                <span>
+                    {items.length} Items
+                </span>
+
+            </div>
+
+        </div>
 
 
-                {items.length === 0 ? (
+
+
+        <div className="order-items-list">
+
+
+            {
+                items.length === 0 ? (
 
                     <div className="empty-order-items">
 
@@ -203,96 +205,160 @@ export default function CustomerOrderItemList({
 
                     </div>
 
+
                 ) : (
+
 
                     items.map((item) => (
 
-                        <div
-                            className="order-item-card"
+
+                        <Link
+
+                            href={`/customer-panel/orderitem/${item.id}`}
+
+                            className="order-item-link"
+
                             key={item.id}
+
                         >
 
 
-                            <div className="product-image">
+                            <div className="order-item-card">
 
-                                <img
-                                    src={
-                                        `${BACKEND_URLS.replace(
-                                            "/api/v1/",
-                                            ""
-                                        )}${item.product.product_image}`
-                                    }
-                                    alt={item.product.name}
-                                />
+
+
+                                <div className="product-image">
+
+
+                                    <img
+
+                                        src={
+                                            `${BACKEND_URLS.replace(
+                                                "/api/v1/",
+                                                ""
+                                            )}${item.product.product_image}`
+                                        }
+
+                                        alt={item.product.name}
+
+                                    />
+
+
+                                </div>
+
+
+
+
+
+                                <div className="product-info">
+
+
+                                    <h3>
+
+                                        {item.product.name}
+
+                                    </h3>
+
+
+
+                                    <p>
+
+                                        Quantity: {item.quantity}
+
+                                    </p>
+
+
+
+                                    <span>
+
+                                        Status:
+
+                                        {
+                                            item.status === "P"
+                                                ? " Pending"
+                                                : ` ${item.status}`
+                                        }
+
+
+                                    </span>
+
+
+                                </div>
+
+
+
+
+
+
+                                <div className="product-price">
+
+
+                                    <span>
+
+                                        Unit Price
+
+                                    </span>
+
+
+
+                                    <strong>
+
+                                        ${item.product.price}
+
+                                    </strong>
+
+
+                                </div>
+
+
+
+
+
+
+
+                                <div className="product-total">
+
+
+                                    <span>
+
+                                        Total
+
+                                    </span>
+
+
+
+                                    <strong>
+
+                                        ${item.total}
+
+                                    </strong>
+
+
+                                </div>
+
+
+
 
                             </div>
 
 
 
-                            <div className="product-info">
+                        </Link>
 
-                                <h3>
-                                    {item.product.name}
-                                </h3>
-
-
-                                <p>
-                                    Quantity: {item.quantity}
-                                </p>
-
-
-                                <span>
-
-                                    Status:
-
-                                    {item.status === "P"
-                                        ? " Pending"
-                                        : ` ${item.status}`}
-
-                                </span>
-
-                            </div>
-
-
-
-                            <div className="product-price">
-
-                                <span>
-                                    Unit Price
-                                </span>
-
-                                <strong>
-                                    ${item.product.price}
-                                </strong>
-
-                            </div>
-
-
-
-                            <div className="product-total">
-
-                                <span>
-                                    Total
-                                </span>
-
-                                <strong>
-                                    ${item.total}
-                                </strong>
-
-                            </div>
-
-
-                        </div>
 
                     ))
 
-                )}
 
-            </div>
+                )
+
+            }
 
 
-        </section>
+        </div>
 
-    );
+
+    </section>
+
+);
 
 }

@@ -5,27 +5,35 @@ import "./layout.css";
 
 
 export default function CustomerLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode;
+    children: React.ReactNode;
 }) {
 
-  return (
-    <>
+    return (
 
-      <Navbar />
+        <div className="customer-layout">
 
-
-      <Sidebar />
+            <Navbar />
 
 
-      <main className="customer-content">
+            <div className="customer-body">
 
-        {children}
-
-      </main>
+                <Sidebar />
 
 
-    </>
-  );
+                <main className="customer-content">
+
+                    {children}
+
+                </main>
+
+
+            </div>
+
+
+        </div>
+
+    );
+
 }
