@@ -1,3 +1,19 @@
+import Footer from "@/components/shop/Footer/Footer";
+import Navbar from "@/components/shop/Navbar/Navbar";
+import Topbar from "@/components/shop/Topbar/Topbar";
+import SectionHeader from "@/components/shop/SectionHeader/SectionHeader";
+import ShopList from "@/components/shop/ShopList/ShopList";
+import RandomProducts from "@/components/shop/RandomProduct/RandomProduct";
+import StoreCategoryList from "@/components/shop/StoreCategoryList/StoreCategoryList";
+import StoreExplorer from "@/components/shop/StoreExplore/StoreExplore";
+import ProductFilterList from "@/components/shop/ProductFiltering/ProductFiltering";
+
+interface Props {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+}
+
 export default async function Page({ searchParams }: Props) {
 
   const params = await searchParams;
