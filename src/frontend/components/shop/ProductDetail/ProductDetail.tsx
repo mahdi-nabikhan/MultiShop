@@ -491,6 +491,14 @@ export default function ProductDetail({
 
             />
 
+
+            <Link
+      href={`/chatbox/${product.store}`}
+      className="chat-link"
+    >
+      Chat with seller
+    </Link>
+
           )
 
 
