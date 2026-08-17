@@ -1,37 +1,97 @@
 /* =========================================
-   Customer Layout
+   CUSTOMER LAYOUT
 ========================================= */
 
-.customer-content {
-    margin-top: 70px;
-    margin-left: 250px;
 
-    min-height: calc(100vh - 70px);
+.customer-layout {
 
-    padding: 24px;
+    width:100%;
 
-    box-sizing: border-box;
+    min-height:100vh;
 
-    width: calc(100% - 250px);
+    display:block;
+
 }
+
+
 
 /* =========================================
-   Responsive
+   BELOW NAVBAR
 ========================================= */
 
-@media (max-width: 1024px) {
-    .customer-content {
-        margin-left: 220px;
-        width: calc(100% - 220px);
-    }
+
+.customer-body {
+
+    width:100%;
+
+    display:flex;
+
+    align-items:stretch;
+
+    min-height:calc(100vh - 82px);
+
 }
 
-@media (max-width: 768px) {
-    .customer-content {
-        margin-left: 0;
-        width: 100%;
 
-        margin-top: 70px;
-        padding: 16px;
+
+/* =========================================
+   CONTENT
+========================================= */
+
+
+.customer-content {
+
+    flex:1;
+
+    min-width:0;
+
+    padding:32px;
+
+    box-sizing:border-box;
+
+}
+
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+
+@media(max-width:1024px){
+
+
+    .customer-content {
+
+        padding:24px;
+
     }
+
+
+}
+
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+
+@media(max-width:768px){
+
+
+    .customer-body {
+
+        flex-direction:column;
+
+    }
+
+
+    .customer-content {
+
+        padding:16px;
+
+    }
+
+
 }

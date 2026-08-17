@@ -533,7 +533,7 @@ class AllProductShopApiView(GenericAPIView):
     def get_queryset(self):
         user = self.request.user
 
-        return self.queryset.filter(
+        return Product.objects.filter(
             models.Q(store__manager__user=user) |
             models.Q(store__admins__user=user)
         ).select_related(
@@ -1125,7 +1125,7 @@ class ManagerDetailApiView(GenericAPIView):
 class AdminDetaiApiView(GenericAPIView):
     permission_classes=[IsManagerOrAdminPermissions]
     
-    serializer_class = AdminsSerializer
+    serializer_class = GetAdminDataSeralizer
     
     
     

@@ -191,7 +191,7 @@ export default function CustomerOrderList() {
 
 
                             <Link
-                                href={`/customer-panel/orderitem/${order.id}`}
+                                href={`/customer-panel/order/${order.id}`}
                                 className="view-order-btn"
                             >
 

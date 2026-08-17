@@ -7,7 +7,7 @@ import axios from "axios";
 import BACKEND_URLS from "@/utils";
 
 import DeleteModal from "../DeleteModal/DeleteModal";
-import UpdateAdminModal from "../UpdateAdminModal";
+import UpdateAdminModal from "../UpdateAdminModal/UpdateAdminModal";
 
 import "./AdminDetail.css";
 
