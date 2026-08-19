@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { getFilteredProducts,Product } from "@/services/product.services";
 import './ProductFiltering.css'
 
 const filters = [
@@ -41,17 +40,10 @@ export default function ProductFilterList() {
 
         queryFn: async()=>{
 
-            const response = await axios.get(
-                `${BACKEND_URLS}website/api/v1/product/filtering/`,
-                {
-                    params:{
-                        order: order
-                    }
-                }
-            );
+            const response = await getFilteredProducts(order)
 
 
-            return response.data;
+            return response;
 
         }
 

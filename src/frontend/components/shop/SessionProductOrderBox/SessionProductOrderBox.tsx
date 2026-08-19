@@ -1,8 +1,8 @@
 'use client'
 import React, { cache } from 'react'
-import BACKEND_URLS from '@/utils'
+import { addProductToSessionCart } from '@/services/order.services'
 import { useState,useEffect } from 'react'
-import axios from 'axios'
+
 import './SessionProductOrderBox.css'
 import { Plus, Minus, ShoppingCart } from "lucide-react";
 
@@ -15,13 +15,7 @@ function SessionProductOrderBox({productId}:{productId:number|string}) {
     const addToCart = async()=> {
         try{
             setLoading(true);
-            const response =  await axios.post(
-                 `${BACKEND_URLS}order/api/v1/session/cart/add/${productId}/`,
-                 {
-                    quantity
-                 },
-                 {withCredentials:true}
-            );
+            const response =  await addProductToSessionCart(productId,quantity)
             console.log(response)
            
             

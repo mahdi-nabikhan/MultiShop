@@ -298,3 +298,43 @@ export async function updateOrderItem(
     return response.data;
 
 }
+
+
+
+
+export async function addOrderItem(
+    productId: number | string,
+    quantity: number
+) {
+
+    const { data } = await axios.post(
+        `${BACKEND_URLS}order/api/v1/order/item/${productId}/`,
+        {
+            quantity,
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}
+
+
+
+export async function addProductToSessionCart(
+    productId: number | string,
+    quantity: number
+) {
+    const { data } = await axios.post(
+        `${BACKEND_URLS}order/api/v1/session/cart/add/${productId}/`,
+        {
+            quantity,
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}

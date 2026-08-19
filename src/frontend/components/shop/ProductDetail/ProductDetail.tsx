@@ -2,8 +2,10 @@
 
 import ProductRating from "@/components/shop/ProductRating/ProductRating";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import {
+  getProduct,
+  getProductImages,ProductImage
+} from "@/services/product.services";
 import Link from "next/link";
 import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
 import useCheckMe from "@/hooks/Checkme";
@@ -19,46 +21,29 @@ import "./ProductDetail.css";
 
 
 interface Props {
-  productId:string;
+  productId: string;
 }
-
 
 
 interface Product {
 
-  id:number;
+  id: number;
 
-  name:string;
+  name: string;
 
-  description:string;
+  description: string;
 
-  quantity_in_stock:number;
+  quantity_in_stock: number;
 
-  price:number;
+  price: number;
 
-  price_after:number;
+  price_after: number;
 
-  product_image:string | null;
+  product_image: string | null;
 
-  category:number;
+  category: number;
 
-  store:number;
-
-}
-
-
-
-interface ProductImage {
-
-  id:number;
-
-  product_image:string;
-
-  title:string | null;
-
-  description:string | null;
-
-  product:number;
+  store: number;
 
 }
 
@@ -67,179 +52,131 @@ interface ProductImage {
 
 
 export default function ProductDetail({
-
   productId
-
-}:Props){
-
-
-  const [product,setProduct] = useState<Product | null>(null);
+}: Props) {
 
 
-  const [images,setImages] = useState<string[]>([]);
+  const [product, setProduct] =
+    useState<Product | null>(null);
 
 
-  const [activeImage,setActiveImage] = useState<string | null>(null);
+  const [images, setImages] =
+    useState<string[]>([]);
 
 
-  const isAuthenticated = useCheckMe();
+  const [activeImage, setActiveImage] =
+    useState<string | null>(null);
 
 
+  const isAuthenticated =
+    useCheckMe();
 
 
+  function fixImageUrl(
+    image: string | null
+  ) {
 
-  function fixImageUrl(image:string | null){
-
-
-    if(!image){
-
+    if (!image) {
       return null;
-
     }
 
-
-    if(image.startsWith("http")){
-
+    if (image.startsWith("http")) {
       return image;
-
     }
-
 
     return `http://localhost:8000${image}`;
-
-
   }
 
 
+  useEffect(() => {
 
+    async function fetchData() {
 
+      try {
 
+        // ==========================================
+        // Get Product
+        // ==========================================
 
-  useEffect(()=>{
-
-
-    async function fetchData(){
-
-
-      try{
-
-
-        const {data:productData}=await axios.get<Product>(
-
-          `${BACKEND_URLS}website/api/v1/product/detail/${productId}`,
-
-          {
-            withCredentials:true
-          }
-
-        );
-
-
+        const productData =
+          await getProduct(productId);
 
         setProduct(productData);
 
 
+        // ==========================================
+        // Get Product Images
+        // ==========================================
+
+        const imageData =
+          await getProductImages(productId);
 
 
-
-
-        const {data:imageData}=await axios.get<ProductImage[]>(
-
-          `${BACKEND_URLS}website/api/v1/list/image/product/${productId}/`
-
-        );
-
-
-
-
-
+        // ==========================================
+        // Build Gallery
+        // ==========================================
 
         const galleryImages = [
 
-
-          fixImageUrl(productData.product_image),
-
+          fixImageUrl(
+            productData.product_image
+          ),
 
           ...imageData.map(
-
-            item=>fixImageUrl(item.product_image)
-
+            (item: ProductImage) =>
+              fixImageUrl(item.product_image)
           )
 
-
-        ]
-
-        .filter(Boolean) as string[];
-
-
-
-
-
-
-        console.log("Gallery Images:",galleryImages);
-
-
+        ].filter(Boolean) as string[];
 
 
         setImages(galleryImages);
 
 
+        // ==========================================
+        // Set First Image
+        // ==========================================
 
-        if(galleryImages.length > 0){
+        if (galleryImages.length > 0) {
 
-          setActiveImage(galleryImages[0]);
+          setActiveImage(
+            galleryImages[0]
+          );
 
         }
 
-
-
-
-
       }
 
-      catch(error){
+      catch (error) {
 
-        console.error(error);
+        console.error(
+          "Product loading error:",
+          error
+        );
 
       }
-
 
     }
 
 
-
-
-
     fetchData();
 
+  }, [productId]);
 
 
-  },[productId]);
+  // ==========================================
+  // Loading
+  // ==========================================
 
-
-
-
-
-
-
-  if(!product){
+  if (!product) {
 
     return (
-
       <h2>
-
         Loading...
-
       </h2>
-
     );
 
   }
-
-
-
-
-
 
 
   return (
@@ -247,49 +184,38 @@ export default function ProductDetail({
     <section className="product-detail container">
 
 
-
-
-
-      {/* Gallery */}
+      {/* ======================================
+          Gallery
+      ====================================== */}
 
       <div className="gallery">
 
 
-
         <div className="thumbnail-list">
-
 
           {
 
-            images.map((img,index)=>(
-
+            images.map((img, index) => (
 
               <div
 
-
                 key={index}
-
 
                 className={
 
                   `thumbnail ${
                     activeImage === img
-                    ?
-                    "active"
-                    :
-                    ""
+                      ? "active"
+                      : ""
                   }`
 
                 }
 
-
-
-                onClick={()=>setActiveImage(img)}
-
-
+                onClick={() =>
+                  setActiveImage(img)
+                }
 
               >
-
 
                 <img
 
@@ -299,32 +225,20 @@ export default function ProductDetail({
 
                 />
 
-
               </div>
-
 
             ))
 
           }
 
-
-
         </div>
-
-
-
-
-
 
 
         <div className="main-image">
 
-
           {
 
-            activeImage &&
-
-            (
+            activeImage && (
 
               <img
 
@@ -336,45 +250,29 @@ export default function ProductDetail({
 
             )
 
-
           }
 
-
-
         </div>
-
-
 
 
       </div>
 
 
-
-
-
-
-
-
-
-      {/* Product Info */}
-
+      {/* ======================================
+          Product Info
+      ====================================== */}
 
       <div className="info">
 
 
-
         <h1>
-
           {product.name}
-
         </h1>
 
 
-
-
+        {/* Rating */}
 
         <div className="rating">
-
 
           <Star
 
@@ -386,23 +284,16 @@ export default function ProductDetail({
 
           />
 
-
           <span>
-
             0.0
-
           </span>
-
 
         </div>
 
 
-
-
-
+        {/* Price */}
 
         <div className="price-box">
-
 
           <span className="old-price">
 
@@ -411,22 +302,16 @@ export default function ProductDetail({
           </span>
 
 
-
-
           <span className="new-price">
 
             ${product.price_after}
 
           </span>
 
-
-
         </div>
 
 
-
-
-
+        {/* Description */}
 
         <p className="description">
 
@@ -435,158 +320,135 @@ export default function ProductDetail({
         </p>
 
 
-
-
-
+        {/* Stock */}
 
         <div className="stock">
 
-
-          In Stock :
-
+          In Stock:
           {" "}
-
           {product.quantity_in_stock}
-
-
 
         </div>
 
 
-
-
-
-
+        {/* ======================================
+            Order Box
+        ====================================== */}
 
         {
 
           isAuthenticated === null
 
-          ?
+            ?
 
-          (
+            (
 
-            <div>
+              <div>
+                Loading...
+              </div>
 
-              Loading...
+            )
 
-            </div>
+            :
 
-          )
+            isAuthenticated
 
+              ?
 
+              (
 
-          :
+                <>
 
-          isAuthenticated
+                  <ProductOrderBox
 
+                    productId={
+                      product.id
+                    }
 
-          ?
-
-          (<>
-         
-
-            <ProductOrderBox
-
-              productId={product.id}
-
-            />
+                  />
 
 
-    <Link
-      href={`/chatbox/${product.store}`}
-      className="chat-link"
-    >
-      Chat with seller
-    </Link>
-    </>
-          )
+                  <Link
 
+                    href={
+                      `/chatbox/${product.store}`
+                    }
 
+                    className="chat-link"
 
-          :
+                  >
 
+                    Chat with seller
 
+                  </Link>
 
-          (
+                </>
 
-            <SessionProductOrderBox
+              )
 
-              productId={product.id}
+              :
 
-            />
+              (
 
-          )
+                <SessionProductOrderBox
 
+                  productId={
+                    product.id
+                  }
 
+                />
+
+              )
 
         }
 
 
-
-
-
-
-
+        {/* ======================================
+            Features
+        ====================================== */}
 
         <div className="features">
 
 
-
           <div>
 
-            <Truck size={18}/>
+            <Truck size={18} />
 
             Free Shipping
 
-
           </div>
-
-
-
 
 
           <div>
 
-            <ShieldCheck size={18}/>
+            <ShieldCheck size={18} />
 
             Warranty Included
 
-
           </div>
-
 
 
         </div>
 
 
-
-
-
-
-
+        {/* ======================================
+            Rating Component
+        ====================================== */}
 
         <ProductRating
 
+          productId={
+            product.id
+          }
 
-          productId={product.id}
-
-
-          isAuthenticated={isAuthenticated??false}
-
-
+          isAuthenticated={
+            isAuthenticated ?? false
+          }
 
         />
 
 
-
-
-
       </div>
-
-
-
-
 
 
     </section>

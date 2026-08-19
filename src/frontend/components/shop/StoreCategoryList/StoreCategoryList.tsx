@@ -1,99 +1,78 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
-import BACKEND_URLS from "@/utils";
+import {
+    getStoreCategories,
+    StoreCategory
+} from "@/services/shop.services";
 
 import "./StoreCategoryList.css";
 
 
-interface StoreCategory {
-
-    id:number;
-
-    name:string;
-
-    slug:string;
-
-    icon:string;
-
-}
-
-
-
 interface Props {
 
-    onSelectCategory:(id:number)=>void;
+    onSelectCategory: (id: number) => void;
 
 }
-
 
 
 export default function StoreCategoryList({
 
     onSelectCategory
 
-}:Props){
+}: Props) {
 
 
-    const [categories,setCategories]=useState<StoreCategory[]>([]);
+    const [categories, setCategories] =
+        useState<StoreCategory[]>([]);
 
-    const [loading,setLoading]=useState(true);
-
-
-
-    const GetCategories = async()=>{
+    const [loading, setLoading] =
+        useState(true);
 
 
-        try{
+    const GetCategories = async () => {
 
+        try {
 
-            const {data}=await axios.get<StoreCategory[]>(
-
-                `${BACKEND_URLS}vendor/api/v1/store/category/`
-
-            );
-
+            const data =
+                await getStoreCategories();
 
             setCategories(data);
 
-
         }
-        catch(error){
+
+        catch (error) {
 
             console.log(error);
 
         }
-        finally{
+
+        finally {
 
             setLoading(false);
 
         }
 
-
     };
 
 
-
-
-    useEffect(()=>{
+    useEffect(() => {
 
         GetCategories();
 
-    },[]);
+    }, []);
 
 
+    if (loading) {
 
-
-
-    if(loading){
-
-        return <div>Loading Categories...</div>
+        return (
+            <div>
+                Loading Categories...
+            </div>
+        );
 
     }
-
-
 
 
     return (
@@ -102,11 +81,8 @@ export default function StoreCategoryList({
 
 
             <h2>
-
                 Store Categories
-
             </h2>
-
 
 
             <div className="category-grid">
@@ -114,8 +90,7 @@ export default function StoreCategoryList({
 
                 {
 
-                    categories.map((category)=>(
-
+                    categories.map((category) => (
 
                         <div
 
@@ -123,9 +98,11 @@ export default function StoreCategoryList({
 
                             className="category-card"
 
-                            onClick={()=>{
+                            onClick={() => {
 
-                                onSelectCategory(category.id)
+                                onSelectCategory(
+                                    category.id
+                                );
 
                             }}
 
@@ -138,12 +115,11 @@ export default function StoreCategoryList({
 
                                 dangerouslySetInnerHTML={{
 
-                                    __html:category.icon
+                                    __html: category.icon
 
                                 }}
 
                             />
-
 
 
                             <h3>
@@ -153,9 +129,7 @@ export default function StoreCategoryList({
                             </h3>
 
 
-
                         </div>
-
 
                     ))
 
@@ -167,6 +141,6 @@ export default function StoreCategoryList({
 
         </section>
 
-    )
+    );
 
 }

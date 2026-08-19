@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { cookies } from "next/headers";
-import BACKEND_URLS from "@/utils";
+
 import {
     Star,
     MapPin,
@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import "./ShopDetail.css";
-import axios from "axios";
+import { getStoreDetail } from "@/services/shop.services";
 import { number } from "framer-motion";
 
 interface ShopProps {
@@ -46,12 +46,7 @@ export default async function ShopDetail({
         headers.Authorization = `Bearer ${token}`;
     }
 
-    const { data: shop } = await axios.get<IGetStoreData>(
-        `${BACKEND_URLS}website/api/v1/store/detail/${shopId}`,
-        {
-            headers,
-        }
-    );
+    const  shop  = await getStoreDetail(shopId)
 
     return (
         <section className="store-page">

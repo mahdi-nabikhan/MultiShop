@@ -1,92 +1,58 @@
 "use client";
 
+import { useEffect, useState } from "react";
 
-import {useEffect,useState} from "react";
-
-import axios from "axios";
-
-
-import BACKEND_URLS from "@/utils";
-
+import {
+    getStoresByCategory,
+    CategoryStore
+} from "@/services/shop.services";
 
 import "./StoreSlider.css";
 
 
-interface Store {
+interface Props {
 
-
-    id:number;
-
-    name:string;
-
-    slug:string;
-
-    logo:string|null;
-
+    categoryId: number;
 
 }
-
-
-
-interface Props{
-
-    categoryId:number;
-
-}
-
 
 
 export default function StoreSlider({
 
     categoryId
 
-}:Props){
+}: Props) {
 
 
-
-    const [stores,setStores]=useState<Store[]>([]);
-
-
-
-    const GetStores=async()=>{
+    const [stores, setStores] =
+        useState<CategoryStore[]>([]);
 
 
-        try{
+    const GetStores = async () => {
 
+        try {
 
-            const {data}=await axios.get<Store[]>(
-
-                `${BACKEND_URLS}vendor/api/v1/list/category/store/${categoryId}/`
-
-            );
-
+            const data =
+                await getStoresByCategory(categoryId);
 
             setStores(data);
 
-
         }
-        catch(error){
+
+        catch (error) {
 
             console.log(error);
 
         }
 
-
     };
 
 
-
-
-    useEffect(()=>{
-
+    useEffect(() => {
 
         GetStores();
 
-
-    },[categoryId]);
-
-
-
+    }, [categoryId]);
 
 
     return (
@@ -101,14 +67,12 @@ export default function StoreSlider({
             </h2>
 
 
-
             <div className="store-row">
 
 
                 {
 
-                    stores.map(store=>(
-
+                    stores.map(store => (
 
                         <div
 
@@ -121,18 +85,17 @@ export default function StoreSlider({
 
                             {
 
-                            store.logo &&
+                                store.logo &&
 
-                            <img
+                                <img
 
-                                src={store.logo}
+                                    src={store.logo}
 
-                                alt={store.name}
+                                    alt={store.name}
 
-                            />
+                                />
 
                             }
-
 
 
                             <h3>
@@ -149,9 +112,7 @@ export default function StoreSlider({
                             </button>
 
 
-
                         </div>
-
 
                     ))
 
@@ -163,7 +124,6 @@ export default function StoreSlider({
 
         </section>
 
-    )
-
+    );
 
 }

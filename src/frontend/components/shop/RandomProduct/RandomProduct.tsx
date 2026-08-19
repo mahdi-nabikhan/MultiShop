@@ -1,34 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getRandomProducts,Product } from "@/services/product.services";
 import Image from "next/image";
 import Link from "next/link";
 import BACKEND_URLS from "@/utils";
 
 import "./RandomProduct.css";
 
-interface Product {
 
-    id: number;
-
-    name: string;
-
-    description: string;
-
-    quantity_in_stock: number;
-
-    price: number;
-
-    price_after: number;
-
-    product_image: string | null;
-
-    category: number;
-
-    store: number;
-
-}
 
 export default function RandomProducts() {
 
@@ -48,12 +28,7 @@ export default function RandomProducts() {
             try {
 
 
-                const { data } = await axios.get(
-
-                    `${BACKEND_URLS}website/api/v1/products/random/`
-
-                );
-
+                const  data  = await getRandomProducts()
 
                 setProducts(data);
 
