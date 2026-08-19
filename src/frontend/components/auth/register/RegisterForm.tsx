@@ -6,9 +6,9 @@ import Link from "next/link";
 import axios from "axios";
 import { Mail, Lock, User } from "lucide-react";
 
-import BACKEND_URLS from "@/utils";
-import "./RegisterForm.css";
 
+import "./RegisterForm.css";
+import { register } from "@/services/auth.services";
 export default function RegisterForm() {
   const router = useRouter();
 
@@ -27,20 +27,15 @@ export default function RegisterForm() {
     setError("");
 
     try {
-      await axios.post(
-        `${BACKEND_URLS}customer/api/v1/customer/register/`,
-        {
-          username,
-          user: {
-            email,
-            password,
-            password2,
-          },
-        },
-        {
-          withCredentials: true,
-        }
-      );
+       await register({
+      username,
+      user: {
+        email,
+        password,
+        password2,
+      },
+    });
+      
 
       router.push("/");
     } catch (err) {

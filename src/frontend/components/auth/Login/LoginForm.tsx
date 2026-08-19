@@ -1,5 +1,5 @@
 "use client";
-
+import { login } from "@/services/auth.services";
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
@@ -7,7 +7,6 @@ import { Mail, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 
-import BACKEND_URLS from "@/utils";
 import "./LoginForm.css";
 
 interface LoginRequest {
@@ -27,18 +26,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
 
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginRequest) => {
-      const response = await axios.post<LoginResponse>(
-        `${BACKEND_URLS}account/api/v1/jwt/token/login/`,
-        data,
-        {
-          withCredentials: true,
-        }
-      );
-
-      return response.data;
-    },
-
+    mutationFn: login,
     onSuccess(data) {
       if (data.redirect_url === "panel") {
         router.push("/shop-admin-panel");
