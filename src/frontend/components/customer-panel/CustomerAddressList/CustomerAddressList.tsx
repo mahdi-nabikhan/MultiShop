@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 
-import axios from "axios";
+import { getAddresses,Address } from "@/services/cutomer-panel.services"; 
 
 import {
     MapPin,
@@ -11,38 +11,13 @@ import {
 } from "lucide-react";
 
 
-import BACKEND_URLS from "@/utils";
 
 import "./CustomerAddressList.css";
 
 
 
 
-interface Customer {
 
-
-    username:string;
-
-
-}
-
-
-
-interface Address {
-
-
-    id:number;
-
-    state:string;
-
-    city:string;
-
-    postal_code:string;
-
-    customer:Customer;
-
-
-}
 
 
 
@@ -59,51 +34,16 @@ export default function CustomerAddressList(){
 
 
 
-    const GetAddresses = async()=>{
+   const GetAddresses = async () => {
+    try {
+        const data = await getAddresses();
 
-
-        try{
-
-
-            const {data}=await axios.get<Address[]>(
-
-
-                `${BACKEND_URLS}customer/api/v1/add/address/`,
-
-                {
-
-                    withCredentials:true
-
-                }
-
-
-            );
-
-
-            setAddresses(data);
-
-
-        }
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-        finally{
-
-
-            setLoading(false);
-
-
-        }
-
-
-    };
+        setAddresses(data);
+    } catch (error) {
+        console.log(error);
+    } finally {
+        setLoading(false);
+    }};
 
 
 

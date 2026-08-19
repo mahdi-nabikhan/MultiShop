@@ -1,21 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
+import { getCustomerConversations,Conversation } from "@/services/chat.services";
 
 import "./ConversationList.css";
-
-interface Conversation {
-    id: number;
-    customer: number;
-    customer_name: string;
-    store: number;
-    status: string;
-    created_at: string;
-    updated_at: string;
-}
 
 interface Props {
     selectedConversation: number | null;
@@ -37,49 +25,32 @@ export default function ConversationList({
         useState("");
 
 
-    const getConversations = async () => {
+    const fetchConversations = async () => {
+    try {
+        setLoading(true);
+        setError("");
 
-        try {
+        const data = await getCustomerConversations();
 
-            setLoading(true);
-            setError("");
+        setConversations(data);
 
-            const response =
-                await axios.get<Conversation[]>(
+    } catch (error) {
 
-                    `${BACKEND_URLS}dashboard/api/v1/list/customer/conversation/`,
+        console.error(
+            "GET CUSTOMER CONVERSATIONS ERROR:",
+            error
+        );
 
-                    {
-                        withCredentials: true,
-                    }
+        setError("Failed to load conversations.");
 
-                );
-
-            setConversations(response.data);
-
-        } catch (error) {
-
-            console.error(
-                "GET CUSTOMER CONVERSATIONS ERROR:",
-                error
-            );
-
-            setError(
-                "Failed to load conversations."
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
 
-        getConversations();
+        fetchConversations();
 
     }, []);
 

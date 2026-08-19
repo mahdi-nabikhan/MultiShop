@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import Link from "next/link";
 
-import axios from "axios";
 
 import {
     Ticket,
@@ -12,75 +11,37 @@ import {
     ChevronRight
 } from "lucide-react";
 
-import BACKEND_URLS from "@/utils";
+import { getCustomerTickets,CustomerTicket } from "@/services/cutomer-panel.services";
 
 import "./CustomerTicketList.css";
 
-interface Customer {
 
-    id:number;
-
-    username:string;
-
-    is_customer:boolean;
-
-    user:number;
-
-}
-
-interface TicketType{
-
-    pk:number;
-
-    title:string;
-
-    content:string;
-
-    store:number;
-
-    customer:Customer;
-
-}
 
 export default function CustomerTicketList(){
 
-    const [tickets,setTickets]=useState<TicketType[]>([]);
+    const [tickets, setTickets] = useState<CustomerTicket[]>([]);
 
     const [loading,setLoading]=useState(true);
 
-    const GetTickets=async()=>{
+   const GetTickets = async () => {
 
-        try{
+    try {
 
-            const {data}=await axios.get<TicketType[]>(
+        const data = await getCustomerTickets();
 
-                `${BACKEND_URLS}dashboard/api/v1/customer/list/ticket/`,
+        setTickets(data);
 
-                {
+    } catch (error) {
 
-                    withCredentials:true
+        console.log(error);
 
-                }
+    } finally {
 
-            );
+        setLoading(false);
 
-            setTickets(data);
+    }
 
-        }
-
-        catch(error){
-
-            console.log(error);
-
-        }
-
-        finally{
-
-            setLoading(false);
-
-        }
-
-    };
+};
 
     useEffect(()=>{
 

@@ -7,7 +7,7 @@ import {
 } from "react";
 
 
-import axios from "axios";
+import { getBills } from "@/services/order.services";
 
 
 import {
@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 
-import BACKEND_URLS from "@/utils";
+
 
 
 import "./CustomerBillList.css";
@@ -76,56 +76,17 @@ export default function CustomerBillList(){
 
 
 
-    const GetBills=async()=>{
+    const fetchBills = async () => {
+    try {
+        const data = await getBills();
 
-
-        try{
-
-
-            const {data}=await axios.get<Bill[]>(
-
-
-                `${BACKEND_URLS}order/api/v1/bill/list/`,
-
-
-                {
-
-                    withCredentials:true
-
-                }
-
-
-            );
-
-
-
-            setBills(data);
-
-
-
-        }
-
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-        finally{
-
-
-            setLoading(false);
-
-
-        }
-
-
-    };
-
+        setBills(data);
+    } catch (error) {
+        console.log(error);
+    } finally {
+        setLoading(false);
+    }
+};
 
 
 
@@ -135,7 +96,7 @@ export default function CustomerBillList(){
     useEffect(()=>{
 
 
-        GetBills();
+        fetchBills();
 
 
     },[]);
