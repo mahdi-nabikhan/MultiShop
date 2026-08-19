@@ -1,37 +1,61 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
 
+
+// ==========================================
+// Bill
+// ==========================================
+
 export interface Cart {
+
     id: number;
+
     status: boolean;
+
     created: string;
+
     customer: number;
+
 }
+
 
 export interface Bill {
+
     id: number;
+
     created_at: string;
+
     status: boolean;
+
     cart: Cart;
+
     address: number;
+
 }
 
+
 export async function getBills(): Promise<Bill[]> {
+
     const response = await axios.get<Bill[]>(
+
         `${BACKEND_URLS}order/api/v1/bill/list/`,
+
         {
             withCredentials: true,
         }
+
     );
 
     return response.data;
+
 }
 
 
+// ==========================================
+// Customer Order
+// ==========================================
 
-
-
-export interface Product {
+export interface CustomerOrderProduct {
 
     id: number;
 
@@ -39,9 +63,93 @@ export interface Product {
 
     description: string;
 
-    product_image: string;
+    product_image: string | null;
 
     price: number;
+
+}
+
+
+export interface CustomerOrderItem {
+
+    id: number;
+
+    quantity: number;
+
+    status: string;
+
+    created: string;
+
+    total: string;
+
+    order: number;
+
+    product: CustomerOrderProduct;
+
+}
+
+
+export async function getCustomerOrderItems(
+    orderId: number
+): Promise<CustomerOrderItem[]> {
+
+    const response = await axios.get<CustomerOrderItem[]>(
+
+        `${BACKEND_URLS}order/api/v1/order/item/list/${orderId}/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+
+}
+
+
+export async function getCustomerOrderItemDetail(
+    itemId: number
+): Promise<CustomerOrderItem> {
+
+    const response = await axios.get<CustomerOrderItem>(
+
+        `${BACKEND_URLS}order/api/v1/order/item/detail/${itemId}/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+
+}
+
+
+// ==========================================
+// Order Detail
+// ==========================================
+
+export interface OrderProduct {
+
+    id: number;
+
+    name: string;
+
+    description: string;
+
+    quantity_in_stock: number;
+
+    price: number;
+
+    price_after: number;
+
+    product_image: string | null;
+
+    category: number;
+
+    store: number;
 
 }
 
@@ -60,36 +168,133 @@ export interface OrderItem {
 
     order: number;
 
-    product: Product;
+    product: OrderProduct;
 
 }
 
 
-export async function getCustomerOrderItems(
-    orderId: number
-): Promise<OrderItem[]> {
+export interface OrderAddress {
+
+    id: number;
+
+    state: string;
+
+    city: string;
+
+    postal_code: string;
+
+    customer: {
+
+        username: string;
+
+    };
+
+}
+
+
+// ==========================================
+// Current Order / Cart
+// ==========================================
+
+export async function getOrderItems(): Promise<OrderItem[]> {
 
     const response = await axios.get<OrderItem[]>(
-        `${BACKEND_URLS}order/api/v1/order/item/list/${orderId}/`,
+
+        `${BACKEND_URLS}order/api/v1/order/item/`,
+
         {
             withCredentials: true,
         }
+
     );
 
     return response.data;
+
 }
 
 
-export async function getCustomerOrderItemDetail(
-    itemId: number
-): Promise<OrderItem> {
+export async function getOrderAddresses(): Promise<OrderAddress[]> {
 
-    const response = await axios.get<OrderItem>(
-        `${BACKEND_URLS}order/api/v1/order/item/detail/${itemId}/`,
+    const response = await axios.get<OrderAddress[]>(
+
+        `${BACKEND_URLS}customer/api/v1/add/address/`,
+
         {
             withCredentials: true,
         }
+
     );
 
     return response.data;
+
+}
+
+
+// ==========================================
+// Checkout
+// ==========================================
+
+export async function createBill(
+    addressId: number
+) {
+
+    const response = await axios.post(
+
+        `${BACKEND_URLS}order/api/v1/bill/create/${addressId}/`,
+
+        {},
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+
+}
+
+
+// ==========================================
+// Order Item Management
+// ==========================================
+
+export async function deleteOrderItem(
+    itemId: number
+): Promise<void> {
+
+    await axios.delete(
+
+        `${BACKEND_URLS}order/api/v1/order/item/detail/${itemId}/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+}
+
+
+export async function updateOrderItem(
+    itemId: number,
+    quantity: number
+) {
+
+    const response = await axios.put(
+
+        `${BACKEND_URLS}order/api/v1/order/item/detail/${itemId}/`,
+
+        {
+            quantity,
+        },
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+
 }
