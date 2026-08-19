@@ -4,45 +4,21 @@ import DeleteAddressModal from "../DeleteAddressModal/DeleteAddressModal";
 
 import { useEffect, useState } from "react";
 
-import axios from "axios";
+
 
 import {
     MapPin,
     Hash,
     User
 } from "lucide-react";
-
-
-import BACKEND_URLS from "@/utils";
+import { getAddressDetail,Address } from "@/services/cutomer-panel.services";
 
 import "./CustomerAddressDetail.css";
 
 
 
 
-interface Customer {
 
-    username: string;
-
-}
-
-
-
-interface Address {
-
-
-    id: number;
-
-    state: string;
-
-    city: string;
-
-    postal_code: string;
-
-    customer: Customer;
-
-
-}
 
 
 
@@ -69,46 +45,16 @@ export default function CustomerAddressDetail({
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
 
-
-
-
     const GetAddressDetail = async () => {
+    try {
+        const data = await getAddressDetail(addressId);
+
+        setAddress(data);
+    } catch (error) {
+        console.log(error);
+    }};
 
 
-        try {
-
-
-            const { data } = await axios.get<Address>(
-
-
-                `${BACKEND_URLS}customer/api/v1/detail/address/${addressId}/`,
-
-                {
-
-                    withCredentials: true
-
-                }
-
-
-            );
-
-
-            setAddress(data);
-
-
-        }
-
-
-        catch (error) {
-
-
-            console.log(error);
-
-
-        }
-
-
-    };
 
 
 

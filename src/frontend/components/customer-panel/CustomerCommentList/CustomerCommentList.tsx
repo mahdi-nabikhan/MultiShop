@@ -3,7 +3,7 @@
 
 import {useEffect,useState} from "react";
 
-import axios from "axios";
+import { getCustomerComments,Comment } from "@/services/cutomer-panel.services";
 
 import {
     MessageCircle,
@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 
 
-import BACKEND_URLS from "@/utils";
 
 import "./CustomerCommentList.css";
 
@@ -20,36 +19,6 @@ import "./CustomerCommentList.css";
 
 
 
-interface User {
-
-
-    id:number;
-
-    email:string;
-
-
-}
-
-
-
-
-interface Comment {
-
-
-    id:number;
-
-    descriptions:string;
-
-    status:string;
-
-    user:User;
-
-    product:number;
-
-    parent:number|null;
-
-
-}
 
 
 
@@ -59,63 +28,24 @@ export default function CustomerCommentList(){
 
 
     const [comments,setComments]=useState<Comment[]>([]);
-
     const [loading,setLoading]=useState(true);
 
 
+    const fetchComments = async () => {
+    try {
+        const data = await getCustomerComments();
+
+        setComments(data);
+
+    } catch (error) {
+        console.log(error);
+
+    } finally {
+        setLoading(false);
+    }
+};
 
 
-
-
-    const GetComments=async()=>{
-
-
-        try{
-
-
-            const {data}=await axios.get<Comment[]>(
-
-
-                `${BACKEND_URLS}customer/api/v1/all/comments/`,
-
-
-                {
-
-                    withCredentials:true
-
-                }
-
-
-            );
-
-
-            setComments(data);
-
-
-
-        }
-
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-        finally{
-
-
-            setLoading(false);
-
-
-        }
-
-
-
-    };
 
 
 
@@ -127,7 +57,7 @@ export default function CustomerCommentList(){
     useEffect(()=>{
 
 
-        GetComments();
+        fetchComments();
 
 
     },[]);

@@ -2,26 +2,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
+import { getCustomerProfile,updateCustomerProfile,CustomerProfileProp } from "@/services/cutomer-panel.services";
 
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 
 import "./CustomerProfile.css";
 
 
-interface CustomerProfile {
 
-    id: number;
-
-    username: string;
-
-    is_customer: boolean;
-
-    user: number;
-
-}
 
 
 export default function CustomerProfile() {
@@ -32,7 +20,7 @@ export default function CustomerProfile() {
     // ==========================================
 
     const [profile, setProfile] =
-        useState<CustomerProfile | null>(null);
+        useState<CustomerProfileProp | null>(null);
 
 
     const [editData, setEditData] =
@@ -73,54 +61,36 @@ export default function CustomerProfile() {
 
     async function getProfile() {
 
-        try {
+    try {
 
-            setLoading(true);
+        setLoading(true);
 
-            setError("");
+        setError("");
 
+        const data = await getCustomerProfile();
 
-            const response =
-                await axios.get<CustomerProfile>(
+        setProfile(data);
 
-                    `${BACKEND_URLS}customer/api/v1/customer/detail/`,
+        setEditData({
+            username: data.username,
+        });
 
-                    {
-                        withCredentials: true,
-                    }
+    } catch (error) {
 
-                );
+        console.error(
+            "Profile loading error:",
+            error
+        );
 
+        setError(
+            "Failed to load your profile."
+        );
 
-            setProfile(response.data);
+    } finally {
 
+        setLoading(false);
 
-            setEditData({
-
-                username:
-                    response.data.username,
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                "Profile loading error:",
-                error
-            );
-
-
-            setError(
-                "Failed to load your profile."
-            );
-
-
-        } finally {
-
-            setLoading(false);
-
-        }
+    }
 
     }
 
@@ -164,80 +134,59 @@ export default function CustomerProfile() {
     // ==========================================
 
     async function updateProfile(
-        e: React.FormEvent
-    ) {
+    e: React.FormEvent
+) {
 
-        e.preventDefault();
+    e.preventDefault();
 
+    try {
 
-        try {
+        setSaving(true);
 
-            setSaving(true);
+        setError("");
 
-            setError("");
+        const data = await updateCustomerProfile(
+            editData
+        );
 
+        setProfile(data);
 
-            const response =
-                await axios.put<CustomerProfile>(
+        setEditData({
+            username: data.username,
+        });
 
-                    `${BACKEND_URLS}customer/api/v1/customer/detail/`,
+        setEditing(false);
 
-                    editData,
+    } catch (error: any) {
 
-                    {
-                        withCredentials: true,
-                    }
+        console.error(
+            "Profile update error:",
+            error
+        );
 
-                );
+        if (error.response?.data) {
 
-
-            setProfile(response.data);
-
-
-            setEditData({
-
-                username:
-                    response.data.username,
-
-            });
-
-
-            setEditing(false);
-
-
-        } catch (error: any) {
-
-            console.error(
-                "Profile update error:",
-                error
+            setError(
+                JSON.stringify(
+                    error.response.data
+                )
             );
 
+        } else {
 
-            if (error.response?.data) {
-
-                setError(
-                    JSON.stringify(
-                        error.response.data
-                    )
-                );
-
-            } else {
-
-                setError(
-                    "Failed to update your profile."
-                );
-
-            }
-
-
-        } finally {
-
-            setSaving(false);
+            setError(
+                "Failed to update your profile."
+            );
 
         }
 
+    } finally {
+
+        setSaving(false);
+
     }
 
+}
 
 
     // ==========================================

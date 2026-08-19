@@ -3,7 +3,7 @@
 
 import {useState} from "react";
 
-import axios from "axios";
+import { createAddress } from "@/services/cutomer-panel.services";
 
 import {
     MapPin,
@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 
 
-import BACKEND_URLS from "@/utils";
 
 
 import "./CustomerAddressCreate.css";
@@ -59,38 +58,14 @@ export default function CustomerAddressCreate({
 
 
             setLoading(true);
+            await createAddress({
+            state,
+            city,
+            postal_code: postalCode,});
 
 
 
-            await axios.post(
-
-
-                `${BACKEND_URLS}customer/api/v1/add/address/`,
-
-
-                {
-
-
-                    state,
-
-                    city,
-
-                    postal_code:postalCode
-
-
-                },
-
-
-                {
-
-
-                    withCredentials:true
-
-
-                }
-
-
-            );
+           
 
 
 

@@ -1,58 +1,64 @@
 "use client";
 
-
 import { useEffect, useState } from "react";
-import axios from "axios";
-import "./ProductRating.css";
 
+import {
+    canRateProduct,
+    addProductRating,
+} from "@/services/product.services";
+
+import "./ProductRating.css";
 
 
 interface ProductRatingProps {
 
-    productId:number;
+    productId: number;
 
-    isAuthenticated:boolean;
+    isAuthenticated: boolean;
 
 }
-
 
 
 export default function ProductRating({
 
     productId,
 
-    isAuthenticated
+    isAuthenticated,
 
-}:ProductRatingProps){
-
-
-
-    const [canRate,setCanRate] = useState(false);
-
-    const [loading,setLoading] = useState(true);
-
-    const [selectedRate,setSelectedRate] = useState(0);
-
-    const [hoverRate,setHoverRate] = useState(0);
-
-    const [sending,setSending] = useState(false);
-
-    const [message,setMessage] = useState("");
+}: ProductRatingProps) {
 
 
+    const [canRate, setCanRate] =
+        useState(false);
 
 
-
-    /*
-        اگر کاربر لاگین نیست
-        هیچ کاری انجام نشود
-    */
+    const [loading, setLoading] =
+        useState(true);
 
 
-    useEffect(()=>{
+    const [selectedRate, setSelectedRate] =
+        useState(0);
 
 
-        if(!isAuthenticated){
+    const [hoverRate, setHoverRate] =
+        useState(0);
+
+
+    const [sending, setSending] =
+        useState(false);
+
+
+    const [message, setMessage] =
+        useState("");
+
+
+    // ==========================================
+    // Check Can Rate
+    // ==========================================
+
+    useEffect(() => {
+
+        if (!isAuthenticated) {
 
             setLoading(false);
 
@@ -61,178 +67,113 @@ export default function ProductRating({
         }
 
 
+        async function checkRate() {
 
-        async function checkRate(){
+            try {
 
+                const canRate =
+                    await canRateProduct(productId);
 
-            try{
-
-
-                const response = await axios.get(
-
-
-                    `http://localhost:8000/customer/api/v1/product/${productId}/can-rate/`,
-
-
-                    {
-
-                        withCredentials:true
-
-                    }
-
-
-                );
-
-
-
-                setCanRate(
-
-                    response.data.can_rate
-
-                );
-
-
+                setCanRate(canRate);
 
             }
-            catch(error){
 
+            catch (error) {
 
-                console.log(error);
-
+                console.error(
+                    "Check product rating error:",
+                    error
+                );
 
             }
-            finally{
 
+            finally {
 
                 setLoading(false);
 
-
             }
 
-
         }
-
 
 
         checkRate();
 
+    }, [
+        productId,
+        isAuthenticated,
+    ]);
 
 
-    },[productId,isAuthenticated]);
+    // ==========================================
+    // Add Rating
+    // ==========================================
 
+    async function addRate() {
 
-
-
-
-
-
-    async function addRate(){
-
-
-
-        if(selectedRate===0)
-
+        if (selectedRate === 0) {
             return;
+        }
 
 
-
-
-        try{
-
+        try {
 
             setSending(true);
 
+            setMessage("");
 
 
-            await axios.post(
-
-
-                `http://localhost:8000/customer/api/v1/add/product/rate/${productId}/`,
-
-
-                {
-
-
-                    rate:selectedRate
-
-
-                },
-
-
-                {
-
-
-                    withCredentials:true
-
-                }
-
-
+            await addProductRating(
+                productId,
+                selectedRate
             );
-
 
 
             setCanRate(false);
 
-
             setMessage(
-
                 "Rating submitted successfully"
-
             );
 
-
-
         }
-        catch(error){
 
+        catch (error) {
 
-            console.log(error);
-
+            console.error(
+                "Product rating error:",
+                error
+            );
 
             setMessage(
-
                 "Error submitting rating"
-
             );
 
-
         }
-        finally{
 
+        finally {
 
             setSending(false);
 
-
         }
-
 
     }
 
 
+    // ==========================================
+    // Guest User
+    // ==========================================
 
-
-
-
-
-    /*
-        کاربر مهمان
-    */
-
-
-    if(!isAuthenticated){
+    if (!isAuthenticated) {
 
         return null;
 
     }
 
 
+    // ==========================================
+    // Loading
+    // ==========================================
 
-
-
-
-
-    if(loading){
-
+    if (loading) {
 
         return (
 
@@ -247,14 +188,9 @@ export default function ProductRating({
     }
 
 
-
-
-
-
     return (
 
         <div className="product-rating">
-
 
 
             <h3>
@@ -264,51 +200,44 @@ export default function ProductRating({
             </h3>
 
 
-
-
-            {
-
-                canRate ?
-
+            {canRate ? (
 
                 <>
 
 
+                    {/* Rating Stars */}
+
                     <div className="rating-stars">
 
-
-                        {
-
-                            [1,2,3,4,5].map((star)=>(
-
+                        {[1, 2, 3, 4, 5].map(
+                            (star) => (
 
                                 <button
 
                                     key={star}
 
+                                    type="button"
 
-                                    onMouseEnter={()=>setHoverRate(star)}
+                                    onMouseEnter={() =>
+                                        setHoverRate(star)
+                                    }
 
+                                    onMouseLeave={() =>
+                                        setHoverRate(0)
+                                    }
 
-                                    onMouseLeave={()=>setHoverRate(0)}
-
-
-                                    onClick={()=>setSelectedRate(star)}
-
-
+                                    onClick={() =>
+                                        setSelectedRate(star)
+                                    }
 
                                     className={
-
-                                        star <= (hoverRate || selectedRate)
-
-                                        ?
-
-                                        "active"
-
-                                        :
-
-                                        ""
-
+                                        star <=
+                                        (
+                                            hoverRate ||
+                                            selectedRate
+                                        )
+                                            ? "active"
+                                            : ""
                                     }
 
                                 >
@@ -317,18 +246,17 @@ export default function ProductRating({
 
                                 </button>
 
-
-                            ))
-
-                        }
-
+                            )
+                        )}
 
                     </div>
 
 
-
+                    {/* Submit */}
 
                     <button
+
+                        type="button"
 
                         className="rating-submit"
 
@@ -336,32 +264,19 @@ export default function ProductRating({
 
                         disabled={sending}
 
-
                     >
 
-                        {
-
-                            sending
-
-                            ?
-
-                            "Sending..."
-
-                            :
-
-                            "Submit Rating"
-
+                        {sending
+                            ? "Sending..."
+                            : "Submit Rating"
                         }
-
 
                     </button>
 
 
                 </>
 
-
-                :
-
+            ) : (
 
                 <p className="rated-text">
 
@@ -369,17 +284,12 @@ export default function ProductRating({
 
                 </p>
 
-
-            }
-
+            )}
 
 
+            {/* Message */}
 
-
-            {
-
-                message &&
-
+            {message && (
 
                 <p className="success-message">
 
@@ -387,14 +297,11 @@ export default function ProductRating({
 
                 </p>
 
-
-            }
-
+            )}
 
 
         </div>
 
     );
-
 
 }

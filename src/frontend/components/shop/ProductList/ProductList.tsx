@@ -1,9 +1,9 @@
-import axios from "axios";
+
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
-import BACKEND_URLS from "@/utils";
-import { cookies } from "next/headers";
 
+import { cookies } from "next/headers";
+import { getStoreProducts,Product } from "@/services/product.services";
 
 interface ProductListProps {
 
@@ -13,27 +13,7 @@ interface ProductListProps {
 
 
 
-export interface Product {
 
-  id:number;
-
-  name:string;
-
-  description:string;
-
-  quantity_in_stock:number;
-
-  price:number;
-
-  price_after:number;
-
-  product_image:string | null;
-
-  category:number;
-
-  store:number;
-
-}
 
 
 
@@ -62,15 +42,7 @@ export default async function ProductList({
 
 
 
-  const {data:products}=await axios.get<Product[]>(
-
-    `${BACKEND_URLS}website/api/v1/product/list/${shopId}`,
-
-    {
-      headers
-    }
-
-  );
+  const  products = await getStoreProducts(shopId, headers);
 
 
 

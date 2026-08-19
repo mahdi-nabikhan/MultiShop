@@ -3,16 +3,12 @@
 
 import {useEffect,useState} from "react";
 
-import axios from "axios";
-
 import {
     MessageCircle,
     Edit,
     Trash
 } from "lucide-react";
-
-
-import BACKEND_URLS from "@/utils";
+import { getCommentDetail,Comment } from "@/services/cutomer-panel.services";
 
 
 import EditCommentModal from "../EditCommentModal/EditCommentModal";
@@ -25,25 +21,7 @@ import "./CustomerCommentDetail.css";
 
 
 
-interface Comment {
 
-
-    id:number;
-
-    descriptions:string;
-
-    status:string;
-
-    user:{
-        email:string
-    };
-
-    product:number;
-
-    parent:number|null;
-
-
-}
 
 
 
@@ -82,43 +60,16 @@ const [openDelete,setOpenDelete]=useState(false);
 
 
 
-const GetComment=async()=>{
-
-
-    try{
-
-
-        const {data}=await axios.get<Comment>(
-
-
-            `${BACKEND_URLS}customer/api/v1/detail/comment/${commentId}/`,
-
-
-            {
-
-                withCredentials:true
-
-            }
-
-
-        );
-
+    const fetchComment = async () => {
+    try {
+        const data = await getCommentDetail(commentId);
 
         setComment(data);
 
-
-
-    }
-
-    catch(error){
-
+    } catch (error) {
         console.log(error);
-
     }
-
-
 };
-
 
 
 
@@ -127,7 +78,7 @@ const GetComment=async()=>{
 useEffect(()=>{
 
 
-    GetComment();
+    fetchComment()
 
 
 },[commentId]);
@@ -310,7 +261,7 @@ close={()=>setOpenEdit(false)}
 
 comment={comment}
 
-refresh={GetComment}
+refresh={fetchComment}
 
 />
 

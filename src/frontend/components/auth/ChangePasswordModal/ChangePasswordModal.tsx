@@ -1,10 +1,8 @@
 "use client";
 
-
+import { changePassword } from "@/services/auth.services";
 import { useState } from "react";
-import axios from "axios";
 
-import BACKEND_URLS from "@/utils";
 
 
 interface Props {
@@ -73,21 +71,7 @@ export default function ChangePasswordModal({
 
 
         try {
-
-
-            const response = await axios.put(
-
-                `${BACKEND_URLS}accounts/api/v1/change-password/`,
-
-                formData,
-
-                {
-                    withCredentials:true
-                }
-
-            );
-
-
+            await changePassword(formData);
             setMessage(
                 "Password changed successfully"
             );

@@ -2,66 +2,10 @@
 
 
 import {useEffect,useState} from "react";
-
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
-
-import {
-    Package,
-    Clock
-} from "lucide-react";
-
-
+import { getCustomerOrderItemDetail,OrderItem } from "@/services/order.services";
+import {Package,Clock} from "lucide-react";
 import "./CustomerOrderItemDetail.css";
-
-
-
-
-interface Product {
-
-
-    id:number;
-
-    name:string;
-
-    description:string;
-
-    product_image:string;
-
-    price:number;
-
-    price_after:number;
-
-
-}
-
-
-
-
-interface OrderItem {
-
-
-    id:number;
-
-    quantity:number;
-
-    status:string;
-
-    created:string;
-
-    total:string;
-
-    order:number;
-
-    product:Product;
-
-
-}
-
-
-
-
+import BACKEND_URLS from "@/utils";
 
 interface Props {
 
@@ -83,47 +27,20 @@ export default function CustomerOrderItemDetail({
 
     const [item,setItem]=useState<OrderItem|null>(null);
 
+    const fetchItemDetail = async () => {
+    try {
+        const data = await getCustomerOrderItemDetail(itemId);
 
+        setItem(data);
 
-
-
-    const GetItemDetail=async()=>{
-
-
-        try{
-
-
-            const {data}=await axios.get<OrderItem>(
-
-
-                `${BACKEND_URLS}order/api/v1/order/item/detail/${itemId}/`,
-
-                {
-
-                    withCredentials:true
-
-                }
-
-            );
-
-
-            setItem(data);
-
-
-        }
-
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
+    } catch (error) {
+        console.log(error);
+    }
     };
 
+
+
+    
 
 
 
@@ -131,7 +48,7 @@ export default function CustomerOrderItemDetail({
     useEffect(()=>{
 
 
-        GetItemDetail();
+        fetchItemDetail();
 
 
     },[itemId]);
