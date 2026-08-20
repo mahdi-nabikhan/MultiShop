@@ -338,3 +338,109 @@ export async function addProductToSessionCart(
 
     return data;
 }
+
+
+
+
+
+// ==========================================
+// Session Cart Interfaces
+// ==========================================
+
+export interface SessionProduct {
+    id: number;
+    name: string;
+    description: string;
+    quantity_in_stock: number;
+    price: number;
+    price_after: number;
+    product_image: string | null;
+    category: number;
+    store: number;
+}
+
+export interface SessionCartItem {
+    product: SessionProduct;
+    quantity: number;
+    total_price: number;
+}
+
+export interface SessionCartResponse {
+    items: SessionCartItem[];
+    total_quantity: number;
+    total_price: number;
+}
+
+
+// ==========================================
+// Get Session Cart
+// ==========================================
+
+export async function getSessionCart(): Promise<SessionCartResponse> {
+
+    const { data } = await axios.get<SessionCartResponse>(
+        `${BACKEND_URLS}order/api/v1/sessions/cart/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}
+
+
+// ==========================================
+// Check Customer
+// ==========================================
+
+export async function getCustomerDetail() {
+
+    const { data } = await axios.get(
+        `${BACKEND_URLS}customer/api/v1/customer/detail/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}
+
+
+// ==========================================
+// Delete Session Cart Product
+// ==========================================
+
+export async function deleteSessionCartProduct(
+    productId: number
+): Promise<void> {
+
+    await axios.delete(
+        `${BACKEND_URLS}order/api/v1/session/cart/delete/${productId}/`,
+        {
+            withCredentials: true,
+        }
+    );
+}
+
+
+// ==========================================
+// Update Session Cart Quantity
+// ==========================================
+
+export async function updateSessionCartQuantity(
+    productId: number,
+    quantity: number
+) {
+
+    const { data } = await axios.put(
+        `${BACKEND_URLS}order/api/v1/session/cart/update/${productId}/`,
+        {
+            quantity,
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}
