@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
+import { createCommentReply } from "@/services/comment.services";
 
 interface Props {
     productID: number | string;
@@ -26,47 +24,41 @@ export default function ReplyForm({
     const [success, setSuccess] = useState("");
 
 
+
+
     async function handleSubmit(
         e: React.FormEvent
     ) {
-
         e.preventDefault();
 
+        const trimmedDescription = description.trim();
 
-        if (!description.trim()) {
+        setError("");
+        setSuccess("");
 
+        if (!trimmedDescription) {
             setError("Reply cannot be empty.");
-
             return;
-
         }
 
+        if (trimmedDescription.length < 3) {
+            setError("Reply must be at least 3 characters.");
+            return;
+        }
+
+        if (trimmedDescription.length > 1000) {
+            setError("Reply cannot exceed 1000 characters.");
+            return;
+        }
 
         try {
-
             setLoading(true);
 
-            setError("");
-
-            setSuccess("");
-
-
-            await axios.post(
-
-                `${BACKEND_URLS}customer/api/v1/add/get/comment/repaly/${commentID}/`,
-
-                {
-                    descriptions: description,
-                    product: productID,
-                    parent: commentID,
-                },
-
-                {
-                    withCredentials: true,
-                }
-
+            await createCommentReply(
+                commentID,
+                productID,
+                trimmedDescription
             );
-
 
             setDescription("");
 
@@ -74,18 +66,13 @@ export default function ReplyForm({
                 "Reply added successfully."
             );
 
-
             if (onReplyCreated) {
-
                 onReplyCreated();
-
             }
-
 
         } catch (error: any) {
 
             console.error(error);
-
 
             if (error.response?.data) {
 
@@ -108,7 +95,6 @@ export default function ReplyForm({
             setLoading(false);
 
         }
-
     }
 
 

@@ -1,28 +1,27 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
-import BACKEND_URLS from "@/utils";
-
-interface IReply {
-    id: number;
-    descriptions: string;
-    status: string;
-    user: number;
-    product: number;
-    parent: number | null;
-}
+import {
+    getCommentReplies,
+    CommentReply,
+} from "@/services/comment.services";
 
 interface Props {
     commentID: number;
 }
 
-export default function ReplyList({ commentID }: Props) {
+export default function ReplyList({
+    commentID
+}: Props) {
 
-    const [replies, setReplies] = useState<IReply[]>([]);
+    const [replies, setReplies] =
+        useState<CommentReply[]>([]);
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] =
+        useState(false);
+
 
     async function loadReplies() {
 
@@ -30,12 +29,10 @@ export default function ReplyList({ commentID }: Props) {
 
             setLoading(true);
 
-            const { data } = await axios.get<IReply[]>(
-                `${BACKEND_URLS}customer/api/v1/add/get/comment/repaly/${commentID}/`,
-                {
-                    withCredentials: true,
-                }
-            );
+            const data =
+                await getCommentReplies(
+                    commentID
+                );
 
             setReplies(data);
 
