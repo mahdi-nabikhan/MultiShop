@@ -71,3 +71,59 @@ export async function register(
 
   return response.data;
 }
+
+
+
+
+export interface RegisterShopAdminPayload {
+    username: string;
+    email: string;
+    password: string;
+    password2: string;
+}
+
+export async function registerShopAdmin(
+    payload: RegisterShopAdminPayload
+) {
+    const { data } = await axios.post(
+        `${BACKEND_URLS}vendor/api/v1/admin/register/`,
+        {
+            username: payload.username,
+            user: {
+                email: payload.email,
+                password: payload.password,
+                password2: payload.password2,
+            },
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}
+
+
+interface CreateOperatorData {
+    username: string;
+    user: {
+        email: string;
+        password: string;
+        password2: string;
+    };
+}
+
+export async function createOperator(
+    data: CreateOperatorData
+) {
+
+    const response = await axios.post(
+        `${BACKEND_URLS}vendor/api/v1/admin/register/`,
+        data,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+}

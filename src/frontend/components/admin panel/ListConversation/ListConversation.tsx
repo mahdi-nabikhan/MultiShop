@@ -1,20 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
+import { getStoreConversations,Conversation } from "@/services/shop-admin-panel.services";
 
 import "./ListConversation.css";
 
-interface Conversation {
-    id: number;
-    store: number;
-    customer: number;
-    status: string;
-    created_at?: string;
-    updated_at?: string;
-}
 
 interface Props {
     selectedConversation: number | null;
@@ -37,35 +27,30 @@ export default function ConversationList({
 
     const getConversations = async () => {
 
-        try {
+    try {
 
-            setLoading(true);
-            setError("");
+        setLoading(true);
+        setError("");
 
-            const response = await axios.get<Conversation[]>(
-                `${BACKEND_URLS}dashboard/api/v1/list/store/conversations/`,
-                {
-                    withCredentials: true,
-                }
-            );
+        const data = await getStoreConversations();
 
-            setConversations(response.data);
+        setConversations(data);
 
-        } catch (error) {
+    } catch (error) {
 
-            console.error(error);
+        console.error(error);
 
-            setError(
-                "Failed to load conversations."
-            );
+        setError(
+            "Failed to load conversations."
+        );
 
-        } finally {
+    } finally {
 
-            setLoading(false);
+        setLoading(false);
 
-        }
+    }
 
-    };
+};
 
 
     useEffect(() => {

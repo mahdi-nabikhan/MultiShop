@@ -1,52 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { getOperators } from "@/services/shop-admin-panel.services";
+import type { Operator } from "@/services/shop-admin-panel.services";
 import "./OperatorList.css";
 
-interface Operator {
-    username: string;
-    user: {
-        email: string;
-    };
-}
 
 export default function OperatorList() {
 
     const [operators, setOperators] = useState<Operator[]>([]);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
 
-        const getOperators = async () => {
+    const loadOperators = async () => {
 
-            try {
+        try {
 
-                const { data } = await axios.get<Operator[]>(
-                    `${BACKEND_URLS}vendor/api/v1/shop/operator/list/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
+            setLoading(true);
 
-                setOperators(data);
+            const data = await getOperators();
 
-            } catch (err) {
+            setOperators(data);
 
-                console.log(err);
+        } catch (err) {
 
-            } finally {
+            console.log(err);
 
-                setLoading(false);
+        } finally {
 
-            }
+            setLoading(false);
 
-        };
+        }
 
-        getOperators();
+    };
 
-    }, []);
+    loadOperators();
+
+}, []);
+
+   
 
     if (loading) {
         return <h2>Loading...</h2>;

@@ -1,16 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { getOperatorDetail } from "@/services/shop-admin-panel.services";
+import type { OperatorDetail } from "@/services/shop-admin-panel.services";
 import "./OperatorDetail.css";
 
-interface OperatorDetail {
-    username: string;
-    user: {
-        email: string;
-    };
-}
 
 interface Props {
     operatorId: number | string;
@@ -21,36 +15,33 @@ export default function OperatorDetail({ operatorId }: Props) {
     const [operator, setOperator] = useState<OperatorDetail | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+   useEffect(() => {
 
-        const getOperator = async () => {
+    const loadOperator = async () => {
 
-            try {
+        try {
 
-                const { data } = await axios.get<OperatorDetail>(
-                    `${BACKEND_URLS}vendor/api/v1/shop/operator/detail/${operatorId}/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
+            setLoading(true);
 
-                setOperator(data);
+            const data = await getOperatorDetail(operatorId);
 
-            } catch (err) {
+            setOperator(data);
 
-                console.log(err);
+        } catch (err) {
 
-            } finally {
+            console.log(err);
 
-                setLoading(false);
+        } finally {
 
-            }
+            setLoading(false);
 
-        };
+        }
 
-        getOperator();
+    };
 
-    }, [operatorId]);
+    loadOperator();
+
+}, [operatorId]);
 
     if (loading) return <h2>Loading...</h2>;
 

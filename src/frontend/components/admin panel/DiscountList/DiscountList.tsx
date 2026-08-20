@@ -1,17 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import "./DiscountList.css";
-import axios from "axios";
+import { getProductDiscounts,DiscountData } from "@/services/shop-admin-panel.services";
 import BACKEND_URLS from "@/utils";
 import DeleteDiscountModal from "../DeleteDiscountModal/DeleteDiscountModal";
 
-interface DiscountData {
-    id: number;
-    products: number;
-    value: number;
-    discount_type: "cash" | "percent";
-}
+
 
 function DiscountList({ productId }: { productId: number }) {
 
@@ -22,31 +16,20 @@ function DiscountList({ productId }: { productId: number }) {
     const [selectedDiscount, setSelectedDiscount] = useState<number | null>(null);
 
     const GetDiscounts = async () => {
+    try {
+        setLoading(true);
 
-        try {
+        const data = await getProductDiscounts(productId);
 
-            setLoading(true);
+        setDiscounts(data);
 
-            const { data } = await axios.get<DiscountData[]>(
-                `${BACKEND_URLS}vendor/api/v1/add/product/discount/${productId}/`,
-                {
-                    withCredentials: true,
-                }
-            );
+    } catch (err) {
+        console.log(err);
 
-            setDiscounts(data);
-
-        } catch (err) {
-
-            console.log(err);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
+    } finally {
+        setLoading(false);
+    }
+};
 
     useEffect(() => {
 

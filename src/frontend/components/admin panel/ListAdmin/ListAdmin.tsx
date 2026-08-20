@@ -2,54 +2,43 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { getAdmins,Admin } from "@/services/shop-admin-panel.services";
 import "./ListAdmin.css";
 
-interface Admin {
-    id:number
-    username: string;
-    user: {
 
-        email: string;
-    };
-}
 
 export default function AdminList() {
     const router = useRouter()
     const [admins, setAdmins] = useState<Admin[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+   useEffect(() => {
 
-        const getAdmins = async () => {
+    const loadAdmins = async () => {
 
-            try {
+        try {
 
-                const { data } = await axios.get<Admin[]>(
-                    `${BACKEND_URLS}vendor/api/v1/shop/admin/list/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
+            setLoading(true);
 
-                setAdmins(data);
+            const data = await getAdmins();
 
-            } catch (err) {
+            setAdmins(data);
 
-                console.log(err);
+        } catch (err) {
 
-            } finally {
+            console.log(err);
 
-                setLoading(false);
+        } finally {
 
-            }
+            setLoading(false);
 
-        };
+        }
 
-        getAdmins();
+    };
 
-    }, []);
+    loadAdmins();
+
+}, []);
 
     if (loading) {
         return <h2>Loading...</h2>;

@@ -207,3 +207,16 @@ export async function searchProducts(
 
     return data;
 }
+
+
+
+export async function deleteProductDiscount(
+    discountId: number
+) {
+    await axios.delete(
+        `${BACKEND_URLS}vendor/api/v1/delete/discount/${discountId}/`,
+        {
+            withCredentials: true,
+        }
+    );
+}
