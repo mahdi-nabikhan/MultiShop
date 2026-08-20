@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+
 import Link from "next/link";
 
 import {
@@ -12,38 +12,12 @@ import {
     CheckCheck,
 } from "lucide-react";
 
-import BACKEND_URLS from "@/utils";
+
+import { getConversationMessages, sendConversationMessage, Message } from "@/services/shop-admin-panel.services";
 
 import "./AdminChatBox.css";
 
 
-interface Message {
-
-    id: number;
-
-    conversation: number;
-
-    sender: string | null;
-
-    text: string | null;
-
-    image: string | null;
-
-    file: string | null;
-
-    reply_to: number | null;
-
-    is_read: boolean;
-
-    is_edited: boolean;
-
-    is_deleted: boolean;
-
-    created_at: string;
-
-    edited_at: string | null;
-
-}
 
 
 interface Props {
@@ -107,19 +81,12 @@ export default function AdminChatBox({
             setError("");
 
 
-            const response =
-                await axios.get<Message[]>(
-
-                    `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/list/`,
-
-                    {
-                        withCredentials: true,
-                    }
-
-                );
+            const data = await getConversationMessages(conversationId);
 
 
-            setMessages(response.data);
+
+
+            setMessages(data);
 
 
         } catch (error) {
@@ -234,20 +201,10 @@ export default function AdminChatBox({
             setError("");
 
 
-            await axios.post(
-
-                `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/`,
-
-                {
-                    text: cleanText,
-                },
-
-                {
-                    withCredentials: true,
-                }
-
+            await sendConversationMessage(
+                conversationId,
+                cleanText
             );
-
 
             setText("");
 
