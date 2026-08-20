@@ -127,3 +127,48 @@ export async function createOperator(
 
     return response.data;
 }
+
+
+
+
+export interface RegisterManagerData {
+
+    user: {
+        email: string;
+        password: string;
+        password2: string;
+    };
+
+    store: {
+        name: string;
+        description: string;
+    };
+
+    address: {
+        state: string;
+        street: string;
+    };
+
+    first_name: string;
+    last_name: string;
+
+}
+
+
+export async function registerManager(
+    data: RegisterManagerData
+): Promise<void> {
+
+    await axios.post(
+
+        `${BACKEND_URLS}vendor/api/v1/manager/register/`,
+
+        data,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+}
