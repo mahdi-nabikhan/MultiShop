@@ -1,46 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { getShopTickets, Ticket } from "@/services/shop-admin-panel.services";
 import "./ShopTicketList.css";
 
-interface Customer {
-    id: number;
-    username: string;
-    is_customer: boolean;
-    user: number;
-}
-
-interface Ticket {
-    pk: number;
-    title: string;
-    content: string;
-    store: number;
-    customer: Customer;
-}
 
 export default function ShopTicketList() {
-
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState(true);
-
     const getTickets = async () => {
 
         try {
 
-            const { data } = await axios.get<Ticket[]>(
-                `${BACKEND_URLS}dashboard/api/v1/shop/all/ticket/`,
-                {
-                    withCredentials: true,
-                }
-            );
+            setLoading(true);
+
+            const data = await getShopTickets();
 
             setTickets(data);
 
         } catch (err) {
 
-            console.log(err);
+            console.error(
+                "Failed to load tickets:",
+                err
+            );
 
         } finally {
 
@@ -49,6 +32,8 @@ export default function ShopTicketList() {
         }
 
     };
+
+
 
     useEffect(() => {
 

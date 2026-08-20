@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import "./CommentCreateBox.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import BACKEND_URLS from "@/utils";
+import { createComment } from "@/services/comment.services";
+
 
 interface CommentCreateBoxProps {
   productId: string;
@@ -31,23 +32,9 @@ export default function CommentCreateBox({
         payload.parent = parent;
       }
 
-      const response = await fetch(
-        `${BACKEND_URLS}customer/api/v1/add/comment/${productId}/`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      return createComment(productId,payload)
 
-      if (!response.ok) {
-        throw new Error("Failed to submit comment");
-      }
 
-      return response.json();
     },
 
     onSuccess: () => {

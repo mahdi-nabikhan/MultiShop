@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { deleteProductDiscount } from "@/services/product.services";
 import "./DeleteDiscountModal.css";
 
 interface Props {
@@ -22,37 +21,25 @@ export default function DeleteDiscountModal({
     const [loading, setLoading] = useState(false);
 
     if (!open) return null;
-
     const deleteHandler = async () => {
+    try {
+        setLoading(true);
 
-        try {
+        await deleteProductDiscount(discountId);
 
-            setLoading(true);
+        refreshDiscounts();
+        onClose();
 
-            await axios.delete(
-                `${BACKEND_URLS}vendor/api/v1/delete/discount/${discountId}/`,
-                {
-                    withCredentials: true,
-                }
-            );
+    } catch (err) {
+        console.log(err);
+        alert("Failed to delete discount.");
 
-            refreshDiscounts();
+    } finally {
+        setLoading(false);
+    }
+};
 
-            onClose();
-
-        } catch (err) {
-
-            console.log(err);
-
-            alert("Failed to delete discount.");
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
+  
 
     return (
 

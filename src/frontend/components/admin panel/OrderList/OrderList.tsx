@@ -1,52 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import {
+    getShopOrders,
+    Order,
+} from "@/services/shop-admin-panel.services";
 import BACKEND_URLS from "@/utils";
 import "./OrderList.css";
 
-interface Customer {
-    id: number;
-    username: string;
-    is_customer: boolean;
-    user: number;
-}
 
-interface Order {
-    pk: number;
-    status: boolean;
-    customer: Customer;
-}
 
 export default function OrderList() {
 
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const getOrders = async () => {
+   const getOrders = async () => {
 
-        try {
+    try {
 
-            const { data } = await axios.get<Order[]>(
-                `${BACKEND_URLS}vendor/api/v1/shop/list/order/`,
-                {
-                    withCredentials: true,
-                }
-            );
+        setLoading(true);
 
-            setOrders(data);
+        const data = await getShopOrders();
 
-        } catch (err) {
+        setOrders(data);
 
-            console.log(err);
+    } catch (err) {
 
-        } finally {
+        console.error(
+            "Failed to load orders:",
+            err
+        );
 
-            setLoading(false);
+    } finally {
 
-        }
+        setLoading(false);
 
-    };
+    }
+
+};
 
     useEffect(() => {
 

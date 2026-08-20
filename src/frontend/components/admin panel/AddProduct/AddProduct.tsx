@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { createProduct } from "@/services/shop-admin-panel.services";
 import "./AddProduct.css";
 
 export default function AddProduct() {
@@ -17,34 +16,85 @@ export default function AddProduct() {
 
     const [loading, setLoading] = useState(false);
 
-    const submitHandler = async (e: React.FormEvent) => {
-
+    const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        try {
+        const trimmedName = name.trim();
+        const trimmedDescription = description.trim();
 
+        const productPrice = Number(price);
+        const productPriceAfter = Number(priceAfter);
+        const productStock = Number(stock);
+        const productCategory = Number(category);
+
+        if (!trimmedName) {
+            alert("Product name is required.");
+            return;
+        }
+
+        if (trimmedName.length < 3) {
+            alert("Product name must be at least 3 characters.");
+            return;
+        }
+
+        if (!trimmedDescription) {
+            alert("Product description is required.");
+            return;
+        }
+
+        if (Number.isNaN(productPrice) || productPrice <= 0) {
+            alert("Price must be greater than 0.");
+            return;
+        }
+
+        if (
+            Number.isNaN(productPriceAfter) ||
+            productPriceAfter <= 0
+        ) {
+            alert("Sale price must be greater than 0.");
+            return;
+        }
+
+        if (productPriceAfter > productPrice) {
+            alert("Sale price cannot be greater than the original price.");
+            return;
+        }
+
+        if (Number.isNaN(productStock) || productStock < 0) {
+            alert("Stock cannot be negative.");
+            return;
+        }
+
+        if (!Number.isInteger(productStock)) {
+            alert("Stock must be a whole number.");
+            return;
+        }
+
+        if (
+            Number.isNaN(productCategory) ||
+            productCategory <= 0
+        ) {
+            alert("Category is required.");
+            return;
+        }
+
+        try {
             setLoading(true);
 
             const formData = new FormData();
 
-            formData.append("name", name);
-            formData.append("description", description);
-            formData.append("price", price);
-            formData.append("price_after", priceAfter);
-            formData.append("quantity_in_stock", stock);
-            formData.append("category", category);
+            formData.append("name", trimmedName);
+            formData.append("description", trimmedDescription);
+            formData.append("price", String(productPrice));
+            formData.append("price_after", String(productPriceAfter));
+            formData.append("quantity_in_stock", String(productStock));
+            formData.append("category", String(productCategory));
 
             if (image) {
                 formData.append("product_image", image);
             }
 
-            await axios.post(
-                `${BACKEND_URLS}vendor/api/v1/add/product/`,
-                formData,
-                {
-                    withCredentials: true,
-                }
-            );
+            await createProduct(formData);
 
             alert("Product created successfully.");
 
@@ -57,18 +107,12 @@ export default function AddProduct() {
             setImage(null);
 
         } catch (err) {
-
             console.log(err);
             alert("Something went wrong.");
-
         } finally {
-
             setLoading(false);
-
         }
-
     };
-
     return (
 
         <div className="create-product">

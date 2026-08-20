@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
 
 import { User, Mail, Lock } from "lucide-react";
 
-import BACKEND_URLS from "@/utils";
+import { registerShopAdmin } from "@/services/auth.services";
 import "./AdminRegisterForm.css";
 
 export default function AdminRegisterForm() {
@@ -20,56 +19,42 @@ export default function AdminRegisterForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   async function handlerSubmit(
     e: React.FormEvent<HTMLFormElement>
-  ) {
+) {
     e.preventDefault();
 
     setLoading(true);
     setError("");
 
     try {
-      await axios.post(
-        `${BACKEND_URLS}vendor/api/v1/admin/register/`,
-        {
-          username,
-          user: {
+        await registerShopAdmin({
+            username,
             email,
             password,
             password2,
-          },
-        },
-        {
-          withCredentials: true,
-        }
-      );
+        });
 
-      router.push("/shop-admin-panel");
+        router.push("/shop-admin-panel");
 
-    } catch (err) {
-
-      if (axios.isAxiosError(err)) {
+    } catch (err: any) {
 
         setError(
-          typeof err.response?.data === "string"
-            ? err.response.data
-            : JSON.stringify(err.response?.data)
+            err?.response?.data
+                ? typeof err.response.data === "string"
+                    ? err.response.data
+                    : JSON.stringify(err.response.data)
+                : "Something went wrong."
         );
-
-      } else {
-
-        setError("Something went wrong.");
-
-      }
 
     } finally {
 
-      setLoading(false);
+        setLoading(false);
 
     }
-  }
+}
 
+ 
   return (
     <div className="register-container">
 

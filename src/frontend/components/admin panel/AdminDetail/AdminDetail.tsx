@@ -1,28 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { updateShopAdmin, getShopAdmin, deleteShopAdmin, AdminDetailProp } from "@/services/shop-admin-panel.services";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
-
 import DeleteModal from "../DeleteModal/DeleteModal";
 import UpdateAdminModal from "../UpdateAdminModal/UpdateAdminModal";
 
 import "./AdminDetail.css";
 
 
-interface AdminDetail {
 
-    username: string;
-
-    user: {
-
-        email: string;
-
-    };
-
-}
 
 
 
@@ -34,25 +21,25 @@ interface Props {
 
 
 
-export default function AdminDetail({adminId}: Props){
+export default function AdminDetail({ adminId }: Props) {
 
 
-    const [admin,setAdmin] = useState<AdminDetail | null>(null);
+    const [admin, setAdmin] = useState<AdminDetailProp | null>(null);
 
 
-    const [loading,setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
 
-    const [deleteLoading,setDeleteLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
 
-    const [updateLoading,setUpdateLoading] = useState(false);
+    const [updateLoading, setUpdateLoading] = useState(false);
 
 
-    const [showDelete,setShowDelete] = useState(false);
+    const [showDelete, setShowDelete] = useState(false);
 
 
-    const [showUpdate,setShowUpdate] = useState(false);
+    const [showUpdate, setShowUpdate] = useState(false);
 
 
 
@@ -62,87 +49,38 @@ export default function AdminDetail({adminId}: Props){
 
 
 
-    async function getAdmin(){
-
-
-        try{
-
-
-            const {data} = await axios.get<AdminDetail>(
-
-                `${BACKEND_URLS}vendor/api/v1/shop/admin/detail/${adminId}/`,
-
-                {
-                    withCredentials:true
-                }
-
-            );
-
+    async function getAdmin() {
+        try {
+            const data = await getShopAdmin(adminId);
 
             setAdmin(data);
 
-
-        }
-
-        catch(error){
-
+        } catch (error) {
             console.log(error);
 
-        }
-
-        finally{
-
+        } finally {
             setLoading(false);
-
         }
-
-
     }
 
 
 
 
 
-
-    async function deleteAdmin(){
-
-
-        try{
-
-
+    async function deleteAdmin() {
+        try {
             setDeleteLoading(true);
 
-
-
-            await axios.delete(
-
-                `${BACKEND_URLS}vendor/api/v1/shop/admin/detail/${adminId}/`,
-
-                {
-                    withCredentials:true
-                }
-
-            );
-
+            await deleteShopAdmin(adminId);
 
             router.push("/shop-admin-panel/admin");
 
-
-        }
-
-        catch(error){
-
+        } catch (error) {
             console.log(error);
 
-        }
-
-        finally{
-
+        } finally {
             setDeleteLoading(false);
-
         }
-
-
     }
 
 
@@ -150,100 +88,57 @@ export default function AdminDetail({adminId}: Props){
 
 
 
-    async function updateAdmin(username:string){
-
-
-        try{
-
-
+    async function updateAdmin(username: string) {
+        try {
             setUpdateLoading(true);
 
+            await updateShopAdmin(adminId, username);
 
-
-            await axios.patch(
-
-                `${BACKEND_URLS}vendor/api/v1/shop/admin/detail/${adminId}/`,
-
-                {
-                    username
-                },
-
-                {
-                    withCredentials:true
+            setAdmin(prev => {
+                if (!prev) {
+                    return prev;
                 }
 
-            );
-
-
-
-            setAdmin(prev=>{
-
-
-                if(!prev)
-
-                    return prev;
-
-
-
                 return {
-
                     ...prev,
-
-                    username
-
+                    username,
                 };
-
-
             });
-
-
 
             setShowUpdate(false);
 
-
-
-        }
-
-        catch(error){
-
+        } catch (error) {
             console.log(error);
 
-        }
-
-        finally{
-
+        } finally {
             setUpdateLoading(false);
-
         }
-
-
     }
 
 
 
 
 
-
-    useEffect(()=>{
+    useEffect(() => {
 
 
         getAdmin();
 
 
-    },[adminId]);
+    }, [adminId]);
 
 
 
 
 
-    if(loading)
+    if (loading)
 
         return <h2>Loading...</h2>;
 
 
 
 
-    if(!admin)
+    if (!admin)
 
         return <h2>Admin Not Found</h2>;
 
@@ -267,8 +162,8 @@ export default function AdminDetail({adminId}: Props){
 
                     {
                         admin.user.email
-                        .charAt(0)
-                        .toUpperCase()
+                            .charAt(0)
+                            .toUpperCase()
                     }
 
 
@@ -356,7 +251,7 @@ export default function AdminDetail({adminId}: Props){
 
                         className="update-btn"
 
-                        onClick={()=>setShowUpdate(true)}
+                        onClick={() => setShowUpdate(true)}
 
                     >
 
@@ -384,7 +279,7 @@ export default function AdminDetail({adminId}: Props){
 
                         className="delete-btn"
 
-                        onClick={()=>setShowDelete(true)}
+                        onClick={() => setShowDelete(true)}
 
                     >
 
@@ -421,7 +316,7 @@ export default function AdminDetail({adminId}: Props){
                 message="Are you sure you want to delete this admin?"
 
 
-                onClose={()=>setShowDelete(false)}
+                onClose={() => setShowDelete(false)}
 
 
                 onConfirm={deleteAdmin}
@@ -447,7 +342,7 @@ export default function AdminDetail({adminId}: Props){
                 username={admin.username}
 
 
-                onClose={()=>setShowUpdate(false)}
+                onClose={() => setShowUpdate(false)}
 
 
                 onConfirm={updateAdmin}

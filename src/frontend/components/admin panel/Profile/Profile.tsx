@@ -1,6 +1,6 @@
 "use client";
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
-import axios from "axios";
+
 import { useState } from "react";
 import {
     useQuery,
@@ -8,7 +8,11 @@ import {
     useQueryClient
 } from "@tanstack/react-query";
 
-import BACKEND_URLS from "@/utils";
+import {
+    getUserRole,
+    getProfile,
+    updateProfile,
+} from "@/services/shop-admin-panel.services";
 
 import ProfileForm from "./ProfileForm";
 
@@ -27,63 +31,21 @@ export default function Profile() {
 
         queryKey: ["user-role"],
 
-
-        queryFn: async () => {
-
-            const response = await axios.get(
-
-                `${BACKEND_URLS}vendor/api/v1/store/user/roles/`,
-
-                {
-                    withCredentials: true
-                }
-
-            );
-
-
-            return response.data.role;
-
-        },
+        queryFn: getUserRole,
 
     });
 
-
-
-
-
-    // گرفتن اطلاعات پروفایل
     const profileQuery = useQuery({
-
 
         queryKey: [
             "profile",
             roleQuery.data
         ],
 
-
         enabled: !!roleQuery.data,
 
-
-
-        queryFn: async () => {
-
-
-            const response = await axios.get(
-
-                `${BACKEND_URLS}vendor/api/v1/${roleQuery.data}/detail/`,
-
-                {
-                    withCredentials: true
-                }
-
-            );
-
-
-            return response.data;
-
-
-        }
-
+        queryFn: () =>
+            getProfile(roleQuery.data!),
 
     });
 
@@ -92,38 +54,18 @@ export default function Profile() {
 
 
 
-    // آپدیت پروفایل
+
+
+
     const updateMutation = useMutation({
 
-
-        mutationFn: async (data: any) => {
-
-
-            const response = await axios.put(
-
-
-                `${BACKEND_URLS}vendor/api/v1/${roleQuery.data}/detail/`,
-
-
-                data,
-
-
-                {
-                    withCredentials: true
-                }
-
-            );
-
-
-            return response.data;
-
-
-        },
-
-
+        mutationFn: (data: any) =>
+            updateProfile(
+                roleQuery.data!,
+                data
+            ),
 
         onSuccess: () => {
-
 
             queryClient.invalidateQueries({
 
@@ -134,12 +76,9 @@ export default function Profile() {
 
             });
 
-
             setEditMode(false);
 
-
         }
-
 
     });
 

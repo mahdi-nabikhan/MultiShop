@@ -1,31 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getOrderItems,OrderItem } from "@/services/shop-admin-panel.services";
 import BACKEND_URLS from "@/utils";
 import "./OrderItemList.css";
 
-interface Product {
-    id: number;
-    name: string;
-    description: string;
-    quantity_in_stock: string;
-    price: number;
-    price_after: number;
-    product_image: string | null;
-    category: number;
-    store: number;
-}
 
-interface OrderItem {
-    id: number;
-    quantity: number;
-    status: string;
-    created: string;
-    total: string;
-    order: number;
-    product: Product;
-}
+
 
 interface Props {
     orderId: number | string;
@@ -38,32 +19,28 @@ export default function OrderItemList({ orderId }: Props) {
 
     const getItems = async () => {
 
-        try {
+    try {
 
-            console.log("Order ID:", orderId);
+        setLoading(true);
 
-            const { data } = await axios.get<OrderItem[]>(
-                `${BACKEND_URLS}order/api/v1/related/order/orderitem/${orderId}/`,
-                {
-                    withCredentials: true,
-                }
-            );
+        const data = await getOrderItems(orderId);
 
-            console.log("API Response:", data);
+        setItems(data);
 
-            setItems(data);
+    } catch (err) {
 
-        } catch (err) {
+        console.error(
+            "Failed to load order items:",
+            err
+        );
 
-            console.log("API Error:", err);
+    } finally {
 
-        } finally {
+        setLoading(false);
 
-            setLoading(false);
+    }
 
-        }
-
-    };
+};
 
     useEffect(() => {
 

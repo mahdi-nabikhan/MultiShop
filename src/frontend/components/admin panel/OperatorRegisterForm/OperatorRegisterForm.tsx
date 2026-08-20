@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
-
+import { createOperator } from "@/services/auth.services";
 import { User, Mail, Lock } from "lucide-react";
-
-import BACKEND_URLS from "@/utils";
 import "./OperatorRegisterForm.css";
 
 export default function OperatorRegisterForm() {
@@ -21,54 +18,123 @@ export default function OperatorRegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handlerSubmit(
+  const handlerSubmit = async (
     e: React.FormEvent<HTMLFormElement>
-  ) {
+) => {
+
     e.preventDefault();
 
-    setLoading(true);
     setError("");
 
-    try {
-      await axios.post(
-        `${BACKEND_URLS}vendor/api/v1/admin/register/`,
-        {
-          username,
-          user: {
-            email,
-            password,
-            password2,
-          },
-        },
-        {
-          withCredentials: true,
-        }
-      );
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim();
 
-      router.push("/shop-admin-panel");
+    if (!cleanUsername) {
+        setError("Username is required.");
+        return;
+    }
+
+    if (cleanUsername.length < 3) {
+        setError("Username must be at least 3 characters.");
+        return;
+    }
+
+    if (cleanEmail.length === 0) {
+        setError("Email is required.");
+        return;
+    }
+
+    if (!password) {
+        setError("Password is required.");
+        return;
+    }
+
+    if (password.length < 8) {
+        setError("Password must be at least 8 characters.");
+        return;
+    }
+
+    if (!password2) {
+        setError("Please confirm your password.");
+        return;
+    }
+
+    if (password !== password2) {
+        setError("Passwords do not match.");
+        return;
+    }
+
+    try {
+
+        setLoading(true);
+
+        await createOperator({
+            username: cleanUsername,
+            user: {
+                email: cleanEmail,
+                password,
+                password2,
+            },
+        });
+
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setPassword2("");
+
+        router.push("/shop-admin-panel");
 
     } catch (err) {
 
-      if (axios.isAxiosError(err)) {
+        console.error(err);
 
-        setError(
-          typeof err.response?.data === "string"
-            ? err.response.data
-            : JSON.stringify(err.response?.data)
-        );
+        if (
+            typeof err === "object" &&
+            err !== null &&
+            "response" in err
+        ) {
 
-      } else {
+            const axiosError = err as {
+                response?: {
+                    data?: unknown;
+                };
+            };
 
-        setError("Something went wrong.");
+            const responseData =
+                axiosError.response?.data;
 
-      }
+            if (typeof responseData === "string") {
+
+                setError(responseData);
+
+            } else if (responseData) {
+
+                setError(
+                    JSON.stringify(responseData)
+                );
+
+            } else {
+
+                setError(
+                    "Failed to create operator."
+                );
+
+            }
+
+        } else {
+
+            setError(
+                "Something went wrong."
+            );
+
+        }
 
     } finally {
 
-      setLoading(false);
+        setLoading(false);
 
     }
-  }
+};
 
   return (
     <div className="register-container">

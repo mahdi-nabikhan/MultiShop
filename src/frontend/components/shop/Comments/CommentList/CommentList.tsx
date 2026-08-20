@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
+import { getProductComments } from "@/services/comment.services";
 
 import CommentCard from "../CommentCard/CommentCard";
 import Pagination from "../../../commen/Paginations";
@@ -76,17 +74,8 @@ export default function CommentList({
             setLoading(true);
 
 
-            const { data } =
-                await axios.get<IResponse>(
-
-                    `${BACKEND_URLS}customer/api/v1/all/products/comments/${productID}/?page=${currentPage}`,
-
-                    {
-                        withCredentials: true,
-                    }
-
-                );
-
+            const  data  =await getProductComments(productID, currentPage)
+               
 
             setComments(data.results);
 

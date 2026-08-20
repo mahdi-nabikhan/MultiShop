@@ -2,8 +2,7 @@
 import React from 'react'
 import { useState } from 'react'
 import { useRouter } from "next/navigation";
-import axios from 'axios';
-import BACKEND_URLS from '@/utils';
+import { registerManager } from '@/services/auth.services'; 
 import './RegisterManager.css'
 export default function RegisterManager() {
     const router = useRouter()
@@ -23,56 +22,67 @@ export default function RegisterManager() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    async function handlerSubmit(
+    e: React.FormEvent<HTMLFormElement>
+) {
 
-    async function handlerSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setLoading(true);
     setError("");
 
     try {
-        await axios.post(
-            `${BACKEND_URLS}vendor/api/v1/manager/register/`,
-            {
-                user: {
-                    email,
-                    password,
-                    password2,
-                },
-                store: {
-                    name: storeName,
-                    description: storeDescription,
-                },
-                address: {
-                    state,
-                    street,
-                },
-                first_name: firstName,
-                last_name: lastName,
+
+        await registerManager({
+
+            user: {
+                email,
+                password,
+                password2,
             },
-            {
-                withCredentials: true,
-            }
-        );
+
+            store: {
+                name: storeName,
+                description: storeDescription,
+            },
+
+            address: {
+                state,
+                street,
+            },
+
+            first_name: firstName,
+            last_name: lastName,
+
+        });
 
         router.push("/");
 
-    } catch (err) {
+    } catch (err: any) {
 
-        if (axios.isAxiosError(err)) {
+        if (err.response?.data) {
+
             setError(
-                typeof err.response?.data === "string"
+                typeof err.response.data === "string"
                     ? err.response.data
-                    : JSON.stringify(err.response?.data)
+                    : JSON.stringify(err.response.data)
             );
+
         } else {
+
             setError("Something went wrong.");
+
         }
 
     } finally {
+
         setLoading(false);
+
     }
+
 }
+
+
     
     return (
         

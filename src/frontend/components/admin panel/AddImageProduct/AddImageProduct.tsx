@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { createProductImage } from "@/services/shop-admin-panel.services";
 
 import "./AddImageProduct.css";
 
@@ -41,7 +40,79 @@ export default function AddProductImageModal({
     const [description,setDescription] = useState("");
 
     const [loading,setLoading] = useState(false);
+    async function handleSubmit() {
 
+    if (!image) {
+        alert("Please select an image.");
+        return;
+    }
+
+    if (!image.type.startsWith("image/")) {
+        alert("Please select a valid image file.");
+        return;
+    }
+
+    if (image.size > 5 * 1024 * 1024) {
+        alert("Image size cannot exceed 5MB.");
+        return;
+    }
+
+    if (!title.trim()) {
+        alert("Title is required.");
+        return;
+    }
+
+    if (title.trim().length < 3) {
+        alert("Title must be at least 3 characters.");
+        return;
+    }
+
+    if (title.trim().length > 200) {
+        alert("Title cannot exceed 200 characters.");
+        return;
+    }
+
+    if (description.trim().length > 1000) {
+        alert("Description cannot exceed 1000 characters.");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("product_image", image);
+    formData.append("title", title.trim());
+    formData.append("description", description.trim());
+
+    try {
+
+        setLoading(true);
+
+        await createProductImage(
+            productId,
+            formData
+        );
+
+        alert("Image uploaded successfully.");
+
+        setImage(null);
+        setTitle("");
+        setDescription("");
+
+        refreshImages();
+        onClose();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to upload image.");
+
+    } finally {
+
+        setLoading(false);
+
+    }
+}
 
 
     if(!open){
@@ -52,92 +123,7 @@ export default function AddProductImageModal({
 
 
 
-    async function handleSubmit(){
-
-
-        if(!image){
-
-            return;
-
-        }
-
-
-
-        const formData = new FormData();
-
-
-        formData.append(
-            "product_image",
-            image
-        );
-
-
-        formData.append(
-            "title",
-            title
-        );
-
-
-        formData.append(
-            "description",
-            description
-        );
-
-
-
-        try{
-
-
-            setLoading(true);
-
-
-
-            await axios.post(
-
-                `${BACKEND_URLS}vendor/api/v1/add/image/product/${productId}/`,
-
-                formData,
-
-                {
-
-                    withCredentials:true,
-
-                    headers:{
-
-                        "Content-Type":"multipart/form-data"
-
-                    }
-
-                }
-
-            );
-
-
-
-            refreshImages();
-
-            onClose();
-
-
-
-        }
-
-        catch(error){
-
-            console.log(error);
-
-        }
-
-        finally{
-
-            setLoading(false);
-
-        }
-
-
-
-    }
-
+    
 
 
 

@@ -1,10 +1,9 @@
 'use client'
-import axios from 'axios'
-import BACKEND_URLS from '@/utils'
+
 import { useState } from 'react'
 import './AddDiscountModal.css'
 import React from 'react'
-
+import { createProductDiscount } from '@/services/shop-admin-panel.services'
 interface Props {
     open: boolean;
     onClose: () => void;
@@ -24,35 +23,68 @@ function AddDiscountModal({
     if (!open) return null
 
     const submitHandler = async (
-        e: React.FormEvent
+        e: React.FormEvent<HTMLFormElement>
     ) => {
+
         e.preventDefault();
+
+        const discountValue = Number(value);
+
+        if (!value.trim()) {
+            alert("Discount value is required.");
+            return;
+        }
+
+        if (Number.isNaN(discountValue)) {
+            alert("Discount value must be a valid number.");
+            return;
+        }
+
+        if (discountValue <= 0) {
+            alert("Discount value must be greater than 0.");
+            return;
+        }
+
+        if (
+            discountType === "percent" &&
+            discountValue > 100
+        ) {
+            alert("Percentage discount cannot exceed 100.");
+            return;
+        }
+
         try {
-            setLoading(true)
-            await axios.post(
-                `${BACKEND_URLS}vendor/api/v1/add/product/discount/${productId}/`,
+
+            setLoading(true);
+
+            await createProductDiscount(
+                productId,
                 {
-                    value: Number(value),
-                    discount_type: discountType
-                },
-                {
-                    withCredentials: true
+                    value: discountValue,
+                    discount_type: discountType,
                 }
-            )
-            alert('discount created successfully')
-            setValue('')
-            setDiscountType('cash')
-            refreshDiscounts()
-            onClose()
+            );
+
+            alert("Discount created successfully");
+
+            setValue("");
+            setDiscountType("cash");
+
+            refreshDiscounts();
+            onClose();
+
         } catch (err) {
-            console.log(err)
-            alert('something went wrong')
+
+            console.log(err);
+
+            alert("Something went wrong");
 
         } finally {
-            setLoading(false)
+
+            setLoading(false);
 
         }
-    }
+    };
 
     return (
         <div className="modal-overlay">

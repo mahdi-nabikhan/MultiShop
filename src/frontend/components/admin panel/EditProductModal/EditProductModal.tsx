@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { updateProduct } from "@/services/shop-admin-panel.services";
 import "./EditProductModal.css";
 
 interface Product {
@@ -68,7 +67,9 @@ export default function EditProductModal({
     }, [product]);
 
 
-    const submitHandler = async (e: React.FormEvent) => {
+    const submitHandler = async (
+        e: React.FormEvent
+    ) => {
 
         e.preventDefault();
 
@@ -86,15 +87,15 @@ export default function EditProductModal({
             formData.append("category", category);
 
             if (image) {
-                formData.append("product_image", image);
+                formData.append(
+                    "product_image",
+                    image
+                );
             }
 
-            await axios.patch(
-                `${BACKEND_URLS}vendor/api/v1/detail/product/${product.id}/`,
-                formData,
-                {
-                    withCredentials: true,
-                }
+            await updateProduct(
+                product.id,
+                formData
             );
 
             await refreshProduct();
@@ -110,7 +111,6 @@ export default function EditProductModal({
             setLoading(false);
 
         }
-
     };
 
     if (!open) {
@@ -142,8 +142,8 @@ export default function EditProductModal({
 
                 </div>
 
-                <form className="edit-form" 
-                onSubmit={submitHandler}>
+                <form className="edit-form"
+                    onSubmit={submitHandler}>
 
                     <div className="image-preview">
 
