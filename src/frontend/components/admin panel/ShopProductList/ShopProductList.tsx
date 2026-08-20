@@ -1,33 +1,12 @@
 import React from 'react'
 import './ShopProductList.css'
-import BACKEND_URLS from '@/utils'
 import { cookies } from 'next/headers'
-import axios from 'axios'
 import ProductRow from '../ProductRow/ProductRow'
-interface ShopProductListData {
-  id: number,
-  name: string,
-  description: string,
-  quantity_in_stock: number,
-  price: number,
-  price_after: number,
-  product_image: string | null,
-  category: number,
-  store: number
-
-
-}
-
+import { getShopProducts } from '@/services/shop-admin-panel.services' 
 async function ShopProductList() {
+
   const cookieStore = await cookies();
-  const { data: products } = await axios.get<ShopProductListData[]>(
-    `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,{
-        headers:{
-        Cookie: cookieStore.toString(),
-        }
-    }
-    
-  )
+  const products = await getShopProducts(cookieStore.toString());
 
   return (
     <div className="product-list">

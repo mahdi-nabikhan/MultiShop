@@ -1,31 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import {
+    getOrderItemDetail,
+    OrderItem,
+} from "@/services/shop-admin-panel.services";
 import "./ShopOrderItemDetail.css";
+import BACKEND_URLS from "@/utils";
 
-interface Product {
-    id: number;
-    name: string;
-    description: string;
-    quantity_in_stock: number;
-    price: number;
-    price_after: number;
-    product_image: string | null;
-    category: number;
-    store: number;
-}
 
-interface OrderItem {
-    id: number;
-    quantity: number;
-    status: string;
-    created: string;
-    total: string;
-    order: number;
-    product: Product;
-}
+
+
 
 interface Props {
     orderItemId: number | string;
@@ -35,37 +20,40 @@ export default function OrderItemDetail({ orderItemId }: Props) {
 
     const [item, setItem] = useState<OrderItem | null>(null);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
 
-        const getOrderItem = async () => {
+    const getOrderItem = async () => {
 
-            try {
+        try {
 
-                const { data } = await axios.get<OrderItem>(
-                    `${BACKEND_URLS}order/api/v1/order/item/detail/${orderItemId}/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
+            setLoading(true);
 
-                setItem(data);
+            const data = await getOrderItemDetail(
+                orderItemId
+            );
 
-            } catch (err) {
+            setItem(data);
 
-                console.log(err);
+        } catch (err) {
 
-            } finally {
+            console.error(
+                "Failed to load order item:",
+                err
+            );
 
-                setLoading(false);
+        } finally {
 
-            }
+            setLoading(false);
 
-        };
+        }
 
-        getOrderItem();
+    };
 
-    }, [orderItemId]);
+    getOrderItem();
+
+}, [orderItemId]);
+
+    
 
     if (loading) {
         return <h2>Loading...</h2>;

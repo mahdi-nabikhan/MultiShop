@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 
-import BACKEND_URLS from "@/utils";
+import {
+    getStoreProfile,
+    updateStoreProfile,
+} from "@/services/shop-admin-panel.services";
 
 import "./StoreProfile.css";
 
@@ -23,7 +25,6 @@ interface StoreFormData {
 
 
 export default function StoreProfile() {
-
 
     const [store, setStore] =
         useState<StoreData | null>(null);
@@ -69,24 +70,14 @@ export default function StoreProfile() {
             setError("");
 
 
-            const response = await axios.get<StoreData>(
-
-                `${BACKEND_URLS}vendor/api/v1/store/detail/`,
-
-                {
-                    withCredentials: true,
-                }
-
-            );
+            const data =
+                await getStoreProfile();
 
 
             console.log(
                 "STORE RESPONSE:",
-                response.data
+                data
             );
-
-
-            const data = response.data;
 
 
             setStore(data);
@@ -94,7 +85,8 @@ export default function StoreProfile() {
 
             setFormData({
 
-                name: data.name ?? "",
+                name:
+                    data.name ?? "",
 
                 description:
                     data.description ?? "",
@@ -114,6 +106,7 @@ export default function StoreProfile() {
                 "Failed to load store information."
             );
 
+
         } finally {
 
             setLoading(false);
@@ -128,7 +121,6 @@ export default function StoreProfile() {
         getStore();
 
     }, []);
-
 
 
     /* =========================
@@ -161,7 +153,6 @@ export default function StoreProfile() {
     }
 
 
-
     /* =========================
        UPDATE STORE
     ========================= */
@@ -182,34 +173,17 @@ export default function StoreProfile() {
             setSuccess("");
 
 
-            const response =
-                await axios.put<StoreData>(
-
-                    `${BACKEND_URLS}vendor/api/v1/store/detail/`,
-
-                    formData,
-
-                    {
-                        withCredentials: true,
-                    }
-
+            const updatedStore =
+                await updateStoreProfile(
+                    formData
                 );
 
 
             console.log(
                 "UPDATED STORE:",
-                response.data
+                updatedStore
             );
 
-
-            const updatedStore =
-                response.data;
-
-
-            /*
-             * Merge کردن اطلاعات جدید
-             * با اطلاعات قبلی
-             */
 
             setStore(
                 (prev) => ({
@@ -273,14 +247,10 @@ export default function StoreProfile() {
 
                     setError(data);
 
+
                 } else if (
                     typeof data === "object"
                 ) {
-
-                    /*
-                     * اگر Django/DRF
-                     * validation error بدهد
-                     */
 
                     const messages =
                         Object.entries(data)
@@ -300,6 +270,7 @@ export default function StoreProfile() {
                         "Failed to update store."
                     );
 
+
                 } else {
 
                     setError(
@@ -307,6 +278,7 @@ export default function StoreProfile() {
                     );
 
                 }
+
 
             } else {
 
@@ -316,6 +288,7 @@ export default function StoreProfile() {
 
             }
 
+
         } finally {
 
             setSaving(false);
@@ -323,7 +296,6 @@ export default function StoreProfile() {
         }
 
     }
-
 
 
     /* =========================
@@ -357,7 +329,6 @@ export default function StoreProfile() {
     }
 
 
-
     /* =========================
        LOADING
     ========================= */
@@ -381,7 +352,6 @@ export default function StoreProfile() {
     }
 
 
-
     /* =========================
        ERROR
     ========================= */
@@ -402,12 +372,6 @@ export default function StoreProfile() {
     }
 
 
-
-    /*
-     * مقادیر امن برای جلوگیری
-     * از undefined
-     */
-
     const storeName =
         store.name ?? "Unnamed Store";
 
@@ -421,7 +385,6 @@ export default function StoreProfile() {
         storeName
             .charAt(0)
             .toUpperCase() || "S";
-
 
 
     /* =========================
@@ -475,11 +438,9 @@ export default function StoreProfile() {
             </div>
 
 
-
             {/* STORE IMAGE */}
 
             <div className="store-image-section">
-
 
                 <div className="store-image">
 
@@ -501,13 +462,11 @@ export default function StoreProfile() {
                 </div>
 
 
-
                 <div>
 
                     <h3>
                         {storeName}
                     </h3>
-
 
                     <span>
                         Store ID: #{store.pk}
@@ -515,9 +474,7 @@ export default function StoreProfile() {
 
                 </div>
 
-
             </div>
-
 
 
             {/* FORM */}
@@ -533,9 +490,7 @@ export default function StoreProfile() {
                 <div className="store-form-group">
 
                     <label htmlFor="store-name">
-
                         Store Name
-
                     </label>
 
 
@@ -563,15 +518,12 @@ export default function StoreProfile() {
                 </div>
 
 
-
                 {/* DESCRIPTION */}
 
                 <div className="store-form-group">
 
                     <label htmlFor="store-description">
-
                         Description
-
                     </label>
 
 
@@ -600,7 +552,6 @@ export default function StoreProfile() {
                 </div>
 
 
-
                 {/* ERROR */}
 
                 {error && (
@@ -612,7 +563,6 @@ export default function StoreProfile() {
                     </div>
 
                 )}
-
 
 
                 {/* SUCCESS */}
@@ -628,13 +578,11 @@ export default function StoreProfile() {
                 )}
 
 
-
                 {/* ACTIONS */}
 
                 {editing && (
 
                     <div className="store-form-actions">
-
 
                         <button
                             type="button"
@@ -660,13 +608,11 @@ export default function StoreProfile() {
 
                         </button>
 
-
                     </div>
 
                 )}
 
             </form>
-
 
         </section>
 

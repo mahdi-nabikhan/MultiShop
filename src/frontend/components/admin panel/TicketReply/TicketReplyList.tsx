@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { getTicketReplies, Reply } from "@/services/shop-admin-panel.services";
 
 import "./TicketReply.css";
 
@@ -10,15 +9,7 @@ import AddReplyModal from "./AddReplyModal";
 import EditReplyModal from "./EditReplyModal";
 import DeleteReplyModal from "./DeleteReplyModal";
 
-interface Reply {
 
-    id: number;
-
-    content: string;
-
-    created: string;
-
-}
 
 interface Props {
 
@@ -44,28 +35,20 @@ export default function TicketReplyList({
 
     const [selectedReply, setSelectedReply] =
         useState<Reply | null>(null);
-
     const getReplies = async () => {
 
         try {
 
-            const { data } = await axios.get<Reply[]>(
-
-                `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${ticketId}/`,
-
-                {
-
-                    withCredentials: true,
-
-                }
-
-            );
+            const data = await getTicketReplies(ticketId);
 
             setReplies(data);
 
         } catch (err) {
 
-            console.log(err);
+            console.error(
+                "Failed to load ticket replies:",
+                err
+            );
 
         } finally {
 
@@ -74,6 +57,8 @@ export default function TicketReplyList({
         }
 
     };
+
+
 
     useEffect(() => {
 

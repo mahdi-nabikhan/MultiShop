@@ -396,3 +396,354 @@ export async function getShopOrders(): Promise<Order[]> {
 
     return data;
 }
+
+
+
+export interface ProductImage {
+
+    id: number;
+
+    product_image: string;
+
+    title: string | null;
+
+    description: string | null;
+
+    product: number;
+
+}
+
+
+export async function getProductImages(
+    productId: number
+): Promise<ProductImage[]> {
+
+    const { data } = await axios.get<ProductImage[]>(
+        `${BACKEND_URLS}website/api/v1/list/image/product/${productId}/`
+    );
+
+    return data;
+
+}
+
+
+
+export async function deleteProduct(
+    productId: number
+): Promise<void> {
+
+    await axios.delete(
+        `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+}
+
+
+export type Role =
+    "manager" |
+    "admin" |
+    "operator";
+
+
+export async function getUserRole(): Promise<Role> {
+
+    const response = await axios.get(
+
+        `${BACKEND_URLS}vendor/api/v1/store/user/roles/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data.role;
+
+}
+
+
+export async function getProfile(
+    role: Role
+) {
+
+    const response = await axios.get(
+
+        `${BACKEND_URLS}vendor/api/v1/${role}/detail/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+
+}
+
+
+export async function updateProfile(
+    role: Role,
+    data: any
+) {
+
+    const response = await axios.put(
+
+        `${BACKEND_URLS}vendor/api/v1/${role}/detail/`,
+
+        data,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+
+}
+
+
+
+export async function getOrderItemDetail(
+    orderItemId: number | string
+): Promise<OrderItem> {
+
+    const response = await axios.get<OrderItem>(
+
+        `${BACKEND_URLS}order/api/v1/order/item/detail/${orderItemId}/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+}
+
+
+export interface ShopProductData {
+
+    id: number;
+
+    name: string;
+
+    description: string;
+
+    quantity_in_stock: number;
+
+    price: number;
+
+    price_after: number;
+
+    product_image: string | null;
+
+    category: number;
+
+    store: number;
+
+}
+
+
+export interface ProductImage {
+
+    id: number;
+
+    product_image: string;
+
+    title: string | null;
+
+    description: string | null;
+
+    product: number;
+
+}
+
+
+export async function getShopProductDetail(
+    productId: number
+): Promise<ShopProductData> {
+
+    const response =
+        await axios.get<ShopProductData>(
+
+            `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
+
+            {
+                withCredentials: true,
+            }
+
+        );
+
+    return response.data;
+
+}
+
+
+export async function getShopProductImages(
+    productId: number
+): Promise<ProductImage[]> {
+
+    const response =
+        await axios.get<ProductImage[]>(
+
+            `${BACKEND_URLS}website/api/v1/list/image/product/${productId}/`
+
+        );
+
+    return response.data;
+
+}
+
+
+export async function deleteProductImage(
+    imageId: number
+): Promise<void> {
+
+    await axios.delete(
+
+        `${BACKEND_URLS}vendor/api/v1/delete/images/${imageId}/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+}
+
+
+
+
+
+export interface ShopProductListData {
+    id: number;
+    name: string;
+    description: string;
+    quantity_in_stock: number;
+    price: number;
+    price_after: number;
+    product_image: string | null;
+    category: number;
+    store: number;
+}
+
+export async function getShopProducts(
+    cookie: string
+): Promise<ShopProductListData[]> {
+
+    const response = await axios.get<ShopProductListData[]>(
+        `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,
+        {
+            headers: {
+                Cookie: cookie,
+            },
+        }
+    );
+
+    return response.data;
+}
+
+
+
+
+export interface Ticket {
+    pk: number;
+    title: string;
+    content: string;
+    store: number;
+    customer: {
+        id: number;
+        username: string;
+        is_customer: boolean;
+        user: number;
+    };
+}
+
+export async function getShopTickets(): Promise<Ticket[]> {
+
+    const response = await axios.get<Ticket[]>(
+        `${BACKEND_URLS}dashboard/api/v1/shop/all/ticket/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+}
+
+
+
+
+
+
+
+export interface StoreData {
+    pk: number;
+    image: string | null;
+    description?: string;
+    name?: string;
+}
+
+export interface StoreFormData {
+    name: string;
+    description: string;
+}
+
+export async function getStoreProfile(): Promise<StoreData> {
+
+    const response = await axios.get<StoreData>(
+        `${BACKEND_URLS}vendor/api/v1/store/detail/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+}
+
+
+export async function updateStoreProfile(
+    data: StoreFormData
+): Promise<StoreData> {
+
+    const response = await axios.put<StoreData>(
+        `${BACKEND_URLS}vendor/api/v1/store/detail/`,
+        data,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
+}
+export interface Reply {
+
+    id: number;
+
+    content: string;
+
+    created: string;
+
+}
+
+
+export async function getTicketReplies(
+    ticketId: number
+): Promise<Reply[]> {
+
+    const response = await axios.get<Reply[]>(
+
+        `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${ticketId}/`,
+
+        {
+            withCredentials: true,
+        }
+
+    );
+
+    return response.data;
+}

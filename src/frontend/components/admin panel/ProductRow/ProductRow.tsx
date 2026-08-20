@@ -1,7 +1,8 @@
 "use client";
 
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import {
+  deleteProduct,
+} from "@/services/shop-admin-panel.services";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import DeleteModal from "../DeleteModal/DeleteModal";
@@ -28,18 +29,13 @@ export default function ProductRow({ product }: Props) {
   const [open, setOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
-
   const handleDelete = async () => {
+
     try {
 
       setLoading(true);
 
-      await axios.delete(
-        `${BACKEND_URLS}vendor/api/v1/detail/product/${product.id}/`,
-        {
-          withCredentials: true,
-        }
-      );
+      await deleteProduct(product.id);
 
       setOpen(false);
 
@@ -47,14 +43,19 @@ export default function ProductRow({ product }: Props) {
 
     } catch (err) {
 
-      console.log(err);
+      console.error(
+        "Failed to delete product:",
+        err
+      );
 
     } finally {
 
       setLoading(false);
 
     }
+
   };
+
 
   return (
     <>

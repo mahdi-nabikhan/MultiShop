@@ -1,241 +1,252 @@
 "use client";
+
 import AddDiscountModal from "../AddDiscountModal/AddDiscountModal";
 import React, { useEffect, useState } from "react";
-import "./ShopProductDetail.css";
-import axios from "axios";
 import BACKEND_URLS from "@/utils";
+import "./ShopProductDetail.css";
+
+import {
+    getShopProductDetail,
+    getShopProductImages,
+    deleteProductImage,
+    ShopProductData,
+    ProductImage,
+} from "@/services/shop-admin-panel.services";
+
 import EditProductModal from "../EditProductModal/EditProductModal";
 import DiscountList from "../DiscountList/DiscountList";
 import AddProductImageModal from "../AddImageProduct/AddImageProduct";
-import ProductImageGallery from "../ProductImageGallery/ProductImageGallery";
 import DeleteImageModal from "../DeleteImageModal/DeleteImageModal";
 
-
-
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Thumbs } from "swiper/modules";
+import {
+    Navigation,
+    Pagination,
+    Thumbs,
+} from "swiper/modules";
+
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
-interface ProductImage {
-    id: number;
-    product_image: string;
-    title: string | null;
-    description: string | null;
-    product: number;
-}
 
 
+function ShopProductDetail({
+    productId,
+}: {
+    productId: number;
+}) {
 
-interface ShopProductData {
-    id: number;
-    name: string;
-    description: string;
-    quantity_in_stock: number;
-    price: number;
-    price_after: number;
-    product_image: string | null;
-    category: number;
-    store: number;
-}
+    const [openImageModal, setOpenImageModal] =
+        useState(false);
 
-function ShopProductDetail({ productId }: { productId: number }) {
-    const [openImageModal, setOpenImageModal] = useState(false);
-    const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
-    const [product, setProduct] = useState<ShopProductData | null>(null);
-    const [openEditModal, setOpenEditModal] = useState(false);
-    const [openDiscountModal, setOpenDiscountModal] = useState(false);
-    const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [thumbsSwiper, setThumbsSwiper] =
+        useState<SwiperType | null>(null);
 
-    const [images, setImages] = useState<ProductImage[]>([]);
-    const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
-    const [openDeleteImageModal, setOpenDeleteImageModal] = useState(false);
+    const [product, setProduct] =
+        useState<ShopProductData | null>(null);
 
-    const DeleteProductImage = async () => {
+    const [openEditModal, setOpenEditModal] =
+        useState(false);
 
-        if (!selectedImage) return;
+    const [openDiscountModal, setOpenDiscountModal] =
+        useState(false);
 
+    const [images, setImages] =
+        useState<ProductImage[]>([]);
 
-        try {
+    const [selectedImage, setSelectedImage] =
+        useState<ProductImage | null>(null);
 
-            await axios.delete(
-                `${BACKEND_URLS}vendor/api/v1/delete/images/${selectedImage.id}/`,
-                {
-                    withCredentials: true,
-                }
-            );
+    const [openDeleteImageModal, setOpenDeleteImageModal] =
+        useState(false);
 
-
-            setOpenDeleteImageModal(false);
-            setSelectedImage(null);
-
-            GetProductData();
-
-
-        } catch (error) {
-
-            console.log(error);
-
-        }
-
-    };
 
     const GetProductData = async () => {
 
         try {
 
-            // Product Detail
-            const { data: productData } = await axios.get<ShopProductData>(
-                `${BACKEND_URLS}vendor/api/v1/detail/product/${productId}/`,
-                {
-                    withCredentials: true,
-                }
-            );
+            const productData =
+                await getShopProductDetail(productId);
 
             setProduct(productData);
 
-            // Product Images
-            const { data: imageData } = await axios.get<ProductImage[]>(
-                `${BACKEND_URLS}website/api/v1/list/image/product/${productId}/`
-            );
-
-            const backendUrl = BACKEND_URLS.replace("/api/v1/", "");
+            const imageData =
+                await getShopProductImages(productId);
 
             const allImages: ProductImage[] = [];
 
-            // Main Product Image
             if (productData.product_image) {
 
-                if (productData.product_image.startsWith("http")) {
+                allImages.push({
 
-                    allImages.push({
-                        id: productData.id,
-                        product_image: productData.product_image,
-                        title: productData.name,
-                        description: productData.description,
-                        product: productData.id
-                    });;
+                    id: productData.id,
 
-                } else {
+                    product_image:
+                        productData.product_image,
 
-                    allImages.push({
-                        id: productData.id,
-                        product_image: productData.product_image,
-                        title: productData.name,
-                        description: productData.description,
-                        product: productData.id
-                    });;
+                    title:
+                        productData.name,
 
-                }
+                    description:
+                        productData.description,
+
+                    product:
+                        productData.id,
+
+                });
 
             }
 
-            // Extra Images
             imageData.forEach((item) => {
 
-                if (item.product_image.startsWith("http")) {
+                allImages.push({
 
-                    allImages.push({
-                        id: item.id,
-                        product_image: item.product_image,
-                        title: item.title,
-                        description: item.description,
-                        product: item.product
-                    });
+                    id: item.id,
 
-                } else {
+                    product_image:
+                        item.product_image,
 
-                    allImages.push({
-                        id: item.id,
-                        product_image: item.product_image,
-                        title: item.title,
-                        description: item.description,
-                        product: item.product
-                    });
+                    title:
+                        item.title,
 
-                }
+                    description:
+                        item.description,
+
+                    product:
+                        item.product,
+
+                });
 
             });
 
             setImages(allImages);
 
-        }
+        } catch (error) {
 
-        catch (err) {
-
-            console.log(err);
+            console.error(
+                "Failed to load product:",
+                error
+            );
 
         }
 
     };
+
+
+    const DeleteProductImage = async () => {
+
+        if (!selectedImage) return;
+
+        try {
+
+            await deleteProductImage(
+                selectedImage.id
+            );
+
+            setOpenDeleteImageModal(false);
+
+            setSelectedImage(null);
+
+            await GetProductData();
+
+        } catch (error) {
+
+            console.error(
+                "Failed to delete product image:",
+                error
+            );
+
+        }
+
+    };
+
+
     useEffect(() => {
 
         GetProductData();
 
     }, [productId]);
 
-    if (!product) {
-        return <div>Loading...</div>;
-    }
 
+    if (!product) {
+
+        return (
+            <div>
+                Loading...
+            </div>
+        );
+
+    }
 
 
     return (
 
-
         <>
+
             <div className="detail-body">
 
                 <div className="gallery-card">
 
                     <Swiper
-                        modules={[Navigation, Pagination, Thumbs]}
+                        modules={[
+                            Navigation,
+                            Pagination,
+                            Thumbs,
+                        ]}
                         navigation
-                        pagination={{ clickable: true }}
-                        thumbs={{ swiper: thumbsSwiper }}
+                        pagination={{
+                            clickable: true,
+                        }}
+                        thumbs={{
+                            swiper: thumbsSwiper,
+                        }}
                         className="main-swiper"
                     >
 
                         {
                             images.length > 0 ? (
 
-                                images.map((image, index) => (
+                                images.map(
+                                    (image, index) => (
 
-                                    <SwiperSlide key={image.id}>
+                                        <SwiperSlide
+                                            key={image.id}
+                                        >
 
+                                            <img
+                                                src={
+                                                    image.product_image.startsWith(
+                                                        "http"
+                                                    )
+                                                        ? image.product_image
+                                                        : `${BACKEND_URLS.replace(
+                                                            "/api/v1/",
+                                                            ""
+                                                        )}${image.product_image}`
+                                                }
+                                                alt={`Product Image ${
+                                                    index + 1
+                                                }`}
+                                                onClick={() => {
 
-                                        <img
+                                                    setSelectedImage(
+                                                        image
+                                                    );
 
-                                            src={
-                                                image.product_image.startsWith("http")
-                                                    ?
-                                                    image.product_image
-                                                    :
-                                                    `${BACKEND_URLS.replace("/api/v1/", "")}${image.product_image}`
-                                            }
+                                                    setOpenDeleteImageModal(
+                                                        true
+                                                    );
 
+                                                }}
+                                            />
 
-                                            alt={`Product Image ${index + 1}`}
+                                        </SwiperSlide>
 
-
-                                            onClick={() => {
-
-                                                setSelectedImage(image);
-
-                                                setOpenDeleteImageModal(true);
-
-                                            }}
-
-
-                                        />
-
-
-                                    </SwiperSlide>
-
-                                ))
+                                    )
+                                )
 
                             ) : (
 
@@ -252,9 +263,15 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         }
 
                     </Swiper>
+
+
                     <Swiper
-                        onSwiper={setThumbsSwiper}
-                        modules={[Thumbs]}
+                        onSwiper={
+                            setThumbsSwiper
+                        }
+                        modules={[
+                            Thumbs,
+                        ]}
                         slidesPerView={4}
                         spaceBetween={12}
                         watchSlidesProgress
@@ -264,32 +281,38 @@ function ShopProductDetail({ productId }: { productId: number }) {
                         {
                             images.length > 0 ? (
 
-                                images.map((image, index) => (
+                                images.map((image) => (
 
-                                    <SwiperSlide key={index}>
+                                    <SwiperSlide
+                                        key={image.id}
+                                    >
 
                                         <img
-
                                             src={
-                                                image.product_image.startsWith("http")
-                                                    ?
-                                                    image.product_image
-                                                    :
-                                                    `${BACKEND_URLS.replace("/api/v1/", "")}${image.product_image}`
+                                                image.product_image.startsWith(
+                                                    "http"
+                                                )
+                                                    ? image.product_image
+                                                    : `${BACKEND_URLS.replace(
+                                                        "/api/v1/",
+                                                        ""
+                                                    )}${image.product_image}`
                                             }
-
-
+                                            alt={
+                                                image.title ??
+                                                "Product Image"
+                                            }
                                             onClick={() => {
 
-                                                console.log("clicked image", image);
+                                                setSelectedImage(
+                                                    image
+                                                );
 
-
-                                                setSelectedImage(image);
-
-                                                setOpenDeleteImageModal(true);
+                                                setOpenDeleteImageModal(
+                                                    true
+                                                );
 
                                             }}
-
                                         />
 
                                     </SwiperSlide>
@@ -314,11 +337,14 @@ function ShopProductDetail({ productId }: { productId: number }) {
 
                 </div>
 
+
                 <div className="info-card">
 
                     <div className="card-header">
 
-                        <h2>{product.name}</h2>
+                        <h2>
+                            {product.name}
+                        </h2>
 
                         <span
                             className={
@@ -327,138 +353,216 @@ function ShopProductDetail({ productId }: { productId: number }) {
                                     : "status out-stock"
                             }
                         >
-                            {product.quantity_in_stock > 0
-                                ? "In Stock"
-                                : "Out of Stock"}
+                            {
+                                product.quantity_in_stock > 0
+                                    ? "In Stock"
+                                    : "Out of Stock"
+                            }
                         </span>
 
                     </div>
 
+
                     <div className="info-grid">
 
                         <div className="info-item">
-                            <span>Product ID</span>
-                            <strong>#{product.id}</strong>
+
+                            <span>
+                                Product ID
+                            </span>
+
+                            <strong>
+                                #{product.id}
+                            </strong>
+
                         </div>
 
-                        <div className="info-item">
-                            <span>Category</span>
-                            <strong>{product.category}</strong>
-                        </div>
 
                         <div className="info-item">
-                            <span>Price</span>
-                            <strong>${product.price}</strong>
+
+                            <span>
+                                Category
+                            </span>
+
+                            <strong>
+                                {product.category}
+                            </strong>
+
                         </div>
 
+
                         <div className="info-item">
-                            <span>Sale Price</span>
+
+                            <span>
+                                Price
+                            </span>
+
+                            <strong>
+                                ${product.price}
+                            </strong>
+
+                        </div>
+
+
+                        <div className="info-item">
+
+                            <span>
+                                Sale Price
+                            </span>
+
                             <strong className="sale-price">
                                 ${product.price_after}
                             </strong>
+
                         </div>
 
-                        <div className="info-item">
-                            <span>Stock</span>
-                            <strong>{product.quantity_in_stock}</strong>
-                        </div>
 
                         <div className="info-item">
-                            <span>Store</span>
-                            <strong>{product.store}</strong>
+
+                            <span>
+                                Stock
+                            </span>
+
+                            <strong>
+                                {product.quantity_in_stock}
+                            </strong>
+
+                        </div>
+
+
+                        <div className="info-item">
+
+                            <span>
+                                Store
+                            </span>
+
+                            <strong>
+                                {product.store}
+                            </strong>
+
                         </div>
 
                     </div>
+
 
                     <div className="description-box">
 
-                        <h3>Description</h3>
+                        <h3>
+                            Description
+                        </h3>
 
-                        <p>{product.description}</p>
+                        <p>
+                            {product.description}
+                        </p>
 
                     </div>
+
 
                     <div className="action-buttons">
 
                         <button
                             className="edit-btn"
-                            onClick={() => setOpenEditModal(true)}
+                            onClick={() =>
+                                setOpenEditModal(true)
+                            }
                         >
                             Edit Product
                         </button>
+
+
                         <button
                             className="primary-btn"
-                            onClick={() => setOpenDiscountModal(true)}
+                            onClick={() =>
+                                setOpenDiscountModal(true)
+                            }
                         >
                             Add Discount
                         </button>
 
+
                         <button className="delete-btn">
                             Delete Product
                         </button>
+
+
                         <button
-
                             className="primary-btn"
-
-                            onClick={() => setOpenImageModal(true)}
-
+                            onClick={() =>
+                                setOpenImageModal(true)
+                            }
                         >
-
                             Add Product Image
-
                         </button>
 
                     </div>
 
                 </div>
-                <DiscountList productId={Number(productId)} />
+
+
+                <DiscountList
+                    productId={Number(productId)}
+                />
+
             </div>
+
+
             <AddDiscountModal
                 open={openDiscountModal}
-                onClose={() => setOpenDiscountModal(false)}
+                onClose={() =>
+                    setOpenDiscountModal(false)
+                }
                 productId={product.id}
-                refreshDiscounts={() => {
-
-                }}
+                refreshDiscounts={() => {}}
             />
+
+
             <EditProductModal
                 open={openEditModal}
-                onClose={() => setOpenEditModal(false)}
+                onClose={() =>
+                    setOpenEditModal(false)
+                }
                 product={product}
-                refreshProduct={GetProductData}
+                refreshProduct={
+                    GetProductData
+                }
             />
+
+
             <AddProductImageModal
-
                 open={openImageModal}
-
-                onClose={() => setOpenImageModal(false)}
-
+                onClose={() =>
+                    setOpenImageModal(false)
+                }
                 productId={product.id}
-
-                refreshImages={() => {
-                    GetProductData();
-                }}
-
+                refreshImages={
+                    GetProductData
+                }
             />
+
+
             <DeleteImageModal
-
                 open={openDeleteImageModal}
-
                 onClose={() => {
 
-                    setOpenDeleteImageModal(false);
+                    setOpenDeleteImageModal(
+                        false
+                    );
 
-                    setSelectedImage(null);
+                    setSelectedImage(
+                        null
+                    );
 
                 }}
-
-                onConfirm={DeleteProductImage}
-
+                onConfirm={
+                    DeleteProductImage
+                }
             />
 
         </>
 
     );
+
 }
+
 
 export default ShopProductDetail;

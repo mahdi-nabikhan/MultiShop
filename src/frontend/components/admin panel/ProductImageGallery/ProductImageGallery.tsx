@@ -1,25 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import {
+    getProductImages,
+    ProductImage,
+} from "@/services/shop-admin-panel.services";
 
 import "./ProductImageGallery.css";
 
 
-interface ProductImage {
 
-    id:number;
-
-    product_image:string;
-
-    title:string | null;
-
-    description:string | null;
-
-    product:number;
-
-}
 
 
 
@@ -42,6 +32,30 @@ export default function ProductImageGallery({
 
 
     const [loading,setLoading] = useState(true);
+    async function fetchImages() {
+
+    try {
+
+        setLoading(true);
+
+        const data = await getProductImages(productId);
+
+        setImages(data);
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load product images:",
+            error
+        );
+
+    } finally {
+
+        setLoading(false);
+
+    }
+
+}
 
 
 
@@ -55,39 +69,7 @@ export default function ProductImageGallery({
 
 
 
-    async function fetchImages(){
-
-
-        try{
-
-
-            const {data}=await axios.get<ProductImage[]>(
-
-                `${BACKEND_URLS}website/api/v1/list/image/product/${productId}/`
-
-            );
-
-
-            setImages(data);
-
-
-        }
-
-        catch(error){
-
-            console.log(error);
-
-        }
-
-        finally{
-
-            setLoading(false);
-
-        }
-
-
-    }
-
+   
 
 
 
