@@ -1,0 +1,39 @@
+# =========================================
+# GitHub Linguist
+# =========================================
+
+# Keep TypeScript / TSX as normal source code
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+
+# Keep Python as normal source code
+*.py linguist-language=Python
+
+
+# =========================================
+# Generated / Build Files
+# =========================================
+
+.next/ linguist-generated
+node_modules/ linguist-vendored
+
+dist/ linguist-generated
+build/ linguist-generated
+
+
+# =========================================
+# Static / Cache Files
+# =========================================
+
+*.min.js linguist-generated
+*.min.css linguist-generated
+
+*.map linguist-generated
+
+
+# =========================================
+# Python Cache
+# =========================================
+
+__pycache__/ linguist-generated
+*.pyc linguist-generated
