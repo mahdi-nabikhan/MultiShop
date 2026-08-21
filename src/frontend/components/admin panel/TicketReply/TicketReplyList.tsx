@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTicketReplies, Reply } from "@/services/shop-admin-panel.services";
-
+import { getTicketReplies } from "@/services/shop-admin-panel.services";
+import { Reply } from "@/types/panel-admin";
 import "./TicketReply.css";
 
 import AddReplyModal from "./AddReplyModal";

@@ -9,10 +9,8 @@ import {
     getShopProductDetail,
     getShopProductImages,
     deleteProductImage,
-    ShopProductData,
-    ProductImage,
 } from "@/services/shop-admin-panel.services";
-
+import {ShopProductData,ProductImage} from '@/types/panel-admin'
 import EditProductModal from "../EditProductModal/EditProductModal";
 import DiscountList from "../DiscountList/DiscountList";
 import AddProductImageModal from "../AddImageProduct/AddImageProduct";

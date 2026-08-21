@@ -2,29 +2,13 @@
 
 
 import {useState,useEffect} from "react";
-
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
-
+import { updateAddress } from "@/services/cutomer-panel.services"; 
 import "./EditAddressModal.css";
+import { Address2 } from "@/types/address";
 
 
 
 
-interface Address {
-
-
-    id:number;
-
-    state:string;
-
-    city:string;
-
-    postal_code:string;
-
-
-}
 
 
 
@@ -37,7 +21,7 @@ interface Props {
 
     onClose:()=>void;
 
-    address:Address;
+    address:Address2;
 
     refreshAddress:()=>void;
 
@@ -106,64 +90,36 @@ export default function EditAddressModal({
 
 
 
-    const UpdateAddress=async(e:React.FormEvent)=>{
+   const updateAddressHandler = async (
+    e: React.FormEvent
+) => {
 
+    e.preventDefault();
 
-        e.preventDefault();
+    try {
 
+        await updateAddress(
+            address.id,
+            {
+                state,
+                city,
+                postal_code: postalCode,
+            }
+        );
 
+        refreshAddress();
+        onClose();
 
-        try{
+    } catch (error) {
 
+        console.error(
+            "UPDATE ADDRESS ERROR:",
+            error
+        );
 
-            await axios.put(
+    }
 
-
-                `${BACKEND_URLS}customer/api/v1/detail/address/${address.id}/`,
-
-                {
-
-
-                    state,
-
-                    city,
-
-                    postal_code:postalCode
-
-
-                },
-
-                {
-
-                    withCredentials:true
-
-                }
-
-
-            );
-
-
-
-            refreshAddress();
-
-
-            onClose();
-
-
-
-        }
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-
-    };
+};
 
 
 
@@ -213,7 +169,7 @@ export default function EditAddressModal({
 
                 <form
 
-                    onSubmit={UpdateAddress}
+                    onSubmit={updateAddressHandler}
 
                     className="edit-address-form"
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getShopTickets, Ticket } from "@/services/shop-admin-panel.services";
+import { getShopTickets } from "@/services/shop-admin-panel.services";
 import "./ShopTicketList.css";
-
+import { Ticket } from "@/types/panel-admin";
 
 export default function ShopTicketList() {
     const [tickets, setTickets] = useState<Ticket[]>([]);

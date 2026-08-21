@@ -3,8 +3,8 @@
 
 import {useEffect,useState} from "react";
 
-import { getCustomerComments,Comment } from "@/services/cutomer-panel.services";
-
+import { getCustomerComments } from "@/services/cutomer-panel.services";
+import { Comment } from "@/types/comment";
 import {
     MessageCircle,
     CheckCircle,

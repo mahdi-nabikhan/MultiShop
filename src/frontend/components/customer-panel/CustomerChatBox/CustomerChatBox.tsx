@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
+
 import Link from "next/link";
 
 import {
@@ -11,38 +11,12 @@ import {
     CheckCheck,
 } from "lucide-react";
 
-import BACKEND_URLS from "@/utils";
-
+import { Message } from "@/types/chat";
+import { getConversationMessages, sendConversationMessage } from "@/services/chat.services";
 import "./CustomerChatBox.css";
 
 
-interface Message {
 
-    id: number;
-
-    conversation: number;
-
-    sender: string;
-
-    text: string;
-
-    image: string | null;
-
-    file: string | null;
-
-    reply_to: number | null;
-
-    is_read: boolean;
-
-    is_edited: boolean;
-
-    is_deleted: boolean;
-
-    created_at: string;
-
-    edited_at: string | null;
-
-}
 
 
 interface Props {
@@ -98,28 +72,16 @@ export default function CustomerChatBox({
             return;
         }
 
-
         try {
 
             setLoading(true);
-
             setError("");
 
+            const data = await getConversationMessages(
+                conversationId
+            );
 
-            const response =
-                await axios.get<Message[]>(
-
-                    `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/list/`,
-
-                    {
-                        withCredentials: true,
-                    }
-
-                );
-
-
-            setMessages(response.data);
-
+            setMessages(data);
 
         } catch (error) {
 
@@ -128,18 +90,15 @@ export default function CustomerChatBox({
                 error
             );
 
-
             setError(
                 "Failed to load messages."
             );
-
 
         } finally {
 
             setLoading(false);
 
         }
-
     };
 
 
@@ -233,18 +192,9 @@ export default function CustomerChatBox({
             setError("");
 
 
-            await axios.post(
-
-                `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/`,
-
-                {
-                    text: text.trim(),
-                },
-
-                {
-                    withCredentials: true,
-                }
-
+            await sendConversationMessage(
+                conversationId,
+                text.trim()
             );
 
 
@@ -435,10 +385,9 @@ export default function CustomerChatBox({
                             <div
                                 key={message.id}
                                 className={
-                                    `customer-message ${
-                                        isCustomer
-                                            ? "customer-message-sent"
-                                            : "customer-message-received"
+                                    `customer-message ${isCustomer
+                                        ? "customer-message-sent"
+                                        : "customer-message-received"
                                     }`
                                 }
                             >

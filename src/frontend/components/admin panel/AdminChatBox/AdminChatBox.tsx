@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 
 
-import { getConversationMessages, sendConversationMessage, Message } from "@/services/shop-admin-panel.services";
-
+import { getConversationMessages, sendConversationMessage } from "@/services/shop-admin-panel.services";
+import { Message } from "@/types/panel-admin";
 import "./AdminChatBox.css";
 
 

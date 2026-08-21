@@ -1,14 +1,11 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-
-
-export interface CreateDiscountPayload {
-
-    value: number;
-
-    discount_type: "cash" | "percent";
-
-}
+import { CreateDiscountPayload,AdminDetailProp,Admin
+    ,Conversation,DiscountData,Message
+    ,Operator,OperatorDetail,Order,OrderItem
+    ,ProductImage,Reply,ShopProductData,
+    ShopProductListData,StoreData,
+    StoreFormData,Ticket } from "@/types/panel-admin";
 
 
 export async function createProductDiscount(
@@ -71,33 +68,8 @@ export async function createProduct(formData: FormData) {
     return data;
 }
 
-export interface Message {
 
-    id: number;
 
-    conversation: number;
-
-    sender: string | null;
-
-    text: string | null;
-
-    image: string | null;
-
-    file: string | null;
-
-    reply_to: number | null;
-
-    is_read: boolean;
-
-    is_edited: boolean;
-
-    is_deleted: boolean;
-
-    created_at: string;
-
-    edited_at: string | null;
-
-}
 
 
 
@@ -134,17 +106,7 @@ export async function sendConversationMessage(
     return data;
 }
 
-export interface AdminDetailProp {
 
-    username: string;
-
-    user: {
-
-        email: string;
-
-    };
-
-}
 
 export async function getShopAdmin(
     adminId: number | string
@@ -195,12 +157,7 @@ export async function updateShopAdmin(
 }
 
 
-export interface DiscountData {
-    id: number;
-    products: number;
-    value: number;
-    discount_type: "cash" | "percent";
-}
+
 
 
 export async function getProductDiscounts(
@@ -236,14 +193,6 @@ export async function updateProduct(
 }
 
 
-export interface Admin {
-    id:number
-    username: string;
-    user: {
-
-        email: string;
-    };
-}
 
 
 export async function getAdmins(): Promise<Admin[]> {
@@ -259,14 +208,6 @@ export async function getAdmins(): Promise<Admin[]> {
 }
 
 
-export interface Conversation {
-    id: number;
-    store: number;
-    customer: number;
-    status: string;
-    created_at?: string;
-    updated_at?: string;
-}
 
 
 
@@ -284,12 +225,7 @@ export async function getStoreConversations(): Promise<Conversation[]> {
 
 
 
-export interface OperatorDetail {
-    username: string;
-    user: {
-        email: string;
-    };
-}
+
 export async function getOperatorDetail(
     operatorId: number | string
 ): Promise<OperatorDetail> {
@@ -306,12 +242,6 @@ export async function getOperatorDetail(
 
 
 
-export interface Operator {
-    username: string;
-    user: {
-        email: string;
-    };
-}
 
 
 
@@ -332,27 +262,7 @@ export async function getOperators(): Promise<Operator[]> {
 
 
 
-export interface Product {
-    id: number;
-    name: string;
-    description: string;
-    quantity_in_stock: string;
-    price: number;
-    price_after: number;
-    product_image: string | null;
-    category: number;
-    store: number;
-}
 
-export interface OrderItem {
-    id: number;
-    quantity: number;
-    status: string;
-    created: string;
-    total: string;
-    order: number;
-    product: Product;
-}
 
 export async function getOrderItems(
     orderId: number | string
@@ -370,18 +280,7 @@ export async function getOrderItems(
 
 
 
-interface Customer {
-    id: number;
-    username: string;
-    is_customer: boolean;
-    user: number;
-}
 
-export interface Order {
-    pk: number;
-    status: boolean;
-    customer: Customer;
-}
 
 
 
@@ -399,19 +298,7 @@ export async function getShopOrders(): Promise<Order[]> {
 
 
 
-export interface ProductImage {
 
-    id: number;
-
-    product_image: string;
-
-    title: string | null;
-
-    description: string | null;
-
-    product: number;
-
-}
 
 
 export async function getProductImages(
@@ -525,42 +412,8 @@ export async function getOrderItemDetail(
 }
 
 
-export interface ShopProductData {
-
-    id: number;
-
-    name: string;
-
-    description: string;
-
-    quantity_in_stock: number;
-
-    price: number;
-
-    price_after: number;
-
-    product_image: string | null;
-
-    category: number;
-
-    store: number;
-
-}
 
 
-export interface ProductImage {
-
-    id: number;
-
-    product_image: string;
-
-    title: string | null;
-
-    description: string | null;
-
-    product: number;
-
-}
 
 
 export async function getShopProductDetail(
@@ -619,17 +472,6 @@ export async function deleteProductImage(
 
 
 
-export interface ShopProductListData {
-    id: number;
-    name: string;
-    description: string;
-    quantity_in_stock: number;
-    price: number;
-    price_after: number;
-    product_image: string | null;
-    category: number;
-    store: number;
-}
 
 export async function getShopProducts(
     cookie: string
@@ -650,18 +492,6 @@ export async function getShopProducts(
 
 
 
-export interface Ticket {
-    pk: number;
-    title: string;
-    content: string;
-    store: number;
-    customer: {
-        id: number;
-        username: string;
-        is_customer: boolean;
-        user: number;
-    };
-}
 
 export async function getShopTickets(): Promise<Ticket[]> {
 
@@ -680,18 +510,6 @@ export async function getShopTickets(): Promise<Ticket[]> {
 
 
 
-
-export interface StoreData {
-    pk: number;
-    image: string | null;
-    description?: string;
-    name?: string;
-}
-
-export interface StoreFormData {
-    name: string;
-    description: string;
-}
 
 export async function getStoreProfile(): Promise<StoreData> {
 
@@ -720,15 +538,7 @@ export async function updateStoreProfile(
 
     return response.data;
 }
-export interface Reply {
 
-    id: number;
-
-    content: string;
-
-    created: string;
-
-}
 
 
 export async function getTicketReplies(

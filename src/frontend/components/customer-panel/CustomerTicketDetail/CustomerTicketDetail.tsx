@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import {
     ArrowLeft,
     Store,
@@ -11,51 +11,18 @@ import {
     Trash2
 } from "lucide-react";
 import Link from "next/link";
-
-import BACKEND_URLS from "@/utils";
+import { getCustomerTicketDetail, getCustomerTicketReplies } from "@/services/ticket.services";
 
 import EditTicketModal from "../EditTicketModal/EditTicketModal";
 import DeleteTicketModal from "../DeleteTicketModal/DeleteTicketModal";
-
+import type { CustomerTicketDetailProp,TicketReplyProp} from "@/types/ticket";
 import "./CustomerTicketDetail.css";
 
-interface Customer {
 
-    id:number;
 
-    username:string;
+interface Props {
 
-    is_customer:boolean;
-
-    user:number;
-
-}
-
-interface Ticket {
-
-    pk:number;
-
-    title:string;
-
-    content:string;
-
-    store:number;
-
-    customer:Customer;
-
-}
-
-interface Reply {
-
-    pk:number;
-
-    content:string;
-
-}
-
-interface Props{
-
-    ticketId:number;
+    ticketId: number;
 
 }
 
@@ -63,73 +30,55 @@ export default function CustomerTicketDetail({
 
     ticketId
 
-}:Props){
+}: Props) {
 
-    const [ticket,setTicket]=useState<Ticket|null>(null);
+    const [ticket, setTicket] = useState<CustomerTicketDetailProp | null>(null);
 
-    const [replies,setReplies]=useState<Reply[]>([]);
+    const [replies, setReplies] = useState<TicketReplyProp[]>([]);
 
-    const [loading,setLoading]=useState(true);
+    const [loading, setLoading] = useState(true);
 
-    const [openEdit,setOpenEdit]=useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
 
-    const [openDelete,setOpenDelete]=useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
 
 
 
-    const GetTicket=async()=>{
+    const getTicket = async () => {
 
-        try{
+        try {
 
-            const {data}=await axios.get<Ticket>(
-
-                `${BACKEND_URLS}dashboard/api/v1/detail/ticket/${ticketId}/`,
-
-                {
-
-                    withCredentials:true
-
-                }
-
-            );
+            const data =
+                await getCustomerTicketDetail(ticketId);
 
             setTicket(data);
 
-        }
+        } catch (error) {
 
-        catch(error){
-
-            console.log(error);
+            console.error(
+                "GET TICKET DETAIL ERROR:",
+                error
+            );
 
         }
 
     };
 
+    const getReplies = async () => {
 
+        try {
 
-    const GetReplies=async()=>{
-
-        try{
-
-            const {data}=await axios.get<Reply[]>(
-
-                `${BACKEND_URLS}dashboard/api/v1/replay/ticket/${ticketId}/`,
-
-                {
-
-                    withCredentials:true
-
-                }
-
-            );
+            const data =
+                await getCustomerTicketReplies(ticketId);
 
             setReplies(data);
 
-        }
+        } catch (error) {
 
-        catch(error){
-
-            console.log(error);
+            console.error(
+                "GET TICKET REPLIES ERROR:",
+                error
+            );
 
         }
 
@@ -137,15 +86,18 @@ export default function CustomerTicketDetail({
 
 
 
-    const Refresh=async()=>{
+
+
+
+    const Refresh = async () => {
 
         setLoading(true);
 
         await Promise.all([
 
-            GetTicket(),
+            getTicket(),
 
-            GetReplies()
+            getReplies()
 
         ]);
 
@@ -155,17 +107,17 @@ export default function CustomerTicketDetail({
 
 
 
-    useEffect(()=>{
+    useEffect(() => {
 
         Refresh();
 
-    },[]);
+    }, [ticketId]);
 
 
 
-    if(loading){
+    if (loading) {
 
-        return(
+        return (
 
             <div className="ticket-loading">
 
@@ -179,9 +131,9 @@ export default function CustomerTicketDetail({
 
 
 
-    if(!ticket){
+    if (!ticket) {
 
-        return(
+        return (
 
             <div className="ticket-loading">
 
@@ -195,7 +147,7 @@ export default function CustomerTicketDetail({
 
 
 
-    return(
+    return (
 
         <section className="customer-ticket-detail">
 
@@ -207,7 +159,7 @@ export default function CustomerTicketDetail({
 
             >
 
-                <ArrowLeft size={18}/>
+                <ArrowLeft size={18} />
 
                 Back To Tickets
 
@@ -240,11 +192,11 @@ export default function CustomerTicketDetail({
 
                             className="ticket-edit-btn"
 
-                            onClick={()=>setOpenEdit(true)}
+                            onClick={() => setOpenEdit(true)}
 
                         >
 
-                            <Edit size={18}/>
+                            <Edit size={18} />
 
                             Edit
 
@@ -254,11 +206,11 @@ export default function CustomerTicketDetail({
 
                             className="ticket-delete-btn"
 
-                            onClick={()=>setOpenDelete(true)}
+                            onClick={() => setOpenDelete(true)}
 
                         >
 
-                            <Trash2 size={18}/>
+                            <Trash2 size={18} />
 
                             Delete
 
@@ -274,7 +226,7 @@ export default function CustomerTicketDetail({
 
                     <div>
 
-                        <User size={18}/>
+                        <User size={18} />
 
                         {ticket.customer.username}
 
@@ -282,7 +234,7 @@ export default function CustomerTicketDetail({
 
                     <div>
 
-                        <Store size={18}/>
+                        <Store size={18} />
 
                         Store #{ticket.store}
 
@@ -314,7 +266,7 @@ export default function CustomerTicketDetail({
 
                         <div className="message-box">
 
-                            <MessageSquare size={18}/>
+                            <MessageSquare size={18} />
 
                             <p>
 
@@ -328,7 +280,7 @@ export default function CustomerTicketDetail({
 
                     {
 
-                        replies.map(reply=>(
+                        replies.map(reply => (
 
                             <div
 
@@ -346,7 +298,7 @@ export default function CustomerTicketDetail({
 
                                 <div className="message-box">
 
-                                    <MessageSquare size={18}/>
+                                    <MessageSquare size={18} />
 
                                     <p>
 
@@ -372,7 +324,7 @@ export default function CustomerTicketDetail({
 
                 open={openEdit}
 
-                close={()=>setOpenEdit(false)}
+                close={() => setOpenEdit(false)}
 
                 ticket={ticket}
 
@@ -386,7 +338,7 @@ export default function CustomerTicketDetail({
 
                 open={openDelete}
 
-                close={()=>setOpenDelete(false)}
+                close={() => setOpenDelete(false)}
 
                 ticketId={ticket.pk}
 

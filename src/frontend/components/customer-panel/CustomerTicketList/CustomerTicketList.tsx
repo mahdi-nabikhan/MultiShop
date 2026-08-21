@@ -11,8 +11,8 @@ import {
     ChevronRight
 } from "lucide-react";
 
-import { getCustomerTickets,CustomerTicket } from "@/services/cutomer-panel.services";
-
+import { getCustomerTickets } from "@/services/cutomer-panel.services";
+import type { CustomerTicket } from "@/types/ticket";
 import "./CustomerTicketList.css";
 
 

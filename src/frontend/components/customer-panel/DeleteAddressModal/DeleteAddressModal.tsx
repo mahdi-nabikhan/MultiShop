@@ -1,12 +1,8 @@
 "use client";
 
 
-import axios from "axios";
-
-import BACKEND_URLS from "@/utils";
-
 import "./DeleteAddressModal.css";
-
+import { deleteAddress } from "@/services/cutomer-panel.services";
 
 
 interface Props {
@@ -47,45 +43,25 @@ export default function DeleteAddressModal({
 
 
 
-    const DeleteAddress = async()=>{
+  const DeleteAddress = async () => {
 
+    try {
 
-        try{
+        await deleteAddress(addressId);
 
+        window.location.href =
+            "/customer-panel/addresses";
 
-            await axios.delete(
+    } catch (error) {
 
+        console.error(
+            "DELETE ADDRESS ERROR:",
+            error
+        );
 
-                `${BACKEND_URLS}customer/api/v1/detail/address/${addressId}/`,
+    }
 
-                {
-
-                    withCredentials:true
-
-                }
-
-
-            );
-
-
-
-            window.location.href="/customer-panel/addresses";
-
-
-
-        }
-
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-    };
+};
 
 
 

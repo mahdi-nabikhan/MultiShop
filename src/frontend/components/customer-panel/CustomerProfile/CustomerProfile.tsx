@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCustomerProfile,updateCustomerProfile,CustomerProfileProp } from "@/services/cutomer-panel.services";
-
+import { getCustomerProfile,updateCustomerProfile } from "@/services/cutomer-panel.services";
+import { CustomerProfileProp } from "@/types/customer";
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 
 import "./CustomerProfile.css";

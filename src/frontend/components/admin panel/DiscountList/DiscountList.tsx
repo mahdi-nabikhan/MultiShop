@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getProductDiscounts,DiscountData } from "@/services/shop-admin-panel.services";
-import BACKEND_URLS from "@/utils";
+import { getProductDiscounts } from "@/services/shop-admin-panel.services";
+import { DiscountData } from "@/types/panel-admin";
 import DeleteDiscountModal from "../DeleteDiscountModal/DeleteDiscountModal";
 
 

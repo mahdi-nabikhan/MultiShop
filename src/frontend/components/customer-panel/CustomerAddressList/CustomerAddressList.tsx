@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 
-import { getAddresses,Address } from "@/services/cutomer-panel.services"; 
-
+import { getAddresses } from "@/services/cutomer-panel.services"; 
+import { Address } from "@/types/address";
 import {
     MapPin,
     Hash

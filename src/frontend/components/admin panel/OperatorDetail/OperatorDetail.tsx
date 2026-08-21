@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getOperatorDetail } from "@/services/shop-admin-panel.services";
-import type { OperatorDetail } from "@/services/shop-admin-panel.services";
+import type { OperatorDetail } from "@/types/panel-admin";
 import "./OperatorDetail.css";
 
 

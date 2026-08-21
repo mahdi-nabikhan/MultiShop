@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { updateShopAdmin, getShopAdmin, deleteShopAdmin, AdminDetailProp } from "@/services/shop-admin-panel.services";
+import { updateShopAdmin, getShopAdmin, deleteShopAdmin } from "@/services/shop-admin-panel.services";
+import { AdminDetailProp } from "@/types/panel-admin";
 import { useRouter } from "next/navigation";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import UpdateAdminModal from "../UpdateAdminModal/UpdateAdminModal";

@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getStoreConversations,Conversation } from "@/services/shop-admin-panel.services";
-
+import { getStoreConversations } from "@/services/shop-admin-panel.services";
+import { Conversation } from "@/types/panel-admin";
 import "./ListConversation.css";
 
 
