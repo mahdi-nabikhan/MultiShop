@@ -1,50 +1,8 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
+import { ProductCommentsResponse,ProductComment,CreateCommentPayload,CommentReply } from "@/types/comment";
 
 
-// ==========================================
-// Comment Interface
-// ==========================================
-
-export interface ProductComment {
-
-    id: number;
-
-    content: string;
-
-    created: string;
-
-    product: number;
-
-    customer: number;
-
-}
-
-
-// ==========================================
-// Get Product Comments
-// ==========================================
-
-export interface ProductComment {
-    id: number;
-    descriptions: string;
-    status: string;
-    user: {
-        id: number;
-        email: string;
-    };
-    product: number;
-    parent: number | null;
-}
-
-export interface ProductCommentsResponse {
-    links: {
-        next: string | null;
-        previous: string | null;
-    };
-    count: number;
-    results: ProductComment[];
-}
 
 
 export async function getProductComments(
@@ -65,9 +23,7 @@ export async function getProductComments(
     return data;
 }
 
-// ==========================================
-// Create Product Comment
-// ==========================================
+
 
 export async function createProductComment(
 
@@ -98,10 +54,7 @@ export async function createProductComment(
 
 
 
-export interface CreateCommentPayload {
-    descriptions: string;
-    parent?: number;
-}
+
 
 export async function createComment(
     productId: string,
@@ -145,14 +98,6 @@ export async function createCommentReply(
 
 
 
-export interface CommentReply {
-    id: number;
-    descriptions: string;
-    status: string;
-    user: number;
-    product: number;
-    parent: number | null;
-}
 
 export async function getCommentReplies(
     commentId: number
