@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    getShopOrders,
-    Order,
-} from "@/services/shop-admin-panel.services";
-import BACKEND_URLS from "@/utils";
+import {getShopOrders} from "@/services/shop-admin-panel.services";
+import type { Order } from "@/types/panel-admin";
 import "./OrderList.css";
 
 

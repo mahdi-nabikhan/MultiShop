@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAdmins,Admin } from "@/services/shop-admin-panel.services";
+import { getAdmins } from "@/services/shop-admin-panel.services";
 import "./ListAdmin.css";
-
+import { Admin } from "@/types/panel-admin";
 
 
 export default function AdminList() {

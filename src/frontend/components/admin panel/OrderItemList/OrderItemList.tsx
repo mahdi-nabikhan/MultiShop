@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getOrderItems,OrderItem } from "@/services/shop-admin-panel.services";
+import { getOrderItems } from "@/services/shop-admin-panel.services";
 import BACKEND_URLS from "@/utils";
 import "./OrderItemList.css";
-
+import type { OrderItem } from "@/types/panel-admin";
 
 
 

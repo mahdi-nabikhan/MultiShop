@@ -1,16 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-    getProductImages,
-    ProductImage,
-} from "@/services/shop-admin-panel.services";
-
+import {getProductImages} from "@/services/shop-admin-panel.services";
+import { ProductImage } from "@/types/panel-admin";
 import "./ProductImageGallery.css";
-
-
-
-
 
 
 interface Props {
