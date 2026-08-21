@@ -52,3 +52,20 @@ export interface ProductCommentsResponse {
     count: number;
     results: ProductComment[];
 }
+
+
+
+
+export interface User {
+    id: number;
+    email: string;
+}
+
+export interface Comment {
+    id: number;
+    descriptions: string;
+    status: string;
+    user: User;
+    product: number;
+    parent: number | null;
+}

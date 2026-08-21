@@ -1,23 +1,8 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-
-export interface Customer {
-    username: string;
-}
-
-export interface Address {
-    id: number;
-    state: string;
-    city: string;
-    postal_code: string;
-    customer: Customer;
-}
-
-export interface CreateAddressRequest {
-    state: string;
-    city: string;
-    postal_code: string;
-}
+import { CreateAddressRequest,Address } from "@/types/address";
+import { CustomerProfileProp } from "@/types/customer";
+import { CustomerTicket } from "@/types/ticket";
 
 export async function createAddress(
     data: CreateAddressRequest
@@ -46,17 +31,6 @@ export async function getAddresses(): Promise<Address[]> {
 
 
 
-export interface Customer {
-    username: string;
-}
-
-export interface Address {
-    id: number;
-    state: string;
-    city: string;
-    postal_code: string;
-    customer: Customer;
-}
 
 
 export async function getAddressDetail(
@@ -75,19 +49,7 @@ export async function getAddressDetail(
 
 
 
-export interface User {
-    id: number;
-    email: string;
-}
 
-export interface Comment {
-    id: number;
-    descriptions: string;
-    status: string;
-    user: User;
-    product: number;
-    parent: number | null;
-}
 
 export async function getCustomerComments(): Promise<Comment[]> {
     const response = await axios.get<Comment[]>(
@@ -103,17 +65,7 @@ export async function getCustomerComments(): Promise<Comment[]> {
 
 
 
-export interface CustomerProfileProp {
 
-    id: number;
-
-    username: string;
-
-    is_customer: boolean;
-
-    user: number;
-
-}
 
 
 export async function getCustomerProfile(): Promise<CustomerProfileProp> {
@@ -154,20 +106,6 @@ export async function updateCustomerProfile(
 }
 
 
-export interface CustomerTicketCustomer {
-    id: number;
-    username: string;
-    is_customer: boolean;
-    user: number;
-}
-
-export interface CustomerTicket {
-    pk: number;
-    title: string;
-    content: string;
-    store: number;
-    customer: CustomerTicketCustomer;
-}
 
 export async function getCustomerTickets(): Promise<CustomerTicket[]> {
 
