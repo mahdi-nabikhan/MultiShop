@@ -8,8 +8,8 @@ import {
     Edit,
     Trash
 } from "lucide-react";
-import { getCommentDetail,Comment } from "@/services/cutomer-panel.services";
-
+import { getCommentDetail } from "@/services/cutomer-panel.services";
+import { Comment } from "@/types/comment";
 
 import EditCommentModal from "../EditCommentModal/EditCommentModal";
 

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getCustomerOrders } from "@/services/order.services";
 import Link from "next/link";
+import { Order } from "@/types/order";
 
-import BACKEND_URLS from "@/utils";
 
 import {
     Package,
@@ -16,17 +16,7 @@ import {
 import "./CustomerOrderList.css";
 
 
-interface Order {
 
-    id: number;
-
-    status: boolean;
-
-    created: string;
-
-    customer: number;
-
-}
 
 
 export default function CustomerOrderList() {
@@ -38,43 +28,30 @@ export default function CustomerOrderList() {
         useState(true);
 
 
-    const GetOrders = async () => {
+    const getOrders = async () => {
 
-        try {
+    try {
 
-            const { data } =
-                await axios.get<Order[]>(
+        const data = await getCustomerOrders();
 
-                    `${BACKEND_URLS}order/api/v1/orders/`,
+        setOrders(data);
 
-                    {
-                        withCredentials: true,
-                    }
+    } catch (error) {
 
-                );
+        console.error("GET CUSTOMER ORDERS ERROR:", error);
 
-            setOrders(data);
+    } finally {
 
-        }
+        setLoading(false);
 
-        catch (error) {
+    }
 
-            console.log(error);
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
+};
 
 
     useEffect(() => {
 
-        GetOrders();
+        getOrders();
 
     }, []);
 

@@ -142,3 +142,15 @@ export interface SessionCartResponse {
     total_quantity: number;
     total_price: number;
 }
+
+export interface Order {
+
+    id: number;
+
+    status: boolean;
+
+    created: string;
+
+    customer: number;
+
+}

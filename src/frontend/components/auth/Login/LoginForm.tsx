@@ -9,15 +9,6 @@ import { useMutation } from "@tanstack/react-query";
 
 import "./LoginForm.css";
 
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  user_id: number;
-  redirect_url: string | null;
-}
 
 export default function LoginForm() {
   const router = useRouter();

@@ -1,13 +1,13 @@
 "use client";
-
-
+import { Ticket } from "@/types/ticket";
+import { updateCustomerTicket } from "@/services/ticket.services";
 import {
     useEffect,
     useState
 } from "react";
 
 
-import axios from "axios";
+
 
 
 import {
@@ -16,26 +16,13 @@ import {
 } from "lucide-react";
 
 
-import BACKEND_URLS from "@/utils";
+
 
 
 import "./EditTicketModal.css";
 
 
 
-interface Ticket {
-
-
-    pk:number;
-
-    title:string;
-
-    content:string;
-
-    store:number;
-
-
-}
 
 
 
@@ -118,68 +105,36 @@ export default function EditTicketModal({
 
 
 
-    const UpdateTicket=async(e:React.FormEvent)=>{
+    const updateTicketHandler = async (
+    e: React.FormEvent
+) => {
 
+    e.preventDefault();
 
-        e.preventDefault();
+    try {
 
+        await updateCustomerTicket(
+            ticket.pk,
+            {
+                title,
+                content,
+                store: ticket.store,
+            }
+        );
 
+        refresh();
+        close();
 
-        try{
+    } catch (error) {
 
+        console.error(
+            "UPDATE TICKET ERROR:",
+            error
+        );
 
-            await axios.put(
+    }
 
-
-                `${BACKEND_URLS}dashboard/api/v1/detail/ticket/${ticket.pk}/`,
-
-
-                {
-
-
-                    title,
-
-                    content,
-
-                    store:ticket.store
-
-
-                },
-
-
-                {
-
-
-                    withCredentials:true
-
-
-                }
-
-
-            );
-
-
-
-            refresh();
-
-
-            close();
-
-
-
-        }
-
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-    };
+};
 
 
 
@@ -239,7 +194,7 @@ export default function EditTicketModal({
 
                 <form
 
-                    onSubmit={UpdateTicket}
+                    onSubmit={updateTicketHandler}
 
                     className="edit-ticket-form"
 

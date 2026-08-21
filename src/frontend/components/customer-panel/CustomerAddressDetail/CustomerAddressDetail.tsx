@@ -11,8 +11,8 @@ import {
     Hash,
     User
 } from "lucide-react";
-import { getAddressDetail,Address } from "@/services/cutomer-panel.services";
-
+import { getAddressDetail } from "@/services/cutomer-panel.services";
+import { Address } from "@/types/address";
 import "./CustomerAddressDetail.css";
 
 

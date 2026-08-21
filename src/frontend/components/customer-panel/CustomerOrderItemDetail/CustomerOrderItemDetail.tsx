@@ -2,7 +2,8 @@
 
 
 import {useEffect,useState} from "react";
-import { getCustomerOrderItemDetail,OrderItem } from "@/services/order.services";
+import { getCustomerOrderItemDetail } from "@/services/order.services";
+import type { CustomerOrderItem } from "@/types/order";
 import {Package,Clock} from "lucide-react";
 import "./CustomerOrderItemDetail.css";
 import BACKEND_URLS from "@/utils";
@@ -25,7 +26,7 @@ export default function CustomerOrderItemDetail({
 
 
 
-    const [item,setItem]=useState<OrderItem|null>(null);
+    const [item,setItem]=useState<CustomerOrderItem|null>(null);
 
     const fetchItemDetail = async () => {
     try {

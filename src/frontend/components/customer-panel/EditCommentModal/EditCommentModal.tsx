@@ -2,30 +2,12 @@
 
 
 import {useEffect,useState} from "react";
-
-import axios from "axios";
-
-import {
-    X,
-    Save
-} from "lucide-react";
-
-
-import BACKEND_URLS from "@/utils";
-
+import {X,Save} from "lucide-react";
+import { CommentProp } from "@/types/comment";
 import "./EditCommentModal.css";
+import { updateComment } from "@/services/comment.services";
 
 
-
-interface Comment {
-
-
-    id:number;
-
-    descriptions:string;
-
-
-}
 
 
 
@@ -37,7 +19,7 @@ interface Props {
 
     close:()=>void;
 
-    comment:Comment;
+    comment:CommentProp;
 
     refresh:()=>void;
 
@@ -90,71 +72,39 @@ export default function EditCommentModal({
         return null;
 
     }
+    const updateCommentHandler = async (
+    e: React.FormEvent
+) => {
+
+    e.preventDefault();
+
+    try {
+
+        await updateComment(
+            comment.id,
+            description
+        );
+
+        refresh();
+        close();
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE COMMENT ERROR:",
+            error
+        );
+
+    }
+
+};
 
 
 
 
 
 
-
-    const UpdateComment=async(e:React.FormEvent)=>{
-
-
-        e.preventDefault();
-
-
-
-        try{
-
-
-            await axios.put(
-
-
-                `${BACKEND_URLS}customer/api/v1/detail/comment/${comment.id}/`,
-
-
-                {
-
-
-                    descriptions:description
-
-
-                },
-
-
-                {
-
-
-                    withCredentials:true
-
-
-                }
-
-
-            );
-
-
-
-            refresh();
-
-
-            close();
-
-
-
-        }
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
-
-    };
-
+    
 
 
 
@@ -207,7 +157,7 @@ export default function EditCommentModal({
 
                 <form
 
-                    onSubmit={UpdateComment}
+                    onSubmit={updateCommentHandler}
 
                     className="edit-comment-form"
 

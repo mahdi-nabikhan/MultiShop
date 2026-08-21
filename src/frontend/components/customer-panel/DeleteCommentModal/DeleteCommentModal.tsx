@@ -1,105 +1,45 @@
 "use client";
 
-
-import axios from "axios";
-
-import {
-    X,
-    Trash
-} from "lucide-react";
-
-
-import BACKEND_URLS from "@/utils";
-
+import { Trash } from "lucide-react";
 import "./DeleteCommentModal.css";
-
-
-
+import { deleteComment } from "@/services/comment.services";
 
 
 interface Props {
-
-
-    open:boolean;
-
-    close:()=>void;
-
-    commentId:number;
-
-
+    open: boolean;
+    close: () => void;
+    commentId: number;
 }
 
 
 
 
 
-export default function DeleteCommentModal({
+export default function DeleteCommentModal({ open, close, commentId }: Props) {
+    const handleDeleteComment = async () => {
 
-    open,
+        try {
 
-    close,
+            await deleteComment(commentId);
 
-    commentId
+            window.location.href =
+                "/customer-panel/comments";
 
+        } catch (error) {
 
-}:Props){
-
-
-
-
-
-    if(!open){
-
-        return null;
-
-    }
-
-
-
-
-
-
-
-    const DeleteComment=async()=>{
-
-
-        try{
-
-
-            await axios.delete(
-
-
-                `${BACKEND_URLS}customer/api/v1/detail/comment/${commentId}/`,
-
-
-                {
-
-                    withCredentials:true
-
-                }
-
-
+            console.error(
+                "DELETE COMMENT ERROR:",
+                error
             );
 
-
-
-            window.location.href="/customer-panel/comments";
-
-
-
         }
-
-
-        catch(error){
-
-
-            console.log(error);
-
-
-        }
-
 
     };
+
+    if (!open) {
+        return null;
+    }
+
 
 
 
@@ -126,7 +66,7 @@ export default function DeleteCommentModal({
                 <div className="delete-icon">
 
 
-                    <Trash size={35}/>
+                    <Trash size={35} />
 
 
                 </div>
@@ -181,7 +121,7 @@ export default function DeleteCommentModal({
 
                         className="delete-btn"
 
-                        onClick={DeleteComment}
+                        onClick={handleDeleteComment}
 
                     >
 

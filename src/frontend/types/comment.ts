@@ -69,3 +69,14 @@ export interface Comment {
     product: number;
     parent: number | null;
 }
+
+
+export interface CommentProp {
+
+
+    id:number;
+
+    descriptions:string;
+
+
+}

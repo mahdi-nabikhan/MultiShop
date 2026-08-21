@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCustomerConversations,Conversation } from "@/services/chat.services";
-
+import { getCustomerConversations } from "@/services/chat.services";
+import { Conversation } from "@/types/chat";
 import "./ConversationList.css";
 
 interface Props {

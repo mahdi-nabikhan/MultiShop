@@ -15,3 +15,11 @@ export interface CreateAddressRequest {
     city: string;
     postal_code: string;
 }
+
+
+
+export interface Address2 {
+    id:number;
+    state:string;
+    city:string;
+    postal_code:string}

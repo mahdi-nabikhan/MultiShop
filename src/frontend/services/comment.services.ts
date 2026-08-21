@@ -1,6 +1,6 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-import { ProductCommentsResponse,ProductComment,CreateCommentPayload,CommentReply } from "@/types/comment";
+import { ProductCommentsResponse,ProductComment,CreateCommentPayload,CommentReply,CommentProp } from "@/types/comment";
 
 
 
@@ -111,4 +111,40 @@ export async function getCommentReplies(
     );
 
     return data;
+}
+
+
+
+
+export async function deleteComment(
+    commentId: number
+): Promise<void> {
+
+    await axios.delete(
+        `${BACKEND_URLS}customer/api/v1/detail/comment/${commentId}/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+}
+
+
+
+export async function updateComment(
+    commentId: number,
+    descriptions: string
+): Promise<CommentProp> {
+
+    const response = await axios.put<CommentProp>(
+        `${BACKEND_URLS}customer/api/v1/detail/comment/${commentId}/`,
+        {
+            descriptions,
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
 }

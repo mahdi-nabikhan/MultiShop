@@ -1,119 +1,40 @@
 "use client";
 
-
-import axios from "axios";
-
-
-import {
-    Trash2,
-    X
-} from "lucide-react";
-
-
-import {
-    useRouter
-} from "next/navigation";
-
-
-import BACKEND_URLS from "@/utils";
-
-
+import { Trash2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { deleteCustomerTicket } from "@/services/ticket.services";
 import "./DeleteTicketModal.css";
 
 
 
-
-
-interface Props{
-
-
-    open:boolean;
-
-    close:()=>void;
-
-    ticketId:number;
-
-
-}
+interface Props { open: boolean; close: () => void; ticketId: number; }
 
 
 
 
 
-export default function DeleteTicketModal({
-
-    open,
-
-    close,
-
-    ticketId
-
-
-}:Props){
-
-
-
+export default function DeleteTicketModal({ open, close, ticketId }: Props) {
     const router = useRouter();
+    if (!open) { return null; }
 
 
 
+    const handleDeleteTicket = async () => {
 
+        try {
 
-
-
-    if(!open){
-
-        return null;
-
-    }
-
-
-
-
-
-
-
-    const DeleteTicket=async()=>{
-
-
-        try{
-
-
-            await axios.delete(
-
-
-                `${BACKEND_URLS}dashboard/api/v1/detail/ticket/${ticketId}/`,
-
-
-                {
-
-
-                    withCredentials:true
-
-
-                }
-
-
-            );
-
-
+            await deleteCustomerTicket(ticketId);
 
             router.push("/customer-panel/tickets");
 
+        } catch (error) {
 
-
-        }
-
-
-        catch(error){
-
-
-            console.log(error);
-
+            console.error(
+                "DELETE TICKET ERROR:",
+                error
+            );
 
         }
-
-
 
     };
 
@@ -123,7 +44,7 @@ export default function DeleteTicketModal({
 
 
 
-    return(
+    return (
 
 
 
@@ -149,7 +70,7 @@ export default function DeleteTicketModal({
 
                 >
 
-                    <X size={22}/>
+                    <X size={22} />
 
                 </button>
 
@@ -162,7 +83,7 @@ export default function DeleteTicketModal({
                 <div className="delete-ticket-icon">
 
 
-                    <Trash2 size={38}/>
+                    <Trash2 size={38} />
 
 
                 </div>
@@ -227,11 +148,11 @@ export default function DeleteTicketModal({
 
                         className="confirm-delete-ticket"
 
-                        onClick={DeleteTicket}
+                        onClick={handleDeleteTicket}
 
                     >
 
-                        <Trash2 size={18}/>
+                        <Trash2 size={18} />
 
                         Delete
 

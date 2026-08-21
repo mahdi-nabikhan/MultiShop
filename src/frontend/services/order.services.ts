@@ -1,6 +1,6 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-import { Bill,Cart,CustomerOrderItem,OrderAddress,OrderItem,SessionCartResponse } from "@/types/order";
+import type { Bill,Cart,CustomerOrderItem,OrderAddress,OrderItem,SessionCartResponse,Order} from "@/types/order";
 
 // ==========================================
 // Bill
@@ -303,4 +303,18 @@ export async function updateSessionCartQuantity(
     );
 
     return data;
+}
+
+
+
+export async function getCustomerOrders(): Promise<Order[]> {
+
+    const response = await axios.get<Order[]>(
+        `${BACKEND_URLS}order/api/v1/orders/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
 }
