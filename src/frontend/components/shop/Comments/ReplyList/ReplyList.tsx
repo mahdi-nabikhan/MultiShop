@@ -1,13 +1,11 @@
 
 "use client";
-
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     getCommentReplies,
-    CommentReply,
 } from "@/services/comment.services";
-
+import type { CommentReply } from "@/types/comment";
 interface Props {
     commentID: number;
 }
@@ -15,48 +13,24 @@ interface Props {
 export default function ReplyList({
     commentID
 }: Props) {
-
-    const [replies, setReplies] =
-        useState<CommentReply[]>([]);
-
-    const [loading, setLoading] =
-        useState(false);
-
-
-    async function loadReplies() {
-
-        try {
-
-            setLoading(true);
-
-            const data =
-                await getCommentReplies(
-                    commentID
-                );
-
-            setReplies(data);
-
-        } catch (error) {
-
-            console.error(
-                "Failed to load replies:",
-                error
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    }
+    const {
+        data: replies = [],
+        isLoading: loading,
+    } = useQuery<CommentReply[]>({
+        queryKey: [
+            "comment-replies",
+            commentID,
+        ],
+        queryFn: () =>
+            getCommentReplies(commentID),
+    });
 
 
-    useEffect(() => {
 
-        loadReplies();
 
-    }, [commentID]);
+
+
+
 
 
     if (loading) {

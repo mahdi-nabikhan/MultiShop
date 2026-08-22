@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import {
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
+
 import { createCommentReply } from "@/services/comment.services";
+
 
 interface Props {
     productID: number | string;
@@ -9,93 +15,81 @@ interface Props {
     onReplyCreated?: () => void;
 }
 
+
 export default function ReplyForm({
     productID,
     commentID,
     onReplyCreated,
 }: Props) {
 
-    const [description, setDescription] = useState("");
+    const queryClient = useQueryClient();
 
-    const [loading, setLoading] = useState(false);
-
-    const [error, setError] = useState("");
-
-    const [success, setSuccess] = useState("");
+    const [description, setDescription] =
+        useState("");
 
 
+    const replyMutation = useMutation({
 
-
-    async function handleSubmit(
-        e: React.FormEvent
-    ) {
-        e.preventDefault();
-
-        const trimmedDescription = description.trim();
-
-        setError("");
-        setSuccess("");
-
-        if (!trimmedDescription) {
-            setError("Reply cannot be empty.");
-            return;
-        }
-
-        if (trimmedDescription.length < 3) {
-            setError("Reply must be at least 3 characters.");
-            return;
-        }
-
-        if (trimmedDescription.length > 1000) {
-            setError("Reply cannot exceed 1000 characters.");
-            return;
-        }
-
-        try {
-            setLoading(true);
-
-            await createCommentReply(
+        mutationFn: () =>
+            createCommentReply(
                 commentID,
                 productID,
-                trimmedDescription
-            );
+                description.trim()
+            ),
+
+        onSuccess: () => {
 
             setDescription("");
 
-            setSuccess(
-                "Reply added successfully."
-            );
+            queryClient.invalidateQueries({
+                queryKey: [
+                    "product-comments",
+                    productID,
+                ],
+            });
 
-            if (onReplyCreated) {
-                onReplyCreated();
-            }
+            onReplyCreated?.();
 
-        } catch (error: any) {
+        },
+
+        onError: (error: any) => {
 
             console.error(error);
 
-            if (error.response?.data) {
+        },
 
-                setError(
-                    JSON.stringify(
-                        error.response.data
-                    )
-                );
+    });
 
-            } else {
 
-                setError(
-                    "Failed to add reply."
-                );
+    const handleSubmit = (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
 
-            }
+        e.preventDefault();
 
-        } finally {
 
-            setLoading(false);
+        const trimmedDescription =
+            description.trim();
 
+
+        if (!trimmedDescription) {
+            return;
         }
-    }
+
+
+        if (trimmedDescription.length < 3) {
+            return;
+        }
+
+
+        if (trimmedDescription.length > 1000) {
+            return;
+        }
+
+
+        replyMutation.mutate();
+
+    };
 
 
     return (
@@ -106,44 +100,61 @@ export default function ReplyForm({
         >
 
             <textarea
+
                 value={description}
+
                 onChange={(e) =>
-                    setDescription(e.target.value)
+                    setDescription(
+                        e.target.value
+                    )
                 }
+
                 placeholder="Write a reply..."
+
                 rows={3}
+
             />
 
 
-            {error && (
+            {replyMutation.isError && (
 
                 <p className="reply-error">
-                    {error}
+
+                    Failed to add reply.
+
                 </p>
 
             )}
 
 
-            {success && (
+            {replyMutation.isSuccess && (
 
                 <p className="reply-success">
-                    {success}
+
+                    Reply added successfully.
+
                 </p>
 
             )}
 
 
             <button
+
                 type="submit"
-                disabled={loading}
+
+                disabled={
+                    replyMutation.isPending
+                }
+
             >
 
-                {loading
+                {replyMutation.isPending
                     ? "Sending..."
                     : "Reply"
                 }
 
             </button>
+
 
         </form>
 
