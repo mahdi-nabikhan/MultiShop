@@ -19,15 +19,15 @@ export default function LoginForm() {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess(data) {
-      if (data.redirect_url === "panel") {
-        router.push("/shop-admin-panel");
-      } else {
-        router.push("/");
-      }
+        if (data.redirect_url === "panel") {
+            router.push("/shop-admin-panel");
+        } else {
+            router.push("/");
+        }
 
-      router.refresh();
+        router.refresh();
     },
-  });
+});
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
