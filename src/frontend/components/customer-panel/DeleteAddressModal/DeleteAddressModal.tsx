@@ -1,6 +1,6 @@
 "use client";
 
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import "./DeleteAddressModal.css";
 import { deleteAddress } from "@/services/cutomer-panel.services";
 
@@ -8,11 +8,11 @@ import { deleteAddress } from "@/services/cutomer-panel.services";
 interface Props {
 
 
-    open:boolean;
+    open: boolean;
 
-    onClose:()=>void;
+    onClose: () => void;
 
-    addressId:number;
+    addressId: number;
 
 
 }
@@ -28,11 +28,47 @@ export default function DeleteAddressModal({
     addressId
 
 
-}:Props){
+}: Props) {
 
 
 
-    if(!open){
+
+    const queryClient = useQueryClient();
+
+    const {
+        mutate: DeleteAddress,
+        isPending,
+    } = useMutation({
+        mutationFn: () => deleteAddress(addressId),
+
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["addresses"],
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: ["address-detail", addressId],
+            });
+
+            onClose();
+        },
+
+        onError: (error) => {
+            console.error(
+                "DELETE ADDRESS ERROR:",
+                error
+            );
+        },
+    });
+
+
+
+
+
+
+
+
+    if (!open) {
 
         return null;
 
@@ -43,25 +79,6 @@ export default function DeleteAddressModal({
 
 
 
-  const DeleteAddress = async () => {
-
-    try {
-
-        await deleteAddress(addressId);
-
-        window.location.href =
-            "/customer-panel/addresses";
-
-    } catch (error) {
-
-        console.error(
-            "DELETE ADDRESS ERROR:",
-            error
-        );
-
-    }
-
-};
 
 
 
@@ -121,15 +138,11 @@ export default function DeleteAddressModal({
 
 
                     <button
-
                         className="confirm-delete"
-
-                        onClick={DeleteAddress}
-
+                        onClick={() => DeleteAddress()}
+                        disabled={isPending}
                     >
-
-                        Delete
-
+                        {isPending ? "Deleting..." : "Delete"}
                     </button>
 
 

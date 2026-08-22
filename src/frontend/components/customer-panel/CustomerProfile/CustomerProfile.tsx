@@ -1,8 +1,13 @@
 
 "use client";
-
-import { useEffect, useState } from "react";
-import { getCustomerProfile,updateCustomerProfile } from "@/services/cutomer-panel.services";
+import { useEffect } from "react";
+import { useState } from "react";
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+import { getCustomerProfile, updateCustomerProfile } from "@/services/cutomer-panel.services";
 import { CustomerProfileProp } from "@/types/customer";
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 
@@ -19,8 +24,7 @@ export default function CustomerProfile() {
     // Profile
     // ==========================================
 
-    const [profile, setProfile] =
-        useState<CustomerProfileProp | null>(null);
+
 
 
     const [editData, setEditData] =
@@ -33,16 +37,8 @@ export default function CustomerProfile() {
         useState(false);
 
 
-    const [loading, setLoading] =
-        useState(true);
 
 
-    const [saving, setSaving] =
-        useState(false);
-
-
-    const [error, setError] =
-        useState("");
 
 
 
@@ -59,52 +55,22 @@ export default function CustomerProfile() {
     // Get Customer Profile
     // ==========================================
 
-    async function getProfile() {
+    const queryClient = useQueryClient();
 
-    try {
-
-        setLoading(true);
-
-        setError("");
-
-        const data = await getCustomerProfile();
-
-        setProfile(data);
-
-        setEditData({
-            username: data.username,
-        });
-
-    } catch (error) {
-
-        console.error(
-            "Profile loading error:",
-            error
-        );
-
-        setError(
-            "Failed to load your profile."
-        );
-
-    } finally {
-
-        setLoading(false);
-
-    }
-
-    }
-
+    const {
+        data: profile,
+        isLoading,
+        isError,
+        refetch,
+    } = useQuery<CustomerProfileProp>({
+        queryKey: ["customer-profile"],
+        queryFn: getCustomerProfile,
+    });
 
 
     // ==========================================
     // Load Profile
     // ==========================================
-
-    useEffect(() => {
-
-        getProfile();
-
-    }, []);
 
 
 
@@ -127,73 +93,56 @@ export default function CustomerProfile() {
 
     }
 
-
+    useEffect(() => {
+        if (profile) {
+            setEditData({
+                username: profile.username,
+            });
+        }
+    }, [profile]);
 
     // ==========================================
     // Update Profile
     // ==========================================
 
-    async function updateProfile(
-    e: React.FormEvent
-) {
+    const updateProfileMutation = useMutation({
+        mutationFn: updateCustomerProfile,
 
-    e.preventDefault();
+        onSuccess: (data) => {
+            queryClient.setQueryData(
+                ["customer-profile"],
+                data
+            );
 
-    try {
+            setEditData({
+                username: data.username,
+            });
 
-        setSaving(true);
+            setEditing(false);
+        },
 
-        setError("");
+        onError: (error: any) => {
+            console.error(
+                "Profile update error:",
+                error
+            );
+        },
+    });
+    function updateProfile(
+        e: React.FormEvent
+    ) {
+        e.preventDefault();
 
-        const data = await updateCustomerProfile(
+        updateProfileMutation.mutate(
             editData
         );
-
-        setProfile(data);
-
-        setEditData({
-            username: data.username,
-        });
-
-        setEditing(false);
-
-    } catch (error: any) {
-
-        console.error(
-            "Profile update error:",
-            error
-        );
-
-        if (error.response?.data) {
-
-            setError(
-                JSON.stringify(
-                    error.response.data
-                )
-            );
-
-        } else {
-
-            setError(
-                "Failed to update your profile."
-            );
-
-        }
-
-    } finally {
-
-        setSaving(false);
-
     }
-
-}
-
 
     // ==========================================
     // Loading
     // ==========================================
 
-    if (loading) {
+    if (isLoading) {
 
         return (
 
@@ -213,23 +162,19 @@ export default function CustomerProfile() {
     // Error
     // ==========================================
 
-    if (error && !profile) {
+    if (isError && !profile) {
 
         return (
 
             <div className="customer-profile-error">
 
                 <p>
-                    {error}
+                    {isError}
                 </p>
 
 
-                <button
-                    onClick={getProfile}
-                >
-
+                <button onClick={() => refetch()}>
                     Try Again
-
                 </button>
 
             </div>
@@ -458,11 +403,11 @@ export default function CustomerProfile() {
 
 
 
-                        {error && (
+                        {isError && (
 
                             <p className="form-error">
 
-                                {error}
+                                {isError}
 
                             </p>
 
@@ -472,54 +417,29 @@ export default function CustomerProfile() {
 
                         <div className="profile-form-actions">
 
-
                             <button
-
                                 type="button"
-
                                 className="cancel-btn"
-
                                 onClick={() => {
-
                                     setEditing(false);
 
-                                    setError("");
-
                                     setEditData({
-
-                                        username:
-                                            profile.username,
-
+                                        username: profile.username,
                                     });
-
                                 }}
-
                             >
-
                                 Cancel
-
                             </button>
-
-
-
                             <button
-
                                 type="submit"
-
                                 className="save-profile-btn"
-
-                                disabled={saving}
-
+                                disabled={updateProfileMutation.isPending}
                             >
-
-                                {saving
+                                {updateProfileMutation.isPending
                                     ? "Saving..."
                                     : "Save Changes"
                                 }
-
                             </button>
-
-
                         </div>
 
 

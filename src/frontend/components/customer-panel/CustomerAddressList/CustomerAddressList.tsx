@@ -1,9 +1,7 @@
 "use client";
 
-
-import { useEffect, useState } from "react";
-
-import { getAddresses } from "@/services/cutomer-panel.services"; 
+import { useQuery } from "@tanstack/react-query";
+import { getAddresses } from "@/services/cutomer-panel.services";
 import { Address } from "@/types/address";
 import {
     MapPin,
@@ -15,57 +13,31 @@ import {
 import "./CustomerAddressList.css";
 
 
+export default function CustomerAddressList() {
+    const {
+        data: addresses = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-addresses"],
+        queryFn: getAddresses,
+    });
+
+
+
+    if (isError) {
+        return (
+            <div className="address-loading">
+                Failed to load addresses.
+            </div>
+        );
+    }
 
 
 
 
 
-
-
-export default function CustomerAddressList(){
-
-
-
-    const [addresses,setAddresses] = useState<Address[]>([]);
-
-    const [loading,setLoading] = useState(true);
-
-
-
-
-
-   const GetAddresses = async () => {
-    try {
-        const data = await getAddresses();
-
-        setAddresses(data);
-    } catch (error) {
-        console.log(error);
-    } finally {
-        setLoading(false);
-    }};
-
-
-
-
-
-
-
-    useEffect(()=>{
-
-
-        GetAddresses();
-
-
-    },[]);
-
-
-
-
-
-
-
-    if(loading){
+    if (isLoading) {
 
 
         return (
@@ -127,76 +99,76 @@ export default function CustomerAddressList(){
                 {
 
 
-                addresses.map((address)=>(
+                    addresses.map((address) => (
 
 
 
-                    <div
+                        <div
 
-                        className="address-card"
+                            className="address-card"
 
-                        key={address.id}
+                            key={address.id}
 
-                    >
-
-
-
-
-                        <div className="address-icon">
-
-
-                            <MapPin size={28}/>
-
-
-                        </div>
+                        >
 
 
 
 
-
-                        <div className="address-content">
-
+                            <div className="address-icon">
 
 
-                            <h3>
-
-                                {address.city}
-
-                            </h3>
-
-
-
-                            <p>
-
-                                {address.state}
-
-                            </p>
-
-
-
-                            <div className="postal">
-
-
-                                <Hash size={16}/>
-
-
-                                {address.postal_code}
+                                <MapPin size={28} />
 
 
                             </div>
 
 
 
+
+
+                            <div className="address-content">
+
+
+
+                                <h3>
+
+                                    {address.city}
+
+                                </h3>
+
+
+
+                                <p>
+
+                                    {address.state}
+
+                                </p>
+
+
+
+                                <div className="postal">
+
+
+                                    <Hash size={16} />
+
+
+                                    {address.postal_code}
+
+
+                                </div>
+
+
+
+                            </div>
+
+
+
+
+
                         </div>
 
 
-
-
-
-                    </div>
-
-
-                ))
+                    ))
 
 
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import Link from "next/link";
 
@@ -17,41 +17,25 @@ import "./CustomerTicketList.css";
 
 
 
-export default function CustomerTicketList(){
+export default function CustomerTicketList() {
+    const {
+        data: tickets = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-tickets"],
+        queryFn: getCustomerTickets,
+    });
 
-    const [tickets, setTickets] = useState<CustomerTicket[]>([]);
 
-    const [loading,setLoading]=useState(true);
 
-   const GetTickets = async () => {
 
-    try {
 
-        const data = await getCustomerTickets();
+    if (
+        isLoading
+    ) {
 
-        setTickets(data);
-
-    } catch (error) {
-
-        console.log(error);
-
-    } finally {
-
-        setLoading(false);
-
-    }
-
-};
-
-    useEffect(()=>{
-
-        GetTickets();
-
-    },[]);
-
-    if(loading){
-
-        return(
+        return (
 
             <div className="ticket-loading">
 
@@ -62,8 +46,15 @@ export default function CustomerTicketList(){
         )
 
     }
+    if (isError) {
+    return (
+        <div className="ticket-loading">
+            Failed to load tickets.
+        </div>
+    );
+}
 
-    return(
+    return (
 
         <section className="customer-ticket-list">
 
@@ -87,7 +78,7 @@ export default function CustomerTicketList(){
 
                 {
 
-                    tickets.map(ticket=>(
+                    tickets.map(ticket => (
 
                         <div
 
@@ -99,7 +90,7 @@ export default function CustomerTicketList(){
 
                             <div className="ticket-icon">
 
-                                <Ticket size={30}/>
+                                <Ticket size={30} />
 
                             </div>
 
@@ -115,15 +106,15 @@ export default function CustomerTicketList(){
 
                                     {
 
-                                        ticket.content.length>120
+                                        ticket.content.length > 120
 
-                                        ?
+                                            ?
 
-                                        ticket.content.slice(0,120)+"..."
+                                            ticket.content.slice(0, 120) + "..."
 
-                                        :
+                                            :
 
-                                        ticket.content
+                                            ticket.content
 
                                     }
 
@@ -133,7 +124,7 @@ export default function CustomerTicketList(){
 
                                     <div className="ticket-store">
 
-                                        <Store size={16}/>
+                                        <Store size={16} />
 
                                         Store #{ticket.store}
 
@@ -149,7 +140,7 @@ export default function CustomerTicketList(){
 
                                         View
 
-                                        <ChevronRight size={16}/>
+                                        <ChevronRight size={16} />
 
                                     </Link>
 

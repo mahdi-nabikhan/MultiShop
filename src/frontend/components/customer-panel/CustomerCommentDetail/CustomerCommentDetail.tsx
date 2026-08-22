@@ -1,7 +1,7 @@
 "use client";
 
-
-import {useEffect,useState} from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     MessageCircle,
@@ -30,7 +30,7 @@ import "./CustomerCommentDetail.css";
 interface Props {
 
 
-    commentId:number;
+    commentId: number;
 
 
 }
@@ -43,252 +43,209 @@ export default function CustomerCommentDetail({
 
     commentId
 
-}:Props){
-
-
-
-const [comment,setComment]=useState<Comment|null>(null);
-
-
-const [openEdit,setOpenEdit]=useState(false);
-
-
-const [openDelete,setOpenDelete]=useState(false);
+}: Props) {
 
 
 
 
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
+    const {
+        data: comment,
+        isLoading,
+        isError,
+    } = useQuery<Comment>({
+        queryKey: ["comment-detail", commentId],
+        queryFn: () => getCommentDetail(commentId),
+        enabled: !!commentId,
+    });
 
 
-    const fetchComment = async () => {
-    try {
-        const data = await getCommentDetail(commentId);
-
-        setComment(data);
-
-    } catch (error) {
-        console.log(error);
+    if (isLoading) {
+        return <div>
+            Loading...
+        </div>;
     }
-};
 
+    if (isError) {
+        return <div>
+            Failed to load comment.
+        </div>;
+    }
 
+        if (!comment) {
+        return <div>Comment not found.</div>;
+    }
 
 
+    return (
 
-useEffect(()=>{
+        <section className="comment-detail">
 
+            <div className="comment-detail-header">
 
-    fetchComment()
+                <h2>
+                    Comment Details
+                </h2>
 
+                <div>
 
-},[commentId]);
+                    <button
 
+                        className="edit-btn"
 
+                        onClick={() => setOpenEdit(true)}
 
+                    >
 
+                        <Edit size={18} />
 
+                        Edit
 
+                    </button>
 
-if(!comment){
 
 
-return <div>
 
-Loading...
+                    <button
 
-</div>
+                        className="delete-btn"
 
+                        onClick={() => setOpenDelete(true)}
 
-}
+                    >
 
+                        <Trash size={18} />
 
+                        Delete
 
+                    </button>
 
 
+                </div>
 
 
-return (
 
+            </div>
 
-<section className="comment-detail">
 
 
 
 
 
-<div className="comment-detail-header">
 
+            <div className="comment-detail-card">
 
-<h2>
 
-Comment Details
 
-</h2>
+                <div className="comment-detail-icon">
 
+                    <MessageCircle size={40} />
 
-<div>
+                </div>
 
 
-<button
 
-className="edit-btn"
 
-onClick={()=>setOpenEdit(true)}
 
->
+                <div>
 
-<Edit size={18}/>
 
-Edit
+                    <h3>
 
-</button>
+                        Product #{comment.product}
 
+                    </h3>
 
 
 
-<button
+                    <p>
 
-className="delete-btn"
+                        {comment.descriptions}
 
-onClick={()=>setOpenDelete(true)}
+                    </p>
 
->
 
-<Trash size={18}/>
 
-Delete
 
-</button>
+                    <div className="comment-status">
 
 
-</div>
+                        Status:
 
+                        {
 
+                            comment.status === "C"
 
-</div>
+                                ?
 
+                                " Approved"
 
+                                :
 
+                                " Pending"
 
+                        }
 
 
+                    </div>
 
-<div className="comment-detail-card">
 
 
+                    <span>
 
-<div className="comment-detail-icon">
+                        {comment.user.email}
 
-<MessageCircle size={40}/>
+                    </span>
 
-</div>
 
 
+                </div>
 
 
 
-<div>
 
 
-<h3>
+            </div>
 
-Product #{comment.product}
 
-</h3>
 
 
 
-<p>
 
-{comment.descriptions}
 
-</p>
+            <EditCommentModal
+                open={openEdit}
+                close={() => setOpenEdit(false)}
+                comment={comment}
 
 
+            />
 
 
-<div className="comment-status">
 
 
-Status:
 
-{
+            <DeleteCommentModal
 
-comment.status==="C"
+                open={openDelete}
 
-?
+                close={() => setOpenDelete(false)}
 
-" Approved"
+                commentId={comment.id}
 
-:
+            />
 
-" Pending"
 
-}
 
 
-</div>
 
 
 
-<span>
+        </section>
 
-{comment.user.email}
 
-</span>
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
-<EditCommentModal
-
-open={openEdit}
-
-close={()=>setOpenEdit(false)}
-
-comment={comment}
-
-refresh={fetchComment}
-
-/>
-
-
-
-
-
-<DeleteCommentModal
-
-open={openDelete}
-
-close={()=>setOpenDelete(false)}
-
-commentId={comment.id}
-
-/>
-
-
-
-
-
-
-
-</section>
-
-
-);
+    );
 
 
 }

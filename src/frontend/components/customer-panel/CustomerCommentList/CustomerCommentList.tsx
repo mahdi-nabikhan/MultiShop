@@ -1,7 +1,7 @@
 "use client";
 
 
-import {useEffect,useState} from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { getCustomerComments } from "@/services/cutomer-panel.services";
 import { Comment } from "@/types/comment";
@@ -10,67 +10,22 @@ import {
     CheckCircle,
     Clock
 } from "lucide-react";
-
-
-
 import "./CustomerCommentList.css";
 
 
 
 
+export default function CustomerCommentList() {
+    const {
+        data: comments = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-comments"],
+        queryFn: getCustomerComments,
+    });
 
-
-
-
-
-export default function CustomerCommentList(){
-
-
-
-    const [comments,setComments]=useState<Comment[]>([]);
-    const [loading,setLoading]=useState(true);
-
-
-    const fetchComments = async () => {
-    try {
-        const data = await getCustomerComments();
-
-        setComments(data);
-
-    } catch (error) {
-        console.log(error);
-
-    } finally {
-        setLoading(false);
-    }
-};
-
-
-
-
-
-
-
-
-
-
-    useEffect(()=>{
-
-
-        fetchComments();
-
-
-    },[]);
-
-
-
-
-
-
-
-
-
-    if(loading){
+    if (isLoading) {
 
 
         return (
@@ -85,7 +40,13 @@ export default function CustomerCommentList(){
 
     }
 
-
+    if (isError) {
+        return (
+            <div className="comments-loading">
+                Failed to load comments.
+            </div>
+        );
+    }
 
 
 
@@ -133,102 +94,106 @@ export default function CustomerCommentList(){
                 {
 
 
-                comments.map((comment)=>(
+                    comments.map((comment) => (
 
 
 
-                    <div
+                        <div
 
-                        className="comment-card"
+                            className="comment-card"
 
-                        key={comment.id}
+                            key={comment.id}
 
-                    >
-
-
-
-
-
-                        <div className="comment-icon">
-
-
-                            <MessageCircle size={28}/>
-
-
-                        </div>
+                        >
 
 
 
 
 
-
-                        <div className="comment-content">
-
-
-                            <h3>
-
-                                Product #{comment.product}
-
-                            </h3>
+                            <div className="comment-icon">
 
 
+                                <MessageCircle size={28} />
 
 
-                            <p>
-
-                                {comment.descriptions}
-
-                            </p>
+                            </div>
 
 
 
 
 
 
-                            <div className="comment-meta">
+                            <div className="comment-content">
 
 
+                                <h3>
 
-                                <span>
+                                    Product #{comment.product}
 
-
-                                    {
-
-                                    comment.status==="C"
-
-                                    ?
-
-                                    <>
-
-                                    <CheckCircle size={16}/>
-
-                                    Approved
-
-                                    </>
-
-                                    :
-
-                                    <>
-
-                                    <Clock size={16}/>
-
-                                    Pending
-
-                                    </>
-
-                                    }
-
-
-                                </span>
+                                </h3>
 
 
 
 
-                                <small>
+                                <p>
 
-                                    {comment.user.email}
+                                    {comment.descriptions}
 
-                                </small>
+                                </p>
+
+
+
+
+
+
+                                <div className="comment-meta">
+
+
+
+                                    <span>
+
+
+                                        {
+
+                                            comment.status === "C"
+
+                                                ?
+
+                                                <>
+
+                                                    <CheckCircle size={16} />
+
+                                                    Approved
+
+                                                </>
+
+                                                :
+
+                                                <>
+
+                                                    <Clock size={16} />
+
+                                                    Pending
+
+                                                </>
+
+                                        }
+
+
+                                    </span>
+
+
+
+
+                                    <small>
+
+                                        {comment.user.email}
+
+                                    </small>
+
+
+
+                                </div>
 
 
 
@@ -236,16 +201,12 @@ export default function CustomerCommentList(){
 
 
 
+
                         </div>
 
 
 
-
-                    </div>
-
-
-
-                ))
+                    ))
 
 
                 }

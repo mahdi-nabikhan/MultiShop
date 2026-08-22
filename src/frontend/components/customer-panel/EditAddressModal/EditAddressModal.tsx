@@ -1,259 +1,211 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {useState,useEffect} from "react";
-import { updateAddress } from "@/services/cutomer-panel.services"; 
-import "./EditAddressModal.css";
+import { updateAddress } from "@/services/cutomer-panel.services";
 import { Address2 } from "@/types/address";
 
-
-
-
-
-
-
+import "./EditAddressModal.css";
 
 
 interface Props {
-
-
-    open:boolean;
-
-    onClose:()=>void;
-
-    address:Address2;
-
-    refreshAddress:()=>void;
-
-
+    open: boolean;
+    onClose: () => void;
+    address: Address2;
 }
 
 
-
-
 export default function EditAddressModal({
-
     open,
-
     onClose,
-
     address,
+}: Props) {
 
-    refreshAddress
-
-
-}:Props){
-
-
-
-    const [state,setState]=useState("");
-
-    const [city,setCity]=useState("");
-
-    const [postalCode,setPostalCode]=useState("");
+    const [state, setState] = useState("");
+    const [city, setCity] = useState("");
+    const [postalCode, setPostalCode] = useState("");
 
 
+    const queryClient = useQueryClient();
 
 
-    useEffect(()=>{
+    /* =========================
+       LOAD ADDRESS DATA
+    ========================= */
 
+    useEffect(() => {
 
-        if(address){
-
+        if (address) {
 
             setState(address.state);
-
             setCity(address.city);
-
             setPostalCode(address.postal_code);
-
 
         }
 
-
-    },[address]);
-
+    }, [address]);
 
 
+    /* =========================
+       UPDATE ADDRESS
+    ========================= */
+
+    const updateAddressMutation = useMutation({
+
+        mutationFn: () =>
+            updateAddress(
+                address.id,
+                {
+                    state,
+                    city,
+                    postal_code: postalCode,
+                }
+            ),
+
+        onSuccess: () => {
+
+            queryClient.invalidateQueries({
+                queryKey: ["address-detail", address.id],
+            });
+
+            onClose();
+
+        },
+
+        onError: (error) => {
+
+            console.error(
+                "UPDATE ADDRESS ERROR:",
+                error
+            );
+
+        },
+
+    });
 
 
+    /* =========================
+       SUBMIT
+    ========================= */
+
+    const updateAddressHandler = (
+        e: React.FormEvent
+    ) => {
+
+        e.preventDefault();
+
+        updateAddressMutation.mutate();
+
+    };
 
 
-    if(!open){
+    if (!open) {
 
         return null;
 
     }
 
 
-
-
-
-
-   const updateAddressHandler = async (
-    e: React.FormEvent
-) => {
-
-    e.preventDefault();
-
-    try {
-
-        await updateAddress(
-            address.id,
-            {
-                state,
-                city,
-                postal_code: postalCode,
-            }
-        );
-
-        refreshAddress();
-        onClose();
-
-    } catch (error) {
-
-        console.error(
-            "UPDATE ADDRESS ERROR:",
-            error
-        );
-
-    }
-
-};
-
-
-
-
-
-
-
-
     return (
 
         <div className="modal-overlay">
 
-
-
             <div className="edit-address-modal">
 
 
+                {/* HEADER */}
 
                 <div className="modal-header">
 
-
                     <h2>
-
                         Edit Address
-
                     </h2>
 
 
                     <button
-
+                        type="button"
                         onClick={onClose}
-
+                        disabled={
+                            updateAddressMutation.isPending
+                        }
                     >
-
                         ×
-
                     </button>
-
 
                 </div>
 
 
-
-
-
-
+                {/* FORM */}
 
                 <form
-
                     onSubmit={updateAddressHandler}
-
                     className="edit-address-form"
-
                 >
 
 
-
                     <input
-
                         value={state}
-
-                        onChange={(e)=>setState(e.target.value)}
-
+                        onChange={(e) =>
+                            setState(e.target.value)
+                        }
                         placeholder="State"
-
                         required
-
+                        disabled={
+                            updateAddressMutation.isPending
+                        }
                     />
 
 
-
-
-
                     <input
-
                         value={city}
-
-                        onChange={(e)=>setCity(e.target.value)}
-
+                        onChange={(e) =>
+                            setCity(e.target.value)
+                        }
                         placeholder="City"
-
                         required
-
+                        disabled={
+                            updateAddressMutation.isPending
+                        }
                     />
-
-
-
 
 
                     <input
-
                         value={postalCode}
-
-                        onChange={(e)=>setPostalCode(e.target.value)}
-
+                        onChange={(e) =>
+                            setPostalCode(e.target.value)
+                        }
                         placeholder="Postal Code"
-
                         required
-
+                        disabled={
+                            updateAddressMutation.isPending
+                        }
                     />
-
-
-
-
-
 
 
                     <button
-
                         type="submit"
-
+                        disabled={
+                            updateAddressMutation.isPending
+                        }
                     >
 
-                        Update Address
+                        {
+                            updateAddressMutation.isPending
+                                ? "Updating..."
+                                : "Update Address"
+                        }
 
                     </button>
-
-
 
 
                 </form>
 
 
-
-
-
             </div>
-
-
 
         </div>
 
-
     );
-
 
 }

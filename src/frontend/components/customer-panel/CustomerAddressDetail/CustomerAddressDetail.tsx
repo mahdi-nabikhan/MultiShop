@@ -2,73 +2,57 @@
 import EditAddressModal from "../EditAddressModal/EditAddressModal";
 import DeleteAddressModal from "../DeleteAddressModal/DeleteAddressModal";
 
-import { useEffect, useState } from "react";
-
-
-
-import {
-    MapPin,
-    Hash,
-    User
-} from "lucide-react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {MapPin,} from "lucide-react";
 import { getAddressDetail } from "@/services/cutomer-panel.services";
-import { Address } from "@/types/address";
 import "./CustomerAddressDetail.css";
 
 
+interface Props {addressId: number;}
 
 
+export default function CustomerAddressDetail({addressId}: Props) {
 
-
-
-
-
-
-interface Props {
-
-    addressId: number;
-
-}
-
-
-
-
-export default function CustomerAddressDetail({
-
-    addressId
-
-}: Props) {
-
-
-
-    const [address, setAddress] = useState<Address | null>(null);
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
 
-    const GetAddressDetail = async () => {
-    try {
-        const data = await getAddressDetail(addressId);
-
-        setAddress(data);
-    } catch (error) {
-        console.log(error);
-    }};
-
-
-
+    const {
+        data: address,
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["address-detail", addressId],
+        queryFn: () => getAddressDetail(addressId),
+        enabled: !!addressId,
+    });
 
 
 
+    if (isError) {
+        return (
+            <div className="address-detail-loading">
+                Failed to load address.
+            </div>
+        );
+    }
+
+
+    if (isLoading) {
+        return (
+            <div className="address-detail-loading">
+                Loading Address...
+            </div>
+        );
+    }
 
 
 
-    useEffect(() => {
 
 
-        GetAddressDetail();
 
 
-    }, [addressId]);
+
 
 
 
@@ -295,16 +279,9 @@ export default function CustomerAddressDetail({
 
 
             <EditAddressModal
-
                 open={openEdit}
-
                 onClose={() => setOpenEdit(false)}
-
                 address={address}
-
-                refreshAddress={GetAddressDetail}
-
-
             />
             <DeleteAddressModal
 
