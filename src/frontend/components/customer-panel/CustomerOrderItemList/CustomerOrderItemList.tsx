@@ -1,22 +1,21 @@
 "use client";
+
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import BACKEND_URLS from "@/utils";
 
 import "./CustomerOrderOtemList.css";
-import { getCustomerOrderItems, OrderItem } from "@/services/order.services";
+
+import { getCustomerOrderItems } from "@/services/order.services";
+
 import { Package } from "lucide-react";
 
-
-
-
-
+import type { OrderItem } from "@/types/order";
 
 
 interface Props {
-
     orderId: number;
-
 }
 
 
@@ -25,55 +24,18 @@ export default function CustomerOrderItemList({
 }: Props) {
 
 
-    const [items, setItems] =
-        useState<OrderItem[]>([]);
+    const {
+        data: items = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-order-items", orderId],
+        queryFn: () => getCustomerOrderItems(orderId),
+        enabled: !!orderId,
+    });
 
 
-    const [loading, setLoading] =
-        useState(true);
-
-
-    const [error, setError] =
-        useState("");
-
-
-    const fetchOrderItems = async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const data = await getCustomerOrderItems(orderId);
-
-            setItems(data);
-
-        } catch (error) {
-            console.error(
-                "GET CUSTOMER ORDER ITEMS ERROR:",
-                error
-            );
-
-            setError(
-                "Failed to load order items."
-            );
-
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    useEffect(() => {
-
-        if (!orderId) {
-            return;
-        }
-
-        fetchOrderItems();
-
-    }, [orderId]);
-
-
-    if (loading) {
+    if (isLoading) {
 
         return (
 
@@ -88,13 +50,13 @@ export default function CustomerOrderItemList({
     }
 
 
-    if (error) {
+    if (isError) {
 
         return (
 
             <div className="order-error">
 
-                {error}
+                Failed to load order items.
 
             </div>
 
@@ -136,172 +98,106 @@ export default function CustomerOrderItemList({
             </div>
 
 
-
-
             <div className="order-items-list">
 
+                {items.length === 0 ? (
 
-                {
-                    items.length === 0 ? (
+                    <div className="empty-order-items">
 
-                        <div className="empty-order-items">
+                        <Package size={40} />
 
-                            <Package size={40} />
+                        <p>
+                            No products found in this order.
+                        </p>
 
-                            <p>
-                                No products found in this order.
-                            </p>
+                    </div>
 
-                        </div>
+                ) : (
 
+                    items.map((item) => (
 
-                    ) : (
+                        <Link
+                            href={`/customer-panel/orderitem/${item.id}`}
+                            className="order-item-link"
+                            key={item.id}
+                        >
 
+                            <div className="order-item-card">
 
-                        items.map((item) => (
 
+                                <div className="product-image">
 
-                            <Link
-
-                                href={`/customer-panel/orderitem/${item.id}`}
-
-                                className="order-item-link"
-
-                                key={item.id}
-
-                            >
-
-
-                                <div className="order-item-card">
-
-
-
-                                    <div className="product-image">
-
-
-                                        <img
-
-                                            src={
-                                                `${BACKEND_URLS.replace(
-                                                    "/api/v1/",
-                                                    ""
-                                                )}${item.product.product_image}`
-                                            }
-
-                                            alt={item.product.name}
-
-                                        />
-
-
-                                    </div>
-
-
-
-
-
-                                    <div className="product-info">
-
-
-                                        <h3>
-
-                                            {item.product.name}
-
-                                        </h3>
-
-
-
-                                        <p>
-
-                                            Quantity: {item.quantity}
-
-                                        </p>
-
-
-
-                                        <span>
-
-                                            Status:
-
-                                            {
-                                                item.status === "P"
-                                                    ? " Pending"
-                                                    : ` ${item.status}`
-                                            }
-
-
-                                        </span>
-
-
-                                    </div>
-
-
-
-
-
-
-                                    <div className="product-price">
-
-
-                                        <span>
-
-                                            Unit Price
-
-                                        </span>
-
-
-
-                                        <strong>
-
-                                            ${item.product.price}
-
-                                        </strong>
-
-
-                                    </div>
-
-
-
-
-
-
-
-                                    <div className="product-total">
-
-
-                                        <span>
-
-                                            Total
-
-                                        </span>
-
-
-
-                                        <strong>
-
-                                            ${item.total}
-
-                                        </strong>
-
-
-                                    </div>
-
-
-
+                                    <img
+                                        src={
+                                            `${BACKEND_URLS.replace(
+                                                "/api/v1/",
+                                                ""
+                                            )}${item.product.product_image}`
+                                        }
+                                        alt={item.product.name}
+                                    />
 
                                 </div>
 
 
+                                <div className="product-info">
 
-                            </Link>
+                                    <h3>
+                                        {item.product.name}
+                                    </h3>
 
 
-                        ))
+                                    <p>
+                                        Quantity: {item.quantity}
+                                    </p>
 
 
-                    )
+                                    <span>
 
-                }
+                                        Status:
 
+                                        {item.status === "P"
+                                            ? " Pending"
+                                            : ` ${item.status}`}
+
+                                    </span>
+
+                                </div>
+
+
+                                <div className="product-price">
+
+                                    <span>
+                                        Unit Price
+                                    </span>
+
+                                    <strong>
+                                        ${item.product.price}
+                                    </strong>
+
+                                </div>
+
+
+                                <div className="product-total">
+
+                                    <span>
+                                        Total
+                                    </span>
+
+                                    <strong>
+                                        ${item.total}
+                                    </strong>
+
+                                </div>
+
+
+                            </div>
+
+                        </Link>
+
+                    ))
+
+                )}
 
             </div>
 

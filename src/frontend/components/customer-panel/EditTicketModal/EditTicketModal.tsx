@@ -1,311 +1,167 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+
 import { Ticket } from "@/types/ticket";
 import { updateCustomerTicket } from "@/services/ticket.services";
-import {
-    useEffect,
-    useState
-} from "react";
-
-
-
-
 
 import {
     X,
-    Save
+    Save,
 } from "lucide-react";
-
-
-
-
 
 import "./EditTicketModal.css";
 
-
-
-
-
-
 interface Props {
-
-
-    open:boolean;
-
-    close:()=>void;
-
-    ticket:Ticket;
-
-    refresh:()=>void;
-
-
+    open: boolean;
+    close: () => void;
+    ticket: Ticket;
+    refresh: () => void;
 }
 
-
-
-
-
 export default function EditTicketModal({
-
     open,
-
     close,
-
     ticket,
+    refresh,
+}: Props) {
 
-    refresh
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
 
+    useEffect(() => {
 
-}:Props){
-
-
-
-    const [title,setTitle]=useState("");
-
-    const [content,setContent]=useState("");
-
-
-
-
-
-
-
-    useEffect(()=>{
-
-
-        if(ticket){
-
+        if (ticket) {
 
             setTitle(ticket.title);
-
             setContent(ticket.content);
-
 
         }
 
+    }, [ticket]);
 
+    const {
+        mutate: updateTicket,
+        isPending,
+    } = useMutation({
 
-    },[ticket]);
+        mutationFn: () =>
+            updateCustomerTicket(
+                ticket.pk,
+                {
+                    title,
+                    content,
+                    store: ticket.store,
+                }
+            ),
 
+        onSuccess: async () => {
 
+            await refresh();
 
+            close();
 
+        },
 
+        onError: (error) => {
 
+            console.error(
+                "UPDATE TICKET ERROR:",
+                error
+            );
 
-    if(!open){
+        },
 
+    });
+
+    if (!open) {
         return null;
-
     }
 
+    const updateTicketHandler = (
+        e: React.FormEvent
+    ) => {
 
+        e.preventDefault();
 
+        updateTicket();
 
+    };
 
-
-
-
-    const updateTicketHandler = async (
-    e: React.FormEvent
-) => {
-
-    e.preventDefault();
-
-    try {
-
-        await updateCustomerTicket(
-            ticket.pk,
-            {
-                title,
-                content,
-                store: ticket.store,
-            }
-        );
-
-        refresh();
-        close();
-
-    } catch (error) {
-
-        console.error(
-            "UPDATE TICKET ERROR:",
-            error
-        );
-
-    }
-
-};
-
-
-
-
-
-
-
-
-    return(
-
-
+    return (
 
         <div className="edit-ticket-overlay">
 
-
-
-
-
             <div className="edit-ticket-modal">
-
-
-
-
-
 
                 <div className="edit-ticket-header">
 
-
                     <h2>
-
                         Edit Ticket
-
                     </h2>
 
-
-
                     <button
-
+                        type="button"
                         onClick={close}
-
+                        disabled={isPending}
                     >
-
-                        <X size={22}/>
-
+                        <X size={22} />
                     </button>
-
-
 
                 </div>
 
-
-
-
-
-
-
-
                 <form
-
                     onSubmit={updateTicketHandler}
-
                     className="edit-ticket-form"
-
                 >
 
-
-
-
-
                     <label>
-
                         Title
-
                     </label>
-
-
 
                     <input
-
-
                         value={title}
-
-
-                        onChange={(e)=>
-
+                        onChange={(e) =>
                             setTitle(e.target.value)
-
                         }
-
-
                         required
-
-
+                        disabled={isPending}
                     />
-
-
-
-
-
 
                     <label>
-
                         Content
-
                     </label>
 
-
-
-
                     <textarea
-
-
                         value={content}
-
-
-                        onChange={(e)=>
-
+                        onChange={(e) =>
                             setContent(e.target.value)
-
                         }
-
-
                         required
-
-
+                        disabled={isPending}
                     />
 
-
-
-
-
-
-
                     <button
-
                         type="submit"
-
                         className="save-ticket-btn"
-
+                        disabled={isPending}
                     >
 
-                        <Save size={18}/>
+                        <Save size={18} />
 
-
-                        Update Ticket
-
+                        {isPending
+                            ? "Updating..."
+                            : "Update Ticket"
+                        }
 
                     </button>
 
-
-
-
-
-
                 </form>
-
-
-
-
-
-
 
             </div>
 
-
-
-
         </div>
 
-
-
     );
-
 }

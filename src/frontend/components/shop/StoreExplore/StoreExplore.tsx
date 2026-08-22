@@ -1,22 +1,31 @@
 "use client";
 
-
-import {useState} from "react";
-
+import { useState } from "react";
 
 import StoreCategoryList from "../StoreCategoryList/StoreCategoryList";
-
 import StoreSlider from "../StoreSlider/StoreSlider";
 
 import "./StoreExplore.css";
 
 
+export default function StoreExplorer() {
 
-export default function StoreExplorer(){
+    const [categoryId, setCategoryId] =
+        useState<number | null>(null);
 
 
-    const [categoryId,setCategoryId]=useState<number|null>(null);
+    const handleCategorySelect = (
+        id: number
+    ) => {
 
+        setCategoryId(
+            prev =>
+                prev === id
+                    ? null
+                    : id
+        );
+
+    };
 
 
     return (
@@ -26,47 +35,26 @@ export default function StoreExplorer(){
 
             <StoreCategoryList
 
-    onSelectCategory={(id)=>{
+                onSelectCategory={
+                    handleCategorySelect
+                }
+
+            />
 
 
-        if(categoryId === id){
+            {categoryId !== null && (
 
-   
-            setCategoryId(null);
+                <StoreSlider
 
-        }
-        else{
+                    categoryId={categoryId}
 
-        
-            setCategoryId(id);
+                />
 
-        }
-
-
-    }}
-
-/>
-
-
-
-            {
-
-                categoryId && (
-
-                    <StoreSlider
-
-                        categoryId={categoryId}
-
-                    />
-
-                )
-
-            }
+            )}
 
 
         </section>
 
-    )
-
+    );
 
 }

@@ -2,7 +2,7 @@
 
 import { changePassword } from "@/services/auth.services";
 import { useState } from "react";
-
+import { useMutation } from "@tanstack/react-query";
 
 
 interface Props {
@@ -27,23 +27,41 @@ export default function ChangePasswordModal({
     });
 
 
-
-    const [loading, setLoading] = useState(false);
-
     const [message, setMessage] = useState("");
-
     const [errors, setErrors] = useState<any>({});
 
 
 
-    if(!isOpen)
+    if (!isOpen)
         return null;
 
+    const changePasswordMutation = useMutation({
+        mutationFn: changePassword,
 
+        onSuccess: () => {
+            setMessage("Password changed successfully");
+
+            setFormData({
+                old_password: "",
+                new_password: "",
+                new_password1: "",
+            });
+
+            setTimeout(() => {
+                onClose();
+            }, 1500);
+        },
+
+        onError: (error: any) => {
+            if (error.response?.data) {
+                setErrors(error.response.data);
+            }
+        },
+    });
 
     function handleChange(
         e: React.ChangeEvent<HTMLInputElement>
-    ){
+    ) {
 
         setFormData({
 
@@ -57,65 +75,13 @@ export default function ChangePasswordModal({
 
 
 
-    async function handleSubmit(
-        e: React.FormEvent
-    ){
-
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-
-        setLoading(true);
         setErrors({});
         setMessage("");
 
-
-
-        try {
-            await changePassword(formData);
-            setMessage(
-                "Password changed successfully"
-            );
-
-
-            setFormData({
-
-                old_password:"",
-                new_password:"",
-                new_password1:"",
-
-            });
-
-
-
-            setTimeout(()=>{
-
-                onClose();
-
-            },1500);
-
-
-
-        }
-
-        catch(error:any){
-
-
-            if(error.response?.data){
-
-                setErrors(
-                    error.response.data
-                );
-
-            }
-
-        }
-
-        finally{
-
-            setLoading(false);
-
-        }
-
+        changePasswordMutation.mutate(formData);
     }
 
 
@@ -240,18 +206,13 @@ export default function ChangePasswordModal({
 
 
                     <button
-                        disabled={loading}
+                        type="submit"
+                        disabled={changePasswordMutation.isPending}
                     >
-
-                        {
-                            loading
-                            ?
-                            "Changing..."
-                            :
-                            "Change Password"
+                        {changePasswordMutation.isPending
+                            ? "Changing..."
+                            : "Change Password"
                         }
-
-
                     </button>
 
 

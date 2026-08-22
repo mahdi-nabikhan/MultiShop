@@ -1,8 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import { getCustomerConversations } from "@/services/chat.services";
-import { Conversation } from "@/types/chat";
+import { useQuery } from "@tanstack/react-query";
 import "./ConversationList.css";
 
 interface Props {
@@ -15,47 +13,21 @@ export default function ConversationList({
     onSelectConversation,
 }: Props) {
 
-    const [conversations, setConversations] =
-        useState<Conversation[]>([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [error, setError] =
-        useState("");
-
-
-    const fetchConversations = async () => {
-    try {
-        setLoading(true);
-        setError("");
-
-        const data = await getCustomerConversations();
-
-        setConversations(data);
-
-    } catch (error) {
-
-        console.error(
-            "GET CUSTOMER CONVERSATIONS ERROR:",
-            error
-        );
-
-        setError("Failed to load conversations.");
-
-    } finally {
-        setLoading(false);
-    }
-};
-
-    useEffect(() => {
-
-        fetchConversations();
-
-    }, []);
+    const {
+        data: conversations = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-conversations"],
+        queryFn: getCustomerConversations,
+    });
 
 
-    if (loading) {
+
+
+
+
+    if (isLoading) {
 
         return (
 
@@ -74,7 +46,7 @@ export default function ConversationList({
     }
 
 
-    if (error) {
+    if (isError) {
 
         return (
 
@@ -82,7 +54,7 @@ export default function ConversationList({
 
                 <div className="customer-conversation-error">
 
-                    {error}
+                    Failed to load conversations.
 
                 </div>
 
@@ -137,10 +109,9 @@ export default function ConversationList({
                             type="button"
 
                             className={
-                                `customer-conversation-item ${
-                                    selectedConversation === conversation.id
-                                        ? "active"
-                                        : ""
+                                `customer-conversation-item ${selectedConversation === conversation.id
+                                    ? "active"
+                                    : ""
                                 }`
                             }
 

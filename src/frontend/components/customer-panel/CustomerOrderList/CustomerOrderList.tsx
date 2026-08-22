@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getCustomerOrders } from "@/services/order.services";
 import Link from "next/link";
-import { Order } from "@/types/order";
+
 
 
 import {
@@ -20,43 +20,22 @@ import "./CustomerOrderList.css";
 
 
 export default function CustomerOrderList() {
-
-    const [orders, setOrders] =
-        useState<Order[]>([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-
-    const getOrders = async () => {
-
-    try {
-
-        const data = await getCustomerOrders();
-
-        setOrders(data);
-
-    } catch (error) {
-
-        console.error("GET CUSTOMER ORDERS ERROR:", error);
-
-    } finally {
-
-        setLoading(false);
-
-    }
-
-};
+    const {
+        data: orders = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-orders"],
+        queryFn: getCustomerOrders,
+    });
 
 
-    useEffect(() => {
-
-        getOrders();
-
-    }, []);
 
 
-    if (loading) {
+
+
+
+    if (isLoading) {
 
         return (
 
@@ -68,6 +47,15 @@ export default function CustomerOrderList() {
 
         );
 
+    }
+
+
+    if (isError) {
+        return (
+            <div className="order-loading">
+                Failed to load orders.
+            </div>
+        );
     }
 
 

@@ -56,3 +56,20 @@ export async function sendConversationMessage(
 
     return response.data;
 }
+
+
+
+
+export async function createConversation(storeId: number) {
+    const { data } = await axios.post(
+        `${BACKEND_URLS}dashboard/api/v1/chat/conversations/`,
+        {
+            store: storeId,
+        },
+        {
+            withCredentials: true,
+        }
+    );
+
+    return data;
+}

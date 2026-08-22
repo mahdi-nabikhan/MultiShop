@@ -1,147 +1,60 @@
 "use client";
 
 
-import {useState} from "react";
-
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { createAddress } from "@/services/cutomer-panel.services";
 
-import {
-    MapPin,
-    Plus
-} from "lucide-react";
-
-
-
-
+import {MapPin,Plus} from "lucide-react";
 import "./CustomerAddressCreate.css";
 
 
+interface Props {refreshAddresses: () => void;}
 
 
-interface Props {
-
-    refreshAddresses:()=>void;
-
-}
+export default function CustomerAddressCreate({refreshAddresses}: Props) {
 
 
 
-
-export default function CustomerAddressCreate({
-
-    refreshAddresses
-
-}:Props){
-
-
-
-    const [state,setState]=useState("");
-
-    const [city,setCity]=useState("");
-
-    const [postalCode,setPostalCode]=useState("");
-
-    const [loading,setLoading]=useState(false);
-
-
-
-
-
-
-    const CreateAddress=async(e:React.FormEvent)=>{
-
-
-        e.preventDefault();
-
-
-        try{
-
-
-            setLoading(true);
-            await createAddress({
-            state,
-            city,
-            postal_code: postalCode,});
-
-
-
-           
-
-
+    const [state, setState] = useState("");
+    const [city, setCity] = useState("");
+    const [postalCode, setPostalCode] = useState("");
+    const createAddressMutation = useMutation({
+        mutationFn: createAddress,
+        onSuccess: () => {
 
             setState("");
-
             setCity("");
-
             setPostalCode("");
-
-
-
             refreshAddresses();
-
-
-
-        }
-
-
-        catch(error){
-
-
+        },
+        onError: (error) => {
             console.log(error);
-
-
-        }
-
-
-        finally{
-
-
-            setLoading(false);
-
-
-        }
-
-
-
-    };
+        },
+    });
 
 
 
 
 
 
+    const CreateAddress = (e: React.FormEvent) => {e.preventDefault();
+        createAddressMutation.mutate({
+            state,
+            city,
+            postal_code: postalCode,});};
     return (
-
-
         <section className="create-address">
-
-
-
-
-
             <div className="create-address-header">
-
-
                 <div className="address-title-icon">
-
-                    <MapPin size={24}/>
-
+                    <MapPin size={24} />
                 </div>
-
-
                 <div>
-
                     <h2>
-
-                        Add New Address
-
+                       Add New Address
                     </h2>
-
-
                     <p>
-
                         Create a new delivery address
-
                     </p>
 
                 </div>
@@ -172,7 +85,7 @@ export default function CustomerAddressCreate({
 
                     value={state}
 
-                    onChange={(e)=>setState(e.target.value)}
+                    onChange={(e) => setState(e.target.value)}
 
                     required
 
@@ -190,7 +103,7 @@ export default function CustomerAddressCreate({
 
                     value={city}
 
-                    onChange={(e)=>setCity(e.target.value)}
+                    onChange={(e) => setCity(e.target.value)}
 
                     required
 
@@ -209,7 +122,7 @@ export default function CustomerAddressCreate({
 
                     value={postalCode}
 
-                    onChange={(e)=>setPostalCode(e.target.value)}
+                    onChange={(e) => setPostalCode(e.target.value)}
 
                     required
 
@@ -224,25 +137,25 @@ export default function CustomerAddressCreate({
 
                     type="submit"
 
-                    disabled={loading}
+                    disabled={createAddressMutation.isPending}
 
                 >
 
 
-                    <Plus size={18}/>
+                    <Plus size={18} />
 
 
                     {
 
-                        loading
+                        createAddressMutation.isPending
 
-                        ?
+                            ?
 
-                        "Adding..."
+                            "Adding..."
 
-                        :
+                            :
 
-                        "Add Address"
+                            "Add Address"
 
                     }
 

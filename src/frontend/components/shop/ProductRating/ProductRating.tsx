@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
 
 import {
     canRateProduct,
@@ -28,12 +34,8 @@ export default function ProductRating({
 }: ProductRatingProps) {
 
 
-    const [canRate, setCanRate] =
-        useState(false);
-
-
-    const [loading, setLoading] =
-        useState(true);
+    const queryClient =
+        useQueryClient();
 
 
     const [selectedRate, setSelectedRate] =
@@ -44,10 +46,6 @@ export default function ProductRating({
         useState(0);
 
 
-    const [sending, setSending] =
-        useState(false);
-
-
     const [message, setMessage] =
         useState("");
 
@@ -56,87 +54,58 @@ export default function ProductRating({
     // Check Can Rate
     // ==========================================
 
-    useEffect(() => {
+    const {
+        data: canRate = false,
+        isLoading: loading,
+        isError,
+    } = useQuery({
 
-        if (!isAuthenticated) {
+        queryKey: [
+            "can-rate-product",
+            productId,
+        ],
 
-            setLoading(false);
+        queryFn: () =>
+            canRateProduct(productId),
 
-            return;
+        enabled:
+            isAuthenticated,
 
-        }
-
-
-        async function checkRate() {
-
-            try {
-
-                const canRate =
-                    await canRateProduct(productId);
-
-                setCanRate(canRate);
-
-            }
-
-            catch (error) {
-
-                console.error(
-                    "Check product rating error:",
-                    error
-                );
-
-            }
-
-            finally {
-
-                setLoading(false);
-
-            }
-
-        }
-
-
-        checkRate();
-
-    }, [
-        productId,
-        isAuthenticated,
-    ]);
+    });
 
 
     // ==========================================
     // Add Rating
     // ==========================================
 
-    async function addRate() {
+    const ratingMutation = useMutation({
 
-        if (selectedRate === 0) {
-            return;
-        }
-
-
-        try {
-
-            setSending(true);
-
-            setMessage("");
-
-
-            await addProductRating(
+        mutationFn: () =>
+            addProductRating(
                 productId,
                 selectedRate
-            );
+            ),
 
-
-            setCanRate(false);
+        onSuccess: () => {
 
             setMessage(
                 "Rating submitted successfully"
             );
 
-        }
+            setSelectedRate(0);
 
-        catch (error) {
+            queryClient.invalidateQueries({
+
+                queryKey: [
+                    "can-rate-product",
+                    productId,
+                ],
+
+            });
+
+        },
+
+        onError: (error) => {
 
             console.error(
                 "Product rating error:",
@@ -147,15 +116,32 @@ export default function ProductRating({
                 "Error submitting rating"
             );
 
+        },
+
+    });
+
+
+    // ==========================================
+    // Submit Rating
+    // ==========================================
+
+    const addRate = () => {
+
+        if (
+            selectedRate === 0 ||
+            ratingMutation.isPending
+        ) {
+
+            return;
+
         }
 
-        finally {
 
-            setSending(false);
+        setMessage("");
 
-        }
+        ratingMutation.mutate();
 
-    }
+    };
 
 
     // ==========================================
@@ -187,6 +173,29 @@ export default function ProductRating({
 
     }
 
+
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError) {
+
+        return (
+
+            <div className="rating-loading">
+
+                Failed to load rating status.
+
+            </div>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
 
@@ -230,14 +239,22 @@ export default function ProductRating({
                                         setSelectedRate(star)
                                     }
 
+                                    disabled={
+                                        ratingMutation.isPending
+                                    }
+
                                     className={
+
                                         star <=
                                         (
                                             hoverRate ||
                                             selectedRate
                                         )
+
                                             ? "active"
+
                                             : ""
+
                                     }
 
                                 >
@@ -262,13 +279,21 @@ export default function ProductRating({
 
                         onClick={addRate}
 
-                        disabled={sending}
+                        disabled={
+
+                            ratingMutation.isPending ||
+                            selectedRate === 0
+
+                        }
 
                     >
 
-                        {sending
+                        {ratingMutation.isPending
+
                             ? "Sending..."
+
                             : "Submit Rating"
+
                         }
 
                     </button>

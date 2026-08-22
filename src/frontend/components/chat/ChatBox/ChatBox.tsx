@@ -1,30 +1,32 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 
-import BACKEND_URLS from "@/utils";
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+    createConversation,
+    getConversationMessages,
+    sendConversationMessage,
+} from "@/services/chat.services";
 
 import ChatMessage from "../ChatMessage/ChatMessage";
 import ChatInput from "../ChatInput/ChatInput";
 
+import { MessageProp } from "@/types/chat";
+
 import "./ChatBox.css";
 
-interface Message {
-    id: number;
-    conversation: number;
-    text: string;
-    image: string | null;
-    file: string | null;
-    created_at: string;
-    sender: string;
-    is_read: boolean;
-}
 
 interface Props {
     storeId: number;
     currentUserEmail: string;
 }
+
 
 export default function ChatBox({
     storeId,
@@ -34,175 +36,109 @@ export default function ChatBox({
     const [conversationId, setConversationId] =
         useState<number | null>(null);
 
-    const [messages, setMessages] =
-        useState<Message[]>([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
     const messagesEndRef =
         useRef<HTMLDivElement>(null);
 
-
-    /* =========================
-       CREATE / GET CONVERSATION
-    ========================= */
-
-    const CreateConversation = async () => {
-
-        try {
-
-            console.log("STORE ID:", storeId);
-            console.log("STORE ID TYPE:", typeof storeId);
-
-            const { data } = await axios.post(
-
-                `${BACKEND_URLS}dashboard/api/v1/chat/conversations/`,
-
-                {
-                    store: storeId,
-                },
-
-                {
-                    withCredentials: true,
-                }
-
-            );
-
-            setConversationId(
-                data.conversation_id
-            );
-
-        } catch (error: any) {
-
-            console.log(
-                "CREATE CONVERSATION STATUS:",
-                error.response?.status
-            );
-
-            console.log(
-                "CREATE CONVERSATION DATA:",
-                error.response?.data
-            );
-
-            console.log(
-                "CREATE CONVERSATION ERROR:",
-                error
-            );
-
-        }
-
-    };
-
-
-    /* =========================
-       GET MESSAGES
-    ========================= */
-
-    const GetMessages = async (
-        id: number
-    ) => {
-
-        try {
-
-            const { data } = await axios.get(
-
-                `${BACKEND_URLS}dashboard/api/v1/conversations/${id}/messages/list/`,
-
-                {
-                    withCredentials: true,
-                }
-
-            );
-
-            setMessages(data);
-
-        } catch (error) {
-
-            console.log(
-                "GET MESSAGES ERROR:",
-                error
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-
-    /* =========================
-       SEND MESSAGE
-    ========================= */
-
-    const SendMessage = async (
-        text: string
-    ) => {
-
-        if (!conversationId) {
-            return;
-        }
-
-        try {
-
-            await axios.post(
-
-                `${BACKEND_URLS}dashboard/api/v1/conversations/${conversationId}/messages/`,
-
-                {
-                    text,
-                },
-
-                {
-                    withCredentials: true,
-                }
-
-            );
-
-            await GetMessages(
-                conversationId
-            );
-
-        } catch (error) {
-
-            console.log(
-                "SEND MESSAGE ERROR:",
-                error
-            );
-
-        }
-
-    };
+    const queryClient =
+        useQueryClient();
 
 
     /* =========================
        CREATE CONVERSATION
     ========================= */
 
-    useEffect(() => {
+    const createConversationMutation =
+        useMutation({
 
-        CreateConversation();
+            mutationFn: createConversation,
 
-    }, [storeId]);
+            onSuccess: (data) => {
+
+                setConversationId(
+                    data.conversation_id
+                );
+
+            },
+
+        });
 
 
     /* =========================
-       LOAD MESSAGES
+       GET MESSAGES
+    ========================= */
+
+    const {
+        data: messages = [],
+        isLoading,
+        isError,
+    } = useQuery<MessageProp[]>({
+
+        queryKey: [
+            "conversation-messages",
+            conversationId,
+        ],
+
+        queryFn: () =>
+            getConversationMessages(
+                conversationId as number
+            ),
+
+        enabled:
+            conversationId !== null,
+
+        refetchInterval: 3000,
+
+    });
+
+
+    /* =========================
+       SEND MESSAGE
+    ========================= */
+
+    const sendMessageMutation =
+        useMutation({
+
+            mutationFn: ({
+                conversationId,
+                text,
+            }: {
+                conversationId: number;
+                text: string;
+            }) =>
+                sendConversationMessage(
+                    conversationId,
+                    text
+                ),
+
+            onSuccess: () => {
+
+                queryClient.invalidateQueries({
+
+                    queryKey: [
+                        "conversation-messages",
+                        conversationId,
+                    ],
+
+                });
+
+            },
+
+        });
+
+
+    /* =========================
+       CREATE / GET CONVERSATION
     ========================= */
 
     useEffect(() => {
 
-        if (conversationId) {
+        setConversationId(null);
 
-            GetMessages(
-                conversationId
-            );
+        createConversationMutation.mutate(
+            storeId
+        );
 
-        }
-
-    }, [conversationId]);
+    }, [storeId]);
 
 
     /* =========================
@@ -221,44 +157,41 @@ export default function ChatBox({
 
 
     /* =========================
-       AUTO REFRESH
-    ========================= */
-
-    useEffect(() => {
-
-        if (!conversationId) {
-            return;
-        }
-
-        const interval =
-            setInterval(() => {
-
-                GetMessages(
-                    conversationId
-                );
-
-            }, 3000);
-
-        return () => {
-
-            clearInterval(interval);
-
-        };
-
-    }, [conversationId]);
-
-
-    /* =========================
        LOADING
     ========================= */
 
-    if (loading) {
+    if (
+        createConversationMutation.isPending ||
+        isLoading
+    ) {
 
         return (
 
             <section className="chatbox">
 
                 Loading...
+
+            </section>
+
+        );
+
+    }
+
+
+    /* =========================
+       ERROR
+    ========================= */
+
+    if (
+        createConversationMutation.isError ||
+        isError
+    ) {
+
+        return (
+
+            <section className="chatbox">
+
+                Failed to load chat.
 
             </section>
 
@@ -315,17 +248,6 @@ export default function ChatBox({
 
                 {messages.map((message) => {
 
-                    /*
-                     * API sender:
-                     *
-                     * customer1@gmail.com
-                     * manager1@gmail.com
-                     *
-                     * currentUserEmail:
-                     *
-                     * customer1@gmail.com
-                     */
-
                     const isCurrentUser =
                         message.sender
                             ?.trim()
@@ -354,13 +276,9 @@ export default function ChatBox({
                             }
 
                             sender={
-
                                 isCurrentUser
-
                                     ? "customer"
-
                                     : "seller"
-
                             }
 
                             createdAt={
@@ -388,7 +306,23 @@ export default function ChatBox({
             {/* INPUT */}
 
             <ChatInput
-                onSend={SendMessage}
+
+                onSend={(text) => {
+
+                    if (!conversationId) {
+                        return;
+                    }
+
+                    sendMessageMutation.mutate({
+
+                        conversationId,
+
+                        text,
+
+                    });
+
+                }}
+
             />
 
 

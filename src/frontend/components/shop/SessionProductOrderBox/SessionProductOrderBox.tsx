@@ -1,84 +1,162 @@
-'use client'
-import React, { cache } from 'react'
-import { addProductToSessionCart } from '@/services/order.services'
-import { useState,useEffect } from 'react'
+"use client";
 
-import './SessionProductOrderBox.css'
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { Plus, Minus, ShoppingCart } from "lucide-react";
 
+import {
+    addProductToSessionCart,
+} from "@/services/order.services";
+
+import "./SessionProductOrderBox.css";
 
 
+interface SessionProductOrderBoxProps {
+    productId: number | string;
+}
 
-function SessionProductOrderBox({productId}:{productId:number|string}) {
-    const [quantity,setQuantity]= useState(0)
-    const[loading,setLoading]=useState(false)
-    const addToCart = async()=> {
-        try{
-            setLoading(true);
-            const response =  await addProductToSessionCart(productId,quantity)
-            console.log(response)
-           
-            
 
-        }catch(err){
-            console.log(err)
+export default function SessionProductOrderBox({
+    productId,
+}: SessionProductOrderBoxProps) {
 
-        }finally{
-            setLoading(false)
-        }
-    }
-  return (
-    <div className="order-box">
 
+    const [quantity, setQuantity] =
+        useState(0);
+
+
+    const addToCartMutation = useMutation({
+
+        mutationFn: () =>
+            addProductToSessionCart(
+                productId,
+                quantity
+            ),
+
+        onSuccess: (response) => {
+
+            console.log(
+                "Product added to session cart:",
+                response
+            );
+
+        },
+
+        onError: (error) => {
+
+            console.error(
+                "Add to session cart error:",
+                error
+            );
+
+        },
+
+    });
+
+
+    const increaseQuantity = () => {
+
+        setQuantity(prev => prev + 1);
+
+    };
+
+
+    const decreaseQuantity = () => {
+
+        setQuantity(prev =>
+            prev > 1
+                ? prev - 1
+                : prev
+        );
+
+    };
+
+
+    return (
+
+        <div className="order-box">
+
+
+            {/* Quantity */}
 
             <div className="quantity-box">
 
+
                 <button
-                    onClick={() =>
-                        quantity > 1 &&
-                        setQuantity(quantity - 1)
+
+                    type="button"
+
+                    onClick={
+                        decreaseQuantity
                     }
+
                 >
-                    <Minus size={18}/>
+
+                    <Minus size={18} />
+
                 </button>
 
 
                 <span>
+
                     {quantity}
+
                 </span>
 
 
                 <button
-                    onClick={() =>
-                        setQuantity(quantity + 1)
+
+                    type="button"
+
+                    onClick={
+                        increaseQuantity
                     }
+
                 >
-                    <Plus size={18}/>
+
+                    <Plus size={18} />
+
                 </button>
+
 
             </div>
 
 
+            {/* Add To Cart */}
 
             <button
+
+                type="button"
+
                 className="cart-button"
-                onClick={addToCart}
-                disabled={loading}
+
+                onClick={() =>
+                    addToCartMutation.mutate()
+                }
+
+                disabled={
+                    addToCartMutation.isPending ||
+                    quantity <= 0
+                }
+
             >
 
-                <ShoppingCart size={20}/>
+                <ShoppingCart size={20} />
 
-                {
-                    loading
+
+                {addToCartMutation.isPending
+
                     ? "Adding..."
+
                     : "Add To Cart"
+
                 }
 
             </button>
 
 
         </div>
-  )
-}
 
-export default SessionProductOrderBox
+    );
+
+}

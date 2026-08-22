@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     ArrowLeft,
@@ -15,7 +16,7 @@ import { getCustomerTicketDetail, getCustomerTicketReplies } from "@/services/ti
 
 import EditTicketModal from "../EditTicketModal/EditTicketModal";
 import DeleteTicketModal from "../DeleteTicketModal/DeleteTicketModal";
-import type { CustomerTicketDetailProp,TicketReplyProp} from "@/types/ticket";
+import type { CustomerTicketDetailProp, TicketReplyProp } from "@/types/ticket";
 import "./CustomerTicketDetail.css";
 
 
@@ -32,90 +33,48 @@ export default function CustomerTicketDetail({
 
 }: Props) {
 
-    const [ticket, setTicket] = useState<CustomerTicketDetailProp | null>(null);
+    const {
+        data: ticket,
+        isLoading: ticketLoading,
+        isError: ticketError,
+        refetch: refetchTicket,
+    } = useQuery<CustomerTicketDetailProp>({
+        queryKey: ["customer-ticket-detail", ticketId],
+        queryFn: () => getCustomerTicketDetail(ticketId),
+        enabled: !!ticketId,
+    });
 
-    const [replies, setReplies] = useState<TicketReplyProp[]>([]);
-
-    const [loading, setLoading] = useState(true);
-
+    const {
+        data: replies = [],
+        isLoading: repliesLoading,
+        isError: repliesError,
+        refetch: refetchReplies,
+    } = useQuery<TicketReplyProp[]>({
+        queryKey: ["customer-ticket-replies", ticketId],
+        queryFn: () => getCustomerTicketReplies(ticketId),
+        enabled: !!ticketId,
+    });
     const [openEdit, setOpenEdit] = useState(false);
 
     const [openDelete, setOpenDelete] = useState(false);
 
-
-
-    const getTicket = async () => {
-
-        try {
-
-            const data =
-                await getCustomerTicketDetail(ticketId);
-
-            setTicket(data);
-
-        } catch (error) {
-
-            console.error(
-                "GET TICKET DETAIL ERROR:",
-                error
-            );
-
-        }
-
-    };
-
-    const getReplies = async () => {
-
-        try {
-
-            const data =
-                await getCustomerTicketReplies(ticketId);
-
-            setReplies(data);
-
-        } catch (error) {
-
-            console.error(
-                "GET TICKET REPLIES ERROR:",
-                error
-            );
-
-        }
-
-    };
-
-
-
-
-
-
     const Refresh = async () => {
-
-        setLoading(true);
-
         await Promise.all([
-
-            getTicket(),
-
-            getReplies()
-
+            refetchTicket(),
+            refetchReplies(),
         ]);
-
-        setLoading(false);
-
     };
 
 
 
-    useEffect(() => {
-
-        Refresh();
-
-    }, [ticketId]);
 
 
 
-    if (loading) {
+
+
+
+
+    if (ticketLoading || repliesLoading) {
 
         return (
 
@@ -145,7 +104,13 @@ export default function CustomerTicketDetail({
 
     }
 
-
+    if (ticketError || repliesError) {
+        return (
+            <div className="ticket-loading">
+                Failed to load ticket.
+            </div>
+        );
+    }
 
     return (
 

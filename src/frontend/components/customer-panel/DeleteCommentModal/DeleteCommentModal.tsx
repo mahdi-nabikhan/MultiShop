@@ -3,7 +3,7 @@
 import { Trash } from "lucide-react";
 import "./DeleteCommentModal.css";
 import { deleteComment } from "@/services/comment.services";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Props {
     open: boolean;
@@ -16,25 +16,38 @@ interface Props {
 
 
 export default function DeleteCommentModal({ open, close, commentId }: Props) {
-    const handleDeleteComment = async () => {
 
-        try {
 
-            await deleteComment(commentId);
 
-            window.location.href =
-                "/customer-panel/comments";
+    const queryClient = useQueryClient();
 
-        } catch (error) {
+    const {
+        mutate: handleDeleteComment,
+        isPending,
+    } = useMutation({
+        mutationFn: () => deleteComment(commentId),
 
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["customer-comments"],
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: ["comment-detail", commentId],
+            });
+
+            close();
+        },
+
+        onError: (error) => {
             console.error(
                 "DELETE COMMENT ERROR:",
                 error
             );
+        },
+    });
 
-        }
 
-    };
 
     if (!open) {
         return null;
@@ -118,15 +131,10 @@ export default function DeleteCommentModal({ open, close, commentId }: Props) {
 
 
                     <button
-
                         className="delete-btn"
-
-                        onClick={handleDeleteComment}
-
+                        onClick={() => handleDeleteComment()}
                     >
-
                         Delete
-
                     </button>
 
 

@@ -1,14 +1,9 @@
 "use client";
 
 
-import {
-    useEffect,
-    useState
-} from "react";
-
 
 import { getBills } from "@/services/order.services";
-
+import { useQuery } from "@tanstack/react-query";
 
 import {
     ReceiptText,
@@ -19,102 +14,37 @@ import {
     XCircle
 } from "lucide-react";
 
-
-
-
-
 import "./CustomerBillList.css";
 
 
-
-interface Cart {
-
-
-    id:number;
-
-    status:boolean;
-
-    created:string;
-
-    customer:number;
+export default function CustomerBillList() {
 
 
-}
-
-
-
-interface Bill {
-
-
-    id:number;
-
-    created_at:string;
-
-    status:boolean;
-
-    cart:Cart;
-
-    address:number;
-
-
-}
-
-
-
-
-export default function CustomerBillList(){
-
-
-
-    const [bills,setBills]=useState<Bill[]>([]);
-
-    const [loading,setLoading]=useState(true);
+    const {
+        data: bills = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-bills"],
+        queryFn: getBills,
+    });
 
 
 
 
 
 
-
-    const fetchBills = async () => {
-    try {
-        const data = await getBills();
-
-        setBills(data);
-    } catch (error) {
-        console.log(error);
-    } finally {
-        setLoading(false);
+    if (isError) {
+        return (
+            <div className="bill-loading">
+                Failed to load bills.
+            </div>
+        );
     }
-};
 
 
-
-
-
-
-    useEffect(()=>{
-
-
-        fetchBills();
-
-
-    },[]);
-
-
-
-
-
-
-
-
-
-    if(loading){
-
-
-        return(
-
-
+    if (isLoading) {
+        return (
             <div className="bill-loading">
 
                 Loading Bills...
@@ -129,56 +59,22 @@ export default function CustomerBillList(){
 
 
 
-
-
-
-
-
-    return(
-
-
+    return (
         <section className="customer-bill-list">
-
-
-
-
-
             <div className="bill-header">
-
-
                 <h2>
-
                     My Bills
-
                 </h2>
-
-
                 <span>
-
                     {bills.length} Bills
-
                 </span>
-
-
             </div>
-
-
-
-
-
-
 
             <div className="bill-grid">
 
-
-
-
-
                 {
 
-                    bills.map((bill)=>(
-
-
+                    bills.map((bill) => (
 
                         <div
 
@@ -195,7 +91,7 @@ export default function CustomerBillList(){
                             <div className="bill-icon">
 
 
-                                <ReceiptText size={32}/>
+                                <ReceiptText size={32} />
 
 
                             </div>
@@ -230,7 +126,7 @@ export default function CustomerBillList(){
                                     <div>
 
 
-                                        <CalendarDays size={16}/>
+                                        <CalendarDays size={16} />
 
 
                                         {bill.created_at}
@@ -245,7 +141,7 @@ export default function CustomerBillList(){
                                     <div>
 
 
-                                        <ShoppingCart size={16}/>
+                                        <ShoppingCart size={16} />
 
 
                                         Cart #{bill.cart.id}
@@ -261,7 +157,7 @@ export default function CustomerBillList(){
                                     <div>
 
 
-                                        <MapPin size={16}/>
+                                        <MapPin size={16} />
 
 
                                         Address #{bill.address}
@@ -285,13 +181,13 @@ export default function CustomerBillList(){
 
                                         bill.status
 
-                                        ?
+                                            ?
 
-                                        "bill-status success"
+                                            "bill-status success"
 
-                                        :
+                                            :
 
-                                        "bill-status pending"
+                                            "bill-status pending"
 
                                     }
 
@@ -303,27 +199,27 @@ export default function CustomerBillList(){
 
                                         bill.status
 
-                                        ?
+                                            ?
 
-                                        <>
+                                            <>
 
-                                        <CheckCircle size={16}/>
+                                                <CheckCircle size={16} />
 
-                                        Paid
+                                                Paid
 
-                                        </>
-
-
-                                        :
+                                            </>
 
 
-                                        <>
+                                            :
 
-                                        <XCircle size={16}/>
 
-                                        Pending
+                                            <>
 
-                                        </>
+                                                <XCircle size={16} />
+
+                                                Pending
+
+                                            </>
 
                                     }
 

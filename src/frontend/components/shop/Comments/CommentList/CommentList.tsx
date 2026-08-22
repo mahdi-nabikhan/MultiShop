@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
 import { getProductComments } from "@/services/comment.services";
 
 import CommentCard from "../CommentCard/CommentCard";
@@ -44,71 +46,32 @@ export default function CommentList({
     productID,
 }: Props) {
 
-
-    const [comments, setComments] =
-        useState<IComment[]>([]);
+    const [page, setPage] = useState(1);
 
 
-    const [next, setNext] =
-        useState<string | null>(null);
+    const {
+        data,
+        isLoading: loading,
+    } = useQuery<IResponse>({
+        queryKey: [
+            "product-comments",
+            productID,
+            page,
+        ],
 
-
-    const [previous, setPrevious] =
-        useState<string | null>(null);
-
-
-    const [page, setPage] =
-        useState(1);
-
-
-    const [loading, setLoading] =
-        useState(false);
-
-
-    async function loadComments(
-        currentPage: number
-    ) {
-
-        try {
-
-            setLoading(true);
-
-
-            const  data  =await getProductComments(productID, currentPage)
-               
-
-            setComments(data.results);
-
-            setNext(data.links.next);
-
-            setPrevious(data.links.previous);
-
-
-        } catch (error) {
-
-            console.error(error);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    }
-
-
-    useEffect(() => {
-
-        loadComments(page);
-
-    }, [page]);
+        queryFn: () =>
+            getProductComments(
+                productID,
+                page
+            ),
+    });
 
 
     return (
 
         <div className="comment-list">
 
-            {comments.map((comment) => (
+            {data?.results.map((comment) => (
 
                 <CommentCard
                     key={comment.id}
@@ -121,22 +84,25 @@ export default function CommentList({
 
             <Pagination
 
-                next={next}
+                next={
+                    data?.links.next ?? null
+                }
 
-                previous={previous}
+                previous={
+                    data?.links.previous ?? null
+                }
 
                 loading={loading}
 
                 onNext={() =>
                     setPage(
-                        (prev: number) =>
-                            prev + 1
+                        prev => prev + 1
                     )
                 }
 
                 onPrevious={() =>
                     setPage(
-                        (prev: number) =>
+                        prev =>
                             Math.max(
                                 1,
                                 prev - 1

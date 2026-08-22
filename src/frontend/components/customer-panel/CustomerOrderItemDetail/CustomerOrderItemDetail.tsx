@@ -1,16 +1,16 @@
 "use client";
 
 
-import {useEffect,useState} from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getCustomerOrderItemDetail } from "@/services/order.services";
 import type { CustomerOrderItem } from "@/types/order";
-import {Package,Clock} from "lucide-react";
+import { Package, Clock } from "lucide-react";
 import "./CustomerOrderItemDetail.css";
 import BACKEND_URLS from "@/utils";
 
 interface Props {
 
-    itemId:number;
+    itemId: number;
 
 }
 
@@ -18,49 +18,50 @@ interface Props {
 
 
 
-export default function CustomerOrderItemDetail({
+export default function CustomerOrderItemDetail({ itemId }: Props) {
+    const {
+        data: item,
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["customer-order-item-detail", itemId],
+        queryFn: () => getCustomerOrderItemDetail(itemId),
+        enabled: !!itemId,
+    });
 
-    itemId
-
-}:Props){
 
 
 
-    const [item,setItem]=useState<CustomerOrderItem|null>(null);
 
-    const fetchItemDetail = async () => {
-    try {
-        const data = await getCustomerOrderItemDetail(itemId);
 
-        setItem(data);
 
-    } catch (error) {
-        console.log(error);
+    if (isLoading) {
+
+
+        return (
+
+            <div className="order-detail-loading">
+
+                Loading...
+
+            </div>
+
+        )
+
+
     }
-    };
 
 
-
-    
-
-
-
-
-    useEffect(()=>{
-
-
-        fetchItemDetail();
+    if (isError) {
+        return (
+            <div className="order-detail-loading">
+                Failed to load order item.
+            </div>
+        );
+    }
 
 
-    },[itemId]);
-
-
-
-
-
-
-
-    if(!item){
+    if (!item) {
 
 
         return (
@@ -78,12 +79,9 @@ export default function CustomerOrderItemDetail({
 
 
 
-
-
-
     const imageUrl =
 
-    `${BACKEND_URLS.replace("/api/v1/","")}${item.product.product_image}`;
+        `${BACKEND_URLS.replace("/api/v1/", "")}${item.product.product_image}`;
 
 
 
@@ -225,8 +223,8 @@ export default function CustomerOrderItemDetail({
                             <strong>
 
                                 {
-                                new Date(item.created)
-                                .toLocaleDateString()
+                                    new Date(item.created)
+                                        .toLocaleDateString()
                                 }
 
                             </strong>
@@ -245,20 +243,20 @@ export default function CustomerOrderItemDetail({
                     <div className="detail-status">
 
 
-                        <Clock size={18}/>
+                        <Clock size={18} />
 
 
                         {
 
                             item.status === "P"
 
-                            ?
+                                ?
 
-                            "Pending"
+                                "Pending"
 
-                            :
+                                :
 
-                            item.status
+                                item.status
 
                         }
 

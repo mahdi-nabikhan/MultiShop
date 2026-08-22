@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createProductImage } from "@/services/shop-admin-panel.services";
 
 import "./AddImageProduct.css";
@@ -8,13 +9,13 @@ import "./AddImageProduct.css";
 
 interface Props {
 
-    open:boolean;
+    open: boolean;
 
-    onClose:()=>void;
+    onClose: () => void;
 
-    productId:number;
+    productId: number;
 
-    refreshImages:()=>void;
+    refreshImages: () => void;
 
 }
 
@@ -30,92 +31,102 @@ export default function AddProductImageModal({
 
     refreshImages
 
-}:Props){
+}: Props) {
 
 
-    const [image,setImage] = useState<File | null>(null);
+    const [image, setImage] = useState<File | null>(null);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const queryClient = useQueryClient();
 
-    const [title,setTitle] = useState("");
+    const createImageMutation = useMutation({
+        mutationFn: (formData: FormData) =>
+            createProductImage(productId, formData),
 
-    const [description,setDescription] = useState("");
+        onSuccess: () => {
 
-    const [loading,setLoading] = useState(false);
-    async function handleSubmit() {
+            queryClient.invalidateQueries({
+                queryKey: ["product-images", productId],
+            });
 
-    if (!image) {
-        alert("Please select an image.");
-        return;
-    }
+            setImage(null);
+            setTitle("");
+            setDescription("");
 
-    if (!image.type.startsWith("image/")) {
-        alert("Please select a valid image file.");
-        return;
-    }
+            onClose();
+        },
 
-    if (image.size > 5 * 1024 * 1024) {
-        alert("Image size cannot exceed 5MB.");
-        return;
-    }
+        onError: (error) => {
 
-    if (!title.trim()) {
-        alert("Title is required.");
-        return;
-    }
+            console.error(
+                "Image upload error:",
+                error
+            );
 
-    if (title.trim().length < 3) {
-        alert("Title must be at least 3 characters.");
-        return;
-    }
+            alert("Failed to upload image.");
+        },
+    });
+    const handleSubmit = () => {
 
-    if (title.trim().length > 200) {
-        alert("Title cannot exceed 200 characters.");
-        return;
-    }
+        if (!image) {
+            alert("Please select an image.");
+            return;
+        }
 
-    if (description.trim().length > 1000) {
-        alert("Description cannot exceed 1000 characters.");
-        return;
-    }
+        if (!image.type.startsWith("image/")) {
+            alert("Please select a valid image file.");
+            return;
+        }
 
-    const formData = new FormData();
+        if (image.size > 5 * 1024 * 1024) {
+            alert("Image size cannot exceed 5MB.");
+            return;
+        }
 
-    formData.append("product_image", image);
-    formData.append("title", title.trim());
-    formData.append("description", description.trim());
+        if (!title.trim()) {
+            alert("Title is required.");
+            return;
+        }
 
-    try {
+        if (title.trim().length < 3) {
+            alert("Title must be at least 3 characters.");
+            return;
+        }
 
-        setLoading(true);
+        if (title.trim().length > 200) {
+            alert("Title cannot exceed 200 characters.");
+            return;
+        }
 
-        await createProductImage(
-            productId,
-            formData
+        if (description.trim().length > 1000) {
+            alert(
+                "Description cannot exceed 1000 characters."
+            );
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append(
+            "product_image",
+            image
         );
 
-        alert("Image uploaded successfully.");
+        formData.append(
+            "title",
+            title.trim()
+        );
 
-        setImage(null);
-        setTitle("");
-        setDescription("");
+        formData.append(
+            "description",
+            description.trim()
+        );
 
-        refreshImages();
-        onClose();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Failed to upload image.");
-
-    } finally {
-
-        setLoading(false);
-
-    }
-}
+        createImageMutation.mutate(formData);
+    };
 
 
-    if(!open){
+    if (!open) {
 
         return null;
 
@@ -123,7 +134,7 @@ export default function AddProductImageModal({
 
 
 
-    
+
 
 
 
@@ -150,7 +161,7 @@ export default function AddProductImageModal({
 
                     accept="image/*"
 
-                    onChange={(e)=>
+                    onChange={(e) =>
 
                         setImage(
                             e.target.files?.[0] ?? null
@@ -168,7 +179,7 @@ export default function AddProductImageModal({
 
                     value={title}
 
-                    onChange={(e)=>
+                    onChange={(e) =>
 
                         setTitle(e.target.value)
 
@@ -184,7 +195,7 @@ export default function AddProductImageModal({
 
                     value={description}
 
-                    onChange={(e)=>
+                    onChange={(e) =>
 
                         setDescription(e.target.value)
 
@@ -198,24 +209,14 @@ export default function AddProductImageModal({
 
 
                     <button
-
                         onClick={handleSubmit}
-
-                        disabled={loading}
-
+                        disabled={createImageMutation.isPending}
                     >
-
-                        {
-                            loading
-                            ?
-                            "Uploading..."
-                            :
-                            "Upload"
+                        {createImageMutation.isPending
+                            ? "Uploading..."
+                            : "Upload"
                         }
-
                     </button>
-
-
 
                     <button
 

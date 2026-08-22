@@ -4,7 +4,7 @@ import { Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { deleteCustomerTicket } from "@/services/ticket.services";
 import "./DeleteTicketModal.css";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 
 interface Props { open: boolean; close: () => void; ticketId: number; }
@@ -14,30 +14,36 @@ interface Props { open: boolean; close: () => void; ticketId: number; }
 
 
 export default function DeleteTicketModal({ open, close, ticketId }: Props) {
-    const router = useRouter();
+    const queryClient = useQueryClient();
     if (!open) { return null; }
 
 
 
-    const handleDeleteTicket = async () => {
+    const {
+        mutate: handleDeleteTicket,
+        isPending,
+    } = useMutation({
+        mutationFn: () => deleteCustomerTicket(ticketId),
 
-        try {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["customer-tickets"],
+            });
 
-            await deleteCustomerTicket(ticketId);
+            await queryClient.invalidateQueries({
+                queryKey: ["customer-ticket-detail", ticketId],
+            });
 
-            router.push("/customer-panel/tickets");
+            close();
+        },
 
-        } catch (error) {
-
+        onError: (error) => {
             console.error(
                 "DELETE TICKET ERROR:",
                 error
             );
-
-        }
-
-    };
-
+        },
+    });
 
 
 
@@ -147,8 +153,8 @@ export default function DeleteTicketModal({ open, close, ticketId }: Props) {
                     <button
 
                         className="confirm-delete-ticket"
-
-                        onClick={handleDeleteTicket}
+                        onClick={() => handleDeleteTicket()}
+                        disabled={isPending}
 
                     >
 

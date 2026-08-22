@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from "axios";
 import { Mail, Lock, User } from "lucide-react";
-
+import { useMutation } from "@tanstack/react-query";
 
 import "./RegisterForm.css";
 import { register } from "@/services/auth.services";
@@ -17,17 +17,23 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const registerMutation = useMutation({
+    mutationFn: register,
 
-  async function handlerSubmit(e: React.FormEvent<HTMLFormElement>) {
+    onSuccess: () => {
+      router.push("/");
+    },
+  });
+
+
+
+
+  function handlerSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ) {
     e.preventDefault();
 
-    setLoading(true);
-    setError("");
-
-    try {
-       await register({
+    registerMutation.mutate({
       username,
       user: {
         email,
@@ -35,22 +41,6 @@ export default function RegisterForm() {
         password2,
       },
     });
-      
-
-      router.push("/");
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(
-          typeof err.response?.data === "string"
-            ? err.response.data
-            : JSON.stringify(err.response?.data)
-        );
-      } else {
-        setError("Something went wrong.");
-      }
-    } finally {
-      setLoading(false);
-    }
   }
 
   return (
@@ -115,7 +105,7 @@ export default function RegisterForm() {
             <span>I agree with terms and conditions</span>
           </label>
 
-          {error && (
+          {registerMutation.error && (
             <div
               style={{
                 color: "#ef4444",
@@ -123,16 +113,24 @@ export default function RegisterForm() {
                 textAlign: "center",
               }}
             >
-              {error}
+              {axios.isAxiosError(registerMutation.error)
+                ? typeof registerMutation.error.response?.data === "string"
+                  ? registerMutation.error.response.data
+                  : JSON.stringify(
+                    registerMutation.error.response?.data
+                  )
+                : "Something went wrong."}
             </div>
           )}
 
           <button
             type="submit"
             className="register-button"
-            disabled={loading}
+            disabled={registerMutation.isPending}
           >
-            {loading ? "Creating Account..." : "Create Account"}
+            {registerMutation.isPending
+              ? "Creating Account..."
+              : "Create Account"}
           </button>
         </form>
 

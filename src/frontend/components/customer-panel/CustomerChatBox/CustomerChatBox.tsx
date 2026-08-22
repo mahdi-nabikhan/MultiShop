@@ -1,156 +1,113 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
 import Link from "next/link";
-
 import {
     Send,
     FileText,
     Check,
     CheckCheck,
 } from "lucide-react";
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+    getConversationMessages,
+    sendConversationMessage,
+} from "@/services/chat.services";
 
 import { Message } from "@/types/chat";
-import { getConversationMessages, sendConversationMessage } from "@/services/chat.services";
+
 import "./CustomerChatBox.css";
 
-
-
-
-
 interface Props {
-
     conversationId: number | null;
-
     currentUserEmail: string;
-
 }
 
-
 export default function CustomerChatBox({
-
     conversationId,
-
     currentUserEmail,
-
 }: Props) {
 
-
-    const [messages, setMessages] =
-        useState<Message[]>([]);
-
-
-    const [loading, setLoading] =
-        useState(false);
-
-
-    const [sending, setSending] =
-        useState(false);
-
-
-    const [text, setText] =
-        useState("");
-
-
-    const [error, setError] =
-        useState("");
-
+    const [text, setText] = useState("");
 
     const messagesEndRef =
         useRef<HTMLDivElement>(null);
 
-
+    const queryClient = useQueryClient();
 
     /* =========================
        GET MESSAGES
     ========================= */
 
-    const getMessages = async () => {
+    const {
+        data: messages = [],
+        isLoading,
+        isError,
+    } = useQuery<Message[]>({
+        queryKey: [
+            "conversation-messages",
+            conversationId,
+        ],
+
+        queryFn: () =>
+            getConversationMessages(
+                conversationId!
+            ),
+
+        enabled: !!conversationId,
+
+        refetchInterval: 3000,
+    });
+
+
+    /* =========================
+       SEND MESSAGE
+    ========================= */
+
+    const sendMessageMutation = useMutation({
+        mutationFn: (message: string) =>
+            sendConversationMessage(
+                conversationId!,
+                message
+            ),
+
+        onSuccess: () => {
+
+            setText("");
+
+            queryClient.invalidateQueries({
+                queryKey: [
+                    "conversation-messages",
+                    conversationId,
+                ],
+            });
+        },
+    });
+
+
+    /* =========================
+       SEND MESSAGE HANDLER
+    ========================= */
+
+    const sendMessage = () => {
 
         if (!conversationId) {
             return;
         }
 
-        try {
-
-            setLoading(true);
-            setError("");
-
-            const data = await getConversationMessages(
-                conversationId
-            );
-
-            setMessages(data);
-
-        } catch (error) {
-
-            console.error(
-                "GET MESSAGES ERROR:",
-                error
-            );
-
-            setError(
-                "Failed to load messages."
-            );
-
-        } finally {
-
-            setLoading(false);
-
+        if (!text.trim()) {
+            return;
         }
+
+        sendMessageMutation.mutate(
+            text.trim()
+        );
     };
-
-
-
-    /* =========================
-       LOAD CONVERSATION
-    ========================= */
-
-    useEffect(() => {
-
-        setMessages([]);
-
-        setError("");
-
-
-        if (conversationId) {
-
-            getMessages();
-
-        }
-
-    }, [conversationId]);
-
-
-
-    /* =========================
-       AUTO REFRESH
-    ========================= */
-
-    useEffect(() => {
-
-        if (!conversationId) {
-            return;
-        }
-
-
-        const interval =
-            setInterval(() => {
-
-                getMessages();
-
-            }, 3000);
-
-
-        return () => {
-
-            clearInterval(interval);
-
-        };
-
-    }, [conversationId]);
-
 
 
     /* =========================
@@ -160,71 +117,10 @@ export default function CustomerChatBox({
     useEffect(() => {
 
         messagesEndRef.current?.scrollIntoView({
-
             behavior: "smooth",
-
         });
 
     }, [messages]);
-
-
-
-    /* =========================
-       SEND MESSAGE
-    ========================= */
-
-    const sendMessage = async () => {
-
-        if (!conversationId) {
-            return;
-        }
-
-
-        if (!text.trim()) {
-            return;
-        }
-
-
-        try {
-
-            setSending(true);
-
-            setError("");
-
-
-            await sendConversationMessage(
-                conversationId,
-                text.trim()
-            );
-
-
-            setText("");
-
-
-            await getMessages();
-
-
-        } catch (error) {
-
-            console.error(
-                "SEND MESSAGE ERROR:",
-                error
-            );
-
-
-            setError(
-                "Failed to send message."
-            );
-
-
-        } finally {
-
-            setSending(false);
-
-        }
-
-    };
-
 
 
     /* =========================
@@ -243,11 +139,8 @@ export default function CustomerChatBox({
             e.preventDefault();
 
             sendMessage();
-
         }
-
     };
-
 
 
     /* =========================
@@ -278,11 +171,8 @@ export default function CustomerChatBox({
                 </div>
 
             </section>
-
         );
-
     }
-
 
 
     /* =========================
@@ -292,7 +182,6 @@ export default function CustomerChatBox({
     return (
 
         <section className="customer-chatbox">
-
 
             {/* =========================
                 HEADER
@@ -323,15 +212,13 @@ export default function CustomerChatBox({
             </header>
 
 
-
             {/* =========================
                 BODY
             ========================= */}
 
             <div className="customer-chat-body">
 
-
-                {loading && messages.length === 0 ? (
+                {isLoading ? (
 
                     <div className="customer-chat-loading">
 
@@ -339,11 +226,11 @@ export default function CustomerChatBox({
 
                     </div>
 
-                ) : error && messages.length === 0 ? (
+                ) : isError ? (
 
                     <div className="customer-chat-error">
 
-                        {error}
+                        Failed to load messages.
 
                     </div>
 
@@ -361,23 +248,15 @@ export default function CustomerChatBox({
 
                     messages.map((message) => {
 
-
-                        /*
-                         * API sender:
-                         *
-                         * customer1@gmail.com
-                         *
-                         * manager1@gmail.com
-                         *
-                         */
-
-
                         const isCustomer =
                             typeof message.sender === "string" &&
                             typeof currentUserEmail === "string" &&
-                            message.sender.trim().toLowerCase() ===
-                            currentUserEmail.trim().toLowerCase();
-
+                            message.sender
+                                .trim()
+                                .toLowerCase() ===
+                            currentUserEmail
+                                .trim()
+                                .toLowerCase();
 
 
                         return (
@@ -385,15 +264,15 @@ export default function CustomerChatBox({
                             <div
                                 key={message.id}
                                 className={
-                                    `customer-message ${isCustomer
-                                        ? "customer-message-sent"
-                                        : "customer-message-received"
+                                    `customer-message ${
+                                        isCustomer
+                                            ? "customer-message-sent"
+                                            : "customer-message-received"
                                     }`
                                 }
                             >
 
                                 <div className="customer-message-bubble">
-
 
                                     {/* SENDER */}
 
@@ -404,7 +283,6 @@ export default function CustomerChatBox({
                                             : message.sender}
 
                                     </span>
-
 
 
                                     {/* TEXT */}
@@ -418,7 +296,6 @@ export default function CustomerChatBox({
                                     )}
 
 
-
                                     {/* IMAGE */}
 
                                     {message.image && (
@@ -430,7 +307,6 @@ export default function CustomerChatBox({
                                         />
 
                                     )}
-
 
 
                                     {/* FILE */}
@@ -452,7 +328,6 @@ export default function CustomerChatBox({
                                         </Link>
 
                                     )}
-
 
 
                                     {/* FOOTER */}
@@ -494,15 +369,11 @@ export default function CustomerChatBox({
 
                                     </div>
 
-
                                 </div>
 
                             </div>
-
                         );
-
                     })
-
                 )}
 
 
@@ -513,21 +384,19 @@ export default function CustomerChatBox({
             </div>
 
 
-
             {/* =========================
-                ERROR
+                SEND ERROR
             ========================= */}
 
-            {error && messages.length > 0 && (
+            {sendMessageMutation.isError &&
+                messages.length > 0 && (
 
-                <div className="customer-chat-send-error">
+                    <div className="customer-chat-send-error">
 
-                    {error}
+                        Failed to send message.
 
-                </div>
-
-            )}
-
+                    </div>
+                )}
 
 
             {/* =========================
@@ -544,7 +413,9 @@ export default function CustomerChatBox({
                         setText(e.target.value)
                     }
                     onKeyDown={handleKeyDown}
-                    disabled={sending}
+                    disabled={
+                        sendMessageMutation.isPending
+                    }
                 />
 
 
@@ -552,12 +423,12 @@ export default function CustomerChatBox({
                     type="button"
                     onClick={sendMessage}
                     disabled={
-                        sending ||
+                        sendMessageMutation.isPending ||
                         !text.trim()
                     }
                 >
 
-                    {sending ? (
+                    {sendMessageMutation.isPending ? (
 
                         "..."
 
@@ -571,9 +442,6 @@ export default function CustomerChatBox({
 
             </div>
 
-
         </section>
-
     );
-
 }

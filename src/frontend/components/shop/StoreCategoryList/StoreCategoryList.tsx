@@ -1,79 +1,81 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     getStoreCategories,
-    StoreCategory
+    StoreCategory,
 } from "@/services/shop.services";
 
 import "./StoreCategoryList.css";
 
 
 interface Props {
-
     onSelectCategory: (id: number) => void;
-
 }
 
 
 export default function StoreCategoryList({
-
-    onSelectCategory
-
+    onSelectCategory,
 }: Props) {
 
 
-    const [categories, setCategories] =
-        useState<StoreCategory[]>([]);
+    const {
+        data: categories = [],
+        isLoading,
+        isError,
+    } = useQuery<StoreCategory[]>({
 
-    const [loading, setLoading] =
-        useState(true);
+        queryKey: [
+            "store-categories",
+        ],
 
+        queryFn: getStoreCategories,
 
-    const GetCategories = async () => {
-
-        try {
-
-            const data =
-                await getStoreCategories();
-
-            setCategories(data);
-
-        }
-
-        catch (error) {
-
-            console.log(error);
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
+    });
 
 
-    useEffect(() => {
+    // ==========================================
+    // Loading
+    // ==========================================
 
-        GetCategories();
-
-    }, []);
-
-
-    if (loading) {
+    if (isLoading) {
 
         return (
+
             <div>
+
                 Loading Categories...
+
             </div>
+
         );
 
     }
 
+
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError) {
+
+        return (
+
+            <div>
+
+                Error loading categories.
+
+            </div>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
 
@@ -81,59 +83,52 @@ export default function StoreCategoryList({
 
 
             <h2>
+
                 Store Categories
+
             </h2>
 
 
             <div className="category-grid">
 
 
-                {
+                {categories.map((category) => (
 
-                    categories.map((category) => (
+                    <div
+
+                        key={category.id}
+
+                        className="category-card"
+
+                        onClick={() =>
+                            onSelectCategory(
+                                category.id
+                            )
+                        }
+
+                    >
 
                         <div
 
-                            key={category.id}
+                            className="category-icon"
 
-                            className="category-card"
-
-                            onClick={() => {
-
-                                onSelectCategory(
-                                    category.id
-                                );
-
+                            dangerouslySetInnerHTML={{
+                                __html: category.icon,
                             }}
 
-                        >
+                        />
 
 
-                            <div
+                        <h3>
 
-                                className="category-icon"
+                            {category.name}
 
-                                dangerouslySetInnerHTML={{
-
-                                    __html: category.icon
-
-                                }}
-
-                            />
+                        </h3>
 
 
-                            <h3>
+                    </div>
 
-                                {category.name}
-
-                            </h3>
-
-
-                        </div>
-
-                    ))
-
-                }
+                ))}
 
 
             </div>
