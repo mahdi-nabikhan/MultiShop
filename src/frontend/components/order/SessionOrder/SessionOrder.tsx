@@ -1,16 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import DeleteOrderItemModal from "../DeleteOrderItemModal/DeleteOrderItemModal";
+
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
 
 import {
     getSessionCart,
     getCustomerDetail,
     deleteSessionCartProduct,
-    updateSessionCartQuantity,SessionCartResponse,SessionProduct
+    updateSessionCartQuantity,
 } from "@/services/order.services";
 
-import DeleteOrderItemModal from "../DeleteOrderItemModal/DeleteOrderItemModal";
+import type {
+    SessionCartResponse,
+    SessionProduct,
+} from "@/types/order";
 
 import "./SessionOrder.css";
 
@@ -19,83 +30,115 @@ export default function SessionOrder() {
 
     const router = useRouter();
 
+    const queryClient = useQueryClient();
 
-    const [cart, setCart] = useState<SessionCartResponse | null>(null);
 
-    const [loading, setLoading] = useState(true);
+    // ==========================================
+    // Cart
+    // ==========================================
 
-    const [checkoutLoading, setCheckoutLoading] = useState(false);
+    const {
+        data: cart,
+        isLoading: loading,
+    } = useQuery<SessionCartResponse>({
+        queryKey: ["session-cart"],
+        queryFn: getSessionCart,
+    });
 
-    const [deleteLoading, setDeleteLoading] = useState(false);
 
-    const [openDelete, setOpenDelete] = useState(false);
-
-    const [selectedProduct, setSelectedProduct] =
-        useState<SessionProduct | null>(null);
+    // ==========================================
+    // Quantities
+    // ==========================================
 
     const [quantities, setQuantities] =
         useState<Record<number, number>>({});
 
 
     // ==========================================
-    // Get Cart
+    // Delete
     // ==========================================
 
-    const getCart = async () => {
+    const [openDelete, setOpenDelete] =
+        useState(false);
 
-        try {
-
-            setLoading(true);
-
-            const data = await getSessionCart();
-
-            setCart(data);
+    const [selectedProduct, setSelectedProduct] =
+        useState<SessionProduct | null>(null);
 
 
-            const quantityMap: Record<number, number> = {};
+    const deleteMutation = useMutation({
 
+        mutationFn: (productId: number) =>
+            deleteSessionCartProduct(productId),
 
-            data.items.forEach(item => {
+        onSuccess: () => {
 
-                quantityMap[item.product.id] =
-                    item.quantity;
-
+            queryClient.invalidateQueries({
+                queryKey: ["session-cart"],
             });
 
+            setOpenDelete(false);
 
-            setQuantities(quantityMap);
+            setSelectedProduct(null);
 
-        }
+        },
 
-        catch (err) {
+        onError: (error) => {
 
-            console.log(err);
+            console.error(
+                "DELETE SESSION CART PRODUCT ERROR:",
+                error
+            );
 
-        }
+        },
 
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
+    });
 
 
     // ==========================================
-    // Initial Load
+    // Update Quantity
     // ==========================================
 
-    useEffect(() => {
+    const updateMutation = useMutation({
 
-        getCart();
+        mutationFn: ({
+            productId,
+            quantity,
+        }: {
+            productId: number;
+            quantity: number;
+        }) =>
+            updateSessionCartQuantity(
+                productId,
+                quantity
+            ),
 
-    }, []);
+        onSuccess: () => {
+
+            queryClient.invalidateQueries({
+                queryKey: ["session-cart"],
+            });
+
+        },
+
+        onError: (error) => {
+
+            console.error(
+                "UPDATE SESSION CART QUANTITY ERROR:",
+                error
+            );
+
+        },
+
+    });
 
 
     // ==========================================
     // Checkout
     // ==========================================
+
+    const [checkoutLoading, setCheckoutLoading] =
+        useState(false);
+
 
     const checkout = async () => {
 
@@ -103,7 +146,8 @@ export default function SessionOrder() {
 
             setCheckoutLoading(true);
 
-            const data = await getCustomerDetail();
+            const data =
+                await getCustomerDetail();
 
 
             if (data) {
@@ -112,15 +156,11 @@ export default function SessionOrder() {
 
             }
 
-        }
-
-        catch (err) {
+        } catch (error) {
 
             router.push("/login");
 
-        }
-
-        finally {
+        } finally {
 
             setCheckoutLoading(false);
 
@@ -130,103 +170,18 @@ export default function SessionOrder() {
 
 
     // ==========================================
-    // Remove Product
+    // Delete Product
     // ==========================================
 
-    const removeProduct = async () => {
+    const removeProduct = () => {
 
         if (!selectedProduct) {
-
             return;
-
         }
 
-
-        try {
-
-            setDeleteLoading(true);
-
-
-            await deleteSessionCartProduct(
-                selectedProduct.id
-            );
-
-
-            setCart(prev => {
-
-                if (!prev) {
-
-                    return prev;
-
-                }
-
-
-                return {
-
-                    ...prev,
-
-                    items: prev.items.filter(
-
-                        item =>
-                            item.product.id !==
-                            selectedProduct.id
-
-                    )
-
-                };
-
-            });
-
-
-            setOpenDelete(false);
-
-            setSelectedProduct(null);
-
-        }
-
-        catch (err) {
-
-            console.log(err);
-
-        }
-
-        finally {
-
-            setDeleteLoading(false);
-
-        }
-
-    };
-
-
-    // ==========================================
-    // Update Quantity
-    // ==========================================
-
-    const updateQuantity = async (
-        productId: number
-    ) => {
-
-        try {
-
-            await updateSessionCartQuantity(
-
-                productId,
-
-                quantities[productId]
-
-            );
-
-
-            await getCart();
-
-        }
-
-        catch (err) {
-
-            console.log(err);
-
-        }
+        deleteMutation.mutate(
+            selectedProduct.id
+        );
 
     };
 
@@ -236,7 +191,8 @@ export default function SessionOrder() {
     // ==========================================
 
     const increaseQuantity = (
-        productId: number
+        productId: number,
+        currentQuantity: number
     ) => {
 
         setQuantities(prev => ({
@@ -244,7 +200,7 @@ export default function SessionOrder() {
             ...prev,
 
             [productId]:
-                (prev[productId] ?? 1) + 1
+                (prev[productId] ?? currentQuantity) + 1,
 
         }));
 
@@ -256,22 +212,27 @@ export default function SessionOrder() {
     // ==========================================
 
     const decreaseQuantity = (
-        productId: number
+        productId: number,
+        currentQuantity: number
     ) => {
 
-        setQuantities(prev => ({
+        setQuantities(prev => {
 
-            ...prev,
+            const quantity =
+                prev[productId] ?? currentQuantity;
 
-            [productId]:
+            return {
 
-                prev[productId] > 1
+                ...prev,
 
-                    ? prev[productId] - 1
+                [productId]:
+                    quantity > 1
+                        ? quantity - 1
+                        : 1,
 
-                    : 1
+            };
 
-        }));
+        });
 
     };
 
@@ -287,9 +248,7 @@ export default function SessionOrder() {
             <section className="session-cart-loading">
 
                 <h2>
-
                     Loading Cart...
-
                 </h2>
 
             </section>
@@ -310,16 +269,12 @@ export default function SessionOrder() {
             <section className="empty-cart">
 
                 <h1>
-
                     Your Shopping Cart Is Empty
-
                 </h1>
 
                 <p>
-
                     Start shopping and add products
                     to your cart.
-
                 </p>
 
 
@@ -350,17 +305,22 @@ export default function SessionOrder() {
 
     const subtotal = cart.items.reduce(
 
-        (sum, item) =>
+        (sum, item) => {
 
-            sum +
-
-            item.product.price_after *
-
-            (
+            const quantity =
                 quantities[item.product.id]
-                ??
-                item.quantity
-            ),
+                ?? item.quantity;
+
+            return (
+
+                sum +
+
+                item.product.price_after *
+                quantity
+
+            );
+
+        },
 
         0
 
@@ -391,20 +351,14 @@ export default function SessionOrder() {
                     <div className="cart-header">
 
                         <h1>
-
                             Shopping Cart
-
                         </h1>
 
-
                         <span>
-
                             {cart.items.length} Items
-
                         </span>
 
                     </div>
-
 
 
                     <div className="cart-content">
@@ -415,17 +369,20 @@ export default function SessionOrder() {
                         <div className="cart-items">
 
 
-                            {cart.items.map(
-                                (item) => (
+                            {cart.items.map(item => {
+
+                                const quantity =
+                                    quantities[
+                                        item.product.id
+                                    ]
+                                    ?? item.quantity;
+
+
+                                return (
 
                                     <div
-
                                         className="cart-item"
-
-                                        key={
-                                            item.product.id
-                                        }
-
+                                        key={item.product.id}
                                     >
 
 
@@ -436,8 +393,7 @@ export default function SessionOrder() {
                                             <img
 
                                                 src={
-                                                    item.product
-                                                        .product_image
+                                                    item.product.product_image
                                                     ??
                                                     "/product.jpg"
                                                 }
@@ -451,38 +407,29 @@ export default function SessionOrder() {
                                         </div>
 
 
-
                                         {/* Product Info */}
 
                                         <div className="cart-product-info">
 
                                             <h3>
-
                                                 {
-                                                    item.product
-                                                        .name
+                                                    item.product.name
                                                 }
-
                                             </h3>
 
 
                                             <p>
-
                                                 {
-                                                    item.product
-                                                        .description
+                                                    item.product.description
                                                 }
-
                                             </p>
 
 
                                             <span className="product-price">
 
                                                 $
-
                                                 {
-                                                    item.product
-                                                        .price_after
+                                                    item.product.price_after
                                                 }
 
                                             </span>
@@ -490,9 +437,7 @@ export default function SessionOrder() {
 
                                             <span className="stock">
 
-                                                Stock :
-
-                                                {" "}
+                                                Stock:{" "}
 
                                                 {
                                                     item.product
@@ -504,7 +449,6 @@ export default function SessionOrder() {
                                         </div>
 
 
-
                                         {/* Quantity */}
 
                                         <div className="quantity-control">
@@ -512,9 +456,12 @@ export default function SessionOrder() {
 
                                             <button
 
+                                                type="button"
+
                                                 onClick={() =>
                                                     decreaseQuantity(
-                                                        item.product.id
+                                                        item.product.id,
+                                                        item.quantity
                                                     )
                                                 }
 
@@ -525,20 +472,15 @@ export default function SessionOrder() {
                                             </button>
 
 
-
                                             <input
 
                                                 type="number"
 
-                                                value={
-                                                    quantities[
-                                                        item.product.id
-                                                    ]
-                                                }
+                                                min={1}
 
-                                                onChange={(
-                                                    e
-                                                ) =>
+                                                value={quantity}
+
+                                                onChange={e => {
 
                                                     setQuantities(
                                                         prev => ({
@@ -547,26 +489,25 @@ export default function SessionOrder() {
 
                                                             [item.product.id]:
                                                                 Number(
-                                                                    e.target
-                                                                        .value
-                                                                )
+                                                                    e.target.value
+                                                                ),
 
                                                         })
-                                                    )
+                                                    );
 
-                                                }
-
-                                                min={1}
+                                                }}
 
                                             />
 
 
-
                                             <button
+
+                                                type="button"
 
                                                 onClick={() =>
                                                     increaseQuantity(
-                                                        item.product.id
+                                                        item.product.id,
+                                                        item.quantity
                                                     )
                                                 }
 
@@ -577,26 +518,41 @@ export default function SessionOrder() {
                                             </button>
 
 
-
                                             <button
+
+                                                type="button"
 
                                                 className="update-btn"
 
-                                                onClick={() =>
-                                                    updateQuantity(
-                                                        item.product.id
-                                                    )
+                                                disabled={
+                                                    updateMutation.isPending
                                                 }
+
+                                                onClick={() => {
+
+                                                    updateMutation.mutate({
+
+                                                        productId:
+                                                            item.product.id,
+
+                                                        quantity,
+
+                                                    });
+
+                                                }}
 
                                             >
 
-                                                Update
+                                                {
+                                                    updateMutation.isPending
+                                                        ? "Updating..."
+                                                        : "Update"
+                                                }
 
                                             </button>
 
 
                                         </div>
-
 
 
                                         {/* Actions */}
@@ -609,26 +565,21 @@ export default function SessionOrder() {
                                                 $
 
                                                 {
+
                                                     (
-                                                        item.product
-                                                            .price_after
+                                                        item.product.price_after
                                                         *
-                                                        (
-                                                            quantities[
-                                                                item.product
-                                                                    .id
-                                                            ]
-                                                            ??
-                                                            item.quantity
-                                                        )
+                                                        quantity
                                                     ).toFixed(2)
+
                                                 }
 
                                             </strong>
 
 
-
                                             <button
+
+                                                type="button"
 
                                                 className="delete-btn"
 
@@ -656,11 +607,12 @@ export default function SessionOrder() {
 
                                     </div>
 
-                                )
-                            )}
+                                );
+
+                            })}
+
 
                         </div>
-
 
 
                         {/* Order Summary */}
@@ -669,130 +621,89 @@ export default function SessionOrder() {
 
 
                             <h2>
-
                                 Order Summary
-
                             </h2>
 
 
-
                             <div className="summary-row">
 
                                 <span>
-
                                     Total Items
-
                                 </span>
 
-
                                 <strong>
-
-                                    {
-                                        cart.total_quantity
-                                    }
-
+                                    {cart.total_quantity}
                                 </strong>
 
                             </div>
 
 
-
                             <div className="summary-row">
 
                                 <span>
-
                                     Subtotal
-
                                 </span>
 
-
                                 <strong>
-
-                                    $
-                                    {
-                                        subtotal.toFixed(2)
-                                    }
-
+                                    ${subtotal.toFixed(2)}
                                 </strong>
 
                             </div>
-
 
 
                             <div className="summary-row">
 
                                 <span>
-
                                     Shipping
-
                                 </span>
 
-
                                 <strong>
-
-                                    {
-                                        shipping === 0
-                                            ? "Free"
-                                            : `$${shipping}`
-                                    }
-
+                                    Free
                                 </strong>
 
                             </div>
-
 
 
                             <hr />
 
 
-
                             <div className="summary-total">
 
                                 <span>
-
                                     Total
-
                                 </span>
 
-
                                 <strong>
-
-                                    $
-                                    {
-                                        grandTotal.toFixed(2)
-                                    }
-
+                                    ${grandTotal.toFixed(2)}
                                 </strong>
 
                             </div>
 
 
-
                             <button
+
+                                type="button"
 
                                 className="checkout-btn"
 
                                 onClick={checkout}
 
-                                disabled={
-                                    checkoutLoading
-                                }
+                                disabled={checkoutLoading}
 
                             >
 
                                 {
                                     checkoutLoading
-
                                         ? "Loading..."
-
                                         : "Proceed To Checkout"
                                 }
 
                             </button>
 
 
-
                             <button
+
+                                type="button"
 
                                 className="continue-shopping-btn"
 
@@ -812,12 +723,9 @@ export default function SessionOrder() {
 
                     </div>
 
-
                 </div>
 
-
             </section>
-
 
 
             {/* Delete Modal */}
@@ -826,7 +734,9 @@ export default function SessionOrder() {
 
                 open={openDelete}
 
-                loading={deleteLoading}
+                loading={
+                    deleteMutation.isPending
+                }
 
                 productName={
                     selectedProduct?.name ?? ""
@@ -843,7 +753,6 @@ export default function SessionOrder() {
                 onConfirm={removeProduct}
 
             />
-
 
         </>
 

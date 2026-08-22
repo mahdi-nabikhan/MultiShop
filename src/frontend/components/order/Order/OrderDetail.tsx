@@ -2,9 +2,21 @@
 
 import DeleteOrderItemModal from "../DeleteOrderItemModal/DeleteOrderItemModal";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { getOrderItems, getOrderAddresses, createBill, deleteOrderItem, updateOrderItem } from "@/services/order.services";
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+    getOrderItems,
+    getOrderAddresses,
+    createBill,
+    deleteOrderItem,
+    updateOrderItem,
+} from "@/services/order.services";
 
 import BACKEND_URLS from "@/utils";
 
@@ -79,12 +91,19 @@ export default function OrderDetail() {
     // Order Items
     // ==========================================
 
-    const [items, setItems] =
-        useState<OrderItem[]>([]);
+    const {
 
+        data: items = [],
 
-    const [loading, setLoading] =
-        useState(true);
+        isLoading: loading,
+
+    } = useQuery({
+
+        queryKey: ["order-items"],
+
+        queryFn: getOrderItems,
+
+    });
 
 
     // ==========================================
@@ -99,8 +118,40 @@ export default function OrderDetail() {
         useState(false);
 
 
-    const [deleteLoading, setDeleteLoading] =
-        useState(false);
+    const queryClient = useQueryClient();
+
+
+    const deleteMutation = useMutation({
+
+        mutationFn: deleteOrderItem,
+
+        onSuccess: () => {
+
+            queryClient.invalidateQueries({
+
+                queryKey: ["order-items"],
+
+            });
+
+            setOpenDelete(false);
+
+            setSelectedItem(null);
+
+        },
+
+        onError: (error) => {
+
+            console.error(
+
+                "Delete order item error:",
+
+                error
+
+            );
+
+        },
+
+    });
 
 
     // ==========================================
@@ -111,16 +162,60 @@ export default function OrderDetail() {
         useState<Record<number, number>>({});
 
 
+    useEffect(() => {
+
+        const qty: Record<number, number> = {};
+
+
+        items.forEach(item => {
+
+            qty[item.id] = item.quantity;
+
+        });
+
+
+        setQuantities(qty);
+
+    }, [items]);
+
+
     // ==========================================
     // Addresses
     // ==========================================
 
-    const [addresses, setAddresses] =
-        useState<OrderAddress[]>([]);
-
-
     const [selectedAddress, setSelectedAddress] =
         useState<number | null>(null);
+
+
+    const {
+
+        data: addresses = [],
+
+        isLoading: addressesLoading,
+
+    } = useQuery({
+
+        queryKey: ["order-addresses"],
+
+        queryFn: getOrderAddresses,
+
+    });
+
+
+    useEffect(() => {
+
+        if (
+            addresses.length > 0 &&
+            selectedAddress === null
+        ) {
+
+            setSelectedAddress(
+                addresses[0].id
+            );
+
+        }
+
+    }, [addresses, selectedAddress]);
 
 
     // ==========================================
@@ -130,109 +225,6 @@ export default function OrderDetail() {
     const [checkoutLoading, setCheckoutLoading] =
         useState(false);
 
-
-    // ==========================================
-    // Get Order Items
-    // ==========================================
-
-    const getOrderItem = async () => {
-
-        try {
-
-            setLoading(true);
-
-            const data = await getOrderItems();
-
-            setItems(data);
-
-
-            const qty: Record<number, number> = {};
-
-
-            data.forEach(item => {
-
-                qty[item.id] = item.quantity;
-
-            });
-
-
-            setQuantities(qty);
-
-        }
-
-        catch (err) {
-
-            console.error(
-                "Failed to load order items:",
-                err
-            );
-
-            setItems([]);
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-
-    // ==========================================
-    // Get Addresses
-    // ==========================================
-
-    const getAddresses = async () => {
-
-        try {
-
-            const data =
-                await getOrderAddresses();
-
-
-            setAddresses(data);
-
-
-            if (data.length > 0) {
-
-                setSelectedAddress(
-                    data[0].id
-                );
-
-            }
-
-        }
-
-        catch (err) {
-
-            console.error(
-                "Failed to load addresses:",
-                err
-            );
-
-        }
-
-    };
-
-
-    // ==========================================
-    // Load Data
-    // ==========================================
-
-    useEffect(() => {
-
-        getOrderItem();
-
-        getAddresses();
-
-    }, []);
-
-
-    // ==========================================
-    // Checkout
-    // ==========================================
 
     const checkout = async () => {
 
@@ -266,7 +258,6 @@ export default function OrderDetail() {
             );
 
         }
-
         catch (err) {
 
             console.error(
@@ -280,7 +271,6 @@ export default function OrderDetail() {
             );
 
         }
-
         finally {
 
             setCheckoutLoading(false);
@@ -294,54 +284,13 @@ export default function OrderDetail() {
     // Delete Order Item
     // ==========================================
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
 
-        if (!selectedItem) {
+        if (!selectedItem) return;
 
-            return;
-
-        }
-
-
-        try {
-
-            setDeleteLoading(true);
-
-
-            await deleteOrderItem(
-                selectedItem.id
-            );
-
-
-            setItems(prev =>
-                prev.filter(
-                    item =>
-                        item.id !==
-                        selectedItem.id
-                )
-            );
-
-
-            setOpenDelete(false);
-
-            setSelectedItem(null);
-
-        }
-
-        catch (err) {
-
-            console.error(
-                "Delete order item error:",
-                err
-            );
-
-        }
-
-        finally {
-
-            setDeleteLoading(false);
-
-        }
+        deleteMutation.mutate(
+            selectedItem.id
+        );
 
     };
 
@@ -350,61 +299,43 @@ export default function OrderDetail() {
     // Update Quantity
     // ==========================================
 
-    const updateQuantity = async (
-        item: OrderItem
-    ) => {
+    const updateMutation = useMutation({
 
-        try {
-
-            const quantity =
-                quantities[item.id];
-
-
-            await updateOrderItem(
-                item.id,
+        mutationFn: ({
+            itemId,
+            quantity,
+        }: {
+            itemId: number;
+            quantity: number;
+        }) =>
+            updateOrderItem(
+                itemId,
                 quantity
-            );
+            ),
 
+        onSuccess: () => {
 
-            setItems(prev =>
+            queryClient.invalidateQueries({
 
-                prev.map(orderItem =>
+                queryKey: ["order-items"],
 
-                    orderItem.id === item.id
+            });
 
-                        ? {
+        },
 
-                            ...orderItem,
-
-                            quantity,
-
-                            total: String(
-
-                                quantity *
-                                orderItem.product.price_after
-
-                            ),
-
-                        }
-
-                        : orderItem
-
-                )
-
-            );
-
-        }
-
-        catch (err) {
+        onError: (error) => {
 
             console.error(
+
                 "Update quantity error:",
-                err
+
+                error
+
             );
 
-        }
+        },
 
-    };
+    });
 
 
     // ==========================================
@@ -477,12 +408,16 @@ export default function OrderDetail() {
                 <div>
 
                     <h1>
+
                         🛒 My Shopping Cart
+
                     </h1>
 
                     <p>
+
                         Review your products
                         before checkout.
+
                     </p>
 
                 </div>
@@ -492,18 +427,24 @@ export default function OrderDetail() {
 
                     className="checkout-top-btn"
 
-                    disabled={!selectedAddress}
+                    disabled={
+                        !selectedAddress ||
+                        checkoutLoading
+                    }
 
                     onClick={checkout}
 
                 >
 
-                    Proceed To Checkout →
+                    {
+                        checkoutLoading
+                            ? "Creating..."
+                            : "Proceed To Checkout →"
+                    }
 
                 </button>
 
             </div>
-
 
 
             {/* ==================================
@@ -516,11 +457,15 @@ export default function OrderDetail() {
                 <div className="stat-card">
 
                     <h4>
+
                         Products
+
                     </h4>
 
                     <strong>
+
                         {items.length}
+
                     </strong>
 
                 </div>
@@ -529,7 +474,9 @@ export default function OrderDetail() {
                 <div className="stat-card">
 
                     <h4>
+
                         Created
+
                     </h4>
 
                     <strong>
@@ -548,12 +495,15 @@ export default function OrderDetail() {
                 <div className="stat-card">
 
                     <h4>
+
                         Total
+
                     </h4>
 
                     <strong>
 
                         $
+
                         {total.toFixed(2)}
 
                     </strong>
@@ -562,7 +512,6 @@ export default function OrderDetail() {
 
 
             </div>
-
 
 
             {/* ==================================
@@ -629,7 +578,6 @@ export default function OrderDetail() {
                                 </div>
 
 
-
                                 {/* Product Info */}
 
                                 <div className="product-info">
@@ -653,7 +601,6 @@ export default function OrderDetail() {
                                     </p>
 
 
-
                                     {/* Product Grid */}
 
                                     <div className="product-grid">
@@ -664,7 +611,9 @@ export default function OrderDetail() {
                                         <div>
 
                                             <span>
+
                                                 Quantity
+
                                             </span>
 
 
@@ -675,14 +624,21 @@ export default function OrderDetail() {
                                                 min={1}
 
                                                 value={
-                                                    quantities[item.id]
+
+                                                    quantities[
+                                                        item.id
+                                                    ]
+
                                                     ??
+
                                                     item.quantity
+
                                                 }
 
                                                 onChange={e => {
 
                                                     setQuantities(
+
                                                         prev => ({
 
                                                             ...prev,
@@ -693,6 +649,7 @@ export default function OrderDetail() {
                                                                 ),
 
                                                         })
+
                                                     );
 
                                                 }}
@@ -702,19 +659,21 @@ export default function OrderDetail() {
                                         </div>
 
 
-
                                         {/* Price */}
 
                                         <div>
 
                                             <span>
+
                                                 Price
+
                                             </span>
 
 
                                             <strong>
 
                                                 $
+
                                                 {
                                                     item.product.price
                                                 }
@@ -724,19 +683,21 @@ export default function OrderDetail() {
                                         </div>
 
 
-
                                         {/* Discount */}
 
                                         <div>
 
                                             <span>
+
                                                 Discount
+
                                             </span>
 
 
                                             <strong>
 
                                                 $
+
                                                 {
                                                     item.product.price_after
                                                 }
@@ -746,13 +707,14 @@ export default function OrderDetail() {
                                         </div>
 
 
-
                                         {/* Total */}
 
                                         <div>
 
                                             <span>
+
                                                 Total
+
                                             </span>
 
 
@@ -763,11 +725,15 @@ export default function OrderDetail() {
                                                 {(
 
                                                     (
+
                                                         quantities[
                                                             item.id
                                                         ]
+
                                                         ??
+
                                                         item.quantity
+
                                                     )
 
                                                     *
@@ -782,7 +748,6 @@ export default function OrderDetail() {
 
 
                                     </div>
-
 
 
                                     {/* Actions */}
@@ -825,7 +790,6 @@ export default function OrderDetail() {
                                         </span>
 
 
-
                                         <div>
 
 
@@ -840,21 +804,40 @@ export default function OrderDetail() {
                                             </button>
 
 
-
                                             <button
 
                                                 className="update-btn"
 
-                                                onClick={() =>
-                                                    updateQuantity(item)
+                                                disabled={
+                                                    updateMutation.isPending
                                                 }
+
+                                                onClick={() => {
+
+                                                    updateMutation.mutate({
+
+                                                        itemId:
+                                                            item.id,
+
+                                                        quantity:
+                                                            quantities[
+                                                                item.id
+                                                            ] ??
+                                                            item.quantity,
+
+                                                    });
+
+                                                }}
 
                                             >
 
-                                                Update
+                                                {
+                                                    updateMutation.isPending
+                                                        ? "Updating..."
+                                                        : "Update"
+                                                }
 
                                             </button>
-
 
 
                                             <button
@@ -897,7 +880,6 @@ export default function OrderDetail() {
                     </div>
 
 
-
                     {/* ==================================
                         ADDRESS
                     ================================== */}
@@ -918,7 +900,6 @@ export default function OrderDetail() {
                             should be delivered.
 
                         </p>
-
 
 
                         <div className="address-list">
@@ -943,6 +924,7 @@ export default function OrderDetail() {
                                                 :
 
                                                 ""
+
                                         }`
 
                                     }
@@ -955,8 +937,10 @@ export default function OrderDetail() {
                                         type="radio"
 
                                         checked={
+
                                             selectedAddress ===
                                             address.id
+
                                         }
 
                                         onChange={() =>
@@ -969,7 +953,6 @@ export default function OrderDetail() {
 
 
                                     <div>
-
 
                                         <h4>
 
@@ -988,14 +971,15 @@ export default function OrderDetail() {
 
                                         <span>
 
-                                            Postal Code :
+                                            Postal Code:
+
                                             {" "}
+
                                             {
                                                 address.postal_code
                                             }
 
                                         </span>
-
 
                                     </div>
 
@@ -1014,7 +998,6 @@ export default function OrderDetail() {
                 </div>
 
 
-
                 {/* ==================================
                     RIGHT
                 ================================== */}
@@ -1029,69 +1012,78 @@ export default function OrderDetail() {
                     </h2>
 
 
-
                     <div className="summary-row">
 
                         <span>
+
                             Products
+
                         </span>
 
                         <strong>
+
                             {items.length}
+
                         </strong>
 
                     </div>
 
 
-
                     <div className="summary-row">
 
                         <span>
+
                             Shipping
+
                         </span>
 
                         <strong>
+
                             Free
+
                         </strong>
 
                     </div>
-
 
 
                     <div className="summary-row">
 
                         <span>
+
                             Discount
+
                         </span>
 
                         <strong>
+
                             $0.00
+
                         </strong>
 
                     </div>
-
 
 
                     <hr />
 
 
-
                     <div className="summary-total">
 
                         <span>
+
                             Total
+
                         </span>
 
 
                         <h2>
 
                             $
+
                             {total.toFixed(2)}
 
                         </h2>
 
                     </div>
-
 
 
                     <button
@@ -1101,8 +1093,10 @@ export default function OrderDetail() {
                         onClick={checkout}
 
                         disabled={
+
                             !selectedAddress ||
                             checkoutLoading
+
                         }
 
                     >
@@ -1130,7 +1124,6 @@ export default function OrderDetail() {
             </div>
 
 
-
             {/* ==================================
                 DELETE MODAL
             ================================== */}
@@ -1139,7 +1132,9 @@ export default function OrderDetail() {
 
                 open={openDelete}
 
-                loading={deleteLoading}
+                loading={
+                    deleteMutation.isPending
+                }
 
                 productName={
                     selectedItem?.product.name ?? ""
