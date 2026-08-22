@@ -1,13 +1,13 @@
+"use client";
 
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
 
-import { cookies } from "next/headers";
-import { getStoreProducts,Product } from "@/services/product.services";
-
+import { useQuery } from "@tanstack/react-query";
+import { getStoreProducts } from "@/services/product.services";
 interface ProductListProps {
 
-  shopId:string;
+  shopId: string;
 
 }
 
@@ -17,32 +17,37 @@ interface ProductListProps {
 
 
 
-export default async function ProductList({
+export default  function ProductList({
 
   shopId
 
-}:ProductListProps){
+}: ProductListProps) {
 
 
-  const cookieStore = await cookies();
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["store-products", shopId],
+    queryFn: () => getStoreProducts(shopId),
+  });
 
-  const token = cookieStore.get("access")?.value;
 
 
 
-  const headers:Record<string,string> = {};
 
+  if (isLoading) {
+    return <p>Loading products...</p>;
+  }
 
-
-  if(token){
-
-    headers.Authorization = `Bearer ${token}`;
-
+  if (isError) {
+    return <p>Error loading products.</p>;
   }
 
 
 
-  const  products = await getStoreProducts(shopId, headers);
+
 
 
 
@@ -81,7 +86,7 @@ export default async function ProductList({
 
 
         {
-          products.map((product)=>(
+          products.map((product) => (
 
             <ProductCard
 

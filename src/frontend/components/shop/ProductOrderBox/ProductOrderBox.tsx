@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import {
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
 
 import {
     Plus,
@@ -27,58 +31,45 @@ function ProductOrderBox({
 }: ProductOrderBoxProps) {
 
 
+    const queryClient = useQueryClient();
+
+
     const [quantity, setQuantity] =
         useState(0);
 
 
-    const [loading, setLoading] =
-        useState(false);
+    const addToCartMutation = useMutation({
 
-
-    // ==========================================
-    // Add Product To Cart
-    // ==========================================
-
-    const addToCart = async () => {
-
-        if (quantity <= 0) {
-            return;
-        }
-
-
-        try {
-
-            setLoading(true);
-
-
-            await addOrderItem(
+        mutationFn: () =>
+            addOrderItem(
                 productId,
                 quantity
-            );
+            ),
 
+        onSuccess: () => {
 
-            console.log(
-                "Product added to cart successfully."
-            );
+            queryClient.invalidateQueries({
+                queryKey: ["order-items"],
+            });
 
-        }
+            queryClient.invalidateQueries({
+                queryKey: ["session-cart"],
+            });
 
-        catch (error) {
+            setQuantity(0);
+
+        },
+
+        onError: (error) => {
 
             console.error(
                 "Add to cart error:",
                 error
             );
 
-        }
+        },
 
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
+    });
 
 
     return (
@@ -86,7 +77,9 @@ function ProductOrderBox({
         <div className="order-box">
 
 
-            {/* Quantity */}
+            {/* ==========================================
+                Quantity
+            ========================================== */}
 
             <div className="quantity-box">
 
@@ -95,11 +88,19 @@ function ProductOrderBox({
 
                     type="button"
 
-                    onClick={() =>
-                        quantity > 1 &&
+                    onClick={() => {
+
                         setQuantity(
-                            quantity - 1
-                        )
+                            prev =>
+                                prev > 1
+                                    ? prev - 1
+                                    : 0
+                        );
+
+                    }}
+
+                    disabled={
+                        addToCartMutation.isPending
                     }
 
                 >
@@ -120,10 +121,16 @@ function ProductOrderBox({
 
                     type="button"
 
-                    onClick={() =>
+                    onClick={() => {
+
                         setQuantity(
-                            quantity + 1
-                        )
+                            prev => prev + 1
+                        );
+
+                    }}
+
+                    disabled={
+                        addToCartMutation.isPending
                     }
 
                 >
@@ -136,7 +143,9 @@ function ProductOrderBox({
             </div>
 
 
-            {/* Add To Cart */}
+            {/* ==========================================
+                Add To Cart
+            ========================================== */}
 
             <button
 
@@ -144,10 +153,18 @@ function ProductOrderBox({
 
                 className="cart-button"
 
-                onClick={addToCart}
+                onClick={() => {
+
+                    if (quantity <= 0) {
+                        return;
+                    }
+
+                    addToCartMutation.mutate();
+
+                }}
 
                 disabled={
-                    loading ||
+                    addToCartMutation.isPending ||
                     quantity <= 0
                 }
 
@@ -156,9 +173,12 @@ function ProductOrderBox({
                 <ShoppingCart size={20} />
 
 
-                {loading
+                {addToCartMutation.isPending
+
                     ? "Adding..."
+
                     : "Add To Cart"
+
                 }
 
 

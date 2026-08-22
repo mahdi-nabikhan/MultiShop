@@ -1,59 +1,124 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
     getStoresByCategory,
-    CategoryStore
+    CategoryStore,
 } from "@/services/shop.services";
 
 import "./StoreSlider.css";
 
 
 interface Props {
-
     categoryId: number;
-
 }
 
 
 export default function StoreSlider({
-
-    categoryId
-
+    categoryId,
 }: Props) {
 
 
-    const [stores, setStores] =
-        useState<CategoryStore[]>([]);
+    const {
+        data: stores = [],
+        isLoading,
+        isError,
+    } = useQuery<CategoryStore[]>({
+
+        queryKey: [
+            "stores-by-category",
+            categoryId,
+        ],
+
+        queryFn: () =>
+            getStoresByCategory(
+                categoryId
+            ),
+
+        enabled: categoryId !== null,
+
+    });
 
 
-    const GetStores = async () => {
+    // ==========================================
+    // Loading
+    // ==========================================
 
-        try {
+    if (isLoading) {
 
-            const data =
-                await getStoresByCategory(categoryId);
+        return (
 
-            setStores(data);
+            <section className="store-slider">
 
-        }
+                <h2>
+                    Stores
+                </h2>
 
-        catch (error) {
+                <p>
+                    Loading stores...
+                </p>
 
-            console.log(error);
+            </section>
 
-        }
+        );
 
-    };
+    }
 
 
-    useEffect(() => {
+    // ==========================================
+    // Error
+    // ==========================================
 
-        GetStores();
+    if (isError) {
 
-    }, [categoryId]);
+        return (
 
+            <section className="store-slider">
+
+                <h2>
+                    Stores
+                </h2>
+
+                <p>
+                    Error loading stores.
+                </p>
+
+            </section>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // Empty
+    // ==========================================
+
+    if (stores.length === 0) {
+
+        return (
+
+            <section className="store-slider">
+
+                <h2>
+                    Stores
+                </h2>
+
+                <p>
+                    No stores found.
+                </p>
+
+            </section>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
 
@@ -70,53 +135,47 @@ export default function StoreSlider({
             <div className="store-row">
 
 
-                {
+                {stores.map((store) => (
 
-                    stores.map(store => (
+                    <div
 
-                        <div
+                        className="store-card"
 
-                            className="store-card"
+                        key={store.id}
 
-                            key={store.id}
-
-                        >
+                    >
 
 
-                            {
+                        {store.logo && (
 
-                                store.logo &&
+                            <img
 
-                                <img
+                                src={store.logo}
 
-                                    src={store.logo}
+                                alt={store.name}
 
-                                    alt={store.name}
+                            />
 
-                                />
-
-                            }
+                        )}
 
 
-                            <h3>
+                        <h3>
 
-                                {store.name}
+                            {store.name}
 
-                            </h3>
-
-
-                            <button>
-
-                                Visit Store
-
-                            </button>
+                        </h3>
 
 
-                        </div>
+                        <button>
 
-                    ))
+                            Visit Store
 
-                }
+                        </button>
+
+
+                    </div>
+
+                ))}
 
 
             </div>

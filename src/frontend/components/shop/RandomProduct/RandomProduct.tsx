@@ -1,70 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getRandomProducts,Product } from "@/services/product.services";
-import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+
+import { getRandomProducts } from "@/services/product.services";
+import type { Product } from "@/types/product";
+
 import Link from "next/link";
 import BACKEND_URLS from "@/utils";
 
 import "./RandomProduct.css";
 
 
-
 export default function RandomProducts() {
 
 
-    const [products, setProducts] = useState<Product[]>([]);
+    const {
+        data: products = [],
+        isLoading,
+        isError,
+    } = useQuery<Product[]>({
 
-    const [loading, setLoading] = useState(true);
+        queryKey: [
+            "random-products",
+        ],
 
+        queryFn:
+            getRandomProducts,
 
-
-    useEffect(() => {
-
-
-        async function fetchProducts() {
-
-
-            try {
-
-
-                const  data  = await getRandomProducts()
-
-                setProducts(data);
+    });
 
 
-            }
-            catch (error) {
+    // ==========================================
+    // Loading
+    // ==========================================
 
-                console.log(error);
-
-            }
-            finally {
-
-                setLoading(false);
-
-            }
-
-
-        }
-
-
-        fetchProducts();
-
-
-    }, []);
-
-
-
-    if (loading) {
+    if (isLoading) {
 
         return (
 
             <section className="random-products">
 
-                <h2>Recommended Products</h2>
+                <h2>
+                    Recommended Products
+                </h2>
 
-                <p>Loading...</p>
+                <p>
+                    Loading...
+                </p>
 
             </section>
 
@@ -73,6 +55,34 @@ export default function RandomProducts() {
     }
 
 
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError) {
+
+        return (
+
+            <section className="random-products">
+
+                <h2>
+                    Recommended Products
+                </h2>
+
+                <p>
+                    Failed to load products.
+                </p>
+
+            </section>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // Empty
+    // ==========================================
 
     if (products.length === 0) {
 
@@ -81,6 +91,9 @@ export default function RandomProducts() {
     }
 
 
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
 
@@ -90,98 +103,84 @@ export default function RandomProducts() {
             <div className="random-products-header">
 
                 <h2>
-
                     Recommended Products
-
                 </h2>
 
             </div>
 
 
-
             <div className="random-products-grid">
 
 
-                {
+                {products.map(product => (
 
-                    products.map(product => (
+                    <Link
 
+                        href={`/product/${product.id}`}
 
-                        <Link
+                        className="random-product-card"
 
-                            href={`/product/${product.id}`}
+                        key={product.id}
 
-                            className="random-product-card"
-
-                            key={product.id}
-
-                        >
+                    >
 
 
-                            <div className="random-product-image">
+                        <div className="random-product-image">
+
+                            <img
+
+                                src={
+                                    `${BACKEND_URLS}${product.product_image}`
+                                }
+
+                                alt={product.name}
+
+                                className="product-image"
+
+                            />
+
+                        </div>
 
 
-                                <img
-                                    src={`${BACKEND_URLS}${product.product_image}`}
-                                    alt={product.name}
-                                    className="product-image"
-                                />
+                        <div className="random-product-content">
 
 
-                            </div>
+                            <h3>
+                                {product.name}
+                            </h3>
 
 
-
-                            <div className="random-product-content">
-
-
-                                <h3>
-
-                                    {product.name}
-
-                                </h3>
+                            <p>
+                                {product.description}
+                            </p>
 
 
-
-                                <p>
-
-                                    {product.description}
-
-                                </p>
+                            <div className="random-product-footer">
 
 
+                                <span className="old-price">
 
-                                <div className="random-product-footer">
+                                    ${product.price}
 
-
-                                    <span className="old-price">
-
-                                        ${product.price}
-
-                                    </span>
+                                </span>
 
 
+                                <span className="new-price">
 
-                                    <span className="new-price">
+                                    ${product.price_after}
 
-                                        ${product.price_after}
-
-                                    </span>
-
-
-                                </div>
-
+                                </span>
 
 
                             </div>
 
 
-                        </Link>
+                        </div>
 
 
-                    ))
+                    </Link>
 
-                }
+                ))}
 
 
             </div>

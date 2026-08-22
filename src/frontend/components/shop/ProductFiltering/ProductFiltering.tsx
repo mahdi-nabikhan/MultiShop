@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getFilteredProducts,Product } from "@/services/product.services";
-import './ProductFiltering.css'
+
+import { getFilteredProducts } from "@/services/product.services";
+
+import type { Product } from "@/types/product";
+
+import "./ProductFiltering.css";
+
 
 const filters = [
     {
         title: "Lowest Price",
         value: "price_asc",
     },
-
     {
         title: "Highest Price",
         value: "price_dsc",
@@ -20,147 +24,111 @@ const filters = [
 
 export default function ProductFilterList() {
 
-
     const [order, setOrder] = useState("");
 
 
-
     const {
-        data: products,
+        data: products = [],
         isLoading,
         isError,
+    } = useQuery<Product[]>({
 
-    } = useQuery({
-
-        queryKey:[
+        queryKey: [
             "products",
-            order
+            "filter",
+            order,
         ],
 
-
-        queryFn: async()=>{
-
-            const response = await getFilteredProducts(order)
-
-
-            return response;
-
-        }
+        queryFn: () =>
+            getFilteredProducts(order),
 
     });
 
 
+    if (isError) {
 
-    if(isError)
         return (
             <p>
                 Error loading products
             </p>
         );
 
+    }
 
 
     return (
 
         <div>
 
-
             {/* Filter Buttons */}
 
             <div className="filter-buttons">
 
+                {filters.map((filter) => (
 
-                {
-                    filters.map((filter)=>(
+                    <button
+                        key={filter.value}
+                        onClick={() =>
+                            setOrder(filter.value)
+                        }
+                        className={
+                            order === filter.value
+                                ? "active"
+                                : ""
+                        }
+                    >
 
-                        <button
+                        {filter.title}
 
-                            key={filter.value}
+                    </button>
 
-                            onClick={()=>{
-                                setOrder(filter.value)
-                            }}
-
-
-                            className={
-                                order === filter.value
-                                ?
-                                "active"
-                                :
-                                ""
-                            }
-
-                        >
-
-                            {filter.title}
-
-                        </button>
-
-                    ))
-                }
-
+                ))}
 
             </div>
 
 
-
             {/* Products */}
 
-            {
-                isLoading
-
-                ?
+            {isLoading ? (
 
                 <p>
                     Loading products...
                 </p>
 
-
-                :
-
+            ) : (
 
                 <div className="product-grid">
 
+                    {products.map((product) => (
 
-                    {
-                        products?.map((product:any)=>(
+                        <div
+                            key={product.id}
+                            className="product-card"
+                        >
 
-                            <div
-                                key={product.id}
-                                className="product-card"
-                            >
+                            <img
+                                src={product.product_image ?? "/product.jpg"}
+                                alt={product.name}
+                            />
 
+                            <h3>
+                                {product.name}
+                            </h3>
 
-                                <img
-                                    src={product.product_image}
-                                    alt={product.name}
-                                />
+                            <p>
+                                ${product.price_after}
+                            </p>
 
+                        </div>
 
-                                <h3>
-                                    {product.name}
-                                </h3>
-
-
-                                <p>
-                                    {
-                                        product.price_after
-                                    }
-                                </p>
-
-
-                            </div>
-
-                        ))
-                    }
-
+                    ))}
 
                 </div>
 
-            }
-
+            )}
 
         </div>
 
     );
+
 }
