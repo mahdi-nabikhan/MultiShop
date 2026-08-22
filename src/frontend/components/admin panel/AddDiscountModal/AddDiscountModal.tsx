@@ -1,26 +1,61 @@
 'use client'
 
-import { useState } from 'react'
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import './AddDiscountModal.css'
-import React from 'react'
+
 import { createProductDiscount } from '@/services/shop-admin-panel.services'
 interface Props {
     open: boolean;
     onClose: () => void;
     productId: number;
-    refreshDiscounts: () => void;
 }
 
 function AddDiscountModal({
     open,
     onClose,
-    productId,
-    refreshDiscounts
+    productId
 }: Props) {
+    const queryClient = useQueryClient();
     const [value, setValue] = useState('')
     const [discountType, setDiscountType] = useState<'cash' | 'percent'>('cash')
-    const [loading, setLoading] = useState(false)
+    const createDiscountMutation = useMutation({
+    mutationFn: (discountValue: number) =>
+        createProductDiscount(
+            productId,
+            {
+                value: discountValue,
+                discount_type: discountType,
+            }
+        ),
+
+    onSuccess: () => {
+
+        queryClient.invalidateQueries({
+            queryKey: [
+                "product-discounts",
+                productId,
+            ],
+        });
+
+        setValue("");
+        setDiscountType("cash");
+
+        onClose();
+    },
+
+    onError: (error) => {
+
+        console.error(
+            "Create discount error:",
+            error
+        );
+
+        alert("Something went wrong");
+    },
+});
     if (!open) return null
+
 
     const submitHandler = async (
         e: React.FormEvent<HTMLFormElement>
@@ -30,61 +65,63 @@ function AddDiscountModal({
 
         const discountValue = Number(value);
 
+
+        // ==========================================
+        // Validation
+        // ==========================================
+
         if (!value.trim()) {
+
             alert("Discount value is required.");
+
             return;
+
         }
+
 
         if (Number.isNaN(discountValue)) {
+
             alert("Discount value must be a valid number.");
+
             return;
+
         }
 
+
         if (discountValue <= 0) {
-            alert("Discount value must be greater than 0.");
+
+            alert(
+                "Discount value must be greater than 0."
+            );
+
             return;
+
         }
+
 
         if (
             discountType === "percent" &&
             discountValue > 100
         ) {
-            alert("Percentage discount cannot exceed 100.");
-            return;
-        }
 
-        try {
-
-            setLoading(true);
-
-            await createProductDiscount(
-                productId,
-                {
-                    value: discountValue,
-                    discount_type: discountType,
-                }
+            alert(
+                "Percentage discount cannot exceed 100."
             );
 
-            alert("Discount created successfully");
-
-            setValue("");
-            setDiscountType("cash");
-
-            refreshDiscounts();
-            onClose();
-
-        } catch (err) {
-
-            console.log(err);
-
-            alert("Something went wrong");
-
-        } finally {
-
-            setLoading(false);
+            return;
 
         }
+
+
+        // ==========================================
+        // Create Discount
+        // ==========================================
+
+        createDiscountMutation.mutate(discountValue);
+
     };
+
+
 
     return (
         <div className="modal-overlay">
@@ -152,12 +189,11 @@ function AddDiscountModal({
                         <button
                             type="submit"
                             className="save-btn"
-                            disabled={loading}
+                            disabled={createDiscountMutation.isPending}
                         >
-                            {
-                                loading
-                                    ? "Creating..."
-                                    : "Create Discount"
+                            {createDiscountMutation.isPending
+                                ? "Creating..."
+                                : "Create Discount"
                             }
                         </button>
 

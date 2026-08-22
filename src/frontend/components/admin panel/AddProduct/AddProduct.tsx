@@ -1,6 +1,7 @@
 "use client";
-
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+
 import { createProduct } from "@/services/shop-admin-panel.services";
 import "./AddProduct.css";
 
@@ -14,9 +15,32 @@ export default function AddProduct() {
     const [category, setCategory] = useState("");
     const [image, setImage] = useState<File | null>(null);
 
-    const [loading, setLoading] = useState(false);
+    const createProductMutation = useMutation({
+        mutationFn: (formData: FormData) =>
+            createProduct(formData),
 
-    const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+        onSuccess: () => {
+            alert("Product created successfully.");
+
+            setName("");
+            setDescription("");
+            setPrice("");
+            setPriceAfter("");
+            setStock("");
+            setCategory("");
+            setImage(null);
+        },
+
+        onError: (error) => {
+            console.error("Create product error:", error);
+
+            alert("Something went wrong.");
+        },
+    });
+
+    const submitHandler = async (
+        e: React.FormEvent<HTMLFormElement>
+    ) => {
         e.preventDefault();
 
         const trimmedName = name.trim();
@@ -26,6 +50,10 @@ export default function AddProduct() {
         const productPriceAfter = Number(priceAfter);
         const productStock = Number(stock);
         const productCategory = Number(category);
+
+        // ==========================================
+        // Validation
+        // ==========================================
 
         if (!trimmedName) {
             alert("Product name is required.");
@@ -56,11 +84,16 @@ export default function AddProduct() {
         }
 
         if (productPriceAfter > productPrice) {
-            alert("Sale price cannot be greater than the original price.");
+            alert(
+                "Sale price cannot be greater than the original price."
+            );
             return;
         }
 
-        if (Number.isNaN(productStock) || productStock < 0) {
+        if (
+            Number.isNaN(productStock) ||
+            productStock < 0
+        ) {
             alert("Stock cannot be negative.");
             return;
         }
@@ -78,40 +111,54 @@ export default function AddProduct() {
             return;
         }
 
-        try {
-            setLoading(true);
+        // ==========================================
+        // Form Data
+        // ==========================================
 
-            const formData = new FormData();
+        const formData = new FormData();
 
-            formData.append("name", trimmedName);
-            formData.append("description", trimmedDescription);
-            formData.append("price", String(productPrice));
-            formData.append("price_after", String(productPriceAfter));
-            formData.append("quantity_in_stock", String(productStock));
-            formData.append("category", String(productCategory));
+        formData.append(
+            "name",
+            trimmedName
+        );
 
-            if (image) {
-                formData.append("product_image", image);
-            }
+        formData.append(
+            "description",
+            trimmedDescription
+        );
 
-            await createProduct(formData);
+        formData.append(
+            "price",
+            String(productPrice)
+        );
 
-            alert("Product created successfully.");
+        formData.append(
+            "price_after",
+            String(productPriceAfter)
+        );
 
-            setName("");
-            setDescription("");
-            setPrice("");
-            setPriceAfter("");
-            setStock("");
-            setCategory("");
-            setImage(null);
+        formData.append(
+            "quantity_in_stock",
+            String(productStock)
+        );
 
-        } catch (err) {
-            console.log(err);
-            alert("Something went wrong.");
-        } finally {
-            setLoading(false);
+        formData.append(
+            "category",
+            String(productCategory)
+        );
+
+        if (image) {
+            formData.append(
+                "product_image",
+                image
+            );
         }
+
+        // ==========================================
+        // Mutation
+        // ==========================================
+
+        createProductMutation.mutate(formData);
     };
     return (
 
@@ -241,13 +288,13 @@ export default function AddProduct() {
                 }
 
                 <button
+                    type="submit"
                     className="create-btn"
-                    disabled={loading}
+                    disabled={createProductMutation.isPending}
                 >
-                    {
-                        loading
-                            ? "Creating..."
-                            : "Create Product"
+                    {createProductMutation.isPending
+                        ? "Creating..."
+                        : "Create Product"
                     }
                 </button>
 
