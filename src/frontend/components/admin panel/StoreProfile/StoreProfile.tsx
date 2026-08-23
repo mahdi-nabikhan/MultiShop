@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 
 import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import {
     getStoreProfile,
     updateStoreProfile,
 } from "@/services/shop-admin-panel.services";
@@ -26,8 +32,7 @@ interface StoreFormData {
 
 export default function StoreProfile() {
 
-    const [store, setStore] =
-        useState<StoreData | null>(null);
+    const queryClient = useQueryClient();
 
 
     const [formData, setFormData] =
@@ -38,14 +43,6 @@ export default function StoreProfile() {
 
 
     const [editing, setEditing] =
-        useState(false);
-
-
-    const [loading, setLoading] =
-        useState(true);
-
-
-    const [saving, setSaving] =
         useState(false);
 
 
@@ -61,147 +58,59 @@ export default function StoreProfile() {
        GET STORE
     ========================= */
 
-    async function getStore() {
-
-        try {
-
-            setLoading(true);
-
-            setError("");
-
-
-            const data =
-                await getStoreProfile();
-
-
-            console.log(
-                "STORE RESPONSE:",
-                data
-            );
-
-
-            setStore(data);
-
-
-            setFormData({
-
-                name:
-                    data.name ?? "",
-
-                description:
-                    data.description ?? "",
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                "GET STORE ERROR:",
-                error
-            );
-
-
-            setError(
-                "Failed to load store information."
-            );
-
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    }
-
-
-    useEffect(() => {
-
-        getStore();
-
-    }, []);
+    const {
+        data: store,
+        isPending: loading,
+        isError,
+    } = useQuery<StoreData>({
+        queryKey: ["store-profile"],
+        queryFn: getStoreProfile,
+    });
 
 
     /* =========================
-       HANDLE INPUT
+       SET FORM DATA
     ========================= */
 
-    function handleChange(
-        e: React.ChangeEvent<
-            HTMLInputElement |
-            HTMLTextAreaElement
-        >
-    ) {
+    useEffect(() => {
 
-        const {
-            name,
-            value
-        } = e.target;
+        if (!store) {
+            return;
+        }
 
+        setFormData({
 
-        setFormData(
-            (prev) => ({
+            name:
+                store.name ?? "",
 
-                ...prev,
+            description:
+                store.description ?? "",
 
-                [name]: value,
+        });
 
-            })
-        );
-
-    }
+    }, [store]);
 
 
     /* =========================
        UPDATE STORE
     ========================= */
 
-    async function handleSubmit(
-        e: React.FormEvent
-    ) {
+    const updateMutation = useMutation({
 
-        e.preventDefault();
+        mutationFn: (
+            data: StoreFormData
+        ) =>
+            updateStoreProfile(data),
 
+        onSuccess: (updatedStore) => {
 
-        try {
+            queryClient.invalidateQueries({
 
-            setSaving(true);
+                queryKey: [
+                    "store-profile",
+                ],
 
-            setError("");
-
-            setSuccess("");
-
-
-            const updatedStore =
-                await updateStoreProfile(
-                    formData
-                );
-
-
-            console.log(
-                "UPDATED STORE:",
-                updatedStore
-            );
-
-
-            setStore(
-                (prev) => ({
-
-                    ...prev,
-
-                    ...updatedStore,
-
-                    name:
-                        updatedStore.name ??
-                        formData.name,
-
-                    description:
-                        updatedStore.description ??
-                        formData.description,
-
-                })
-            );
+            });
 
 
             setFormData({
@@ -225,7 +134,11 @@ export default function StoreProfile() {
             );
 
 
-        } catch (error: any) {
+            setError("");
+
+        },
+
+        onError: (error: any) => {
 
             console.error(
                 "UPDATE STORE ERROR:",
@@ -246,7 +159,6 @@ export default function StoreProfile() {
                 ) {
 
                     setError(data);
-
 
                 } else if (
                     typeof data === "object"
@@ -270,7 +182,6 @@ export default function StoreProfile() {
                         "Failed to update store."
                     );
 
-
                 } else {
 
                     setError(
@@ -278,7 +189,6 @@ export default function StoreProfile() {
                     );
 
                 }
-
 
             } else {
 
@@ -288,12 +198,60 @@ export default function StoreProfile() {
 
             }
 
+        },
 
-        } finally {
+    });
 
-            setSaving(false);
 
-        }
+    /* =========================
+       HANDLE INPUT
+    ========================= */
+
+    function handleChange(
+        e: React.ChangeEvent<
+            HTMLInputElement |
+            HTMLTextAreaElement
+        >
+    ) {
+
+        const {
+            name,
+            value,
+        } = e.target;
+
+
+        setFormData(
+            (prev) => ({
+
+                ...prev,
+
+                [name]: value,
+
+            })
+        );
+
+    }
+
+
+    /* =========================
+       HANDLE SUBMIT
+    ========================= */
+
+    function handleSubmit(
+        e: React.FormEvent
+    ) {
+
+        e.preventDefault();
+
+
+        setError("");
+
+        setSuccess("");
+
+
+        updateMutation.mutate(
+            formData
+        );
 
     }
 
@@ -356,7 +314,7 @@ export default function StoreProfile() {
        ERROR
     ========================= */
 
-    if (!store) {
+    if (isError || !store) {
 
         return (
 
@@ -372,8 +330,13 @@ export default function StoreProfile() {
     }
 
 
+    /* =========================
+       STORE DATA
+    ========================= */
+
     const storeName =
-        store.name ?? "Unnamed Store";
+        store.name ??
+        "Unnamed Store";
 
 
     const storeDescription =
@@ -384,7 +347,8 @@ export default function StoreProfile() {
     const storeInitial =
         storeName
             .charAt(0)
-            .toUpperCase() || "S";
+            .toUpperCase() ||
+        "S";
 
 
     /* =========================
@@ -588,7 +552,7 @@ export default function StoreProfile() {
                             type="button"
                             className="store-cancel-button"
                             onClick={handleCancel}
-                            disabled={saving}
+                            disabled={updateMutation.isPending}
                         >
 
                             Cancel
@@ -599,10 +563,10 @@ export default function StoreProfile() {
                         <button
                             type="submit"
                             className="store-save-button"
-                            disabled={saving}
+                            disabled={updateMutation.isPending}
                         >
 
-                            {saving
+                            {updateMutation.isPending
                                 ? "Saving..."
                                 : "Save Changes"}
 

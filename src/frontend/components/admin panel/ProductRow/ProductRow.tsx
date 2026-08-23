@@ -5,6 +5,7 @@ import {
 } from "@/services/shop-admin-panel.services";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import DeleteModal from "../DeleteModal/DeleteModal";
 
 interface ShopProductListData {
@@ -27,33 +28,24 @@ export default function ProductRow({ product }: Props) {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
 
-  const [loading, setLoading] = useState(false);
-  const handleDelete = async () => {
-
-    try {
-
-      setLoading(true);
-
-      await deleteProduct(product.id);
-
+    onSuccess: () => {
       setOpen(false);
-
       router.refresh();
+    },
 
-    } catch (err) {
-
+    onError: (err) => {
       console.error(
         "Failed to delete product:",
         err
       );
+    },
+  });
 
-    } finally {
-
-      setLoading(false);
-
-    }
-
+  const handleDelete = () => {
+    deleteMutation.mutate(product.id);
   };
 
 
@@ -128,7 +120,7 @@ export default function ProductRow({ product }: Props) {
 
       <DeleteModal
         open={open}
-        loading={loading}
+        loading={deleteMutation.isPending}
         title="Delete Product"
         message={`Are you sure you want to delete "${product.name}"? This action cannot be undone.`}
         onClose={() => setOpen(false)}

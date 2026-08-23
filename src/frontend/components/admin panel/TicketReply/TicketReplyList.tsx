@@ -1,76 +1,79 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getTicketReplies } from "@/services/shop-admin-panel.services";
 import { Reply } from "@/types/panel-admin";
 import "./TicketReply.css";
-
+import { useState } from "react";
 import AddReplyModal from "./AddReplyModal";
 import EditReplyModal from "./EditReplyModal";
 import DeleteReplyModal from "./DeleteReplyModal";
 
-
-
 interface Props {
-
     ticketId: number;
-
 }
 
 export default function TicketReplyList({
-
     ticketId,
-
 }: Props) {
 
-    const [replies, setReplies] = useState<Reply[]>([]);
-
-    const [loading, setLoading] = useState(true);
+    const queryClient = useQueryClient();
 
     const [openAdd, setOpenAdd] = useState(false);
-
     const [openEdit, setOpenEdit] = useState(false);
-
     const [openDelete, setOpenDelete] = useState(false);
 
     const [selectedReply, setSelectedReply] =
         useState<Reply | null>(null);
-    const getReplies = async () => {
 
-        try {
+    const {
+        data: replies = [],
+        isPending,
+        isError,
+    } = useQuery<Reply[]>({
+        queryKey: ["ticket-replies", ticketId],
+        queryFn: () => getTicketReplies(ticketId),
+    });
 
-            const data = await getTicketReplies(ticketId);
 
-            setReplies(data);
+    const refreshReplies = async () => {
 
-        } catch (err) {
-
-            console.error(
-                "Failed to load ticket replies:",
-                err
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
+        await queryClient.invalidateQueries({
+            queryKey: ["ticket-replies", ticketId],
+        });
 
     };
 
 
+    const handleCloseEdit = () => {
 
-    useEffect(() => {
+        setOpenEdit(false);
+        setSelectedReply(null);
 
-        getReplies();
+    };
 
-    }, [ticketId]);
 
-    if (loading) {
+    const handleCloseDelete = () => {
+
+        setOpenDelete(false);
+        setSelectedReply(null);
+
+    };
+
+
+    if (isPending) {
 
         return <h2>Loading...</h2>;
 
     }
+
+
+    if (isError) {
+
+        return <h2>Failed to load replies</h2>;
+
+    }
+
 
     return (
 
@@ -79,17 +82,12 @@ export default function TicketReplyList({
             <div className="reply-header">
 
                 <h2>
-
                     Replies
-
                 </h2>
 
                 <button
-
                     onClick={() => setOpenAdd(true)}
-
                     className="add-reply-btn"
-
                 >
 
                     + Add Reply
@@ -98,122 +96,107 @@ export default function TicketReplyList({
 
             </div>
 
+
             {
 
-                replies.map((reply) => (
+                replies.length === 0 ? (
 
-                    <div
+                    <p>
+                        No replies yet.
+                    </p>
 
-                        className="reply-card"
+                ) : (
 
-                        key={reply.id}
+                    replies.map((reply) => (
 
-                    >
+                        <div
+                            className="reply-card"
+                            key={reply.id}
+                        >
 
-                        <p>
+                            <p>
+                                {reply.content}
+                            </p>
 
-                            {reply.content}
+                            <span>
+                                {reply.created}
+                            </span>
 
-                        </p>
+                            <div className="reply-actions">
 
-                        <span>
+                                <button
+                                    className="edit"
+                                    onClick={() => {
 
-                            {reply.created}
+                                        setSelectedReply(reply);
+                                        setOpenEdit(true);
 
-                        </span>
+                                    }}
+                                >
 
-                        <div className="reply-actions">
+                                    Edit
 
-                            <button
+                                </button>
 
-                                className="edit"
 
-                                onClick={() => {
+                                <button
+                                    className="delete"
+                                    onClick={() => {
 
-                                    setSelectedReply(reply);
+                                        setSelectedReply(reply);
+                                        setOpenDelete(true);
 
-                                    setOpenEdit(true);
+                                    }}
+                                >
 
-                                }}
+                                    Delete
 
-                            >
+                                </button>
 
-                                Edit
-
-                            </button>
-
-                            <button
-
-                                className="delete"
-
-                                onClick={() => {
-
-                                    setSelectedReply(reply);
-
-                                    setOpenDelete(true);
-
-                                }}
-
-                            >
-
-                                Delete
-
-                            </button>
+                            </div>
 
                         </div>
 
-                    </div>
+                    ))
 
-                ))
+                )
 
             }
 
+
             <AddReplyModal
-
                 open={openAdd}
-
                 onClose={() => setOpenAdd(false)}
-
                 ticketId={ticketId}
-
-                refreshReplies={getReplies}
-
+                refreshReplies={refreshReplies}
             />
+
 
             {
 
                 selectedReply && (
 
                     <EditReplyModal
-
                         open={openEdit}
-
-                        onClose={() => setOpenEdit(false)}
-
+                        onClose={handleCloseEdit}
                         reply={selectedReply}
-
-                        refreshReplies={getReplies}
-
+                        refreshReplies={refreshReplies}
                     />
 
                 )
 
             }
 
+
             {
 
                 selectedReply && (
 
                     <DeleteReplyModal
-
                         open={openDelete}
-
-                        onClose={() => setOpenDelete(false)}
-
+                        onClose={handleCloseDelete}
                         replyId={selectedReply.id}
-
-                        refreshReplies={getReplies}
-
+                        refreshReplies={refreshReplies}
                     />
 
                 )

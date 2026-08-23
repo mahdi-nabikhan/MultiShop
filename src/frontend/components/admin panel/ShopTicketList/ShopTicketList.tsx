@@ -1,48 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getShopTickets } from "@/services/shop-admin-panel.services";
 import "./ShopTicketList.css";
-import { Ticket } from "@/types/panel-admin";
 
 export default function ShopTicketList() {
-    const [tickets, setTickets] = useState<Ticket[]>([]);
-    const [loading, setLoading] = useState(true);
-    const getTickets = async () => {
 
-        try {
+    const {
+        data: tickets = [],
+        isPending,
+        isError,
+    } = useQuery({
+        queryKey: ["shop-tickets"],
+        queryFn: getShopTickets,
+    });
 
-            setLoading(true);
-
-            const data = await getShopTickets();
-
-            setTickets(data);
-
-        } catch (err) {
-
-            console.error(
-                "Failed to load tickets:",
-                err
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-
-
-    useEffect(() => {
-
-        getTickets();
-
-    }, []);
-
-    if (loading) {
+    if (isPending) {
         return <h2>Loading...</h2>;
+    }
+
+    if (isError) {
+        return <h2>Failed to load tickets.</h2>;
     }
 
     if (tickets.length === 0) {
@@ -76,7 +54,9 @@ export default function ShopTicketList() {
 
                             <div>
 
-                                <h2>{ticket.title}</h2>
+                                <h2>
+                                    {ticket.title}
+                                </h2>
 
                                 <span>
                                     Ticket #{ticket.pk}
@@ -123,5 +103,4 @@ export default function ShopTicketList() {
         </div>
 
     );
-
 }

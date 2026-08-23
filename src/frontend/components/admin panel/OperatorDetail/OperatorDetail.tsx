@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getOperatorDetail } from "@/services/shop-admin-panel.services";
-import type { OperatorDetail } from "@/types/panel-admin";
+
 import "./OperatorDetail.css";
 
 
@@ -11,39 +11,24 @@ interface Props {
 }
 
 export default function OperatorDetail({ operatorId }: Props) {
+    const {
+        data: operator,
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["operator-detail", operatorId],
+        queryFn: () => getOperatorDetail(operatorId),
+    });
 
-    const [operator, setOperator] = useState<OperatorDetail | null>(null);
-    const [loading, setLoading] = useState(true);
+    if (isError) {
+    return <h2>Failed to load operator.</h2>;
+}
 
-   useEffect(() => {
 
-    const loadOperator = async () => {
 
-        try {
 
-            setLoading(true);
 
-            const data = await getOperatorDetail(operatorId);
-
-            setOperator(data);
-
-        } catch (err) {
-
-            console.log(err);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    loadOperator();
-
-}, [operatorId]);
-
-    if (loading) return <h2>Loading...</h2>;
+    if (isLoading) return <h2>Loading...</h2>;
 
     if (!operator) return <h2>Operator Not Found</h2>;
 

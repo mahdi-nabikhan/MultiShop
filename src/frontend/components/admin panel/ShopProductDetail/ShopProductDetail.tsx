@@ -1,22 +1,30 @@
 "use client";
 
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import AddDiscountModal from "../AddDiscountModal/AddDiscountModal";
-import React, { useEffect, useState } from "react";
+import EditProductModal from "../EditProductModal/EditProductModal";
+import DiscountList from "../DiscountList/DiscountList";
+import AddProductImageModal from "../AddImageProduct/AddImageProduct";
+import DeleteImageModal from "../DeleteImageModal/DeleteImageModal";
+
 import BACKEND_URLS from "@/utils";
-import "./ShopProductDetail.css";
 
 import {
     getShopProductDetail,
     getShopProductImages,
     deleteProductImage,
 } from "@/services/shop-admin-panel.services";
-import {ShopProductData,ProductImage} from '@/types/panel-admin'
-import EditProductModal from "../EditProductModal/EditProductModal";
-import DiscountList from "../DiscountList/DiscountList";
-import AddProductImageModal from "../AddImageProduct/AddImageProduct";
-import DeleteImageModal from "../DeleteImageModal/DeleteImageModal";
+
+import type {
+    ProductImage,
+} from "@/types/panel-admin";
+
+import "./ShopProductDetail.css";
 
 import { Swiper, SwiperSlide } from "swiper/react";
+
 import {
     Navigation,
     Pagination,
@@ -37,23 +45,20 @@ function ShopProductDetail({
     productId: number;
 }) {
 
+    const queryClient = useQueryClient();
+
+
     const [openImageModal, setOpenImageModal] =
         useState(false);
 
     const [thumbsSwiper, setThumbsSwiper] =
         useState<SwiperType | null>(null);
 
-    const [product, setProduct] =
-        useState<ShopProductData | null>(null);
-
     const [openEditModal, setOpenEditModal] =
         useState(false);
 
     const [openDiscountModal, setOpenDiscountModal] =
         useState(false);
-
-    const [images, setImages] =
-        useState<ProductImage[]>([]);
 
     const [selectedImage, setSelectedImage] =
         useState<ProductImage | null>(null);
@@ -62,79 +67,96 @@ function ShopProductDetail({
         useState(false);
 
 
-    const GetProductData = async () => {
+    /*
+    |--------------------------------------------------------------------------
+    | Product Query
+    |--------------------------------------------------------------------------
+    */
 
-        try {
+    const {
+        data: product,
+        isLoading: productLoading,
+        isError: productError,
+    } = useQuery({
 
-            const productData =
-                await getShopProductDetail(productId);
+        queryKey: [
+            "shop-product-detail",
+            productId,
+        ],
 
-            setProduct(productData);
+        queryFn: () =>
+            getShopProductDetail(productId),
 
-            const imageData =
-                await getShopProductImages(productId);
-
-            const allImages: ProductImage[] = [];
-
-            if (productData.product_image) {
-
-                allImages.push({
-
-                    id: productData.id,
-
-                    product_image:
-                        productData.product_image,
-
-                    title:
-                        productData.name,
-
-                    description:
-                        productData.description,
-
-                    product:
-                        productData.id,
-
-                });
-
-            }
-
-            imageData.forEach((item) => {
-
-                allImages.push({
-
-                    id: item.id,
-
-                    product_image:
-                        item.product_image,
-
-                    title:
-                        item.title,
-
-                    description:
-                        item.description,
-
-                    product:
-                        item.product,
-
-                });
-
-            });
-
-            setImages(allImages);
-
-        } catch (error) {
-
-            console.error(
-                "Failed to load product:",
-                error
-            );
-
-        }
-
-    };
+    });
 
 
-    const DeleteProductImage = async () => {
+    /*
+    |--------------------------------------------------------------------------
+    | Product Images Query
+    |--------------------------------------------------------------------------
+    */
+
+    const {
+        data: productImages = [],
+        isLoading: imagesLoading,
+        isError: imagesError,
+    } = useQuery({
+
+        queryKey: [
+            "shop-product-images",
+            productId,
+        ],
+
+        queryFn: () =>
+            getShopProductImages(productId),
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Combine Main Product Image + Additional Images
+    |--------------------------------------------------------------------------
+    */
+
+    const images: ProductImage[] = product
+        ? [
+
+            ...(product.product_image
+                ? [
+
+                    {
+                        id: product.id,
+
+                        product_image:
+                            product.product_image,
+
+                        title:
+                            product.name,
+
+                        description:
+                            product.description,
+
+                        product:
+                            product.id,
+                    },
+
+                ]
+                : []),
+
+            ...productImages,
+
+        ]
+        : [];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Delete Product Image
+    |--------------------------------------------------------------------------
+    */
+
+    const deleteProductImageHandler = async () => {
 
         if (!selectedImage) return;
 
@@ -148,7 +170,28 @@ function ShopProductDetail({
 
             setSelectedImage(null);
 
-            await GetProductData();
+
+            await Promise.all([
+
+                queryClient.invalidateQueries({
+
+                    queryKey: [
+                        "shop-product-images",
+                        productId,
+                    ],
+
+                }),
+
+                queryClient.invalidateQueries({
+
+                    queryKey: [
+                        "shop-product-detail",
+                        productId,
+                    ],
+
+                }),
+
+            ]);
 
         } catch (error) {
 
@@ -162,19 +205,70 @@ function ShopProductDetail({
     };
 
 
-    useEffect(() => {
+    /*
+    |--------------------------------------------------------------------------
+    | Loading
+    |--------------------------------------------------------------------------
+    */
 
-        GetProductData();
+    if (
+        productLoading ||
+        imagesLoading
+    ) {
 
-    }, [productId]);
+        return (
 
+            <div>
+
+                Loading...
+
+            </div>
+
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Error
+    |--------------------------------------------------------------------------
+    */
+
+    if (
+        productError ||
+        imagesError
+    ) {
+
+        return (
+
+            <div>
+
+                Failed to load product.
+
+            </div>
+
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Product Not Found
+    |--------------------------------------------------------------------------
+    */
 
     if (!product) {
 
         return (
+
             <div>
-                Loading...
+
+                Product Not Found
+
             </div>
+
         );
 
     }
@@ -184,184 +278,248 @@ function ShopProductDetail({
 
         <>
 
+
             <div className="detail-body">
+
+
+                {/* ------------------------------------------------------ */}
+                {/* Product Gallery */}
+                {/* ------------------------------------------------------ */}
 
                 <div className="gallery-card">
 
+
+                    {/* Main Swiper */}
+
                     <Swiper
+
                         modules={[
                             Navigation,
                             Pagination,
                             Thumbs,
                         ]}
+
                         navigation
+
                         pagination={{
                             clickable: true,
                         }}
+
                         thumbs={{
                             swiper: thumbsSwiper,
                         }}
+
                         className="main-swiper"
                     >
 
                         {
-                            images.length > 0 ? (
+                            images.length > 0
 
-                                images.map(
-                                    (image, index) => (
+                                ? (
 
-                                        <SwiperSlide
-                                            key={image.id}
-                                        >
+                                    images.map(
+                                        (
+                                            image,
+                                            index
+                                        ) => (
 
-                                            <img
-                                                src={
-                                                    image.product_image.startsWith(
-                                                        "http"
-                                                    )
-                                                        ? image.product_image
-                                                        : `${BACKEND_URLS.replace(
-                                                            "/api/v1/",
-                                                            ""
-                                                        )}${image.product_image}`
+                                            <SwiperSlide
+                                                key={
+                                                    image.id
                                                 }
-                                                alt={`Product Image ${
-                                                    index + 1
-                                                }`}
-                                                onClick={() => {
+                                            >
 
-                                                    setSelectedImage(
-                                                        image
-                                                    );
+                                                <img
 
-                                                    setOpenDeleteImageModal(
-                                                        true
-                                                    );
+                                                    src={
+                                                        image.product_image.startsWith(
+                                                            "http"
+                                                        )
 
-                                                }}
-                                            />
+                                                            ? image.product_image
 
-                                        </SwiperSlide>
+                                                            : `${BACKEND_URLS.replace(
+                                                                "/api/v1/",
+                                                                ""
+                                                            )}${image.product_image}`
+                                                    }
 
+                                                    alt={`Product Image ${index + 1
+                                                        }`}
+
+                                                    onClick={() => {
+
+                                                        setSelectedImage(
+                                                            image
+                                                        );
+
+                                                        setOpenDeleteImageModal(
+                                                            true
+                                                        );
+
+                                                    }}
+
+                                                />
+
+                                            </SwiperSlide>
+
+                                        )
                                     )
+
                                 )
 
-                            ) : (
+                                : (
 
-                                <SwiperSlide>
-
-                                    <img
-                                        src="/images/no-image.png"
-                                        alt="No Image"
-                                    />
-
-                                </SwiperSlide>
-
-                            )
-                        }
-
-                    </Swiper>
-
-
-                    <Swiper
-                        onSwiper={
-                            setThumbsSwiper
-                        }
-                        modules={[
-                            Thumbs,
-                        ]}
-                        slidesPerView={4}
-                        spaceBetween={12}
-                        watchSlidesProgress
-                        className="thumb-swiper"
-                    >
-
-                        {
-                            images.length > 0 ? (
-
-                                images.map((image) => (
-
-                                    <SwiperSlide
-                                        key={image.id}
-                                    >
+                                    <SwiperSlide>
 
                                         <img
-                                            src={
-                                                image.product_image.startsWith(
-                                                    "http"
-                                                )
-                                                    ? image.product_image
-                                                    : `${BACKEND_URLS.replace(
-                                                        "/api/v1/",
-                                                        ""
-                                                    )}${image.product_image}`
-                                            }
-                                            alt={
-                                                image.title ??
-                                                "Product Image"
-                                            }
-                                            onClick={() => {
-
-                                                setSelectedImage(
-                                                    image
-                                                );
-
-                                                setOpenDeleteImageModal(
-                                                    true
-                                                );
-
-                                            }}
+                                            src="/images/no-image.png"
+                                            alt="No Image"
                                         />
 
                                     </SwiperSlide>
 
-                                ))
-
-                            ) : (
-
-                                <SwiperSlide>
-
-                                    <img
-                                        src="/images/no-image.png"
-                                        alt="No Image"
-                                    />
-
-                                </SwiperSlide>
-
-                            )
+                                )
                         }
 
                     </Swiper>
 
+
+                    {/* Thumbnail Swiper */}
+
+                    <Swiper
+
+                        onSwiper={
+                            setThumbsSwiper
+                        }
+
+                        modules={[
+                            Thumbs,
+                        ]}
+
+                        slidesPerView={4}
+
+                        spaceBetween={12}
+
+                        watchSlidesProgress
+
+                        className="thumb-swiper"
+                    >
+
+                        {
+                            images.length > 0
+
+                                ? (
+
+                                    images.map(
+                                        (image) => (
+
+                                            <SwiperSlide
+                                                key={
+                                                    image.id
+                                                }
+                                            >
+
+                                                <img
+
+                                                    src={
+                                                        image.product_image.startsWith(
+                                                            "http"
+                                                        )
+
+                                                            ? image.product_image
+
+                                                            : `${BACKEND_URLS.replace(
+                                                                "/api/v1/",
+                                                                ""
+                                                            )}${image.product_image}`
+                                                    }
+
+                                                    alt={
+                                                        image.title ??
+                                                        "Product Image"
+                                                    }
+
+                                                    onClick={() => {
+
+                                                        setSelectedImage(
+                                                            image
+                                                        );
+
+                                                        setOpenDeleteImageModal(
+                                                            true
+                                                        );
+
+                                                    }}
+
+                                                />
+
+                                            </SwiperSlide>
+
+                                        )
+                                    )
+
+                                )
+
+                                : (
+
+                                    <SwiperSlide>
+
+                                        <img
+                                            src="/images/no-image.png"
+                                            alt="No Image"
+                                        />
+
+                                    </SwiperSlide>
+
+                                )
+                        }
+
+                    </Swiper>
+
+
                 </div>
 
 
+                {/* ------------------------------------------------------ */}
+                {/* Product Information */}
+                {/* ------------------------------------------------------ */}
+
                 <div className="info-card">
+
 
                     <div className="card-header">
 
                         <h2>
+
                             {product.name}
+
                         </h2>
 
+
                         <span
+
                             className={
                                 product.quantity_in_stock > 0
                                     ? "status in-stock"
                                     : "status out-stock"
                             }
+
                         >
+
                             {
                                 product.quantity_in_stock > 0
                                     ? "In Stock"
                                     : "Out of Stock"
                             }
+
                         </span>
 
                     </div>
 
 
                     <div className="info-grid">
+
 
                         <div className="info-item">
 
@@ -409,7 +567,9 @@ function ShopProductDetail({
                             </span>
 
                             <strong className="sale-price">
+
                                 ${product.price_after}
+
                             </strong>
 
                         </div>
@@ -440,6 +600,7 @@ function ShopProductDetail({
 
                         </div>
 
+
                     </div>
 
 
@@ -458,51 +619,82 @@ function ShopProductDetail({
 
                     <div className="action-buttons">
 
+
                         <button
+
                             className="edit-btn"
+
                             onClick={() =>
                                 setOpenEditModal(true)
                             }
+
                         >
+
                             Edit Product
+
                         </button>
 
 
                         <button
+
                             className="primary-btn"
+
                             onClick={() =>
                                 setOpenDiscountModal(true)
                             }
+
                         >
+
                             Add Discount
+
                         </button>
 
 
                         <button className="delete-btn">
+
                             Delete Product
+
                         </button>
 
 
                         <button
+
                             className="primary-btn"
+
                             onClick={() =>
                                 setOpenImageModal(true)
                             }
+
                         >
+
                             Add Product Image
+
                         </button>
 
+
                     </div>
+
 
                 </div>
 
 
+                {/* ------------------------------------------------------ */}
+                {/* Discounts */}
+                {/* ------------------------------------------------------ */}
+
                 <DiscountList
-                    productId={Number(productId)}
+                    productId={
+                        Number(productId)
+                    }
                 />
+
 
             </div>
 
+
+            {/* ------------------------------------------------------ */}
+            {/* Add Discount Modal */}
+            {/* ------------------------------------------------------ */}
 
             <AddDiscountModal
                 open={openDiscountModal}
@@ -510,9 +702,12 @@ function ShopProductDetail({
                     setOpenDiscountModal(false)
                 }
                 productId={product.id}
-                refreshDiscounts={() => {}}
             />
 
+
+            {/* ------------------------------------------------------ */}
+            {/* Edit Product Modal */}
+            {/* ------------------------------------------------------ */}
 
             <EditProductModal
                 open={openEditModal}
@@ -520,26 +715,55 @@ function ShopProductDetail({
                     setOpenEditModal(false)
                 }
                 product={product}
-                refreshProduct={
-                    GetProductData
-                }
             />
 
 
+            {/* ------------------------------------------------------ */}
+            {/* Add Product Image Modal */}
+            {/* ------------------------------------------------------ */}
+
             <AddProductImageModal
-                open={openImageModal}
+
+                open={
+                    openImageModal
+                }
+
                 onClose={() =>
                     setOpenImageModal(false)
                 }
-                productId={product.id}
-                refreshImages={
-                    GetProductData
+
+                productId={
+                    product.id
                 }
+
+                refreshImages={
+                    async () => {
+
+                        await queryClient.invalidateQueries({
+
+                            queryKey: [
+                                "shop-product-images",
+                                productId,
+                            ],
+
+                        });
+
+                    }
+                }
+
             />
 
 
+            {/* ------------------------------------------------------ */}
+            {/* Delete Image Modal */}
+            {/* ------------------------------------------------------ */}
+
             <DeleteImageModal
-                open={openDeleteImageModal}
+
+                open={
+                    openDeleteImageModal
+                }
+
                 onClose={() => {
 
                     setOpenDeleteImageModal(
@@ -551,10 +775,13 @@ function ShopProductDetail({
                     );
 
                 }}
+
                 onConfirm={
-                    DeleteProductImage
+                    deleteProductImageHandler
                 }
+
             />
+
 
         </>
 

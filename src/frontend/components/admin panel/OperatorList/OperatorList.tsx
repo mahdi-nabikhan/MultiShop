@@ -1,51 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
 import { getOperators } from "@/services/shop-admin-panel.services";
-import type { Operator } from "@/types/panel-admin"; 
+import { useQuery } from "@tanstack/react-query";
 import "./OperatorList.css";
 
 
 export default function OperatorList() {
+    const {
+        data: operators = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["operators"],
+        queryFn: getOperators,
+    });
 
-    const [operators, setOperators] = useState<Operator[]>([]);
-    const [loading, setLoading] = useState(true);
-    useEffect(() => {
 
-    const loadOperators = async () => {
 
-        try {
 
-            setLoading(true);
 
-            const data = await getOperators();
-
-            setOperators(data);
-
-        } catch (err) {
-
-            console.log(err);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    loadOperators();
-
-}, []);
-
-   
-
-    if (loading) {
+    if (isLoading) {
         return <h2>Loading...</h2>;
     }
 
     if (operators.length === 0) {
         return <h2>No Operator Found</h2>;
+    }
+    if (isError) {
+        return <h2>Failed to load operators.</h2>;
     }
 
     return (
