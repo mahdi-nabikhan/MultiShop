@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import './AddDiscountModal.css'
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { createProductDiscount } from '@/services/shop-admin-panel.services'
 interface Props {
     open: boolean;
@@ -32,10 +32,7 @@ function AddDiscountModal({
     onSuccess: () => {
 
         queryClient.invalidateQueries({
-            queryKey: [
-                "product-discounts",
-                productId,
-            ],
+            queryKey: shopAdminQueryKeys.productDiscounts(productId),
         });
 
         setValue("");

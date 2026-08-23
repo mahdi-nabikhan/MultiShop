@@ -1,10 +1,10 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
+import { useQuery } from "@tanstack/react-query";
 import { getOrderItems } from "@/services/shop-admin-panel.services";
 import BACKEND_URLS from "@/utils";
 import "./OrderItemList.css";
-import type { OrderItem } from "@/types/panel-admin";
+
 
 
 
@@ -13,42 +13,20 @@ interface Props {
 }
 
 export default function OrderItemList({ orderId }: Props) {
+    const { data: items = [], isLoading, isError } = useQuery({
+        queryKey: shopAdminQueryKeys.orderItems(orderId),
+        queryFn: () => getOrderItems(orderId),
+    });
 
-    const [items, setItems] = useState<OrderItem[]>([]);
-    const [loading, setLoading] = useState(true);
 
-    const getItems = async () => {
 
-    try {
 
-        setLoading(true);
-
-        const data = await getOrderItems(orderId);
-
-        setItems(data);
-
-    } catch (err) {
-
-        console.error(
-            "Failed to load order items:",
-            err
-        );
-
-    } finally {
-
-        setLoading(false);
-
+    if (isError) {
+        return <h2>Failed to load order items.</h2>;
     }
 
-};
 
-    useEffect(() => {
-
-        getItems();
-
-    }, [orderId]);
-
-    if (loading) {
+    if (isLoading) {
         return <h2>Loading...</h2>;
     }
 

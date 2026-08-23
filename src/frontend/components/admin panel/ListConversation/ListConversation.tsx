@@ -1,66 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getStoreConversations } from "@/services/shop-admin-panel.services";
 import { Conversation } from "@/types/panel-admin";
 import "./ListConversation.css";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 interface Props {
     selectedConversation: number | null;
     onSelectConversation: (conversationId: number) => void;
 }
 
-export default function ConversationList({
-    onSelectConversation,
-}: Props) {
+export default function ConversationList({onSelectConversation,}: Props) {
+    const {data: conversations = [],isLoading,isError,} = useQuery({
+    queryKey: shopAdminQueryKeys.conversations(),
+    queryFn: getStoreConversations,});
+    
 
-    const [conversations, setConversations] =
-        useState<Conversation[]>([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [error, setError] =
-        useState("");
-
-
-    const getConversations = async () => {
-
-    try {
-
-        setLoading(true);
-        setError("");
-
-        const data = await getStoreConversations();
-
-        setConversations(data);
-
-    } catch (error) {
-
-        console.error(error);
-
-        setError(
-            "Failed to load conversations."
-        );
-
-    } finally {
-
-        setLoading(false);
-
-    }
-
-};
-
-
-    useEffect(() => {
-
-        getConversations();
-
-    }, []);
-
-
-    if (loading) {
+    if (isLoading) {
 
         return (
             <aside className="conversation-list">
@@ -75,13 +32,13 @@ export default function ConversationList({
     }
 
 
-    if (error) {
+    if (isError) {
 
         return (
             <aside className="conversation-list">
 
                 <div className="conversation-error">
-                    {error}
+                    {isError}
                 </div>
 
             </aside>

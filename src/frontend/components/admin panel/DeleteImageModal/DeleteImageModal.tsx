@@ -4,27 +4,18 @@ import "./DeleteImageModal.css";
 
 
 interface DeleteImageModalProps {
-
     open: boolean;
-
     onClose: () => void;
-
     onConfirm: () => void;
 
 }
 
 
 export default function DeleteImageModal({
-
     open,
-
     onClose,
-
     onConfirm
-
 }: DeleteImageModalProps) {
-
-
     if (!open) return null;
 
 

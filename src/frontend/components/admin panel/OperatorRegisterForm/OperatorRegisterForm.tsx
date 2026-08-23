@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createOperator } from "@/services/auth.services";
@@ -15,12 +16,52 @@ export default function OperatorRegisterForm() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
+  const [error, setError] = useState("");
+  const createOperatorMutation = useMutation({
+    mutationFn: createOperator,
+
+    onSuccess: () => {
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setPassword2("");
+
+      router.push("/shop-admin-panel");
+    },
+
+    onError: (err) => {
+      console.error(err);
+
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err
+      ) {
+        const axiosError = err as {
+          response?: {
+            data?: unknown;
+          };
+        };
+
+        const responseData =
+          axiosError.response?.data;
+
+        if (typeof responseData === "string") {
+          setError(responseData);
+        } else if (responseData) {
+          setError(JSON.stringify(responseData));
+        } else {
+          setError("Failed to create operator.");
+        }
+      } else {
+        setError("Something went wrong.");
+      }
+    },
+  });
   const handlerSubmit = async (
     e: React.FormEvent<HTMLFormElement>
-) => {
+  ) => {
 
     e.preventDefault();
 
@@ -30,111 +71,50 @@ export default function OperatorRegisterForm() {
     const cleanEmail = email.trim();
 
     if (!cleanUsername) {
-        setError("Username is required.");
-        return;
+      setError("Username is required.");
+      return;
     }
 
     if (cleanUsername.length < 3) {
-        setError("Username must be at least 3 characters.");
-        return;
+      setError("Username must be at least 3 characters.");
+      return;
     }
 
     if (cleanEmail.length === 0) {
-        setError("Email is required.");
-        return;
+      setError("Email is required.");
+      return;
     }
 
     if (!password) {
-        setError("Password is required.");
-        return;
+      setError("Password is required.");
+      return;
     }
 
     if (password.length < 8) {
-        setError("Password must be at least 8 characters.");
-        return;
+      setError("Password must be at least 8 characters.");
+      return;
     }
 
     if (!password2) {
-        setError("Please confirm your password.");
-        return;
+      setError("Please confirm your password.");
+      return;
     }
 
     if (password !== password2) {
-        setError("Passwords do not match.");
-        return;
+      setError("Passwords do not match.");
+      return;
     }
+    createOperatorMutation.mutate({
+      username: cleanUsername,
+      user: {
+        email: cleanEmail,
+        password,
+        password2,
+      },
+    });
 
-    try {
 
-        setLoading(true);
-
-        await createOperator({
-            username: cleanUsername,
-            user: {
-                email: cleanEmail,
-                password,
-                password2,
-            },
-        });
-
-        setUsername("");
-        setEmail("");
-        setPassword("");
-        setPassword2("");
-
-        router.push("/shop-admin-panel");
-
-    } catch (err) {
-
-        console.error(err);
-
-        if (
-            typeof err === "object" &&
-            err !== null &&
-            "response" in err
-        ) {
-
-            const axiosError = err as {
-                response?: {
-                    data?: unknown;
-                };
-            };
-
-            const responseData =
-                axiosError.response?.data;
-
-            if (typeof responseData === "string") {
-
-                setError(responseData);
-
-            } else if (responseData) {
-
-                setError(
-                    JSON.stringify(responseData)
-                );
-
-            } else {
-
-                setError(
-                    "Failed to create operator."
-                );
-
-            }
-
-        } else {
-
-            setError(
-                "Something went wrong."
-            );
-
-        }
-
-    } finally {
-
-        setLoading(false);
-
-    }
-};
+  };
 
   return (
     <div className="register-container">
@@ -233,10 +213,10 @@ export default function OperatorRegisterForm() {
           <button
             type="submit"
             className="register-button"
-            disabled={loading}
+            disabled={createOperatorMutation.isPending}
           >
 
-            {loading
+            {createOperatorMutation.isPending
               ? "Creating..."
               : "Create Operator"}
 

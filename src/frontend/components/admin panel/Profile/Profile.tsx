@@ -1,11 +1,13 @@
 "use client";
-import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 
+import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { useState } from "react";
+
 import {
     useQuery,
     useMutation,
-    useQueryClient
+    useQueryClient,
 } from "@tanstack/react-query";
 
 import {
@@ -16,31 +18,41 @@ import {
 
 import ProfileForm from "./ProfileForm";
 
+import "./Profile.css";
+
 
 type Role = "manager" | "admin" | "operator";
 
 
 export default function Profile() {
 
-
     const queryClient = useQueryClient();
+
     const [editMode, setEditMode] = useState(false);
     const [passwordModal, setPasswordModal] = useState(false);
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get User Role
+    |--------------------------------------------------------------------------
+    */
+
     const roleQuery = useQuery<Role>({
-
-        queryKey: ["user-role"],
-
+        queryKey: shopAdminQueryKeys.userRole(),
         queryFn: getUserRole,
-
     });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get Profile
+    |--------------------------------------------------------------------------
+    */
 
     const profileQuery = useQuery({
 
-        queryKey: [
-            "profile",
-            roleQuery.data
-        ],
+        queryKey: shopAdminQueryKeys.profile(roleQuery.data!),
 
         enabled: !!roleQuery.data,
 
@@ -50,12 +62,11 @@ export default function Profile() {
     });
 
 
-
-
-
-
-
-
+    /*
+    |--------------------------------------------------------------------------
+    | Update Profile
+    |--------------------------------------------------------------------------
+    */
 
     const updateMutation = useMutation({
 
@@ -69,88 +80,146 @@ export default function Profile() {
 
             queryClient.invalidateQueries({
 
-                queryKey: [
-                    "profile",
-                    roleQuery.data
-                ]
+               queryKey: shopAdminQueryKeys.profile(roleQuery.data!)
 
             });
 
             setEditMode(false);
 
-        }
+        },
+
+        onError: (error) => {
+
+            console.error(
+                "Failed to update profile:",
+                error
+            );
+
+        },
 
     });
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Loading States
+    |--------------------------------------------------------------------------
+    */
 
-
-
-
-    if (roleQuery.isPending)
-
-        return (
-
-            <p>
-                Loading role...
-            </p>
-
-        );
-
-
-
-
-    if (roleQuery.isError)
+    if (roleQuery.isPending) {
 
         return (
 
-            <p>
-                Failed to load role
-            </p>
+            <div className="profile-container">
+
+                <div className="profile-card">
+
+                    <p>
+                        Loading role...
+                    </p>
+
+                </div>
+
+            </div>
 
         );
 
+    }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Role Error
+    |--------------------------------------------------------------------------
+    */
 
-
-    if (profileQuery.isPending)
+    if (roleQuery.isError) {
 
         return (
 
-            <p>
-                Loading profile...
-            </p>
+            <div className="profile-container">
+
+                <div className="profile-card">
+
+                    <p>
+                        Failed to load role.
+                    </p>
+
+                </div>
+
+            </div>
 
         );
 
+    }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Profile Loading
+    |--------------------------------------------------------------------------
+    */
 
-
-    if (profileQuery.isError)
+    if (profileQuery.isPending) {
 
         return (
 
-            <p>
-                Failed to load profile
-            </p>
+            <div className="profile-container">
+
+                <div className="profile-card">
+
+                    <p>
+                        Loading profile...
+                    </p>
+
+                </div>
+
+            </div>
 
         );
 
+    }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Profile Error
+    |--------------------------------------------------------------------------
+    */
 
+    if (profileQuery.isError) {
+
+        return (
+
+            <div className="profile-container">
+
+                <div className="profile-card">
+
+                    <p>
+                        Failed to load profile.
+                    </p>
+
+                </div>
+
+            </div>
+
+        );
+
+    }
 
 
     const profile = profileQuery.data;
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Render
+    |--------------------------------------------------------------------------
+    */
 
     return (
 
         <div className="profile-container">
-
 
 
             {
@@ -162,7 +231,6 @@ export default function Profile() {
                         <h2>
                             Profile Information
                         </h2>
-
 
 
                         <div className="profile-row">
@@ -180,8 +248,6 @@ export default function Profile() {
                         </div>
 
 
-
-
                         <div className="profile-row">
 
                             <span>
@@ -195,9 +261,6 @@ export default function Profile() {
                             </strong>
 
                         </div>
-
-
-
 
 
                         <div className="profile-row">
@@ -217,15 +280,11 @@ export default function Profile() {
                         </div>
 
 
-
-
-
                         <div className="profile-row">
 
                             <span>
                                 Store
                             </span>
-
 
                             <strong>
 
@@ -238,26 +297,23 @@ export default function Profile() {
                         </div>
 
 
-
-
-
                         <button
-
                             className="edit-profile-btn"
-
-                            onClick={() => setEditMode(true)}
-
+                            onClick={() =>
+                                setEditMode(true)
+                            }
                         >
 
                             Edit Profile
 
                         </button>
+
+
                         <button
-
                             className="change-password-btn"
-
-                            onClick={() => setPasswordModal(true)}
-
+                            onClick={() =>
+                                setPasswordModal(true)
+                            }
                         >
 
                             Change Password
@@ -271,25 +327,17 @@ export default function Profile() {
             }
 
 
-
-
-
-
-
             {
                 editMode && (
-
 
                     <div className="profile-edit-box">
 
 
-
                         <button
-
                             className="back-profile-btn"
-
-                            onClick={() => setEditMode(false)}
-
+                            onClick={() =>
+                                setEditMode(false)
+                            }
                         >
 
                             Back
@@ -297,34 +345,26 @@ export default function Profile() {
                         </button>
 
 
-
-
-
                         <ProfileForm
 
-
                             data={profile}
-
 
                             loading={
                                 updateMutation.isPending
                             }
 
-
-
                             onSubmit={(values) => {
 
-                                updateMutation.mutate(values);
+                                updateMutation.mutate(
+                                    values
+                                );
 
                             }}
-
 
                         />
 
 
-
                     </div>
-
 
                 )
             }
@@ -334,9 +374,13 @@ export default function Profile() {
 
                 isOpen={passwordModal}
 
-                onClose={() => setPasswordModal(false)}
+                onClose={() =>
+                    setPasswordModal(false)
+                }
 
             />
+
+
         </div>
 
     );

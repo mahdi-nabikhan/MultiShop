@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { createProduct } from "@/services/shop-admin-panel.services";
 import "./AddProduct.css";
 
@@ -14,12 +14,16 @@ export default function AddProduct() {
     const [stock, setStock] = useState("");
     const [category, setCategory] = useState("");
     const [image, setImage] = useState<File | null>(null);
+    const queryClient = useQueryClient();
 
     const createProductMutation = useMutation({
         mutationFn: (formData: FormData) =>
             createProduct(formData),
 
         onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: shopAdminQueryKeys.products(),
+            });
             alert("Product created successfully.");
 
             setName("");

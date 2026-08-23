@@ -5,7 +5,10 @@ import {
 } from "@/services/shop-admin-panel.services";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 import DeleteModal from "../DeleteModal/DeleteModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 interface ShopProductListData {
   id: number;
@@ -25,35 +28,29 @@ interface Props {
 
 export default function ProductRow({ product }: Props) {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
 
-  const [loading, setLoading] = useState(false);
-  const handleDelete = async () => {
-
-    try {
-
-      setLoading(true);
-
-      await deleteProduct(product.id);
-
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: shopAdminQueryKeys.products(),
+      });
       setOpen(false);
-
       router.refresh();
+    },
 
-    } catch (err) {
-
+    onError: (err) => {
       console.error(
         "Failed to delete product:",
         err
       );
+    },
+  });
 
-    } finally {
-
-      setLoading(false);
-
-    }
-
+  const handleDelete = () => {
+    deleteMutation.mutate(product.id);
   };
 
 
@@ -128,7 +125,7 @@ export default function ProductRow({ product }: Props) {
 
       <DeleteModal
         open={open}
-        loading={loading}
+        loading={deleteMutation.isPending}
         title="Delete Product"
         message={`Are you sure you want to delete "${product.name}"? This action cannot be undone.`}
         onClose={() => setOpen(false)}

@@ -1,6 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import {
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { deleteProductDiscount } from "@/services/product.services";
 import "./DeleteDiscountModal.css";
 
@@ -8,41 +13,40 @@ interface Props {
     open: boolean;
     onClose: () => void;
     discountId: number;
-    refreshDiscounts: () => void;
 }
 
 export default function DeleteDiscountModal({
     open,
     onClose,
     discountId,
-    refreshDiscounts,
 }: Props) {
-    console.log('this is discount id',discountId)
-    const [loading, setLoading] = useState(false);
+
+    const queryClient = useQueryClient();
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteProductDiscount,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: shopAdminQueryKeys.productDiscounts(discountId),
+            });
+
+            onClose();
+        },
+
+        onError: (err) => {
+            console.log(err);
+            alert("Failed to delete discount.");
+        },
+    });
+
+    const deleteHandler = () => {
+        deleteMutation.mutate(discountId);
+    };
 
     if (!open) return null;
-    const deleteHandler = async () => {
-    try {
-        setLoading(true);
-
-        await deleteProductDiscount(discountId);
-
-        refreshDiscounts();
-        onClose();
-
-    } catch (err) {
-        console.log(err);
-        alert("Failed to delete discount.");
-
-    } finally {
-        setLoading(false);
-    }
-};
-
-  
 
     return (
-
         <div className="delete-modal-overlay">
 
             <div className="delete-modal">
@@ -64,7 +68,7 @@ export default function DeleteDiscountModal({
                     <button
                         className="cancel-btn"
                         onClick={onClose}
-                        disabled={loading}
+                        disabled={deleteMutation.isPending}
                     >
                         Cancel
                     </button>
@@ -72,12 +76,11 @@ export default function DeleteDiscountModal({
                     <button
                         className="confirm-delete-btn"
                         onClick={deleteHandler}
-                        disabled={loading}
+                        disabled={deleteMutation.isPending}
                     >
-                        {
-                            loading
-                                ? "Deleting..."
-                                : "Delete"
+                        {deleteMutation.isPending
+                            ? "Deleting..."
+                            : "Delete"
                         }
                     </button>
 
@@ -86,7 +89,5 @@ export default function DeleteDiscountModal({
             </div>
 
         </div>
-
     );
-
 }

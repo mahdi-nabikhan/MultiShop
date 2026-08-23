@@ -1,73 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {getProductImages} from "@/services/shop-admin-panel.services";
-import { ProductImage } from "@/types/panel-admin";
+import { useQuery } from "@tanstack/react-query";
+import { getProductImages } from "@/services/shop-admin-panel.services";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import "./ProductImageGallery.css";
 
 
 interface Props {
 
-    productId:number;
+    productId: number;
 
 }
 
 
 
-export default function ProductImageGallery({
+export default function ProductImageGallery({ productId }: Props) {
+    const { data: images = [], isLoading, isError, } = useQuery({
+        queryKey: shopAdminQueryKeys.productImages(productId),
+        queryFn: () => getProductImages(productId),
+    });
 
-    productId
-
-}:Props){
-
-
-    const [images,setImages] = useState<ProductImage[]>([]);
-
-
-    const [loading,setLoading] = useState(true);
-    async function fetchImages() {
-
-    try {
-
-        setLoading(true);
-
-        const data = await getProductImages(productId);
-
-        setImages(data);
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load product images:",
-            error
+    if (isError) {
+        return (
+            <div className="gallery-error">
+                Failed to load product images.
+            </div>
         );
-
-    } finally {
-
-        setLoading(false);
-
     }
 
-}
-
-
-
-    useEffect(()=>{
-
-
-        fetchImages();
-
-
-    },[productId]);
-
-
-
-   
 
 
 
 
-    if(loading){
+
+    if (isLoading) {
 
         return (
 
@@ -84,7 +50,7 @@ export default function ProductImageGallery({
 
 
 
-    if(images.length === 0){
+    if (images.length === 0) {
 
         return (
 
@@ -134,7 +100,7 @@ export default function ProductImageGallery({
 
 
                 {
-                    images.map((image)=>(
+                    images.map((image) => (
 
                         <div
 
