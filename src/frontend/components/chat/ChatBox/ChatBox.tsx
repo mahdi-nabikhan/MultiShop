@@ -1,5 +1,7 @@
+
 "use client";
 
+import { chatQueryKeys } from "@/Lib/query-keys/chat.keys";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -73,10 +75,10 @@ export default function ChatBox({
         isError,
     } = useQuery<MessageProp[]>({
 
-        queryKey: [
-            "conversation-messages",
-            conversationId,
-        ],
+        queryKey:
+            chatQueryKeys.conversationMessages(
+                conversationId as number
+            ),
 
         queryFn: () =>
             getConversationMessages(
@@ -114,10 +116,10 @@ export default function ChatBox({
 
                 queryClient.invalidateQueries({
 
-                    queryKey: [
-                        "conversation-messages",
-                        conversationId,
-                    ],
+                    queryKey:
+                        chatQueryKeys.conversationMessages(
+                            conversationId as number
+                        ),
 
                 });
 
@@ -331,3 +333,4 @@ export default function ChatBox({
     );
 
 }
+
