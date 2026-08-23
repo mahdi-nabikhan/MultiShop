@@ -1,47 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { getAdmins } from "@/services/shop-admin-panel.services";
 import "./ListAdmin.css";
-import { Admin } from "@/types/panel-admin";
+
 
 
 export default function AdminList() {
     const router = useRouter()
-    const [admins, setAdmins] = useState<Admin[]>([]);
-    const [loading, setLoading] = useState(true);
+    const {
+        data: admins = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: ["admins"],
+        queryFn: getAdmins,
+    });
 
-   useEffect(() => {
 
-    const loadAdmins = async () => {
 
-        try {
-
-            setLoading(true);
-
-            const data = await getAdmins();
-
-            setAdmins(data);
-
-        } catch (err) {
-
-            console.log(err);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    loadAdmins();
-
-}, []);
-
-    if (loading) {
+    if (isLoading) {
         return <h2>Loading...</h2>;
+    }
+    if (isError) {
+        return <h2>Failed to load admins.</h2>;
     }
 
     if (admins.length === 0) {
@@ -96,7 +79,7 @@ export default function AdminList() {
 
                             </div>
 
-                            <div className="admin-badge" onClick={() =>{
+                            <div className="admin-badge" onClick={() => {
                                 router.push(`admin/${admin.id}`)
                             }}>
 

@@ -2,175 +2,86 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-
-import {
-    Send,
-    FileText,
-    Check,
-    CheckCheck,
-} from "lucide-react";
-
+import {Send,FileText,Check,CheckCheck} from "lucide-react";
 
 import { getConversationMessages, sendConversationMessage } from "@/services/shop-admin-panel.services";
-import { Message } from "@/types/panel-admin";
 import "./AdminChatBox.css";
 
 
 
 
-interface Props {
-
-    conversationId: number | null;
-
-    currentUserEmail: string;
-
-}
+interface Props {conversationId: number | null;currentUserEmail: string;}
 
 
-export default function AdminChatBox({
-
-    conversationId,
-
-    currentUserEmail,
-
-}: Props) {
+export default function AdminChatBox({conversationId,currentUserEmail,}: Props) {
 
 
-    const [messages, setMessages] =
-        useState<Message[]>([]);
 
+    const [text, setText] =useState("");
+    const messagesEndRef =useRef<HTMLDivElement>(null);
+    const queryClient = useQueryClient();
 
-    const [loading, setLoading] =
-        useState(false);
+    const {
+        data: messages = [],
+        isLoading: loading,
+        isError,
+        refetch: getMessages,
+    } = useQuery({
+        queryKey: ["conversation-messages", conversationId],
+        queryFn: () =>
+            getConversationMessages(conversationId!),
+        enabled: !!conversationId,
+        refetchInterval: 3000,
+    });
 
-
-    const [sending, setSending] =
-        useState(false);
-
-
-    const [text, setText] =
-        useState("");
-
-
-    const [error, setError] =
-        useState("");
-
-
-    const messagesEndRef =
-        useRef<HTMLDivElement>(null);
-
+    const error = isError
+        ? "Failed to load messages."
+        : "";
 
 
     /* =========================
        GET MESSAGES
     ========================= */
 
-    const getMessages = async () => {
-
-        if (!conversationId) {
-            return;
-        }
-
-
-        try {
-
-            setLoading(true);
-
-            setError("");
-
-
-            const data = await getConversationMessages(conversationId);
+  
 
 
 
+  
 
-            setMessages(data);
+    const sendMessageMutation = useMutation({
+        mutationFn: ({
+            conversationId,
+            text,
+        }: {
+            conversationId: number;
+            text: string;
+        }) =>
+            sendConversationMessage(
+                conversationId,
+                text
+            ),
 
+        onSuccess: () => {
+            setText('');
 
-        } catch (error) {
+            queryClient.invalidateQueries({
+                queryKey: [
+                    "conversation-messages",
+                    conversationId,
+                ],
+            });
+        },
 
+        onError: (error) => {
             console.error(
-                "GET MESSAGES ERROR:",
+                "SEND MESSAGE ERROR:",
                 error
             );
-
-            setError(
-                "Failed to load messages."
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-
-
-    /* =========================
-       CONVERSATION CHANGE
-    ========================= */
-
-    useEffect(() => {
-
-        setMessages([]);
-
-        setError("");
-
-
-        if (conversationId) {
-
-            getMessages();
-
-        }
-
-    }, [conversationId]);
-
-
-
-    /* =========================
-       AUTO REFRESH
-    ========================= */
-
-    useEffect(() => {
-
-        if (!conversationId) {
-            return;
-        }
-
-
-        const interval =
-            setInterval(() => {
-
-                getMessages();
-
-            }, 3000);
-
-
-        return () => {
-
-            clearInterval(interval);
-
-        };
-
-    }, [conversationId]);
-
-
-
-    /* =========================
-       AUTO SCROLL
-    ========================= */
-
-    useEffect(() => {
-
-        messagesEndRef.current?.scrollIntoView({
-            behavior: "smooth",
-        });
-
-    }, [messages]);
+        },
+    });
 
 
 
@@ -178,60 +89,23 @@ export default function AdminChatBox({
        SEND MESSAGE
     ========================= */
 
-    const sendMessage = async () => {
+    const sendMessage = () => {
 
-        if (!conversationId) {
-            return;
-        }
+    if (!conversationId) {
+        return;
+    }
 
+    const cleanText = text.trim();
 
-        const cleanText =
-            text.trim();
+    if (!cleanText) {
+        return;
+    }
 
-
-        if (!cleanText) {
-            return;
-        }
-
-
-        try {
-
-            setSending(true);
-
-            setError("");
-
-
-            await sendConversationMessage(
-                conversationId,
-                cleanText
-            );
-
-            setText("");
-
-
-            await getMessages();
-
-
-        } catch (error) {
-
-            console.error(
-                "SEND MESSAGE ERROR:",
-                error
-            );
-
-
-            setError(
-                "Failed to send message."
-            );
-
-        } finally {
-
-            setSending(false);
-
-        }
-
-    };
-
+    sendMessageMutation.mutate({
+        conversationId,
+        text: cleanText,
+    });
+};
 
 
     /* =========================
@@ -577,7 +451,7 @@ export default function AdminChatBox({
 
                     onKeyDown={handleKeyDown}
 
-                    disabled={sending}
+                    disabled={sendMessageMutation.isPending}
 
                 />
 
@@ -589,13 +463,13 @@ export default function AdminChatBox({
                     onClick={sendMessage}
 
                     disabled={
-                        sending ||
+                        sendMessageMutation.isPending ||
                         !text.trim()
                     }
 
                 >
 
-                    {sending
+                    {sendMessageMutation.isPending
                         ? "..."
                         : <Send size={18} />}
 

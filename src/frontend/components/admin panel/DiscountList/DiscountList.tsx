@@ -1,46 +1,32 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getProductDiscounts } from "@/services/shop-admin-panel.services";
-import { DiscountData } from "@/types/panel-admin";
+
 import DeleteDiscountModal from "../DeleteDiscountModal/DeleteDiscountModal";
 
 
 
 function DiscountList({ productId }: { productId: number }) {
 
-    const [discounts, setDiscounts] = useState<DiscountData[]>([]);
-    const [loading, setLoading] = useState(true);
 
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [selectedDiscount, setSelectedDiscount] = useState<number | null>(null);
 
-    const GetDiscounts = async () => {
-    try {
-        setLoading(true);
+    const {data: discounts = [],isLoading,isError} = useQuery({
+        queryKey: ["product-discounts", productId],
+        queryFn: () => getProductDiscounts(productId)});
 
-        const data = await getProductDiscounts(productId);
 
-        setDiscounts(data);
-
-    } catch (err) {
-        console.log(err);
-
-    } finally {
-        setLoading(false);
-    }
-};
-
-    useEffect(() => {
-
-        GetDiscounts();
-
-    }, [productId]);
-
-    if (loading) {
+    
+    if (isLoading) {
 
         return <h3>Loading...</h3>;
 
+    }
+
+    if (isError) {
+        return <h3>Failed to load discounts.</h3>;
     }
 
     return (
@@ -144,7 +130,7 @@ function DiscountList({ productId }: { productId: number }) {
 
                         }}
                         discountId={selectedDiscount}
-                        refreshDiscounts={GetDiscounts}
+                       
                     />
 
                 )

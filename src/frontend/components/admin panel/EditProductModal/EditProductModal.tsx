@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {useMutation,useQueryClient,} from "@tanstack/react-query";
 import { updateProduct } from "@/services/shop-admin-panel.services";
 import "./EditProductModal.css";
 
@@ -20,14 +21,14 @@ interface Props {
     open: boolean;
     onClose: () => void;
     product: Product;
-    refreshProduct: () => Promise<void>;
+   
 }
 
 export default function EditProductModal({
     open,
     onClose,
     product,
-    refreshProduct,
+   
 }: Props) {
 
     const [name, setName] = useState("");
@@ -44,8 +45,35 @@ export default function EditProductModal({
 
     const [preview, setPreview] = useState("");
 
-    const [loading, setLoading] = useState(false);
+    const queryClient = useQueryClient();
 
+const updateMutation = useMutation({
+    mutationFn: ({
+        productId,
+        formData,
+    }: {
+        productId: number;
+        formData: FormData;
+    }) => updateProduct(productId, formData),
+
+    onSuccess: () => {
+        queryClient.invalidateQueries({
+            queryKey: ["product", product.id],
+        });
+
+        queryClient.invalidateQueries({
+            queryKey: ["products"],
+        });
+
+        onClose();
+    },
+
+    onError: (err) => {
+        console.log(err);
+    },
+});
+
+  
     useEffect(() => {
 
         if (!product) return;
@@ -67,51 +95,32 @@ export default function EditProductModal({
     }, [product]);
 
 
-    const submitHandler = async (
-        e: React.FormEvent
-    ) => {
+    const submitHandler = (
+    e: React.FormEvent
+) => {
+    e.preventDefault();
 
-        e.preventDefault();
+    const formData = new FormData();
 
-        try {
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("price_after", priceAfter);
+    formData.append("quantity_in_stock", stock);
+    formData.append("category", category);
 
-            setLoading(true);
+    if (image) {
+        formData.append(
+            "product_image",
+            image
+        );
+    }
 
-            const formData = new FormData();
-
-            formData.append("name", name);
-            formData.append("description", description);
-            formData.append("price", price);
-            formData.append("price_after", priceAfter);
-            formData.append("quantity_in_stock", stock);
-            formData.append("category", category);
-
-            if (image) {
-                formData.append(
-                    "product_image",
-                    image
-                );
-            }
-
-            await updateProduct(
-                product.id,
-                formData
-            );
-
-            await refreshProduct();
-
-            onClose();
-
-        } catch (err) {
-
-            console.log(err);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-    };
+    updateMutation.mutate({
+        productId: product.id,
+        formData,
+    });
+};
 
     if (!open) {
         return null;
@@ -279,10 +288,10 @@ export default function EditProductModal({
                         <button
                             type="submit"
                             className="save-btn"
-                            disabled={loading}
+                            disabled={updateMutation.isPending}
                         >
                             {
-                                loading
+                                updateMutation.isPending
                                     ? "Saving..."
                                     : "Save Changes"
                             }

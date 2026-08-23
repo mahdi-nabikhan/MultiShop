@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -17,42 +18,38 @@ export default function AdminRegisterForm() {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
 
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  async function handlerSubmit(
-    e: React.FormEvent<HTMLFormElement>
+  const registerMutation = useMutation({
+  mutationFn: registerShopAdmin,
+
+  onSuccess: () => {
+    router.push("/shop-admin-panel");
+  },
+
+  onError: (err: unknown) => {
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Something went wrong."
+    );
+  },
+});
+
+function handlerSubmit(
+  e: React.FormEvent<HTMLFormElement>
 ) {
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
+  setError("");
 
-    try {
-        await registerShopAdmin({
-            username,
-            email,
-            password,
-            password2,
-        });
-
-        router.push("/shop-admin-panel");
-
-    } catch (err: any) {
-
-        setError(
-            err?.response?.data
-                ? typeof err.response.data === "string"
-                    ? err.response.data
-                    : JSON.stringify(err.response.data)
-                : "Something went wrong."
-        );
-
-    } finally {
-
-        setLoading(false);
-
-    }
+  registerMutation.mutate({
+    username,
+    email,
+    password,
+    password2,
+  });
 }
+ 
 
  
   return (
@@ -152,10 +149,10 @@ export default function AdminRegisterForm() {
           <button
             type="submit"
             className="register-button"
-            disabled={loading}
+            disabled={registerMutation.isPending}
           >
 
-            {loading
+            {registerMutation.isPending
               ? "Creating..."
               : "Create Operator"}
 
