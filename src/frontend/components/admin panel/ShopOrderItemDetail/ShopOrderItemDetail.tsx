@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {getOrderItemDetail,} from "@/services/shop-admin-panel.services";
 import "./ShopOrderItemDetail.css";
 import BACKEND_URLS from "@/utils";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 
 
@@ -20,7 +20,7 @@ export default function OrderItemDetail({ orderItemId }: Props) {
     isLoading,
     isError,
 } = useQuery({
-    queryKey: ["order-item-detail", orderItemId],
+    queryKey:  shopAdminQueryKeys.orderItem(orderItemId),
     queryFn: () => getOrderItemDetail(orderItemId),
 });
 

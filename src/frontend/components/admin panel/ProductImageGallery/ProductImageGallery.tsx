@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getProductImages } from "@/services/shop-admin-panel.services";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import "./ProductImageGallery.css";
 
 
@@ -16,7 +16,7 @@ interface Props {
 
 export default function ProductImageGallery({ productId }: Props) {
     const { data: images = [], isLoading, isError, } = useQuery({
-        queryKey: ["product-images", productId],
+        queryKey: shopAdminQueryKeys.productImages(productId),
         queryFn: () => getProductImages(productId),
     });
 

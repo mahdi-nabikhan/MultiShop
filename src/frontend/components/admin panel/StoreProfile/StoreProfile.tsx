@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import {
     useMutation,
     useQuery,
@@ -63,7 +63,7 @@ export default function StoreProfile() {
         isPending: loading,
         isError,
     } = useQuery<StoreData>({
-        queryKey: ["store-profile"],
+        queryKey: shopAdminQueryKeys.storeProfile(),
         queryFn: getStoreProfile,
     });
 

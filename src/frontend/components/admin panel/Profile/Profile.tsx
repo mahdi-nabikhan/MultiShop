@@ -1,7 +1,7 @@
 "use client";
 
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { useState } from "react";
 
 import {
@@ -39,7 +39,7 @@ export default function Profile() {
     */
 
     const roleQuery = useQuery<Role>({
-        queryKey: ["user-role"],
+        queryKey: shopAdminQueryKeys.userRole(),
         queryFn: getUserRole,
     });
 
@@ -52,10 +52,7 @@ export default function Profile() {
 
     const profileQuery = useQuery({
 
-        queryKey: [
-            "profile",
-            roleQuery.data,
-        ],
+        queryKey: shopAdminQueryKeys.profile(roleQuery.data!),
 
         enabled: !!roleQuery.data,
 
@@ -83,10 +80,7 @@ export default function Profile() {
 
             queryClient.invalidateQueries({
 
-                queryKey: [
-                    "profile",
-                    roleQuery.data,
-                ],
+               queryKey: shopAdminQueryKeys.profile(roleQuery.data!)
 
             });
 

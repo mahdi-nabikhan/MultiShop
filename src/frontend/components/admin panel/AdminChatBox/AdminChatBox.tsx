@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {Send,FileText,Check,CheckCheck} from "lucide-react";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { getConversationMessages, sendConversationMessage } from "@/services/shop-admin-panel.services";
 import "./AdminChatBox.css";
 
@@ -27,9 +27,8 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
         data: messages = [],
         isLoading: loading,
         isError,
-        refetch: getMessages,
     } = useQuery({
-        queryKey: ["conversation-messages", conversationId],
+        queryKey: shopAdminQueryKeys.conversationMessages(conversationId!),
         queryFn: () =>
             getConversationMessages(conversationId!),
         enabled: !!conversationId,
@@ -68,10 +67,8 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
             setText('');
 
             queryClient.invalidateQueries({
-                queryKey: [
-                    "conversation-messages",
-                    conversationId,
-                ],
+                queryKey: shopAdminQueryKeys.conversationMessages(conversationId!)
+                
             });
         },
 

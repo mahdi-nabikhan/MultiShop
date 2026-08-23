@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
+
 import AddDiscountModal from "../AddDiscountModal/AddDiscountModal";
 import EditProductModal from "../EditProductModal/EditProductModal";
 import DiscountList from "../DiscountList/DiscountList";
@@ -17,9 +19,7 @@ import {
     deleteProductImage,
 } from "@/services/shop-admin-panel.services";
 
-import type {
-    ProductImage,
-} from "@/types/panel-admin";
+import type { ProductImage } from "@/types/panel-admin";
 
 import "./ShopProductDetail.css";
 
@@ -46,7 +46,6 @@ function ShopProductDetail({
 }) {
 
     const queryClient = useQueryClient();
-
 
     const [openImageModal, setOpenImageModal] =
         useState(false);
@@ -79,10 +78,8 @@ function ShopProductDetail({
         isError: productError,
     } = useQuery({
 
-        queryKey: [
-            "shop-product-detail",
-            productId,
-        ],
+        queryKey:
+            shopAdminQueryKeys.product(productId),
 
         queryFn: () =>
             getShopProductDetail(productId),
@@ -102,10 +99,8 @@ function ShopProductDetail({
         isError: imagesError,
     } = useQuery({
 
-        queryKey: [
-            "shop-product-images",
-            productId,
-        ],
+        queryKey:
+            shopAdminQueryKeys.productImages(productId),
 
         queryFn: () =>
             getShopProductImages(productId),
@@ -170,24 +165,23 @@ function ShopProductDetail({
 
             setSelectedImage(null);
 
-
             await Promise.all([
 
                 queryClient.invalidateQueries({
 
-                    queryKey: [
-                        "shop-product-images",
-                        productId,
-                    ],
+                    queryKey:
+                        shopAdminQueryKeys.productImages(
+                            productId
+                        ),
 
                 }),
 
                 queryClient.invalidateQueries({
 
-                    queryKey: [
-                        "shop-product-detail",
-                        productId,
-                    ],
+                    queryKey:
+                        shopAdminQueryKeys.product(
+                            productId
+                        ),
 
                 }),
 
@@ -344,8 +338,9 @@ function ShopProductDetail({
                                                             )}${image.product_image}`
                                                     }
 
-                                                    alt={`Product Image ${index + 1
-                                                        }`}
+                                                    alt={`Product Image ${
+                                                        index + 1
+                                                    }`}
 
                                                     onClick={() => {
 
@@ -697,11 +692,19 @@ function ShopProductDetail({
             {/* ------------------------------------------------------ */}
 
             <AddDiscountModal
-                open={openDiscountModal}
+
+                open={
+                    openDiscountModal
+                }
+
                 onClose={() =>
                     setOpenDiscountModal(false)
                 }
-                productId={product.id}
+
+                productId={
+                    product.id
+                }
+
             />
 
 
@@ -710,11 +713,19 @@ function ShopProductDetail({
             {/* ------------------------------------------------------ */}
 
             <EditProductModal
-                open={openEditModal}
+
+                open={
+                    openEditModal
+                }
+
                 onClose={() =>
                     setOpenEditModal(false)
                 }
-                product={product}
+
+                product={
+                    product
+                }
+
             />
 
 
@@ -741,10 +752,10 @@ function ShopProductDetail({
 
                         await queryClient.invalidateQueries({
 
-                            queryKey: [
-                                "shop-product-images",
-                                productId,
-                            ],
+                            queryKey:
+                                shopAdminQueryKeys.productImages(
+                                    productId
+                                ),
 
                         });
 

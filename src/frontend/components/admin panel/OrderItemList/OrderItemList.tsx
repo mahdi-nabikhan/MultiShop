@@ -1,5 +1,5 @@
 "use client";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { useQuery } from "@tanstack/react-query";
 import { getOrderItems } from "@/services/shop-admin-panel.services";
 import BACKEND_URLS from "@/utils";
@@ -14,7 +14,7 @@ interface Props {
 
 export default function OrderItemList({ orderId }: Props) {
     const { data: items = [], isLoading, isError } = useQuery({
-        queryKey: ["order-items", orderId],
+        queryKey: shopAdminQueryKeys.orderItems(orderId),
         queryFn: () => getOrderItems(orderId),
     });
 

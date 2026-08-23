@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import {
     useMutation,
     useQueryClient,
 } from "@tanstack/react-query";
+
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { deleteProductDiscount } from "@/services/product.services";
 import "./DeleteDiscountModal.css";
 
@@ -12,25 +13,22 @@ interface Props {
     open: boolean;
     onClose: () => void;
     discountId: number;
-
 }
 
 export default function DeleteDiscountModal({
     open,
     onClose,
     discountId,
-
 }: Props) {
-    console.log('this is discount id', discountId)
 
-    if (!open) return null;
     const queryClient = useQueryClient();
+
     const deleteMutation = useMutation({
         mutationFn: deleteProductDiscount,
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["product-discounts"],
+                queryKey: shopAdminQueryKeys.productDiscounts(discountId),
             });
 
             onClose();
@@ -41,14 +39,14 @@ export default function DeleteDiscountModal({
             alert("Failed to delete discount.");
         },
     });
+
     const deleteHandler = () => {
         deleteMutation.mutate(discountId);
     };
 
-
+    if (!open) return null;
 
     return (
-
         <div className="delete-modal-overlay">
 
             <div className="delete-modal">
@@ -80,10 +78,9 @@ export default function DeleteDiscountModal({
                         onClick={deleteHandler}
                         disabled={deleteMutation.isPending}
                     >
-                        {
-                            deleteMutation.isPending
-                                ? "Deleting..."
-                                : "Delete"
+                        {deleteMutation.isPending
+                            ? "Deleting..."
+                            : "Delete"
                         }
                     </button>
 
@@ -92,7 +89,5 @@ export default function DeleteDiscountModal({
             </div>
 
         </div>
-
     );
-
 }

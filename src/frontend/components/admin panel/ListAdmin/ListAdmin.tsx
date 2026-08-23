@@ -1,5 +1,5 @@
 "use client";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { getAdmins } from "@/services/shop-admin-panel.services";
@@ -14,7 +14,7 @@ export default function AdminList() {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["admins"],
+        queryKey: shopAdminQueryKeys.admins(),
         queryFn: getAdmins,
     });
 

@@ -2,14 +2,14 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getShopOrders } from "@/services/shop-admin-panel.services";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import "./OrderList.css";
 
 
 
 export default function OrderList() {
     const {data: orders = [],isLoading,isError,} = useQuery({
-        queryKey: ["shop-orders"],
+        queryKey: shopAdminQueryKeys.orders(),
         queryFn: getShopOrders});
 
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {useMutation,useQueryClient,} from "@tanstack/react-query";
 import { updateProduct } from "@/services/shop-admin-panel.services";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import "./EditProductModal.css";
 
 interface Product {
@@ -58,11 +59,11 @@ const updateMutation = useMutation({
 
     onSuccess: () => {
         queryClient.invalidateQueries({
-            queryKey: ["product", product.id],
+            queryKey: shopAdminQueryKeys.products(),
         });
 
         queryClient.invalidateQueries({
-            queryKey: ["products"],
+            queryKey: shopAdminQueryKeys.products()
         });
 
         onClose();

@@ -5,8 +5,10 @@ import {
 } from "@/services/shop-admin-panel.services";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+
 import DeleteModal from "../DeleteModal/DeleteModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 interface ShopProductListData {
   id: number;
@@ -26,12 +28,15 @@ interface Props {
 
 export default function ProductRow({ product }: Props) {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
 
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: shopAdminQueryKeys.products(),
+      });
       setOpen(false);
       router.refresh();
     },

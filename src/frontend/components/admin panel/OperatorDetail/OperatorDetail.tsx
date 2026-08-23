@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getOperatorDetail } from "@/services/shop-admin-panel.services";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import "./OperatorDetail.css";
 
 
@@ -16,7 +16,7 @@ export default function OperatorDetail({ operatorId }: Props) {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["operator-detail", operatorId],
+        queryKey: shopAdminQueryKeys.operator(operatorId),
         queryFn: () => getOperatorDetail(operatorId),
     });
 

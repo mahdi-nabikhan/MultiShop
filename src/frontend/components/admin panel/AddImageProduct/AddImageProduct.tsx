@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createProductImage } from "@/services/shop-admin-panel.services";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import "./AddImageProduct.css";
 
 
@@ -46,7 +46,7 @@ export default function AddProductImageModal({
         onSuccess: () => {
 
             queryClient.invalidateQueries({
-                queryKey: ["product-images", productId],
+                queryKey: shopAdminQueryKeys.productDiscounts(productId),
             });
 
             setImage(null);

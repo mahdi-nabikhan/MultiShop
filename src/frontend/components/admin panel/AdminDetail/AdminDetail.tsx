@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { useMutation, useQuery, useQueryClient, } from "@tanstack/react-query";
 import { updateShopAdmin, getShopAdmin, deleteShopAdmin } from "@/services/shop-admin-panel.services";
 import { AdminDetailProp } from "@/types/panel-admin";
@@ -34,7 +35,7 @@ export default function AdminDetail({ adminId }: Props) {
         data: admin,
         isLoading: loading,
     } = useQuery<AdminDetailProp>({
-        queryKey: ["shop-admin", adminId],
+        queryKey: shopAdminQueryKeys.admin(adminId),
         queryFn: () => getShopAdmin(adminId),
         enabled: !!adminId,
     });
@@ -52,7 +53,7 @@ export default function AdminDetail({ adminId }: Props) {
 
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ["shop-admin"],
+                queryKey: shopAdminQueryKeys.admins(),
             });
 
             router.push("/shop-admin-panel/admin");
@@ -74,7 +75,7 @@ export default function AdminDetail({ adminId }: Props) {
 
         onSuccess: (_, username) => {
             queryClient.setQueryData<AdminDetailProp>(
-                ["shop-admin", adminId],
+                shopAdminQueryKeys.admin(adminId),
                 (prev) => {
                     if (!prev) {
                         return prev;

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getStoreConversations } from "@/services/shop-admin-panel.services";
 import { Conversation } from "@/types/panel-admin";
 import "./ListConversation.css";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 interface Props {
     selectedConversation: number | null;
@@ -13,7 +13,7 @@ interface Props {
 
 export default function ConversationList({onSelectConversation,}: Props) {
     const {data: conversations = [],isLoading,isError,} = useQuery({
-    queryKey: ["store-conversations"],
+    queryKey: shopAdminQueryKeys.conversations(),
     queryFn: getStoreConversations,});
     
 

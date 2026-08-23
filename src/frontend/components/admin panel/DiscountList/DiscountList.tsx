@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getProductDiscounts } from "@/services/shop-admin-panel.services";
-
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import DeleteDiscountModal from "../DeleteDiscountModal/DeleteDiscountModal";
 
 
@@ -14,7 +14,7 @@ function DiscountList({ productId }: { productId: number }) {
     const [selectedDiscount, setSelectedDiscount] = useState<number | null>(null);
 
     const {data: discounts = [],isLoading,isError} = useQuery({
-        queryKey: ["product-discounts", productId],
+        queryKey: shopAdminQueryKeys.productDiscounts(productId),
         queryFn: () => getProductDiscounts(productId)});
 
 

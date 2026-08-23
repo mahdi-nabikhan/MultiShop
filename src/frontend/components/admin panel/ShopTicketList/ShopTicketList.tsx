@@ -3,18 +3,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { getShopTickets } from "@/services/shop-admin-panel.services";
 import "./ShopTicketList.css";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 export default function ShopTicketList() {
 
-    const {
+      const {
         data: tickets = [],
         isPending,
         isError,
     } = useQuery({
-        queryKey: ["shop-tickets"],
+        queryKey: shopAdminQueryKeys.tickets(),
         queryFn: getShopTickets,
     });
-
     if (isPending) {
         return <h2>Loading...</h2>;
     }

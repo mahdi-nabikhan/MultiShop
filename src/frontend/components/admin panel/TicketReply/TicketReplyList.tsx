@@ -7,6 +7,7 @@ import "./TicketReply.css";
 import { useState } from "react";
 import AddReplyModal from "./AddReplyModal";
 import EditReplyModal from "./EditReplyModal";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import DeleteReplyModal from "./DeleteReplyModal";
 
 interface Props {
@@ -31,7 +32,7 @@ export default function TicketReplyList({
         isPending,
         isError,
     } = useQuery<Reply[]>({
-        queryKey: ["ticket-replies", ticketId],
+        queryKey: shopAdminQueryKeys.ticketReplies(ticketId),
         queryFn: () => getTicketReplies(ticketId),
     });
 
@@ -39,7 +40,7 @@ export default function TicketReplyList({
     const refreshReplies = async () => {
 
         await queryClient.invalidateQueries({
-            queryKey: ["ticket-replies", ticketId],
+            queryKey: shopAdminQueryKeys.ticketReplies(ticketId),
         });
 
     };
