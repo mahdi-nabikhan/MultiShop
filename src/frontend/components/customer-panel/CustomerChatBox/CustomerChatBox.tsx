@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+
 import {
     Send,
     FileText,
     Check,
     CheckCheck,
 } from "lucide-react";
+
 import {
     useMutation,
     useQuery,
@@ -19,14 +21,18 @@ import {
     sendConversationMessage,
 } from "@/services/chat.services";
 
+import { chatQueryKeys } from "@/Lib/query-keys/chat.keys";
+
 import { Message } from "@/types/chat";
 
 import "./CustomerChatBox.css";
+
 
 interface Props {
     conversationId: number | null;
     currentUserEmail: string;
 }
+
 
 export default function CustomerChatBox({
     conversationId,
@@ -38,7 +44,9 @@ export default function CustomerChatBox({
     const messagesEndRef =
         useRef<HTMLDivElement>(null);
 
-    const queryClient = useQueryClient();
+    const queryClient =
+        useQueryClient();
+
 
     /* =========================
        GET MESSAGES
@@ -49,19 +57,22 @@ export default function CustomerChatBox({
         isLoading,
         isError,
     } = useQuery<Message[]>({
-        queryKey: [
-            "conversation-messages",
-            conversationId,
-        ],
+
+        queryKey:
+            chatQueryKeys.conversationMessages(
+                conversationId!
+            ),
 
         queryFn: () =>
             getConversationMessages(
                 conversationId!
             ),
 
-        enabled: !!conversationId,
+        enabled:
+            !!conversationId,
 
         refetchInterval: 3000,
+
     });
 
 
@@ -69,25 +80,33 @@ export default function CustomerChatBox({
        SEND MESSAGE
     ========================= */
 
-    const sendMessageMutation = useMutation({
-        mutationFn: (message: string) =>
-            sendConversationMessage(
-                conversationId!,
-                message
-            ),
+    const sendMessageMutation =
+        useMutation({
 
-        onSuccess: () => {
+            mutationFn: (
+                message: string
+            ) =>
+                sendConversationMessage(
+                    conversationId!,
+                    message
+                ),
 
-            setText("");
+            onSuccess: () => {
 
-            queryClient.invalidateQueries({
-                queryKey: [
-                    "conversation-messages",
-                    conversationId,
-                ],
-            });
-        },
-    });
+                setText("");
+
+                queryClient.invalidateQueries({
+
+                    queryKey:
+                        chatQueryKeys.conversationMessages(
+                            conversationId!
+                        ),
+
+                });
+
+            },
+
+        });
 
 
     /* =========================
@@ -107,6 +126,7 @@ export default function CustomerChatBox({
         sendMessageMutation.mutate(
             text.trim()
         );
+
     };
 
 
@@ -117,7 +137,9 @@ export default function CustomerChatBox({
     useEffect(() => {
 
         messagesEndRef.current?.scrollIntoView({
+
             behavior: "smooth",
+
         });
 
     }, [messages]);
@@ -139,7 +161,9 @@ export default function CustomerChatBox({
             e.preventDefault();
 
             sendMessage();
+
         }
+
     };
 
 
@@ -171,7 +195,9 @@ export default function CustomerChatBox({
                 </div>
 
             </section>
+
         );
+
     }
 
 
@@ -183,9 +209,8 @@ export default function CustomerChatBox({
 
         <section className="customer-chatbox">
 
-            {/* =========================
-                HEADER
-            ========================= */}
+
+            {/* HEADER */}
 
             <header className="customer-chat-header">
 
@@ -212,9 +237,7 @@ export default function CustomerChatBox({
             </header>
 
 
-            {/* =========================
-                BODY
-            ========================= */}
+            {/* BODY */}
 
             <div className="customer-chat-body">
 
@@ -273,6 +296,7 @@ export default function CustomerChatBox({
                             >
 
                                 <div className="customer-message-bubble">
+
 
                                     {/* SENDER */}
 
@@ -372,8 +396,11 @@ export default function CustomerChatBox({
                                 </div>
 
                             </div>
+
                         );
+
                     })
+
                 )}
 
 
@@ -384,9 +411,7 @@ export default function CustomerChatBox({
             </div>
 
 
-            {/* =========================
-                SEND ERROR
-            ========================= */}
+            {/* SEND ERROR */}
 
             {sendMessageMutation.isError &&
                 messages.length > 0 && (
@@ -396,12 +421,11 @@ export default function CustomerChatBox({
                         Failed to send message.
 
                     </div>
+
                 )}
 
 
-            {/* =========================
-                INPUT
-            ========================= */}
+            {/* INPUT */}
 
             <div className="customer-chat-input">
 
@@ -442,6 +466,9 @@ export default function CustomerChatBox({
 
             </div>
 
+
         </section>
+
     );
+
 }

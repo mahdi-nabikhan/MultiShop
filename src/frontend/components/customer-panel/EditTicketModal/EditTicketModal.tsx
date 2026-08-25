@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import {
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
 
 import { Ticket } from "@/types/ticket";
 import { updateCustomerTicket } from "@/services/ticket.services";
@@ -11,24 +14,29 @@ import {
     Save,
 } from "lucide-react";
 
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
+
 import "./EditTicketModal.css";
+
 
 interface Props {
     open: boolean;
     close: () => void;
     ticket: Ticket;
-    refresh: () => void;
 }
+
 
 export default function EditTicketModal({
     open,
     close,
     ticket,
-    refresh,
 }: Props) {
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+
+    const queryClient = useQueryClient();
+
 
     useEffect(() => {
 
@@ -40,6 +48,7 @@ export default function EditTicketModal({
         }
 
     }, [ticket]);
+
 
     const {
         mutate: updateTicket,
@@ -58,7 +67,23 @@ export default function EditTicketModal({
 
         onSuccess: async () => {
 
-            await refresh();
+            await queryClient.invalidateQueries({
+                queryKey:
+                    customerQueryKeys.tickets(),
+            });
+
+
+            await queryClient.invalidateQueries({
+                queryKey:
+                    customerQueryKeys.ticket(ticket.pk),
+            });
+
+
+            await queryClient.invalidateQueries({
+                queryKey:
+                    customerQueryKeys.ticketReplies(ticket.pk),
+            });
+
 
             close();
 
@@ -75,9 +100,13 @@ export default function EditTicketModal({
 
     });
 
+
     if (!open) {
+
         return null;
+
     }
+
 
     const updateTicketHandler = (
         e: React.FormEvent
@@ -88,6 +117,7 @@ export default function EditTicketModal({
         updateTicket();
 
     };
+
 
     return (
 
@@ -106,10 +136,13 @@ export default function EditTicketModal({
                         onClick={close}
                         disabled={isPending}
                     >
+
                         <X size={22} />
+
                     </button>
 
                 </div>
+
 
                 <form
                     onSubmit={updateTicketHandler}
@@ -129,6 +162,7 @@ export default function EditTicketModal({
                         disabled={isPending}
                     />
 
+
                     <label>
                         Content
                     </label>
@@ -142,6 +176,7 @@ export default function EditTicketModal({
                         disabled={isPending}
                     />
 
+
                     <button
                         type="submit"
                         className="save-ticket-btn"
@@ -150,9 +185,10 @@ export default function EditTicketModal({
 
                         <Save size={18} />
 
-                        {isPending
-                            ? "Updating..."
-                            : "Update Ticket"
+                        {
+                            isPending
+                                ? "Updating..."
+                                : "Update Ticket"
                         }
 
                     </button>
@@ -164,4 +200,5 @@ export default function EditTicketModal({
         </div>
 
     );
+
 }

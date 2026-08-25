@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-
+import { shopQueryKeys } from "@/Lib/query-keys/shop.keys"; 
 import { getStores } from "@/services/shop.services";
 import ShopPagination from "./ShopPagination";
 
@@ -21,17 +21,9 @@ export default function ShopList({
 }: Props) {
 
 
-    const {
-        data,
-        isLoading,
-        isError,
-    } = useQuery({
+    const {data,isLoading,isError,} = useQuery({
 
-        queryKey: [
-            "stores",
-            page,
-        ],
-
+        queryKey: shopQueryKeys.stores(page),
         queryFn: () =>
             getStores(page),
 

@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import BACKEND_URLS from "@/utils";
 
 import "./CustomerOrderOtemList.css";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
 import { getCustomerOrderItems } from "@/services/order.services";
 
 import { Package } from "lucide-react";
@@ -29,7 +29,7 @@ export default function CustomerOrderItemList({
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-order-items", orderId],
+        queryKey: customerQueryKeys.orderItems(orderId),
         queryFn: () => getCustomerOrderItems(orderId),
         enabled: !!orderId,
     });

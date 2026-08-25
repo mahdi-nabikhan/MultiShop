@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import Link from "next/link";
 
-
 import {
     Ticket,
     Store,
@@ -13,27 +12,28 @@ import {
 
 import { getCustomerTickets } from "@/services/cutomer-panel.services";
 import type { CustomerTicket } from "@/types/ticket";
+
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
+
 import "./CustomerTicketList.css";
 
 
-
 export default function CustomerTicketList() {
+
     const {
         data: tickets = [],
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-tickets"],
+
+        queryKey: customerQueryKeys.tickets(),
+
         queryFn: getCustomerTickets,
+
     });
 
 
-
-
-
-    if (
-        isLoading
-    ) {
+    if (isLoading) {
 
         return (
 
@@ -43,20 +43,30 @@ export default function CustomerTicketList() {
 
             </div>
 
-        )
+        );
 
     }
+
+
     if (isError) {
-    return (
-        <div className="ticket-loading">
-            Failed to load tickets.
-        </div>
-    );
-}
+
+        return (
+
+            <div className="ticket-loading">
+
+                Failed to load tickets.
+
+            </div>
+
+        );
+
+    }
+
 
     return (
 
         <section className="customer-ticket-list">
+
 
             <div className="ticket-header">
 
@@ -73,6 +83,7 @@ export default function CustomerTicketList() {
                 </span>
 
             </div>
+
 
             <div className="ticket-grid">
 
@@ -94,13 +105,16 @@ export default function CustomerTicketList() {
 
                             </div>
 
+
                             <div className="ticket-content">
+
 
                                 <h3>
 
                                     {ticket.title}
 
                                 </h3>
+
 
                                 <p>
 
@@ -120,7 +134,9 @@ export default function CustomerTicketList() {
 
                                 </p>
 
+
                                 <div className="ticket-footer">
+
 
                                     <div className="ticket-store">
 
@@ -129,6 +145,7 @@ export default function CustomerTicketList() {
                                         Store #{ticket.store}
 
                                     </div>
+
 
                                     <Link
 
@@ -144,9 +161,12 @@ export default function CustomerTicketList() {
 
                                     </Link>
 
+
                                 </div>
 
+
                             </div>
+
 
                         </div>
 
@@ -155,6 +175,7 @@ export default function CustomerTicketList() {
                 }
 
             </div>
+
 
         </section>
 

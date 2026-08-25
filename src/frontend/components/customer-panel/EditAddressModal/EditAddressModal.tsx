@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
 import { updateAddress } from "@/services/cutomer-panel.services";
 import { Address2 } from "@/types/address";
 
@@ -66,7 +66,7 @@ export default function EditAddressModal({
         onSuccess: () => {
 
             queryClient.invalidateQueries({
-                queryKey: ["address-detail", address.id],
+                queryKey: customerQueryKeys.address(address.id),
             });
 
             onClose();

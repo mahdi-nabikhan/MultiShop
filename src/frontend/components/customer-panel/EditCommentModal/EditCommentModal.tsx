@@ -7,6 +7,8 @@ import { X, Save } from "lucide-react";
 import { CommentProp } from "@/types/comment";
 import { updateComment } from "@/services/comment.services";
 
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
+
 import "./EditCommentModal.css";
 
 
@@ -31,7 +33,11 @@ export default function EditCommentModal({
     useEffect(() => {
 
         if (comment) {
-            setDescription(comment.descriptions);
+
+            setDescription(
+                comment.descriptions
+            );
+
         }
 
     }, [comment]);
@@ -48,13 +54,14 @@ export default function EditCommentModal({
         onSuccess: () => {
 
             queryClient.invalidateQueries({
-                queryKey: [
-                    "comment-detail",
-                    comment.id,
-                ],
+
+                queryKey:
+                    customerQueryKeys.comments(),
+
             });
 
             close();
+
         },
 
         onError: (error) => {
@@ -70,7 +77,9 @@ export default function EditCommentModal({
 
 
     if (!open) {
+
         return null;
+
     }
 
 
@@ -143,9 +152,11 @@ export default function EditCommentModal({
 
                         <Save size={18} />
 
-                        {updateCommentMutation.isPending
-                            ? "Updating..."
-                            : "Update Comment"}
+                        {
+                            updateCommentMutation.isPending
+                                ? "Updating..."
+                                : "Update Comment"
+                        }
 
                     </button>
 

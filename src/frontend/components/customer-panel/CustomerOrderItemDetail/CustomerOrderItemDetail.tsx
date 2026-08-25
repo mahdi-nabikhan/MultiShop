@@ -4,6 +4,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCustomerOrderItemDetail } from "@/services/order.services";
 import type { CustomerOrderItem } from "@/types/order";
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
 import { Package, Clock } from "lucide-react";
 import "./CustomerOrderItemDetail.css";
 import BACKEND_URLS from "@/utils";
@@ -24,7 +25,7 @@ export default function CustomerOrderItemDetail({ itemId }: Props) {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-order-item-detail", itemId],
+        queryKey: customerQueryKeys.orderItem(itemId),
         queryFn: () => getCustomerOrderItemDetail(itemId),
         enabled: !!itemId,
     });

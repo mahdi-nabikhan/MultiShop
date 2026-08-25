@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
+import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
 import { getFilteredProducts } from "@/services/product.services";
 
 import type { Product } from "@/types/product";
@@ -33,12 +33,7 @@ export default function ProductFilterList() {
         isError,
     } = useQuery<Product[]>({
 
-        queryKey: [
-            "products",
-            "filter",
-            order,
-        ],
-
+        queryKey: shopQueryKeys.filteredProducts(order),
         queryFn: () =>
             getFilteredProducts(order),
 

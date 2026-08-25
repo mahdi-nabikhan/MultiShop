@@ -1,12 +1,15 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 import "./DeleteAddressModal.css";
+
 import { deleteAddress } from "@/services/cutomer-panel.services";
+
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
 
 
 interface Props {
-
 
     open: boolean;
 
@@ -14,9 +17,7 @@ interface Props {
 
     addressId: number;
 
-
 }
-
 
 
 export default function DeleteAddressModal({
@@ -27,45 +28,52 @@ export default function DeleteAddressModal({
 
     addressId
 
-
 }: Props) {
 
 
-
-
     const queryClient = useQueryClient();
+
 
     const {
         mutate: DeleteAddress,
         isPending,
     } = useMutation({
-        mutationFn: () => deleteAddress(addressId),
+
+        mutationFn: () =>
+            deleteAddress(addressId),
 
         onSuccess: async () => {
-            await queryClient.invalidateQueries({
-                queryKey: ["addresses"],
-            });
 
             await queryClient.invalidateQueries({
-                queryKey: ["address-detail", addressId],
+
+                queryKey:
+                    customerQueryKeys.addresses(),
+
             });
+
+
+            await queryClient.invalidateQueries({
+
+                queryKey:
+                    customerQueryKeys.address(addressId),
+
+            });
+
 
             onClose();
+
         },
 
         onError: (error) => {
+
             console.error(
                 "DELETE ADDRESS ERROR:",
                 error
             );
+
         },
+
     });
-
-
-
-
-
-
 
 
     if (!open) {
@@ -75,26 +83,12 @@ export default function DeleteAddressModal({
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     return (
-
 
         <div className="delete-modal-overlay">
 
 
-
             <div className="delete-address-modal">
-
 
 
                 <h2>
@@ -102,7 +96,6 @@ export default function DeleteAddressModal({
                     Delete Address?
 
                 </h2>
-
 
 
                 <p>
@@ -114,11 +107,7 @@ export default function DeleteAddressModal({
                 </p>
 
 
-
-
-
                 <div className="delete-actions">
-
 
 
                     <button
@@ -134,31 +123,35 @@ export default function DeleteAddressModal({
                     </button>
 
 
-
-
-
                     <button
-                        className="confirm-delete"
-                        onClick={() => DeleteAddress()}
-                        disabled={isPending}
-                    >
-                        {isPending ? "Deleting..." : "Delete"}
-                    </button>
 
+                        className="confirm-delete"
+
+                        onClick={() =>
+                            DeleteAddress()
+                        }
+
+                        disabled={isPending}
+
+                    >
+
+                        {
+                            isPending
+                                ? "Deleting..."
+                                : "Delete"
+                        }
+
+                    </button>
 
 
                 </div>
 
 
-
             </div>
-
 
 
         </div>
 
-
     );
-
 
 }
