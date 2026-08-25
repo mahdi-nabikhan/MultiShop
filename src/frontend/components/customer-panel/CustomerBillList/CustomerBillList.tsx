@@ -4,7 +4,7 @@
 
 import { getBills } from "@/services/order.services";
 import { useQuery } from "@tanstack/react-query";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 import {
     ReceiptText,
     CalendarDays,
@@ -25,7 +25,7 @@ export default function CustomerBillList() {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-bills"],
+        queryKey: customerQueryKeys.bills(),
         queryFn: getBills,
     });
 

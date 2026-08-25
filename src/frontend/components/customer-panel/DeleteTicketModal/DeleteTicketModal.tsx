@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { deleteCustomerTicket } from "@/services/ticket.services";
 import "./DeleteTicketModal.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 
 interface Props { open: boolean; close: () => void; ticketId: number; }
 
@@ -27,11 +27,11 @@ export default function DeleteTicketModal({ open, close, ticketId }: Props) {
 
         onSuccess: async () => {
             await queryClient.invalidateQueries({
-                queryKey: ["customer-tickets"],
+                 queryKey: customerQueryKeys.tickets(),
             });
 
             await queryClient.invalidateQueries({
-                queryKey: ["customer-ticket-detail", ticketId],
+                queryKey: customerQueryKeys.ticket(ticketId),
             });
 
             close();

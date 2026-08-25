@@ -11,14 +11,25 @@ import {
     Edit,
     Trash2
 } from "lucide-react";
+
 import Link from "next/link";
-import { getCustomerTicketDetail, getCustomerTicketReplies } from "@/services/ticket.services";
+
+import {
+    getCustomerTicketDetail,
+    getCustomerTicketReplies
+} from "@/services/ticket.services";
 
 import EditTicketModal from "../EditTicketModal/EditTicketModal";
 import DeleteTicketModal from "../DeleteTicketModal/DeleteTicketModal";
-import type { CustomerTicketDetailProp, TicketReplyProp } from "@/types/ticket";
-import "./CustomerTicketDetail.css";
 
+import type {
+    CustomerTicketDetailProp,
+    TicketReplyProp
+} from "@/types/ticket";
+
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
+
+import "./CustomerTicketDetail.css";
 
 
 interface Props {
@@ -27,51 +38,70 @@ interface Props {
 
 }
 
+
 export default function CustomerTicketDetail({
 
     ticketId
 
 }: Props) {
 
+
     const {
         data: ticket,
         isLoading: ticketLoading,
         isError: ticketError,
         refetch: refetchTicket,
+
     } = useQuery<CustomerTicketDetailProp>({
-        queryKey: ["customer-ticket-detail", ticketId],
-        queryFn: () => getCustomerTicketDetail(ticketId),
+
+        queryKey: customerQueryKeys.ticket(ticketId),
+
+        queryFn: () =>
+            getCustomerTicketDetail(ticketId),
+
         enabled: !!ticketId,
+
     });
+
 
     const {
         data: replies = [],
         isLoading: repliesLoading,
         isError: repliesError,
         refetch: refetchReplies,
-    } = useQuery<TicketReplyProp[]>({
-        queryKey: ["customer-ticket-replies", ticketId],
-        queryFn: () => getCustomerTicketReplies(ticketId),
-        enabled: !!ticketId,
-    });
-    const [openEdit, setOpenEdit] = useState(false);
 
-    const [openDelete, setOpenDelete] = useState(false);
+    } = useQuery<TicketReplyProp[]>({
+
+        queryKey:
+            customerQueryKeys.ticketReplies(ticketId),
+
+        queryFn: () =>
+            getCustomerTicketReplies(ticketId),
+
+        enabled: !!ticketId,
+
+    });
+
+
+    const [openEdit, setOpenEdit] =
+        useState(false);
+
+
+    const [openDelete, setOpenDelete] =
+        useState(false);
+
 
     const Refresh = async () => {
+
         await Promise.all([
+
             refetchTicket(),
+
             refetchReplies(),
+
         ]);
+
     };
-
-
-
-
-
-
-
-
 
 
     if (ticketLoading || repliesLoading) {
@@ -89,7 +119,6 @@ export default function CustomerTicketDetail({
     }
 
 
-
     if (!ticket) {
 
         return (
@@ -104,17 +133,26 @@ export default function CustomerTicketDetail({
 
     }
 
+
     if (ticketError || repliesError) {
+
         return (
+
             <div className="ticket-loading">
+
                 Failed to load ticket.
+
             </div>
+
         );
+
     }
+
 
     return (
 
         <section className="customer-ticket-detail">
+
 
             <Link
 
@@ -131,10 +169,11 @@ export default function CustomerTicketDetail({
             </Link>
 
 
-
             <div className="ticket-detail-card">
 
+
                 <div className="ticket-top">
+
 
                     <div>
 
@@ -144,20 +183,26 @@ export default function CustomerTicketDetail({
 
                         </h1>
 
+
                         <p>
 
                             {ticket.content}
 
                         </p>
+
                     </div>
 
+
                     <div className="ticket-actions">
+
 
                         <button
 
                             className="ticket-edit-btn"
 
-                            onClick={() => setOpenEdit(true)}
+                            onClick={() =>
+                                setOpenEdit(true)
+                            }
 
                         >
 
@@ -167,11 +212,14 @@ export default function CustomerTicketDetail({
 
                         </button>
 
+
                         <button
 
                             className="ticket-delete-btn"
 
-                            onClick={() => setOpenDelete(true)}
+                            onClick={() =>
+                                setOpenDelete(true)
+                            }
 
                         >
 
@@ -181,13 +229,15 @@ export default function CustomerTicketDetail({
 
                         </button>
 
+
                     </div>
+
 
                 </div>
 
 
-
                 <div className="ticket-info">
+
 
                     <div>
 
@@ -197,6 +247,7 @@ export default function CustomerTicketDetail({
 
                     </div>
 
+
                     <div>
 
                         <Store size={18} />
@@ -205,13 +256,15 @@ export default function CustomerTicketDetail({
 
                     </div>
 
+
                 </div>
+
 
             </div>
 
 
-
             <div className="conversation">
+
 
                 <h2>
 
@@ -219,9 +272,12 @@ export default function CustomerTicketDetail({
 
                 </h2>
 
+
                 <div className="conversation-list">
 
+
                     <div className="customer-message">
+
 
                         <div className="message-badge">
 
@@ -229,9 +285,12 @@ export default function CustomerTicketDetail({
 
                         </div>
 
+
                         <div className="message-box">
 
+
                             <MessageSquare size={18} />
+
 
                             <p>
 
@@ -239,9 +298,12 @@ export default function CustomerTicketDetail({
 
                             </p>
 
+
                         </div>
 
+
                     </div>
+
 
                     {
 
@@ -255,15 +317,19 @@ export default function CustomerTicketDetail({
 
                             >
 
+
                                 <div className="message-badge support">
 
                                     Support
 
                                 </div>
 
+
                                 <div className="message-box">
 
+
                                     <MessageSquare size={18} />
+
 
                                     <p>
 
@@ -271,7 +337,9 @@ export default function CustomerTicketDetail({
 
                                     </p>
 
+
                                 </div>
+
 
                             </div>
 
@@ -279,17 +347,20 @@ export default function CustomerTicketDetail({
 
                     }
 
+
                 </div>
 
-            </div>
 
+            </div>
 
 
             <EditTicketModal
 
                 open={openEdit}
 
-                close={() => setOpenEdit(false)}
+                close={() =>
+                    setOpenEdit(false)
+                }
 
                 ticket={ticket}
 
@@ -298,16 +369,18 @@ export default function CustomerTicketDetail({
             />
 
 
-
             <DeleteTicketModal
 
                 open={openDelete}
 
-                close={() => setOpenDelete(false)}
+                close={() =>
+                    setOpenDelete(false)
+                }
 
                 ticketId={ticket.pk}
 
             />
+
 
         </section>
 

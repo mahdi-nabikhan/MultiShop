@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCustomerOrders } from "@/services/order.services";
 import Link from "next/link";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
 
 
 import {
@@ -25,7 +25,7 @@ export default function CustomerOrderList() {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-orders"],
+        queryKey: customerQueryKeys.orders(),
         queryFn: getCustomerOrders,
     });
 

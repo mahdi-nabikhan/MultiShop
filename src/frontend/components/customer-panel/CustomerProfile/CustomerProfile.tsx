@@ -1,45 +1,37 @@
-
 "use client";
-import { useEffect } from "react";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+
 import {
     useMutation,
     useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
-import { getCustomerProfile, updateCustomerProfile } from "@/services/cutomer-panel.services";
+
+import {
+    getCustomerProfile,
+    updateCustomerProfile,
+} from "@/services/cutomer-panel.services";
+
 import { CustomerProfileProp } from "@/types/customer";
+
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 import "./CustomerProfile.css";
 
 
-
-
-
 export default function CustomerProfile() {
-
 
     // ==========================================
     // Profile
     // ==========================================
 
+    const [editData, setEditData] = useState({
+        username: "",
+    });
 
-
-
-    const [editData, setEditData] =
-        useState({
-            username: "",
-        });
-
-
-    const [editing, setEditing] =
-        useState(false);
-
-
-
-
-
+    const [editing, setEditing] = useState(false);
 
 
     // ==========================================
@@ -50,12 +42,16 @@ export default function CustomerProfile() {
         useState(false);
 
 
+    // ==========================================
+    // Query Client
+    // ==========================================
+
+    const queryClient = useQueryClient();
+
 
     // ==========================================
     // Get Customer Profile
     // ==========================================
-
-    const queryClient = useQueryClient();
 
     const {
         data: profile,
@@ -63,15 +59,9 @@ export default function CustomerProfile() {
         isError,
         refetch,
     } = useQuery<CustomerProfileProp>({
-        queryKey: ["customer-profile"],
+        queryKey: customerQueryKeys.profile(),
         queryFn: getCustomerProfile,
     });
-
-
-    // ==========================================
-    // Load Profile
-    // ==========================================
-
 
 
     // ==========================================
@@ -83,34 +73,38 @@ export default function CustomerProfile() {
     ) {
 
         setEditData({
-
             ...editData,
-
-            [e.target.name]:
-                e.target.value,
-
+            [e.target.name]: e.target.value,
         });
 
     }
 
+
     useEffect(() => {
+
         if (profile) {
+
             setEditData({
                 username: profile.username,
             });
+
         }
+
     }, [profile]);
+
 
     // ==========================================
     // Update Profile
     // ==========================================
 
     const updateProfileMutation = useMutation({
+
         mutationFn: updateCustomerProfile,
 
         onSuccess: (data) => {
+
             queryClient.setQueryData(
-                ["customer-profile"],
+                customerQueryKeys.profile(),
                 data
             );
 
@@ -119,24 +113,33 @@ export default function CustomerProfile() {
             });
 
             setEditing(false);
+
         },
 
         onError: (error: any) => {
+
             console.error(
                 "Profile update error:",
                 error
             );
+
         },
+
     });
+
+
     function updateProfile(
         e: React.FormEvent
     ) {
+
         e.preventDefault();
 
         updateProfileMutation.mutate(
             editData
         );
+
     }
+
 
     // ==========================================
     // Loading
@@ -157,7 +160,6 @@ export default function CustomerProfile() {
     }
 
 
-
     // ==========================================
     // Error
     // ==========================================
@@ -169,9 +171,8 @@ export default function CustomerProfile() {
             <div className="customer-profile-error">
 
                 <p>
-                    {isError}
+                    Failed to load profile.
                 </p>
-
 
                 <button onClick={() => refetch()}>
                     Try Again
@@ -184,13 +185,11 @@ export default function CustomerProfile() {
     }
 
 
-
     if (!profile) {
 
         return null;
 
     }
-
 
 
     // ==========================================
@@ -218,11 +217,9 @@ export default function CustomerProfile() {
                             ACCOUNT
                         </span>
 
-
                         <h1>
                             My Profile
                         </h1>
-
 
                         <p>
                             Manage your account
@@ -232,19 +229,14 @@ export default function CustomerProfile() {
                     </div>
 
 
-
                     {!editing && (
 
                         <button
-
                             type="button"
-
                             className="edit-profile-btn"
-
                             onClick={() =>
                                 setEditing(true)
                             }
-
                         >
 
                             Edit Profile
@@ -257,9 +249,7 @@ export default function CustomerProfile() {
                 </div>
 
 
-
                 {!editing ? (
-
 
                     <div className="customer-profile-info">
 
@@ -269,20 +259,14 @@ export default function CustomerProfile() {
                         <div className="profile-info-row">
 
                             <div className="profile-info-label">
-
                                 Username
-
                             </div>
 
-
                             <div className="profile-info-value">
-
                                 {profile.username}
-
                             </div>
 
                         </div>
-
 
 
                         {/* Customer ID */}
@@ -290,20 +274,14 @@ export default function CustomerProfile() {
                         <div className="profile-info-row">
 
                             <div className="profile-info-label">
-
                                 Customer ID
-
                             </div>
 
-
                             <div className="profile-info-value">
-
                                 #{profile.id}
-
                             </div>
 
                         </div>
-
 
 
                         {/* Account Type */}
@@ -311,18 +289,13 @@ export default function CustomerProfile() {
                         <div className="profile-info-row">
 
                             <div className="profile-info-label">
-
                                 Account Type
-
                             </div>
-
 
                             <div className="profile-info-value">
 
                                 <span className="customer-badge">
-
                                     Customer
-
                                 </span>
 
                             </div>
@@ -330,24 +303,18 @@ export default function CustomerProfile() {
                         </div>
 
 
-
                         {/* Status */}
 
                         <div className="profile-info-row">
 
                             <div className="profile-info-label">
-
                                 Status
-
                             </div>
-
 
                             <div className="profile-info-value">
 
                                 <span className="active-badge">
-
                                     Active
-
                                 </span>
 
                             </div>
@@ -357,20 +324,15 @@ export default function CustomerProfile() {
 
                     </div>
 
-
                 ) : (
-
 
                     /* ==================================
                        EDIT FORM
                     ================================== */
 
                     <form
-
                         onSubmit={updateProfile}
-
                         className="customer-profile-form"
-
                     >
 
 
@@ -380,39 +342,26 @@ export default function CustomerProfile() {
                                 Username
                             </label>
 
-
                             <input
-
                                 type="text"
-
                                 name="username"
-
-                                value={
-                                    editData.username
-                                }
-
+                                value={editData.username}
                                 onChange={
                                     handleProfileChange
                                 }
-
                                 required
-
                             />
 
                         </div>
 
 
-
                         {isError && (
 
                             <p className="form-error">
-
-                                {isError}
-
+                                Failed to update profile.
                             </p>
 
                         )}
-
 
 
                         <div className="profile-form-actions">
@@ -421,25 +370,35 @@ export default function CustomerProfile() {
                                 type="button"
                                 className="cancel-btn"
                                 onClick={() => {
+
                                     setEditing(false);
 
                                     setEditData({
-                                        username: profile.username,
+                                        username:
+                                            profile.username,
                                     });
+
                                 }}
                             >
                                 Cancel
                             </button>
+
+
                             <button
                                 type="submit"
                                 className="save-profile-btn"
-                                disabled={updateProfileMutation.isPending}
+                                disabled={
+                                    updateProfileMutation.isPending
+                                }
                             >
+
                                 {updateProfileMutation.isPending
                                     ? "Saving..."
                                     : "Save Changes"
                                 }
+
                             </button>
+
                         </div>
 
 
@@ -449,7 +408,6 @@ export default function CustomerProfile() {
 
 
             </section>
-
 
 
             {/* ==================================
@@ -468,11 +426,9 @@ export default function CustomerProfile() {
                             SECURITY
                         </span>
 
-
                         <h2>
                             Password & Security
                         </h2>
-
 
                         <p>
                             Manage your account password.
@@ -481,17 +437,12 @@ export default function CustomerProfile() {
                     </div>
 
 
-
                     <button
-
                         type="button"
-
                         className="change-password-btn"
-
                         onClick={() =>
                             setPasswordModal(true)
                         }
-
                     >
 
                         Change Password
@@ -505,16 +456,11 @@ export default function CustomerProfile() {
             </section>
 
 
-
-
             <ChangePasswordModal
-
                 isOpen={passwordModal}
-
                 onClose={() =>
                     setPasswordModal(false)
                 }
-
             />
 
 

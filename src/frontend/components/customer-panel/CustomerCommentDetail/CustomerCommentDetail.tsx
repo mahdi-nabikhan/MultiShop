@@ -3,11 +3,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import {
-    MessageCircle,
-    Edit,
-    Trash
-} from "lucide-react";
+import {MessageCircle,Edit,Trash} from "lucide-react";
 import { getCommentDetail } from "@/services/cutomer-panel.services";
 import { Comment } from "@/types/comment";
 

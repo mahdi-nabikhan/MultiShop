@@ -2,7 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getAddresses } from "@/services/cutomer-panel.services";
-import { Address } from "@/types/address";
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
+
 import {
     MapPin,
     Hash
@@ -19,7 +20,7 @@ export default function CustomerAddressList() {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-addresses"],
+        queryKey: customerQueryKeys.addresses(),
         queryFn: getAddresses,
     });
 

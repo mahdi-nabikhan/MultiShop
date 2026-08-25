@@ -2,7 +2,7 @@
 
 
 import { useQuery } from "@tanstack/react-query";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 import { getCustomerComments } from "@/services/cutomer-panel.services";
 import { Comment } from "@/types/comment";
 import {
@@ -21,7 +21,7 @@ export default function CustomerCommentList() {
         isLoading,
         isError,
     } = useQuery({
-        queryKey: ["customer-comments"],
+        queryKey: customerQueryKeys.comments(),
         queryFn: getCustomerComments,
     });
 
