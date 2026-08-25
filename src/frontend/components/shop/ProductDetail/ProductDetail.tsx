@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
+import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
 import ProductRating from "@/components/shop/ProductRating/ProductRating";
 
 import {
@@ -41,7 +41,7 @@ export default function ProductDetail({
         isLoading: productLoading,
         isError: productError,
     } = useQuery({
-        queryKey: ["product", productId],
+        queryKey: shopQueryKeys.product(productId),
         queryFn: () => getProduct(productId),
     });
 
@@ -51,7 +51,7 @@ export default function ProductDetail({
         isLoading: imagesLoading,
         isError: imagesError,
     } = useQuery({
-        queryKey: ["product-images", productId],
+        queryKey: shopQueryKeys.productImages(productId),
         queryFn: () => getProductImages(productId),
     });
 

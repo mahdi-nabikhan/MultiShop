@@ -1,5 +1,5 @@
 "use client";
-
+import { shopQueryKeys } from "@/Lib/query-keys/shop.keys"; 
 import { useState } from "react";
 
 import {
@@ -54,24 +54,13 @@ export default function ProductRating({
     // Check Can Rate
     // ==========================================
 
-    const {
-        data: canRate = false,
-        isLoading: loading,
-        isError,
-    } = useQuery({
-
-        queryKey: [
-            "can-rate-product",
-            productId,
-        ],
-
+    const {data: canRate = false,isLoading: loading,isError} = useQuery({
+        queryKey: shopQueryKeys.canRateProduct(productId),
         queryFn: () =>
             canRateProduct(productId),
 
         enabled:
-            isAuthenticated,
-
-    });
+            isAuthenticated,});
 
 
     // ==========================================

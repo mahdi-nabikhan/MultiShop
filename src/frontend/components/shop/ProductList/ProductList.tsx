@@ -1,5 +1,5 @@
 "use client";
-
+import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
 
@@ -29,7 +29,7 @@ export default  function ProductList({
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["store-products", shopId],
+    queryKey: shopQueryKeys.storeProducts(shopId),
     queryFn: () => getStoreProducts(shopId),
   });
 
