@@ -88,7 +88,11 @@ export default function ChatBox({
         enabled:
             conversationId !== null,
 
-        refetchInterval: 3000,
+            refetchInterval: 3000,
+            staleTime: 0,
+            gcTime: 10 * 60 * 1000,
+
+    
 
     });
 
