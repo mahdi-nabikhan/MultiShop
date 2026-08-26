@@ -12,7 +12,6 @@ export default function ReactQueryProvider({
 }: {
     children: React.ReactNode;
 }) {
-
     const [queryClient] = useState(
         () =>
             new QueryClient({
@@ -22,6 +21,7 @@ export default function ReactQueryProvider({
                         gcTime: 5 * 60 * 1000,
                         retry: 1,
                         refetchOnWindowFocus: false,
+                        refetchOnReconnect: true,
                     },
                 },
             })
