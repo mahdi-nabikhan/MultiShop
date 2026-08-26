@@ -28,6 +28,8 @@ export default function CustomerOrderItemDetail({ itemId }: Props) {
         queryKey: customerQueryKeys.orderItem(itemId),
         queryFn: () => getCustomerOrderItemDetail(itemId),
         enabled: !!itemId,
+        staleTime: 10 * 60 * 1000,
+        gcTime: 30 * 60 * 1000,
     });
 
 

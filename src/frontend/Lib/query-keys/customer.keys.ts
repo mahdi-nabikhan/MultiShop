@@ -72,5 +72,6 @@ export const customerQueryKeys = {
 
     bills: () =>
         ["customer", "bills"] as const,
-
+    comment: (commentId: number) =>
+    ["customer", "comment", commentId] as const,
 };

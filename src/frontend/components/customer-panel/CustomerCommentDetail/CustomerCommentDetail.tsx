@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 import {MessageCircle,Edit,Trash} from "lucide-react";
 import { getCommentDetail } from "@/services/cutomer-panel.services";
 import { Comment } from "@/types/comment";
@@ -51,7 +51,7 @@ export default function CustomerCommentDetail({
         isLoading,
         isError,
     } = useQuery<Comment>({
-        queryKey: ["comment-detail", commentId],
+        queryKey: customerQueryKeys.comment(commentId),
         queryFn: () => getCommentDetail(commentId),
         enabled: !!commentId,
     });

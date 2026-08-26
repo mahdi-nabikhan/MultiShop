@@ -20,29 +20,16 @@ import "./CustomerOrderList.css";
 
 
 export default function CustomerOrderList() {
-    const {
-        data: orders = [],
-        isLoading,
-        isError,
-    } = useQuery({
+    const {data: orders = [],isLoading,isError,} = useQuery({
         queryKey: customerQueryKeys.orders(),
         queryFn: getCustomerOrders,
-    });
-
-
-
-
-
-
+        staleTime:10 * 60 * 1000,
+        gcTime:30 * 60 * 1000,});
 
     if (isLoading) {
-
         return (
-
             <div className="order-loading">
-
                 Loading Orders...
-
             </div>
 
         );
