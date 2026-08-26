@@ -53,6 +53,7 @@ export default function ProductDetail({
     } = useQuery({
         queryKey: shopQueryKeys.productImages(productId),
         queryFn: () => getProductImages(productId),
+        staleTime: 2 * 60 * 1000,
     });
 
 

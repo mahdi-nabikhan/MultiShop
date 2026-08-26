@@ -24,6 +24,7 @@ export default function StoreCategoryList({
      data: categories = [],isLoading,isError,} = useQuery<StoreCategory[]>({
        queryKey: shopQueryKeys.storeCategories(),
         queryFn: getStoreCategories,
+        staleTime: 30 * 60 * 1000,
 
     });
 

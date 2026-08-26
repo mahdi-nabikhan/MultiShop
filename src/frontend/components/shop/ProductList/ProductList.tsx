@@ -31,6 +31,8 @@ export default  function ProductList({
   } = useQuery({
     queryKey: shopQueryKeys.storeProducts(shopId),
     queryFn: () => getStoreProducts(shopId),
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
 
