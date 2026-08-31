@@ -1,10 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getCustomerOrders } from "@/services/order.services";
 import Link from "next/link";
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
-
+import useCustomerOrders from "@/hooks/customer/useCustomerOrders";
 
 import {
     Package,
@@ -20,11 +17,7 @@ import "./CustomerOrderList.css";
 
 
 export default function CustomerOrderList() {
-    const {data: orders = [],isLoading,isError,} = useQuery({
-        queryKey: customerQueryKeys.orders(),
-        queryFn: getCustomerOrders,
-        staleTime:10 * 60 * 1000,
-        gcTime:30 * 60 * 1000,});
+    const {data: orders = [],isLoading,isError,} = useCustomerOrders();
 
     if (isLoading) {
         return (

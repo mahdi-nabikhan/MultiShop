@@ -1,157 +1,80 @@
+
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useDeleteAddress from "@/hooks/customer/useDeleteAddress";
 
 import "./DeleteAddressModal.css";
 
-import { deleteAddress } from "@/services/cutomer-panel.services";
-
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
-
-
 interface Props {
-
     open: boolean;
-
     onClose: () => void;
-
     addressId: number;
-
 }
 
-
 export default function DeleteAddressModal({
-
     open,
-
     onClose,
-
-    addressId
-
+    addressId,
 }: Props) {
 
-
-    const queryClient = useQueryClient();
-
-
     const {
-        mutate: DeleteAddress,
+        mutate: deleteAddressMutation,
         isPending,
-    } = useMutation({
-
-        mutationFn: () =>
-            deleteAddress(addressId),
-
-        onSuccess: async () => {
-
-            await queryClient.invalidateQueries({
-
-                queryKey:
-                    customerQueryKeys.addresses(),
-
-            });
-
-
-            await queryClient.invalidateQueries({
-
-                queryKey:
-                    customerQueryKeys.address(addressId),
-
-            });
-
-
-            onClose();
-
-        },
-
-        onError: (error) => {
-
-            console.error(
-                "DELETE ADDRESS ERROR:",
-                error
-            );
-
-        },
-
-    });
-
+    } = useDeleteAddress(addressId);
 
     if (!open) {
-
         return null;
-
     }
 
+    const handleDelete = () => {
+
+        deleteAddressMutation(undefined, {
+            onSuccess: () => {
+                onClose();
+            },
+        });
+
+    };
 
     return (
-
         <div className="delete-modal-overlay">
-
 
             <div className="delete-address-modal">
 
-
                 <h2>
-
                     Delete Address?
-
                 </h2>
 
-
                 <p>
-
                     Are you sure you want to delete this address?
-
                     This action cannot be undone.
-
                 </p>
-
 
                 <div className="delete-actions">
 
-
                     <button
-
                         className="cancel-delete"
-
                         onClick={onClose}
-
+                        disabled={isPending}
                     >
-
                         Cancel
-
                     </button>
-
 
                     <button
-
                         className="confirm-delete"
-
-                        onClick={() =>
-                            DeleteAddress()
-                        }
-
+                        onClick={handleDelete}
                         disabled={isPending}
-
                     >
-
-                        {
-                            isPending
-                                ? "Deleting..."
-                                : "Delete"
+                        {isPending
+                            ? "Deleting..."
+                            : "Delete"
                         }
-
                     </button>
-
 
                 </div>
 
-
             </div>
 
-
         </div>
-
     );
-
 }

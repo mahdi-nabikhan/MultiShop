@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 
 import {
     ArrowLeft,
@@ -9,145 +8,96 @@ import {
     User,
     MessageSquare,
     Edit,
-    Trash2
+    Trash2,
 } from "lucide-react";
 
 import Link from "next/link";
 
-import {
-    getCustomerTicketDetail,
-    getCustomerTicketReplies
-} from "@/services/ticket.services";
+import useCustomerTicketDetail from "@/hooks/customer/useCustomerTicketDetail";
+    
 
-import EditTicketModal from "../EditTicketModal/EditTicketModal";
-import DeleteTicketModal from "../DeleteTicketModal/DeleteTicketModal";
+import EditTicketModal
+    from "../EditTicketModal/EditTicketModal";
 
-import type {
-    CustomerTicketDetailProp,
-    TicketReplyProp
-} from "@/types/ticket";
-
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
+import DeleteTicketModal
+    from "../DeleteTicketModal/DeleteTicketModal";
 
 import "./CustomerTicketDetail.css";
 
 
 interface Props {
-
     ticketId: number;
-
 }
 
 
 export default function CustomerTicketDetail({
-
-    ticketId
-
+    ticketId,
 }: Props) {
 
-
     const {
-        data: ticket,
-        isLoading: ticketLoading,
-        isError: ticketError,
-        refetch: refetchTicket,
-
-    } = useQuery<CustomerTicketDetailProp>({
-
-        queryKey: customerQueryKeys.ticket(ticketId),
-
-        queryFn: () =>
-            getCustomerTicketDetail(ticketId),
-
-        enabled: !!ticketId,
-
-    });
-
-
-    const {
-        data: replies = [],
-        isLoading: repliesLoading,
-        isError: repliesError,
-        refetch: refetchReplies,
-
-    } = useQuery<TicketReplyProp[]>({
-
-        queryKey:
-            customerQueryKeys.ticketReplies(ticketId),
-
-        queryFn: () =>
-            getCustomerTicketReplies(ticketId),
-
-        enabled: !!ticketId,
-
-    });
+        ticket,
+        replies,
+        isLoading,
+        isError,
+        refresh,
+    } = useCustomerTicketDetail(ticketId);
 
 
     const [openEdit, setOpenEdit] =
         useState(false);
 
-
     const [openDelete, setOpenDelete] =
         useState(false);
 
 
-    const Refresh = async () => {
+    // ==========================================
+    // Loading
+    // ==========================================
 
-        await Promise.all([
-
-            refetchTicket(),
-
-            refetchReplies(),
-
-        ]);
-
-    };
-
-
-    if (ticketLoading || repliesLoading) {
+    if (isLoading) {
 
         return (
-
             <div className="ticket-loading">
-
                 Loading...
-
             </div>
-
         );
 
     }
 
+
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError) {
+
+        return (
+            <div className="ticket-loading">
+                Failed to load ticket.
+            </div>
+        );
+
+    }
+
+
+    // ==========================================
+    // Not Found
+    // ==========================================
 
     if (!ticket) {
 
         return (
-
             <div className="ticket-loading">
-
                 Ticket Not Found
-
             </div>
-
         );
 
     }
 
 
-    if (ticketError || repliesError) {
-
-        return (
-
-            <div className="ticket-loading">
-
-                Failed to load ticket.
-
-            </div>
-
-        );
-
-    }
-
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
 
@@ -155,11 +105,8 @@ export default function CustomerTicketDetail({
 
 
             <Link
-
                 href="/customer-panel/tickets"
-
                 className="ticket-back"
-
             >
 
                 <ArrowLeft size={18} />
@@ -168,6 +115,10 @@ export default function CustomerTicketDetail({
 
             </Link>
 
+
+            {/* ==================================
+                TICKET
+            ================================== */}
 
             <div className="ticket-detail-card">
 
@@ -178,16 +129,11 @@ export default function CustomerTicketDetail({
                     <div>
 
                         <h1>
-
                             {ticket.title}
-
                         </h1>
 
-
                         <p>
-
                             {ticket.content}
-
                         </p>
 
                     </div>
@@ -197,13 +143,10 @@ export default function CustomerTicketDetail({
 
 
                         <button
-
                             className="ticket-edit-btn"
-
                             onClick={() =>
                                 setOpenEdit(true)
                             }
-
                         >
 
                             <Edit size={18} />
@@ -214,13 +157,10 @@ export default function CustomerTicketDetail({
 
 
                         <button
-
                             className="ticket-delete-btn"
-
                             onClick={() =>
                                 setOpenDelete(true)
                             }
-
                         >
 
                             <Trash2 size={18} />
@@ -263,41 +203,38 @@ export default function CustomerTicketDetail({
             </div>
 
 
+            {/* ==================================
+                CONVERSATION
+            ================================== */}
+
             <div className="conversation">
 
 
                 <h2>
-
                     Conversation
-
                 </h2>
 
 
                 <div className="conversation-list">
 
 
+                    {/* Customer Message */}
+
                     <div className="customer-message">
 
 
                         <div className="message-badge">
-
                             Customer
-
                         </div>
 
 
                         <div className="message-box">
 
-
                             <MessageSquare size={18} />
 
-
                             <p>
-
                                 {ticket.content}
-
                             </p>
-
 
                         </div>
 
@@ -305,47 +242,37 @@ export default function CustomerTicketDetail({
                     </div>
 
 
-                    {
+                    {/* Support Replies */}
 
-                        replies.map(reply => (
+                    {replies.map((reply) => (
 
-                            <div
-
-                                className="support-message"
-
-                                key={reply.pk}
-
-                            >
+                        <div
+                            className="support-message"
+                            key={reply.pk}
+                        >
 
 
-                                <div className="message-badge support">
+                            <div className="message-badge support">
 
-                                    Support
-
-                                </div>
-
-
-                                <div className="message-box">
-
-
-                                    <MessageSquare size={18} />
-
-
-                                    <p>
-
-                                        {reply.content}
-
-                                    </p>
-
-
-                                </div>
-
+                                Support
 
                             </div>
 
-                        ))
 
-                    }
+                            <div className="message-box">
+
+                                <MessageSquare size={18} />
+
+                                <p>
+                                    {reply.content}
+                                </p>
+
+                            </div>
+
+
+                        </div>
+
+                    ))}
 
 
                 </div>
@@ -353,6 +280,10 @@ export default function CustomerTicketDetail({
 
             </div>
 
+
+            {/* ==================================
+                EDIT
+            ================================== */}
 
             <EditTicketModal
 
@@ -364,10 +295,13 @@ export default function CustomerTicketDetail({
 
                 ticket={ticket}
 
-                refresh={Refresh}
 
             />
 
+
+            {/* ==================================
+                DELETE
+            ================================== */}
 
             <DeleteTicketModal
 
