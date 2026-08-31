@@ -1,41 +1,21 @@
 "use client";
 
 
-import { useQuery } from "@tanstack/react-query";
-import { getCustomerOrderItemDetail } from "@/services/order.services";
-import type { CustomerOrderItem } from "@/types/order";
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
+
+import useCustomerOrderItem from "@/hooks/customer/useCustomerOrderItem";
+
 import { Package, Clock } from "lucide-react";
 import "./CustomerOrderItemDetail.css";
 import BACKEND_URLS from "@/utils";
 
-interface Props {
-
-    itemId: number;
-
-}
-
-
-
-
+interface Props {itemId: number;}
 
 export default function CustomerOrderItemDetail({ itemId }: Props) {
     const {
         data: item,
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: customerQueryKeys.orderItem(itemId),
-        queryFn: () => getCustomerOrderItemDetail(itemId),
-        enabled: !!itemId,
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-    });
-
-
-
-
-
+    } = useCustomerOrderItem(itemId)
 
 
     if (isLoading) {

@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useCustomerOrderItems } from "@/hooks/customer/useCustomerOrder";
 
 import BACKEND_URLS from "@/utils";
 
 import "./CustomerOrderOtemList.css";
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
-import { getCustomerOrderItems } from "@/services/order.services";
+
 
 import { Package } from "lucide-react";
 
@@ -28,14 +27,7 @@ export default function CustomerOrderItemList({
         data: items = [],
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: customerQueryKeys.orderItems(orderId),
-        queryFn: () => getCustomerOrderItems(orderId),
-        enabled: !!orderId,
-        staleTime: 10 * 60 * 1000,
-        gcTime: 30 * 60 * 1000,
-    });
-
+    } = useCustomerOrderItems(orderId)
 
     if (isLoading) {
 

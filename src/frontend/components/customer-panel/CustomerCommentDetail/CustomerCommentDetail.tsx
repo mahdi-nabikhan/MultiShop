@@ -7,6 +7,8 @@ import {MessageCircle,Edit,Trash} from "lucide-react";
 import { getCommentDetail } from "@/services/cutomer-panel.services";
 import { Comment } from "@/types/comment";
 
+import useCustomerComment from "@/hooks/customer/useCustomerComment";
+
 import EditCommentModal from "../EditCommentModal/EditCommentModal";
 
 import DeleteCommentModal from "../DeleteCommentModal/DeleteCommentModal";
@@ -24,11 +26,7 @@ import "./CustomerCommentDetail.css";
 
 
 interface Props {
-
-
     commentId: number;
-
-
 }
 
 
@@ -50,11 +48,7 @@ export default function CustomerCommentDetail({
         data: comment,
         isLoading,
         isError,
-    } = useQuery<Comment>({
-        queryKey: customerQueryKeys.comment(commentId),
-        queryFn: () => getCommentDetail(commentId),
-        enabled: !!commentId,
-    });
+    } = useCustomerComment(commentId)
 
 
     if (isLoading) {

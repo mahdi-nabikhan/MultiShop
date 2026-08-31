@@ -1,10 +1,8 @@
 "use client";
 
+import useBills from "@/hooks/customer/useBills";
 
 
-import { getBills } from "@/services/order.services";
-import { useQuery } from "@tanstack/react-query";
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 import {
     ReceiptText,
     CalendarDays,
@@ -20,19 +18,7 @@ import "./CustomerBillList.css";
 export default function CustomerBillList() {
 
 
-    const {
-        data: bills = [],
-        isLoading,
-        isError,
-    } = useQuery({
-        queryKey: customerQueryKeys.bills(),
-        queryFn: getBills,
-    });
-
-
-
-
-
+    const {data: bills = [],isLoading,isError,} = useBills()
 
     if (isError) {
         return (

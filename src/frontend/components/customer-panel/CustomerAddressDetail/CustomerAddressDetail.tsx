@@ -1,11 +1,11 @@
 "use client";
 import EditAddressModal from "../EditAddressModal/EditAddressModal";
 import DeleteAddressModal from "../DeleteAddressModal/DeleteAddressModal";
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
+import useAddress from "@/hooks/customer/useAddress";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+
 import {MapPin,} from "lucide-react";
-import { getAddressDetail } from "@/services/cutomer-panel.services";
+
 import "./CustomerAddressDetail.css";
 
 
@@ -21,12 +21,7 @@ export default function CustomerAddressDetail({addressId}: Props) {
         data: address,
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: customerQueryKeys.address(addressId),
-        queryFn: () => getAddressDetail(addressId),
-        enabled: !!addressId,
-    });
-
+    } = useAddress(addressId);
 
 
     if (isError) {
