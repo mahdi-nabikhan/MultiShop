@@ -2,14 +2,11 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
-import { createProduct } from "@/services/shop-admin-panel.services";
+import useCreateProduct from "@/hooks/admin-panel/useCreateProduct";
+
 import "./AddProduct.css";
 
 export default function AddProduct() {
-    const queryClient = useQueryClient();
-
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
@@ -18,32 +15,7 @@ export default function AddProduct() {
     const [category, setCategory] = useState("");
     const [image, setImage] = useState<File | null>(null);
 
-    const createProductMutation = useMutation({
-        mutationFn: (formData: FormData) => createProduct(formData),
-
-        onSuccess: () => {
-            // Invalidate products cache
-            queryClient.invalidateQueries({
-                queryKey: shopAdminQueryKeys.products(),
-            });
-
-            // Reset form
-            setName("");
-            setDescription("");
-            setPrice("");
-            setPriceAfter("");
-            setStock("");
-            setCategory("");
-            setImage(null);
-
-            alert("Product created successfully.");
-        },
-
-        onError: (error) => {
-            console.error("Create product error:", error);
-            alert("Something went wrong.");
-        },
-    });
+    const createProductMutation = useCreateProduct()
 
     const submitHandler = (
         e: React.FormEvent<HTMLFormElement>

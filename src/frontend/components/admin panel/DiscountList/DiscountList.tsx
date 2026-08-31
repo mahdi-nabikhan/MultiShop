@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProductDiscounts } from "@/services/shop-admin-panel.services";
 import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import DeleteDiscountModal from "../DeleteDiscountModal/DeleteDiscountModal";
+import useProductDiscounts from "@/hooks/admin-panel/useProductDiscounts";
 
 
 
@@ -12,14 +13,9 @@ function DiscountList({ productId }: { productId: number }) {
 
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [selectedDiscount, setSelectedDiscount] = useState<number | null>(null);
-
-    const {data: discounts = [],isLoading,isError} = useQuery({
-        queryKey: shopAdminQueryKeys.productDiscounts(productId),
-        queryFn: () => getProductDiscounts(productId)});
+    const {data: discounts = [],isLoading,isError} =useProductDiscounts(productId)
         
 
-
-    
     if (isLoading) {
 
         return <h3>Loading...</h3>;

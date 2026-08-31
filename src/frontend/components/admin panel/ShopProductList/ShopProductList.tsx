@@ -1,22 +1,90 @@
-import React from "react";
-import "./ShopProductList.css";
-import { cookies } from "next/headers";
-import ProductRow from "../ProductRow/ProductRow";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 import { getShopProducts } from "@/services/shop-admin-panel.services";
 
-async function ShopProductList() {
-    const cookieStore = await cookies();
+import ProductRow from "../ProductRow/ProductRow";
 
-    const products = await getShopProducts(
-        cookieStore.toString()
-    );
+import "./ShopProductList.css";
+
+
+export default function ShopProductList() {
+
+    const {
+        data: products = [],
+        isLoading,
+        isError,
+    } = useQuery({
+        queryKey: shopAdminQueryKeys.products(),
+        queryFn: getShopProducts,
+    });
+
+
+    // ==========================================
+    // Loading
+    // ==========================================
+
+    if (isLoading) {
+
+        return (
+
+            <div className="product-list">
+
+                <div className="products-loading">
+
+                    Loading products...
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError) {
+
+        return (
+
+            <div className="product-list">
+
+                <div className="products-error">
+
+                    Failed to load products.
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
+
         <div className="product-list">
+
+
+            {/* ==========================================
+                HEADER
+            ========================================== */}
 
             <div className="product-header">
 
                 <div>
+
                     <h1>
                         Products
                     </h1>
@@ -24,7 +92,9 @@ async function ShopProductList() {
                     <p>
                         Manage all products in your store
                     </p>
+
                 </div>
+
 
                 <button
                     className="add-product-btn"
@@ -34,6 +104,12 @@ async function ShopProductList() {
 
             </div>
 
+
+
+            {/* ==========================================
+                TOOLBAR
+            ========================================== */}
+
             <div className="toolbar">
 
                 <input
@@ -41,53 +117,111 @@ async function ShopProductList() {
                     placeholder="Search product..."
                 />
 
+
                 <select>
+
                     <option>
                         All Categories
                     </option>
+
                 </select>
 
+
                 <select>
+
                     <option>
                         All Stock
                     </option>
+
                 </select>
 
             </div>
 
-            <table className="product-table">
 
-                <thead>
 
-                    <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Sale Price</th>
-                        <th>Stock</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
+            {/* ==========================================
+                EMPTY
+            ========================================== */}
 
-                </thead>
+            {products.length === 0 ? (
 
-                <tbody>
+                <div className="products-empty">
 
-                    {products.map((product) => (
+                    <h2>
+                        No Products Found
+                    </h2>
 
-                        <ProductRow
-                            key={product.id}
-                            product={product}
-                        />
+                    <p>
+                        There are no products in your store.
+                    </p>
 
-                    ))}
+                </div>
 
-                </tbody>
+            ) : (
 
-            </table>
+
+                /* ==========================================
+                    TABLE
+                ========================================== */
+
+                <table className="product-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Image
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Price
+                            </th>
+
+                            <th>
+                                Sale Price
+                            </th>
+
+                            <th>
+                                Stock
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {products.map((product) => (
+
+                            <ProductRow
+                                key={product.id}
+                                product={product}
+                            />
+
+                        ))}
+
+                    </tbody>
+
+                </table>
+
+            )}
 
         </div>
-    );
-}
 
-export default ShopProductList;
+    );
+
+}
