@@ -473,23 +473,16 @@ export async function deleteProductImage(
 
 
 
-export async function getShopProducts(
-    cookie: string
-): Promise<ShopProductListData[]> {
-
+export async function getShopProducts(): Promise<ShopProductListData[]> {
     const response = await axios.get<ShopProductListData[]>(
         `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,
         {
-            headers: {
-                Cookie: cookie,
-            },
+            withCredentials: true,
         }
     );
 
     return response.data;
 }
-
-
 
 
 

@@ -1,73 +1,74 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
 
-import "./DeleteAddressModal.css";
+import { deleteComment } from "@/services/comment.services"; 
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 
-import { deleteAddress } from "@/services/cutomer-panel.services";
-
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys"; 
+import "./DeleteCommentModal.css";
 
 
 interface Props {
-
     open: boolean;
-
-    onClose: () => void;
-
-    addressId: number;
-
+    close: () => void;
+    commentId: number;
 }
 
 
-export default function DeleteAddressModal({
+export default function DeleteCommentModal({
 
     open,
 
-    onClose,
+    close,
 
-    addressId
+    commentId,
 
 }: Props) {
 
 
-    const queryClient = useQueryClient();
+    const queryClient =
+        useQueryClient();
 
 
     const {
-        mutate: DeleteAddress,
+        mutate: DeleteComment,
         isPending,
     } = useMutation({
 
         mutationFn: () =>
-            deleteAddress(addressId),
+            deleteComment(commentId),
 
         onSuccess: async () => {
 
             await queryClient.invalidateQueries({
 
                 queryKey:
-                    customerQueryKeys.addresses(),
+                    customerQueryKeys.comments(),
 
             });
 
 
             await queryClient.invalidateQueries({
 
-                queryKey:
-                    customerQueryKeys.address(addressId),
+                queryKey: [
+                    "comment-detail",
+                    commentId,
+                ],
 
             });
 
 
-            onClose();
+            close();
 
         },
 
         onError: (error) => {
 
             console.error(
-                "DELETE ADDRESS ERROR:",
+                "DELETE COMMENT ERROR:",
                 error
             );
 
@@ -88,19 +89,19 @@ export default function DeleteAddressModal({
         <div className="delete-modal-overlay">
 
 
-            <div className="delete-address-modal">
+            <div className="delete-comment-modal">
 
 
                 <h2>
 
-                    Delete Address?
+                    Delete Comment?
 
                 </h2>
 
 
                 <p>
 
-                    Are you sure you want to delete this address?
+                    Are you sure you want to delete this comment?
 
                     This action cannot be undone.
 
@@ -114,7 +115,9 @@ export default function DeleteAddressModal({
 
                         className="cancel-delete"
 
-                        onClick={onClose}
+                        onClick={close}
+
+                        disabled={isPending}
 
                     >
 
@@ -128,7 +131,7 @@ export default function DeleteAddressModal({
                         className="confirm-delete"
 
                         onClick={() =>
-                            DeleteAddress()
+                            DeleteComment()
                         }
 
                         disabled={isPending}
@@ -136,9 +139,13 @@ export default function DeleteAddressModal({
                     >
 
                         {
+
                             isPending
+
                                 ? "Deleting..."
+
                                 : "Delete"
+
                         }
 
                     </button>

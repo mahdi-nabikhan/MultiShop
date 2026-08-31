@@ -2,29 +2,30 @@
 
 import { useEffect, useState } from "react";
 
-import {
-    useMutation,
-    useQuery,
-    useQueryClient,
-} from "@tanstack/react-query";
-
-import {
-    getCustomerProfile,
-    updateCustomerProfile,
-} from "@/services/cutomer-panel.services";
-
-import { CustomerProfileProp } from "@/types/customer";
-
 import ChangePasswordModal from "@/components/auth/ChangePasswordModal/ChangePasswordModal";
 
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
-import "./CustomerProfile.css";
+import useCustomerProfile from "@/hooks/customer/useCustomerProfile";
 
+import "./CustomerProfile.css";
 
 export default function CustomerProfile() {
 
     // ==========================================
-    // Profile
+    // Profile Hook
+    // ==========================================
+
+    const {
+        profile,
+        isLoading,
+        isError,
+        refetch,
+        updateProfile,
+        isUpdating,
+    } = useCustomerProfile();
+
+
+    // ==========================================
+    // Profile State
     // ==========================================
 
     const [editData, setEditData] = useState({
@@ -43,25 +44,20 @@ export default function CustomerProfile() {
 
 
     // ==========================================
-    // Query Client
+    // Sync Profile With Form
     // ==========================================
 
-    const queryClient = useQueryClient();
+    useEffect(() => {
 
+        if (profile) {
 
-    // ==========================================
-    // Get Customer Profile
-    // ==========================================
+            setEditData({
+                username: profile.username,
+            });
 
-    const {
-        data: profile,
-        isLoading,
-        isError,
-        refetch,
-    } = useQuery<CustomerProfileProp>({
-        queryKey: customerQueryKeys.profile(),
-        queryFn: getCustomerProfile,
-    });
+        }
+
+    }, [profile]);
 
 
     // ==========================================
@@ -80,63 +76,29 @@ export default function CustomerProfile() {
     }
 
 
-    useEffect(() => {
-
-        if (profile) {
-
-            setEditData({
-                username: profile.username,
-            });
-
-        }
-
-    }, [profile]);
-
-
     // ==========================================
     // Update Profile
     // ==========================================
 
-    const updateProfileMutation = useMutation({
-
-        mutationFn: updateCustomerProfile,
-
-        onSuccess: (data) => {
-
-            queryClient.setQueryData(
-                customerQueryKeys.profile(),
-                data
-            );
-
-            setEditData({
-                username: data.username,
-            });
-
-            setEditing(false);
-
-        },
-
-        onError: (error: any) => {
-
-            console.error(
-                "Profile update error:",
-                error
-            );
-
-        },
-
-    });
-
-
-    function updateProfile(
+    function handleUpdateProfile(
         e: React.FormEvent
     ) {
 
         e.preventDefault();
 
-        updateProfileMutation.mutate(
-            editData
-        );
+        updateProfile(editData, {
+
+            onSuccess: (data) => {
+
+                setEditData({
+                    username: data.username,
+                });
+
+                setEditing(false);
+
+            },
+
+        });
 
     }
 
@@ -331,7 +293,7 @@ export default function CustomerProfile() {
                     ================================== */
 
                     <form
-                        onSubmit={updateProfile}
+                        onSubmit={handleUpdateProfile}
                         className="customer-profile-form"
                     >
 
@@ -355,6 +317,8 @@ export default function CustomerProfile() {
                         </div>
 
 
+                        {/* Update Error */}
+
                         {isError && (
 
                             <p className="form-error">
@@ -365,6 +329,7 @@ export default function CustomerProfile() {
 
 
                         <div className="profile-form-actions">
+
 
                             <button
                                 type="button"
@@ -380,24 +345,25 @@ export default function CustomerProfile() {
 
                                 }}
                             >
+
                                 Cancel
+
                             </button>
 
 
                             <button
                                 type="submit"
                                 className="save-profile-btn"
-                                disabled={
-                                    updateProfileMutation.isPending
-                                }
+                                disabled={isUpdating}
                             >
 
-                                {updateProfileMutation.isPending
+                                {isUpdating
                                     ? "Saving..."
                                     : "Save Changes"
                                 }
 
                             </button>
+
 
                         </div>
 
@@ -456,11 +422,18 @@ export default function CustomerProfile() {
             </section>
 
 
+            {/* ==================================
+                PASSWORD MODAL
+            ================================== */}
+
             <ChangePasswordModal
+
                 isOpen={passwordModal}
+
                 onClose={() =>
                     setPasswordModal(false)
                 }
+
             />
 
 

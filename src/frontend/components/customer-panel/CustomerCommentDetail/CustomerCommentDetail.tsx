@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
+import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
 import {MessageCircle,Edit,Trash} from "lucide-react";
 import { getCommentDetail } from "@/services/cutomer-panel.services";
 import { Comment } from "@/types/comment";
+
+import useCustomerComment from "@/hooks/customer/useCustomerComment";
 
 import EditCommentModal from "../EditCommentModal/EditCommentModal";
 
@@ -24,11 +26,7 @@ import "./CustomerCommentDetail.css";
 
 
 interface Props {
-
-
     commentId: number;
-
-
 }
 
 
@@ -50,11 +48,7 @@ export default function CustomerCommentDetail({
         data: comment,
         isLoading,
         isError,
-    } = useQuery<Comment>({
-        queryKey: ["comment-detail", commentId],
-        queryFn: () => getCommentDetail(commentId),
-        enabled: !!commentId,
-    });
+    } = useCustomerComment(commentId)
 
 
     if (isLoading) {

@@ -2,112 +2,102 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import Link from "next/link";
-import {Send,FileText,Check,CheckCheck} from "lucide-react";
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
-import { getConversationMessages, sendConversationMessage } from "@/services/shop-admin-panel.services";
+
+import {
+    Send,
+    FileText,
+    Check,
+    CheckCheck,
+} from "lucide-react";
+
+import useConversationMessages from "@/hooks/customer/useConversationMessages";
+import useSendConversationMessage from "@/hooks/admin-panel/useSendConversationMessage";
 import "./AdminChatBox.css";
 
 
+interface Props {
+    conversationId: number | null;
+    currentUserEmail: string;
+}
 
 
-interface Props {conversationId: number | null;currentUserEmail: string;}
+export default function AdminChatBox({
+    conversationId,
+    currentUserEmail,
+}: Props) {
 
 
-export default function AdminChatBox({conversationId,currentUserEmail,}: Props) {
+    // ==========================================
+    // State
+    // ==========================================
+
+    const [text, setText] = useState("");
+
+    const messagesEndRef =
+        useRef<HTMLDivElement>(null);
 
 
-
-    const [text, setText] =useState("");
-    const messagesEndRef =useRef<HTMLDivElement>(null);
-    const queryClient = useQueryClient();
+    // ==========================================
+    // Get Messages
+    // ==========================================
 
     const {
         data: messages = [],
         isLoading: loading,
         isError,
-    } = useQuery({
-        queryKey: shopAdminQueryKeys.conversationMessages(conversationId!),
-        queryFn: () =>
-            getConversationMessages(conversationId!),
-        enabled: !!conversationId,
-        refetchInterval: 3000,
-    });
+    } = useConversationMessages(
+        conversationId
+    );
+
 
     const error = isError
         ? "Failed to load messages."
         : "";
 
 
-    /* =========================
-       GET MESSAGES
-    ========================= */
+    // ==========================================
+    // Send Message
+    // ==========================================
 
-  
-
-
-
-  
-
-    const sendMessageMutation = useMutation({
-        mutationFn: ({
-            conversationId,
-            text,
-        }: {
-            conversationId: number;
-            text: string;
-        }) =>
-            sendConversationMessage(
-                conversationId,
-                text
-            ),
-
-        onSuccess: () => {
-            setText('');
-
-            queryClient.invalidateQueries({
-                queryKey: shopAdminQueryKeys.conversationMessages(conversationId!)
-                
-            });
-        },
-
-        onError: (error) => {
-            console.error(
-                "SEND MESSAGE ERROR:",
-                error
-            );
-        },
-    });
+    const sendMessageMutation =
+        useSendConversationMessage();
 
 
-
-    /* =========================
-       SEND MESSAGE
-    ========================= */
+    // ==========================================
+    // Send Message
+    // ==========================================
 
     const sendMessage = () => {
 
-    if (!conversationId) {
-        return;
-    }
-
-    const cleanText = text.trim();
-
-    if (!cleanText) {
-        return;
-    }
-
-    sendMessageMutation.mutate({
-        conversationId,
-        text: cleanText,
-    });
-};
+        if (!conversationId) {
+            return;
+        }
 
 
-    /* =========================
-       ENTER
-    ========================= */
+        const cleanText =
+            text.trim();
+
+
+        if (!cleanText) {
+            return;
+        }
+
+
+        sendMessageMutation.mutate({
+            conversationId,
+            text: cleanText,
+        });
+
+
+        setText("");
+    };
+
+
+    // ==========================================
+    // Enter
+    // ==========================================
 
     const handleKeyDown = (
         e: React.KeyboardEvent<HTMLInputElement>
@@ -127,10 +117,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
     };
 
 
-
-    /* =========================
-       EMPTY
-    ========================= */
+    // ==========================================
+    // Empty
+    // ==========================================
 
     if (!conversationId) {
 
@@ -162,10 +151,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
     }
 
 
-
-    /* =========================
-       CURRENT USER
-    ========================= */
+    // ==========================================
+    // Current User
+    // ==========================================
 
     const normalizedCurrentUser =
         (currentUserEmail || "")
@@ -173,13 +161,18 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
             .toLowerCase();
 
 
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
 
         <section className="admin-chatbox">
 
 
-            {/* HEADER */}
+            {/* ==================================
+                HEADER
+            ================================== */}
 
             <header className="admin-chat-header">
 
@@ -206,8 +199,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
             </header>
 
 
-
-            {/* BODY */}
+            {/* ==================================
+                BODY
+            ================================== */}
 
             <div className="admin-chat-body">
 
@@ -227,9 +221,11 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                 ) : messages.length === 0 ? (
 
                     <div className="admin-chat-no-messages">
+
                         <p>
                             No messages yet.
                         </p>
+
                     </div>
 
                 ) : (
@@ -237,16 +233,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                     messages.map((message) => {
 
 
-                        /*
-                         * API example:
-                         *
-                         * customer:
-                         * customer1@gmail.com
-                         *
-                         * manager:
-                         * manager1@gmail.com
-                         */
-
+                        // ==================================
+                        // Sender
+                        // ==================================
 
                         const sender =
                             (message.sender || "")
@@ -255,19 +244,8 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
 
 
                         const isAdmin =
-                            sender === normalizedCurrentUser;
-
-
-                        console.log(
-                            "MESSAGE:",
-                            message.id,
-                            "SENDER:",
-                            sender,
-                            "CURRENT:",
-                            normalizedCurrentUser,
-                            "IS ADMIN:",
-                            isAdmin
-                        );
+                            sender ===
+                            normalizedCurrentUser;
 
 
                         return (
@@ -277,13 +255,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                                 key={message.id}
 
                                 className={
-
                                     isAdmin
-
                                         ? "admin-message admin-message-sent"
-
                                         : "admin-message admin-message-received"
-
                                 }
 
                             >
@@ -291,19 +265,23 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                                 <div className="admin-message-bubble">
 
 
-                                    {/* SENDER */}
+                                    {/* ==========================
+                                        SENDER
+                                    ========================== */}
 
                                     <span className="admin-message-sender">
 
                                         {isAdmin
                                             ? "You"
-                                            : message.sender || "Customer"}
+                                            : message.sender ||
+                                              "Customer"}
 
                                     </span>
 
 
-
-                                    {/* TEXT */}
+                                    {/* ==========================
+                                        TEXT
+                                    ========================== */}
 
                                     {message.text && (
 
@@ -314,8 +292,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                                     )}
 
 
-
-                                    {/* IMAGE */}
+                                    {/* ==========================
+                                        IMAGE
+                                    ========================== */}
 
                                     {message.image && (
 
@@ -332,8 +311,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                                     )}
 
 
-
-                                    {/* FILE */}
+                                    {/* ==========================
+                                        FILE
+                                    ========================== */}
 
                                     {message.file && (
 
@@ -358,8 +338,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                                     )}
 
 
-
-                                    {/* FOOTER */}
+                                    {/* ==========================
+                                        FOOTER
+                                    ========================== */}
 
                                     <div className="admin-message-footer">
 
@@ -417,20 +398,24 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
             </div>
 
 
-
-            {/* ERROR */}
+            {/* ==================================
+                ERROR
+            ================================== */}
 
             {error && messages.length > 0 && (
 
                 <div className="admin-chat-send-error">
+
                     {error}
+
                 </div>
 
             )}
 
 
-
-            {/* INPUT */}
+            {/* ==================================
+                INPUT
+            ================================== */}
 
             <div className="admin-chat-input">
 
@@ -448,7 +433,9 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
 
                     onKeyDown={handleKeyDown}
 
-                    disabled={sendMessageMutation.isPending}
+                    disabled={
+                        sendMessageMutation.isPending
+                    }
 
                 />
 
@@ -467,8 +454,12 @@ export default function AdminChatBox({conversationId,currentUserEmail,}: Props) 
                 >
 
                     {sendMessageMutation.isPending
+
                         ? "..."
-                        : <Send size={18} />}
+
+                        : <Send size={18} />
+
+                    }
 
                 </button>
 

@@ -12,18 +12,18 @@ import {
 
 import {
     useMutation,
-    useQuery,
     useQueryClient,
 } from "@tanstack/react-query";
 
 import {
-    getConversationMessages,
     sendConversationMessage,
 } from "@/services/chat.services";
 
 import { chatQueryKeys } from "@/Lib/query-keys/chat.keys";
 
 import { Message } from "@/types/chat";
+
+import useConversationMessages from "@/hooks/customer/useConversationMessages";
 
 import "./CustomerChatBox.css";
 
@@ -56,24 +56,9 @@ export default function CustomerChatBox({
         data: messages = [],
         isLoading,
         isError,
-    } = useQuery<Message[]>({
-
-        queryKey:
-            chatQueryKeys.conversationMessages(
-                conversationId!
-            ),
-
-        queryFn: () =>
-            getConversationMessages(
-                conversationId!
-            ),
-
-        enabled:
-            !!conversationId,
-
-        refetchInterval: 3000,
-
-    });
+    } = useConversationMessages(
+        conversationId
+    );
 
 
     /* =========================
@@ -85,21 +70,36 @@ export default function CustomerChatBox({
 
             mutationFn: (
                 message: string
-            ) =>
-                sendConversationMessage(
-                    conversationId!,
+            ) => {
+
+                if (!conversationId) {
+                    throw new Error(
+                        "Conversation ID is required"
+                    );
+                }
+
+                return sendConversationMessage(
+                    conversationId,
                     message
-                ),
+                );
+            },
+
 
             onSuccess: () => {
 
                 setText("");
 
+
+                if (!conversationId) {
+                    return;
+                }
+
+
                 queryClient.invalidateQueries({
 
                     queryKey:
                         chatQueryKeys.conversationMessages(
-                            conversationId!
+                            conversationId
                         ),
 
                 });
@@ -119,9 +119,11 @@ export default function CustomerChatBox({
             return;
         }
 
+
         if (!text.trim()) {
             return;
         }
+
 
         sendMessageMutation.mutate(
             text.trim()
@@ -269,7 +271,7 @@ export default function CustomerChatBox({
 
                 ) : (
 
-                    messages.map((message) => {
+                    messages.map((message: Message) => {
 
                         const isCustomer =
                             typeof message.sender === "string" &&

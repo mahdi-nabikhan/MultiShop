@@ -1,10 +1,7 @@
+
 "use client";
 
 import { useState } from "react";
-import {
-    useMutation,
-    useQueryClient,
-} from "@tanstack/react-query";
 
 import {
     Plus,
@@ -12,184 +9,103 @@ import {
     ShoppingCart,
 } from "lucide-react";
 
-import {
-    addOrderItem,
-} from "@/services/order.services";
+import useAddOrderItem from "@/hooks/shop/useAddOrderItem";
 
 import "./ProductOrderBox.css";
 
 
 interface ProductOrderBoxProps {
-
     productId: number | string;
-
 }
 
 
-function ProductOrderBox({
+export default function ProductOrderBox({
     productId,
 }: ProductOrderBoxProps) {
 
+    const [quantity, setQuantity] = useState(0);
 
-    const queryClient = useQueryClient();
-
-
-    const [quantity, setQuantity] =
-        useState(0);
+    const addToCartMutation = useAddOrderItem();
 
 
-    const addToCartMutation = useMutation({
+    const handleAddToCart = () => {
 
-        mutationFn: () =>
-            addOrderItem(
-                productId,
-                quantity
-            ),
+        if (quantity <= 0) {
+            return;
+        }
 
-        onSuccess: () => {
+        addToCartMutation.mutate({
+            productId,
+            quantity,
+        });
 
-            queryClient.invalidateQueries({
-                queryKey: ["order-items"],
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: ["session-cart"],
-            });
-
-            setQuantity(0);
-
-        },
-
-        onError: (error) => {
-
-            console.error(
-                "Add to cart error:",
-                error
-            );
-
-        },
-
-    });
+    };
 
 
     return (
 
         <div className="order-box">
 
-
-            {/* ==========================================
-                Quantity
-            ========================================== */}
-
             <div className="quantity-box">
 
-
                 <button
-
                     type="button"
-
                     onClick={() => {
-
-                        setQuantity(
-                            prev =>
-                                prev > 1
-                                    ? prev - 1
-                                    : 0
+                        setQuantity(prev =>
+                            prev > 1
+                                ? prev - 1
+                                : 0
                         );
-
                     }}
-
                     disabled={
                         addToCartMutation.isPending
                     }
-
                 >
-
                     <Minus size={18} />
-
                 </button>
 
 
                 <span>
-
                     {quantity}
-
                 </span>
 
 
                 <button
-
                     type="button"
-
                     onClick={() => {
-
-                        setQuantity(
-                            prev => prev + 1
-                        );
-
+                        setQuantity(prev => prev + 1);
                     }}
-
                     disabled={
                         addToCartMutation.isPending
                     }
-
                 >
-
                     <Plus size={18} />
-
                 </button>
-
 
             </div>
 
 
-            {/* ==========================================
-                Add To Cart
-            ========================================== */}
-
             <button
-
                 type="button"
-
                 className="cart-button"
-
-                onClick={() => {
-
-                    if (quantity <= 0) {
-                        return;
-                    }
-
-                    addToCartMutation.mutate();
-
-                }}
-
+                onClick={handleAddToCart}
                 disabled={
                     addToCartMutation.isPending ||
                     quantity <= 0
                 }
-
             >
 
                 <ShoppingCart size={20} />
 
-
-                {addToCartMutation.isPending
-
-                    ? "Adding..."
-
-                    : "Add To Cart"
-
+                {
+                    addToCartMutation.isPending
+                        ? "Adding..."
+                        : "Add To Cart"
                 }
 
-
             </button>
-
 
         </div>
 
     );
-
 }
-
-
-export default ProductOrderBox;

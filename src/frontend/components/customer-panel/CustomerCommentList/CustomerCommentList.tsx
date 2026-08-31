@@ -1,9 +1,7 @@
 "use client";
 
 
-import { useQuery } from "@tanstack/react-query";
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
-import { getCustomerComments } from "@/services/cutomer-panel.services";
+import useCustomerComments from "@/hooks/customer/useCustomerComments";
 import { Comment } from "@/types/comment";
 import {
     MessageCircle,
@@ -20,10 +18,7 @@ export default function CustomerCommentList() {
         data: comments = [],
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: customerQueryKeys.comments(),
-        queryFn: getCustomerComments,
-    });
+    } = useCustomerComments()
 
     if (isLoading) {
 

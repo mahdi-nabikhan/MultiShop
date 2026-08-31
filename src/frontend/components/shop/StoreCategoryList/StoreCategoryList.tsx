@@ -1,12 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
-import {
-    getStoreCategories,
-    StoreCategory,
-} from "@/services/shop.services";
-
+import useStoreCategories from "@/hooks/shop/StoreCategoryList";
 import "./StoreCategoryList.css";
 
 
@@ -21,11 +15,7 @@ export default function StoreCategoryList({
 
 
     const {
-     data: categories = [],isLoading,isError,} = useQuery<StoreCategory[]>({
-       queryKey: shopQueryKeys.storeCategories(),
-        queryFn: getStoreCategories,
-
-    });
+     data: categories = [],isLoading,isError,} = useStoreCategories()
 
 
     // ==========================================

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
 
 import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
@@ -47,11 +52,13 @@ function ShopProductDetail({
 
     const queryClient = useQueryClient();
 
+
+    // ==========================================
+    // Modal States
+    // ==========================================
+
     const [openImageModal, setOpenImageModal] =
         useState(false);
-
-    const [thumbsSwiper, setThumbsSwiper] =
-        useState<SwiperType | null>(null);
 
     const [openEditModal, setOpenEditModal] =
         useState(false);
@@ -59,18 +66,29 @@ function ShopProductDetail({
     const [openDiscountModal, setOpenDiscountModal] =
         useState(false);
 
-    const [selectedImage, setSelectedImage] =
-        useState<ProductImage | null>(null);
-
     const [openDeleteImageModal, setOpenDeleteImageModal] =
         useState(false);
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Product Query
-    |--------------------------------------------------------------------------
-    */
+    // ==========================================
+    // Swiper
+    // ==========================================
+
+    const [thumbsSwiper, setThumbsSwiper] =
+        useState<SwiperType | null>(null);
+
+
+    // ==========================================
+    // Selected Image
+    // ==========================================
+
+    const [selectedImage, setSelectedImage] =
+        useState<ProductImage | null>(null);
+
+
+    // ==========================================
+    // Product Query
+    // ==========================================
 
     const {
         data: product,
@@ -87,11 +105,9 @@ function ShopProductDetail({
     });
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Product Images Query
-    |--------------------------------------------------------------------------
-    */
+    // ==========================================
+    // Product Images Query
+    // ==========================================
 
     const {
         data: productImages = [],
@@ -108,16 +124,83 @@ function ShopProductDetail({
     });
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Combine Main Product Image + Additional Images
-    |--------------------------------------------------------------------------
-    */
+    // ==========================================
+    // Delete Product Image Mutation
+    // ==========================================
+
+    const deleteImageMutation = useMutation({
+
+        mutationFn: (imageId: number) =>
+            deleteProductImage(imageId),
+
+        onSuccess: async () => {
+
+            setOpenDeleteImageModal(false);
+
+            setSelectedImage(null);
+
+
+            await queryClient.invalidateQueries({
+
+                queryKey:
+                    shopAdminQueryKeys.productImages(
+                        productId
+                    ),
+
+            });
+
+
+            await queryClient.invalidateQueries({
+
+                queryKey:
+                    shopAdminQueryKeys.product(
+                        productId
+                    ),
+
+            });
+
+        },
+
+        onError: (error) => {
+
+            console.error(
+                "Failed to delete product image:",
+                error
+            );
+
+        },
+
+    });
+
+
+    // ==========================================
+    // Delete Product Image Handler
+    // ==========================================
+
+    const deleteProductImageHandler = () => {
+
+        if (!selectedImage) {
+            return;
+        }
+
+        deleteImageMutation.mutate(
+            selectedImage.id
+        );
+
+    };
+
+
+    // ==========================================
+    // Combine Main Product Image
+    // + Additional Images
+    // ==========================================
 
     const images: ProductImage[] = product
+
         ? [
 
             ...(product.product_image
+
                 ? [
 
                     {
@@ -134,76 +217,23 @@ function ShopProductDetail({
 
                         product:
                             product.id,
+
                     },
 
                 ]
+
                 : []),
 
             ...productImages,
 
         ]
+
         : [];
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Delete Product Image
-    |--------------------------------------------------------------------------
-    */
-
-    const deleteProductImageHandler = async () => {
-
-        if (!selectedImage) return;
-
-        try {
-
-            await deleteProductImage(
-                selectedImage.id
-            );
-
-            setOpenDeleteImageModal(false);
-
-            setSelectedImage(null);
-
-            await Promise.all([
-
-                queryClient.invalidateQueries({
-
-                    queryKey:
-                        shopAdminQueryKeys.productImages(
-                            productId
-                        ),
-
-                }),
-
-                queryClient.invalidateQueries({
-
-                    queryKey:
-                        shopAdminQueryKeys.product(
-                            productId
-                        ),
-
-                }),
-
-            ]);
-
-        } catch (error) {
-
-            console.error(
-                "Failed to delete product image:",
-                error
-            );
-
-        }
-
-    };
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Loading
-    |--------------------------------------------------------------------------
-    */
+    // ==========================================
+    // Loading
+    // ==========================================
 
     if (
         productLoading ||
@@ -223,11 +253,9 @@ function ShopProductDetail({
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Error
-    |--------------------------------------------------------------------------
-    */
+    // ==========================================
+    // Error
+    // ==========================================
 
     if (
         productError ||
@@ -247,11 +275,9 @@ function ShopProductDetail({
     }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Product Not Found
-    |--------------------------------------------------------------------------
-    */
+    // ==========================================
+    // Product Not Found
+    // ==========================================
 
     if (!product) {
 
@@ -266,6 +292,28 @@ function ShopProductDetail({
         );
 
     }
+
+
+    // ==========================================
+    // Image URL
+    // ==========================================
+
+    const getImageUrl = (
+        image: string
+    ) => {
+
+        if (image.startsWith("http")) {
+
+            return image;
+
+        }
+
+        return `${BACKEND_URLS.replace(
+            "/api/v1/",
+            ""
+        )}${image}`;
+
+    };
 
 
     return (
@@ -307,6 +355,7 @@ function ShopProductDetail({
                     >
 
                         {
+
                             images.length > 0
 
                                 ? (
@@ -326,16 +375,9 @@ function ShopProductDetail({
                                                 <img
 
                                                     src={
-                                                        image.product_image.startsWith(
-                                                            "http"
+                                                        getImageUrl(
+                                                            image.product_image
                                                         )
-
-                                                            ? image.product_image
-
-                                                            : `${BACKEND_URLS.replace(
-                                                                "/api/v1/",
-                                                                ""
-                                                            )}${image.product_image}`
                                                     }
 
                                                     alt={`Product Image ${
@@ -375,6 +417,7 @@ function ShopProductDetail({
                                     </SwiperSlide>
 
                                 )
+
                         }
 
                     </Swiper>
@@ -402,6 +445,7 @@ function ShopProductDetail({
                     >
 
                         {
+
                             images.length > 0
 
                                 ? (
@@ -418,16 +462,9 @@ function ShopProductDetail({
                                                 <img
 
                                                     src={
-                                                        image.product_image.startsWith(
-                                                            "http"
+                                                        getImageUrl(
+                                                            image.product_image
                                                         )
-
-                                                            ? image.product_image
-
-                                                            : `${BACKEND_URLS.replace(
-                                                                "/api/v1/",
-                                                                ""
-                                                            )}${image.product_image}`
                                                     }
 
                                                     alt={
@@ -468,6 +505,7 @@ function ShopProductDetail({
                                     </SwiperSlide>
 
                                 )
+
                         }
 
                     </Swiper>

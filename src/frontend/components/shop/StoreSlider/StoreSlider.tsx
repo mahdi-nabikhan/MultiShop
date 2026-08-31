@@ -38,6 +38,10 @@ export default function StoreSlider({
 
         enabled: categoryId !== null,
 
+        staleTime: 10 * 60 * 1000,
+
+        gcTime: 30 * 60 * 1000,
+
     });
 
 

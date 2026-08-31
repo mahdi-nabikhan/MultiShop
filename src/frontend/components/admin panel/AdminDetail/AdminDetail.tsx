@@ -1,18 +1,29 @@
 "use client";
+
 import { useState } from "react";
+
+import {
+    useMutation,
+    useQuery,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+    updateShopAdmin,
+    getShopAdmin,
+    deleteShopAdmin,
+} from "@/services/shop-admin-panel.services";
+
 import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
-import { useMutation, useQuery, useQueryClient, } from "@tanstack/react-query";
-import { updateShopAdmin, getShopAdmin, deleteShopAdmin } from "@/services/shop-admin-panel.services";
+
 import { AdminDetailProp } from "@/types/panel-admin";
+
 import { useRouter } from "next/navigation";
+
 import DeleteModal from "../DeleteModal/DeleteModal";
 import UpdateAdminModal from "../UpdateAdminModal/UpdateAdminModal";
 
 import "./AdminDetail.css";
-
-
-
-
 
 
 interface Props {
@@ -22,104 +33,187 @@ interface Props {
 }
 
 
+export default function AdminDetail({
+    adminId,
+}: Props) {
 
-export default function AdminDetail({ adminId }: Props) {
 
-    const [showDelete, setShowDelete] = useState(false);
-    const [showUpdate, setShowUpdate] = useState(false);
+    const [showDelete, setShowDelete] =
+        useState(false);
+
+    const [showUpdate, setShowUpdate] =
+        useState(false);
+
 
     const router = useRouter();
-    const queryClient = useQueryClient();
+
+    const queryClient =
+        useQueryClient();
+
+
+    // ==========================================
+    // Get Admin
+    // ==========================================
 
     const {
         data: admin,
         isLoading: loading,
+        isError,
     } = useQuery<AdminDetailProp>({
-        queryKey: shopAdminQueryKeys.admin(adminId),
-        queryFn: () => getShopAdmin(adminId),
+
+        queryKey:
+            shopAdminQueryKeys.admin(adminId),
+
+        queryFn: () =>
+            getShopAdmin(adminId),
+
         enabled: !!adminId,
+
     });
 
 
+    // ==========================================
+    // Delete Admin
+    // ==========================================
+
+    const deleteAdminMutation =
+        useMutation({
+
+            mutationFn: () =>
+                deleteShopAdmin(adminId),
+
+            onSuccess: () => {
+
+                queryClient.invalidateQueries({
+
+                    queryKey:
+                        shopAdminQueryKeys.admins(),
+
+                });
+
+                router.push(
+                    "/shop-admin-panel/admin"
+                );
+
+            },
+
+            onError: (error) => {
+
+                console.error(
+                    "DELETE ADMIN ERROR:",
+                    error
+                );
+
+            },
+
+        });
 
 
+    // ==========================================
+    // Update Admin
+    // ==========================================
 
+    const updateAdminMutation =
+        useMutation({
 
+            mutationFn: (
+                username: string
+            ) =>
+                updateShopAdmin(
+                    adminId,
+                    username
+                ),
 
+            onSuccess: (_, username) => {
 
+                queryClient.setQueryData<AdminDetailProp>(
 
-    const deleteAdminMutation = useMutation({
-        mutationFn: () => deleteShopAdmin(adminId),
+                    shopAdminQueryKeys.admin(
+                        adminId
+                    ),
 
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: shopAdminQueryKeys.admins(),
-            });
+                    (previous) => {
 
-            router.push("/shop-admin-panel/admin");
-        },
+                        if (!previous) {
 
-        onError: (error) => {
-            console.error("DELETE ADMIN ERROR:", error);
-        },
-    });
+                            return previous;
 
+                        }
 
+                        return {
 
+                            ...previous,
 
+                            username,
 
+                        };
 
-    const updateAdminMutation = useMutation({
-        mutationFn: (username: string) =>
-            updateShopAdmin(adminId, username),
-
-        onSuccess: (_, username) => {
-            queryClient.setQueryData<AdminDetailProp>(
-                shopAdminQueryKeys.admin(adminId),
-                (prev) => {
-                    if (!prev) {
-                        return prev;
                     }
 
-                    return {
-                        ...prev,
-                        username,
-                    };
-                }
-            );
-
-            setShowUpdate(false);
-        },
-
-        onError: (error) => {
-            console.error("UPDATE ADMIN ERROR:", error);
-        },
-    });
+                );
 
 
+                // Update admin list cache
+
+                queryClient.invalidateQueries({
+
+                    queryKey:
+                        shopAdminQueryKeys.admins(),
+
+                });
 
 
+                setShowUpdate(false);
+
+            },
+
+            onError: (error) => {
+
+                console.error(
+                    "UPDATE ADMIN ERROR:",
+                    error
+                );
+
+            },
+
+        });
 
 
+    // ==========================================
+    // Loading
+    // ==========================================
 
-    if (loading)
+    if (loading) {
 
-        return <h2>Loading...</h2>;
+        return (
+            <h2>
+                Loading...
+            </h2>
+        );
 
-
-
-
-    if (!admin)
-
-        return <h2>Admin Not Found</h2>;
-
+    }
 
 
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError || !admin) {
+
+        return (
+            <h2>
+                Admin Not Found
+            </h2>
+        );
+
+    }
 
 
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
-
 
         <div className="admin-detail-page">
 
@@ -127,9 +221,7 @@ export default function AdminDetail({ adminId }: Props) {
             <div className="admin-detail-card">
 
 
-
                 <div className="admin-avatar">
-
 
                     {
                         admin.user.email
@@ -137,20 +229,17 @@ export default function AdminDetail({ adminId }: Props) {
                             .toUpperCase()
                     }
 
-
                 </div>
-
-
 
 
                 <h1>
 
-                    {admin.username || "No Username"}
+                    {
+                        admin.username ||
+                        "No Username"
+                    }
 
                 </h1>
-
-
-
 
 
                 <span className="role-badge">
@@ -158,10 +247,6 @@ export default function AdminDetail({ adminId }: Props) {
                     Administrator
 
                 </span>
-
-
-
-
 
 
                 <div className="detail-grid">
@@ -173,46 +258,36 @@ export default function AdminDetail({ adminId }: Props) {
                             Email
                         </span>
 
-
                         <strong>
 
-                            {admin.user.email}
+                            {
+                                admin.user.email
+                            }
 
                         </strong>
-
 
                     </div>
 
 
-
-
-
                     <div>
-
 
                         <span>
                             Username
                         </span>
 
-
                         <strong>
 
-                            {admin.username || "-"}
+                            {
+                                admin.username ||
+                                "-"
+                            }
 
                         </strong>
-
 
                     </div>
 
 
-
                 </div>
-
-
-
-
-
-
 
 
                 <div className="button-group">
@@ -222,7 +297,9 @@ export default function AdminDetail({ adminId }: Props) {
 
                         className="update-btn"
 
-                        onClick={() => setShowUpdate(true)}
+                        onClick={() =>
+                            setShowUpdate(true)
+                        }
 
                     >
 
@@ -231,26 +308,22 @@ export default function AdminDetail({ adminId }: Props) {
                     </button>
 
 
-
-
-
-
-                    <button className="password-btn">
+                    <button
+                        className="password-btn"
+                    >
 
                         Change Password
 
                     </button>
 
 
-
-
-
-
                     <button
 
                         className="delete-btn"
 
-                        onClick={() => setShowDelete(true)}
+                        onClick={() =>
+                            setShowDelete(true)
+                        }
 
                     >
 
@@ -259,79 +332,72 @@ export default function AdminDetail({ adminId }: Props) {
                     </button>
 
 
-
                 </div>
-
 
 
             </div>
 
 
-
-
-
-
+            {/* ==================================
+                DELETE MODAL
+            ================================== */}
 
             <DeleteModal
 
-
                 open={showDelete}
 
-
-                loading={deleteAdminMutation.isPending}
-
+                loading={
+                    deleteAdminMutation.isPending
+                }
 
                 title="Delete Admin"
 
+                message={
+                    "Are you sure you want to delete this admin?"
+                }
 
-                message="Are you sure you want to delete this admin?"
+                onClose={() =>
+                    setShowDelete(false)
+                }
 
-
-                onClose={() => setShowDelete(false)}
-
-
-                onConfirm={() => deleteAdminMutation.mutate()}
-
+                onConfirm={() =>
+                    deleteAdminMutation.mutate()
+                }
 
             />
 
 
-
-
-
-
+            {/* ==================================
+                UPDATE MODAL
+            ================================== */}
 
             <UpdateAdminModal
 
-
                 open={showUpdate}
 
-
-                loading={updateAdminMutation.isPending}
-
-
-                username={admin.username}
-
-
-                onClose={() => setShowUpdate(false)}
-
-
-                onConfirm={(username) =>
-                    updateAdminMutation.mutate(username)
+                loading={
+                    updateAdminMutation.isPending
                 }
 
+                username={
+                    admin.username
+                }
+
+                onClose={() =>
+                    setShowUpdate(false)
+                }
+
+                onConfirm={(username) =>
+                    updateAdminMutation.mutate(
+                        username
+                    )
+                }
 
             />
-
-
-
-
 
 
         </div>
 
-
     );
-
 
 }

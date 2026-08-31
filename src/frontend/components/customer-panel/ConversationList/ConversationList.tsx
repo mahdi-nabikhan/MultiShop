@@ -1,8 +1,7 @@
 "use client";
-import { getCustomerConversations } from "@/services/chat.services";
-import { useQuery } from "@tanstack/react-query";
+import useConversations from "@/hooks/chat/useConversations";
 import "./ConversationList.css";
-import { chatQueryKeys } from "@/Lib/query-keys/chat.keys";
+
 interface Props {
     selectedConversation: number | null;
     onSelectConversation: (conversationId: number) => void;
@@ -17,17 +16,7 @@ export default function ConversationList({
         data: conversations = [],
         isLoading,
         isError,
-    } = useQuery({
-                queryKey:
-            chatQueryKeys.conversations(),
-
-        queryFn: getCustomerConversations,
-    });
-
-
-
-
-
+    } = useConversations();
 
     if (isLoading) {
 

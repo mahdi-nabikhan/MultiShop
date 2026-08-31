@@ -124,6 +124,7 @@ export default function SearchBox() {
             "search",
             searchQuery,
         ],
+        enabled: Boolean(searchQuery),staleTime: 30 * 1000,
 
         queryFn: async () => {
 

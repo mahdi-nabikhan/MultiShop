@@ -1,12 +1,11 @@
+
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { shopQueryKeys } from "@/Lib/query-keys/shop.keys"; 
-import { getRandomProducts } from "@/services/product.services";
-import type { Product } from "@/types/product";
-
 import Link from "next/link";
+
 import BACKEND_URLS from "@/utils";
+
+import useRandomProducts from "@/hooks/shop/useRandomProducts";
 
 import "./RandomProduct.css";
 
@@ -14,12 +13,11 @@ import "./RandomProduct.css";
 export default function RandomProducts() {
 
 
-    const {data: products = [],isLoading,isError,} = useQuery<Product[]>({
-        queryKey: shopQueryKeys.randomProducts(),
-        queryFn:
-            getRandomProducts,
-
-    });
+    const {
+        data: products = [],
+        isLoading,
+        isError,
+    } = useRandomProducts();
 
 
     // ==========================================
@@ -183,3 +181,4 @@ export default function RandomProducts() {
     );
 
 }
+
