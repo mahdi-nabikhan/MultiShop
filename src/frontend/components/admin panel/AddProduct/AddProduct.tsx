@@ -1,4 +1,6 @@
+
 "use client";
+
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
@@ -6,6 +8,7 @@ import { createProduct } from "@/services/shop-admin-panel.services";
 import "./AddProduct.css";
 
 export default function AddProduct() {
+    const queryClient = useQueryClient();
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -14,18 +17,17 @@ export default function AddProduct() {
     const [stock, setStock] = useState("");
     const [category, setCategory] = useState("");
     const [image, setImage] = useState<File | null>(null);
-    const queryClient = useQueryClient();
 
     const createProductMutation = useMutation({
-        mutationFn: (formData: FormData) =>
-            createProduct(formData),
+        mutationFn: (formData: FormData) => createProduct(formData),
 
         onSuccess: () => {
+            // Invalidate products cache
             queryClient.invalidateQueries({
                 queryKey: shopAdminQueryKeys.products(),
             });
-            alert("Product created successfully.");
 
+            // Reset form
             setName("");
             setDescription("");
             setPrice("");
@@ -33,16 +35,17 @@ export default function AddProduct() {
             setStock("");
             setCategory("");
             setImage(null);
+
+            alert("Product created successfully.");
         },
 
         onError: (error) => {
             console.error("Create product error:", error);
-
             alert("Something went wrong.");
         },
     });
 
-    const submitHandler = async (
+    const submitHandler = (
         e: React.FormEvent<HTMLFormElement>
     ) => {
         e.preventDefault();
@@ -74,7 +77,10 @@ export default function AddProduct() {
             return;
         }
 
-        if (Number.isNaN(productPrice) || productPrice <= 0) {
+        if (
+            Number.isNaN(productPrice) ||
+            productPrice <= 0
+        ) {
             alert("Price must be greater than 0.");
             return;
         }
@@ -121,41 +127,21 @@ export default function AddProduct() {
 
         const formData = new FormData();
 
-        formData.append(
-            "name",
-            trimmedName
-        );
-
-        formData.append(
-            "description",
-            trimmedDescription
-        );
-
-        formData.append(
-            "price",
-            String(productPrice)
-        );
-
-        formData.append(
-            "price_after",
-            String(productPriceAfter)
-        );
-
+        formData.append("name", trimmedName);
+        formData.append("description", trimmedDescription);
+        formData.append("price", String(productPrice));
+        formData.append("price_after", String(productPriceAfter));
         formData.append(
             "quantity_in_stock",
             String(productStock)
         );
-
         formData.append(
             "category",
             String(productCategory)
         );
 
         if (image) {
-            formData.append(
-                "product_image",
-                image
-            );
+            formData.append("product_image", image);
         }
 
         // ==========================================
@@ -164,132 +150,115 @@ export default function AddProduct() {
 
         createProductMutation.mutate(formData);
     };
+
     return (
-
         <div className="create-product">
-
             <div className="create-header">
-
                 <h1>Create Product</h1>
-
                 <p>Add a new product to your shop</p>
-
             </div>
 
             <form
                 className="create-form"
                 onSubmit={submitHandler}
             >
-
                 <div className="form-group">
-
                     <label>Product Name</label>
 
                     <input
                         type="text"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) =>
+                            setName(e.target.value)
+                        }
                     />
-
                 </div>
 
                 <div className="form-group">
-
                     <label>Description</label>
 
                     <textarea
                         rows={5}
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) =>
+                            setDescription(e.target.value)
+                        }
                     />
-
                 </div>
 
                 <div className="grid-2">
-
                     <div className="form-group">
-
                         <label>Price</label>
 
                         <input
                             type="number"
                             value={price}
-                            onChange={(e) => setPrice(e.target.value)}
+                            onChange={(e) =>
+                                setPrice(e.target.value)
+                            }
                         />
-
                     </div>
 
                     <div className="form-group">
-
                         <label>Sale Price</label>
 
                         <input
                             type="number"
                             value={priceAfter}
-                            onChange={(e) => setPriceAfter(e.target.value)}
+                            onChange={(e) =>
+                                setPriceAfter(e.target.value)
+                            }
                         />
-
                     </div>
-
                 </div>
 
                 <div className="grid-2">
-
                     <div className="form-group">
-
                         <label>Stock</label>
 
                         <input
                             type="number"
                             value={stock}
-                            onChange={(e) => setStock(e.target.value)}
+                            onChange={(e) =>
+                                setStock(e.target.value)
+                            }
                         />
-
                     </div>
 
                     <div className="form-group">
-
                         <label>Category</label>
 
                         <input
                             type="number"
                             value={category}
-                            onChange={(e) => setCategory(e.target.value)}
+                            onChange={(e) =>
+                                setCategory(e.target.value)
+                            }
                         />
-
                     </div>
-
                 </div>
 
                 <div className="form-group">
-
                     <label>Product Image</label>
 
                     <input
                         type="file"
                         accept="image/*"
                         onChange={(e) => {
-
-                            if (!e.target.files) return;
-
-                            setImage(e.target.files[0]);
-
+                            const file = e.target.files?.[0] ?? null;
+                            setImage(file);
                         }}
                     />
-
                 </div>
 
-                {
-                    image &&
+                {image && (
                     <div className="preview">
-
                         <img
                             src={URL.createObjectURL(image)}
-                            alt=""
+                            alt="Product preview"
                         />
-
                     </div>
-                }
+                )}
 
                 <button
                     type="submit"
@@ -298,14 +267,9 @@ export default function AddProduct() {
                 >
                     {createProductMutation.isPending
                         ? "Creating..."
-                        : "Create Product"
-                    }
+                        : "Create Product"}
                 </button>
-
             </form>
-
         </div>
-
     );
-
 }

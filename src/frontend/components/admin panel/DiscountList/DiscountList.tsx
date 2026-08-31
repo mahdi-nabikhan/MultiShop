@@ -16,6 +16,7 @@ function DiscountList({ productId }: { productId: number }) {
     const {data: discounts = [],isLoading,isError} = useQuery({
         queryKey: shopAdminQueryKeys.productDiscounts(productId),
         queryFn: () => getProductDiscounts(productId)});
+        
 
 
     
