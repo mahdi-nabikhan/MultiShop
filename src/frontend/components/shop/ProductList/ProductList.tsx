@@ -3,8 +3,9 @@ import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
 import ProductCard from "../ProductCard/ProductCard";
 import "./ProductList.css";
 
-import { useQuery } from "@tanstack/react-query";
-import { getStoreProducts } from "@/services/product.services";
+import useStoreProducts from "@/hooks/shop/useStoreProducts";
+
+
 interface ProductListProps {
 
   shopId: string;
@@ -28,12 +29,7 @@ export default  function ProductList({
     data: products = [],
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: shopQueryKeys.storeProducts(shopId),
-    queryFn: () => getStoreProducts(shopId),
-    staleTime: 2 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-  });
+  } = useStoreProducts(shopId)
 
 
 

@@ -1,17 +1,9 @@
 "use client";
-import { shopQueryKeys } from "@/Lib/query-keys/shop.keys"; 
+
 import { useState } from "react";
 
-import {
-    useQuery,
-    useMutation,
-    useQueryClient,
-} from "@tanstack/react-query";
-
-import {
-    canRateProduct,
-    addProductRating,
-} from "@/services/product.services";
+import useCanRateProduct from "@/hooks/shop/useCanRateProduct";
+import useAddProductRating from "@/hooks/shop/useAddProductRating";
 
 import "./ProductRating.css";
 
@@ -34,10 +26,6 @@ export default function ProductRating({
 }: ProductRatingProps) {
 
 
-    const queryClient =
-        useQueryClient();
-
-
     const [selectedRate, setSelectedRate] =
         useState(0);
 
@@ -54,60 +42,22 @@ export default function ProductRating({
     // Check Can Rate
     // ==========================================
 
-    const {data: canRate = false,isLoading: loading,isError} = useQuery({
-        queryKey: shopQueryKeys.canRateProduct(productId),
-        queryFn: () =>
-            canRateProduct(productId),
-
-        enabled:
-            isAuthenticated,});
+    const {
+        data: canRate = false,
+        isLoading: loading,
+        isError,
+    } = useCanRateProduct(
+        productId,
+        isAuthenticated
+    );
 
 
     // ==========================================
     // Add Rating
     // ==========================================
 
-    const ratingMutation = useMutation({
-
-        mutationFn: () =>
-            addProductRating(
-                productId,
-                selectedRate
-            ),
-
-        onSuccess: () => {
-
-            setMessage(
-                "Rating submitted successfully"
-            );
-
-            setSelectedRate(0);
-
-            queryClient.invalidateQueries({
-
-                queryKey: [
-                    "can-rate-product",
-                    productId,
-                ],
-
-            });
-
-        },
-
-        onError: (error) => {
-
-            console.error(
-                "Product rating error:",
-                error
-            );
-
-            setMessage(
-                "Error submitting rating"
-            );
-
-        },
-
-    });
+    const ratingMutation =
+        useAddProductRating();
 
 
     // ==========================================
@@ -128,7 +78,39 @@ export default function ProductRating({
 
         setMessage("");
 
-        ratingMutation.mutate();
+
+        ratingMutation.mutate({
+
+            productId,
+
+            rate: selectedRate,
+
+        }, {
+
+            onSuccess: () => {
+
+                setMessage(
+                    "Rating submitted successfully"
+                );
+
+                setSelectedRate(0);
+
+            },
+
+            onError: (error) => {
+
+                console.error(
+                    "Product rating error:",
+                    error
+                );
+
+                setMessage(
+                    "Error submitting rating"
+                );
+
+            },
+
+        });
 
     };
 

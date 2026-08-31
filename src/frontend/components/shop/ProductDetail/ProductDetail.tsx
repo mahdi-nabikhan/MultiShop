@@ -1,22 +1,17 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
-import ProductRating from "@/components/shop/ProductRating/ProductRating";
-
-import {
-    getProduct,
-    getProductImages,
-} from "@/services/product.services";
-
 import Link from "next/link";
 
+import ProductRating from "@/components/shop/ProductRating/ProductRating";
+
 import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
+import SessionProductOrderBox from "../SessionProductOrderBox/SessionProductOrderBox";
 
 import useCheckMe from "@/hooks/Checkme";
-
-import SessionProductOrderBox from "../SessionProductOrderBox/SessionProductOrderBox";
+import useProduct from "@/hooks/shop/useProduct";
+import useProductImages from "@/hooks/shop/useProductImages";
 
 import {
     Star,
@@ -26,48 +21,58 @@ import {
 
 import "./ProductDetail.css";
 
-
 interface Props {
     productId: string;
 }
-
 
 export default function ProductDetail({
     productId,
 }: Props) {
 
+    // ==========================================
+    // Product
+    // ==========================================
+
     const {
         data: product,
         isLoading: productLoading,
         isError: productError,
-    } = useQuery({
-        queryKey: shopQueryKeys.product(productId),
-        queryFn: () => getProduct(productId),
-    });
+    } = useProduct(productId);
 
+
+    // ==========================================
+    // Product Images
+    // ==========================================
 
     const {
         data: productImages = [],
         isLoading: imagesLoading,
         isError: imagesError,
-    } = useQuery({
-        queryKey: shopQueryKeys.productImages(productId),
-        queryFn: () => getProductImages(productId),
-        staleTime: 2 * 60 * 1000,
-    });
+    } = useProductImages(productId);
 
+
+    // ==========================================
+    // Authentication
+    // ==========================================
+
+    const isAuthenticated = useCheckMe();
+
+
+    // ==========================================
+    // Active Image
+    // ==========================================
 
     const [activeImage, setActiveImage] =
         useState<string | null>(null);
 
 
-    const isAuthenticated =
-        useCheckMe();
-
+    // ==========================================
+    // Fix Image URL
+    // ==========================================
 
     function fixImageUrl(
         image: string | null
-    ) {
+    ): string | null {
 
         if (!image) {
             return null;
@@ -81,15 +86,25 @@ export default function ProductDetail({
     }
 
 
+    // ==========================================
+    // Images
+    // ==========================================
+
     const images = product
         ? [
             fixImageUrl(product.product_image),
-            ...productImages.map(item =>
-                fixImageUrl(item.product_image)
+
+            ...productImages.map(
+                item =>
+                    fixImageUrl(item.product_image)
             ),
         ].filter(Boolean) as string[]
         : [];
 
+
+    // ==========================================
+    // Set First Image
+    // ==========================================
 
     useEffect(() => {
 
@@ -106,7 +121,14 @@ export default function ProductDetail({
     }, [product, productImages]);
 
 
-    if (productLoading || imagesLoading) {
+    // ==========================================
+    // Loading
+    // ==========================================
+
+    if (
+        productLoading ||
+        imagesLoading
+    ) {
 
         return (
             <h2>
@@ -117,7 +139,15 @@ export default function ProductDetail({
     }
 
 
-    if (productError || imagesError || !product) {
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (
+        productError ||
+        imagesError ||
+        !product
+    ) {
 
         return (
             <h2>
@@ -128,38 +158,48 @@ export default function ProductDetail({
     }
 
 
+    // ==========================================
+    // UI
+    // ==========================================
+
     return (
 
         <section className="product-detail container">
+
+            {/* ==================================
+                Gallery
+            ================================== */}
 
             <div className="gallery">
 
                 <div className="thumbnail-list">
 
-                    {images.map((img, index) => (
+                    {images.map(
+                        (img, index) => (
 
-                        <div
-                            key={index}
-                            className={
-                                `thumbnail ${
-                                    activeImage === img
-                                        ? "active"
-                                        : ""
-                                }`
-                            }
-                            onClick={() =>
-                                setActiveImage(img)
-                            }
-                        >
+                            <div
+                                key={index}
+                                className={
+                                    `thumbnail ${
+                                        activeImage === img
+                                            ? "active"
+                                            : ""
+                                    }`
+                                }
+                                onClick={() =>
+                                    setActiveImage(img)
+                                }
+                            >
 
-                            <img
-                                src={img}
-                                alt={product.name}
-                            />
+                                <img
+                                    src={img}
+                                    alt={product.name}
+                                />
 
-                        </div>
+                            </div>
 
-                    ))}
+                        )
+                    )}
 
                 </div>
 
@@ -180,12 +220,18 @@ export default function ProductDetail({
             </div>
 
 
+            {/* ==================================
+                Product Information
+            ================================== */}
+
             <div className="info">
 
                 <h1>
                     {product.name}
                 </h1>
 
+
+                {/* Rating */}
 
                 <div className="rating">
 
@@ -202,6 +248,8 @@ export default function ProductDetail({
                 </div>
 
 
+                {/* Price */}
+
                 <div className="price-box">
 
                     <span className="old-price">
@@ -215,10 +263,14 @@ export default function ProductDetail({
                 </div>
 
 
+                {/* Description */}
+
                 <p className="description">
                     {product.description}
                 </p>
 
+
+                {/* Stock */}
 
                 <div className="stock">
 
@@ -228,14 +280,20 @@ export default function ProductDetail({
                 </div>
 
 
+                {/* ==================================
+                    Order
+                ================================== */}
+
                 {
                     isAuthenticated === null
 
                         ?
 
-                        <div>
-                            Loading...
-                        </div>
+                        (
+                            <div>
+                                Loading...
+                            </div>
+                        )
 
                         :
 
@@ -243,43 +301,62 @@ export default function ProductDetail({
 
                             ?
 
-                            <>
+                            (
+                                <>
 
-                                <ProductOrderBox
-                                    productId={product.id}
-                                />
+                                    <ProductOrderBox
+                                        productId={product.id}
+                                    />
 
-                                <Link
-                                    href={`/chatbox/${product.store}`}
-                                    className="chat-link"
-                                >
-                                    Chat with seller
-                                </Link>
+                                    <Link
+                                        href={`/chatbox/${product.store}`}
+                                        className="chat-link"
+                                    >
+                                        Chat with seller
+                                    </Link>
 
-                            </>
+                                </>
+                            )
 
                             :
 
-                            <SessionProductOrderBox
-                                productId={product.id}
-                            />
+                            (
+                                <SessionProductOrderBox
+                                    productId={product.id}
+                                />
+                            )
                 }
 
+
+                {/* ==================================
+                    Features
+                ================================== */}
 
                 <div className="features">
 
                     <div>
+
                         <Truck size={18} />
+
                         Free Shipping
+
                     </div>
 
+
                     <div>
+
                         <ShieldCheck size={18} />
+
                         Warranty Included
+
                     </div>
 
                 </div>
 
+
+                {/* ==================================
+                    Rating
+                ================================== */}
 
                 <ProductRating
                     productId={product.id}
@@ -293,5 +370,4 @@ export default function ProductDetail({
         </section>
 
     );
-
 }

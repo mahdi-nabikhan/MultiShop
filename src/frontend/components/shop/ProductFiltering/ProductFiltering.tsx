@@ -1,14 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { shopQueryKeys } from "@/Lib/query-keys/shop.keys";
-import { getFilteredProducts } from "@/services/product.services";
 
-import type { Product } from "@/types/product";
+import useFilteredProducts from "@/hooks/shop/useFilteredProducts";
 
 import "./ProductFiltering.css";
-
 
 const filters = [
     {
@@ -21,38 +17,25 @@ const filters = [
     },
 ];
 
-
 export default function ProductFilterList() {
 
     const [order, setOrder] = useState("");
-
 
     const {
         data: products = [],
         isLoading,
         isError,
-    } = useQuery<Product[]>({
-
-        queryKey: shopQueryKeys.filteredProducts(order),
-        queryFn: () =>
-            getFilteredProducts(order),
-
-    });
-
+    } = useFilteredProducts(order);
 
     if (isError) {
-
         return (
             <p>
                 Error loading products
             </p>
         );
-
     }
 
-
     return (
-
         <div>
 
             {/* Filter Buttons */}
@@ -72,9 +55,7 @@ export default function ProductFilterList() {
                                 : ""
                         }
                     >
-
                         {filter.title}
-
                     </button>
 
                 ))}
@@ -102,7 +83,10 @@ export default function ProductFilterList() {
                         >
 
                             <img
-                                src={product.product_image ?? "/product.jpg"}
+                                src={
+                                    product.product_image ??
+                                    "/product.jpg"
+                                }
                                 alt={product.name}
                             />
 
@@ -123,7 +107,5 @@ export default function ProductFilterList() {
             )}
 
         </div>
-
     );
-
 }
