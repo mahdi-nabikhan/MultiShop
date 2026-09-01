@@ -290,3 +290,34 @@ class CartAddSerializer(serializers.Serializer):
     
 class CartMessageSerializer(serializers.Serializer):
     detail = serializers.CharField()
+    
+    
+    
+
+
+
+class AddToCartSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField(
+        min_value=1
+    )
+
+    def validate_quantity(self, value):
+        product_id = self.context.get("product_id")
+
+        product = Product.objects.filter(
+            pk=product_id
+        ).first()
+
+        if not product:
+            raise serializers.ValidationError(
+                "Product does not exist."
+            )
+
+        if value > product.quantity_in_stock:
+            raise serializers.ValidationError(
+                "Requested quantity exceeds available stock."
+            )
+
+        return value
+
+

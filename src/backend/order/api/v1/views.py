@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from order.sessions import CartSession
 from ...permissions import IsBillOwner,IsOrderItemOwner,IsOrderOwner
 from django.shortcuts import get_object_or_404
+from ...services import CartService
 class OrderListApiView(generics.GenericAPIView):
     """
     API view to handle listing and creating Orders for the authenticated Customer.
@@ -78,101 +79,90 @@ class OrderListApiView(generics.GenericAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class OrderItemCreateApiView(generics.GenericAPIView):
-    """
-    API view to create a new OrderItem for a specific Order.
 
-    Responsibilities
-    ----------------
-    - Handles POST requests to add an item to an existing Order.
-    - Validates the input data using OrderItemSerializer.
-    - Associates the new OrderItem with the Order specified by `pk`.
 
-    Attributes
-    ----------
-    serializer_class : OrderItemSerializer
-        - Serializer used for validation and serialization of OrderItem data.
+class AddToCartApiView(generics.GenericAPIView):
 
-    Methods
-    -------
-    post(self, request, pk)
-        - Handles POST requests.
-        - `pk` is the ID of the Order to which the item will be added.
-        - Validates the input data with OrderItemSerializer.
-        - On success: saves the OrderItem and returns serialized data with status 201 CREATED.
-        - On failure: returns serializer errors with status 400 BAD REQUEST.
+    serializer_class = AddToCartSerializer
+    permission_classes = [IsAuthenticated]
 
-    Usage
-    -----
-        # Add an item to order with ID 5
-        POST /api/v1/order-item/create/5/
-        {
-            "product": 12,
-            "quantity": 2
-        }
-        -> returns the created OrderItem data on success
+    def post(self, request, product_id):
 
-    Notes
-    -----
-    - The view requires the user to be authenticated.
-    - Context is passed to the serializer, including the request and order ID (`pk`).
-    - Only items for the specified order (`pk`) will be created.
-    - Typically used in Customer-facing APIs for building orders dynamically.
-    """
-    serializer_class = OrderItemSerializer
-    permission_classes = [IsAuthenticated,IsOrderOwner]
-    def post(self, request, pk):
-        serializer = self.serializer_class(data=request.data, context={'request': request, 'pk': pk})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(
+            data=request.data,
+            context={
+                "product_id": product_id,
+            },
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        quantity = serializer.validated_data["quantity"]
+
+        customer = Customer.objects.get(
+            user=request.user
+        )
+
+        CartService.add_item(
+            customer_id=customer.id,
+            product_id=product_id,
+            quantity=quantity,
+        )
+
+        return Response(
+            {
+                "message": "Product added to cart successfully.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class OrderItemListAPIView(generics.GenericAPIView):
-    """
-    API view to list all OrderItems for a specific Order.
 
-    Responsibilities
-    ----------------
-    - Handles GET requests to retrieve all items associated with a given Order.
-    - Filters OrderItem objects by the order ID provided in the URL (`pk`).
-    - Serializes the list of OrderItems using OrderItemSerializer.
-
-    Attributes
-    ----------
-    serializer_class : OrderItemSerializer
-        - Serializer used to format OrderItem data.
-    queryset : QuerySet
-        - Base queryset of all OrderItem objects (filtered by order in get method).
-
-    Methods
-    -------
-    get(self, request, pk)
-        - Handles GET requests.
-        - `pk` is the ID of the Order whose items will be listed.
-        - Returns serialized list of OrderItems with status 200 OK.
-
-    Usage
-    -----
-        # List items of order with ID 5
-        GET /api/v1/order-items/5/
-        -> returns a list of OrderItem objects for that order
-
-    Notes
-    -----
-    - The view requires authentication; only authenticated users should access their own orders.
-    - This endpoint is typically used to display order details in a customer dashboard.
-    - If the order has no items, an empty list is returned.
-    """
     serializer_class = OrderItemSerializer
-    queryset = OrderItem.objects.all()
-    permission_classes = [IsAuthenticated,IsOrderOwner]
-    def get(self, request, pk):
-        obj = self.queryset.filter(order__pk=pk)
-        serializer = self.serializer_class(obj, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None):
+
+        customer = Customer.objects.get(
+            user=request.user
+        )
+
+        cart = CartService.get_cart(
+            customer_id=customer.id
+        )
+
+        if not cart:
+            return Response(
+                [],
+                status=status.HTTP_200_OK
+            )
+
+        products = Product.objects.filter(
+            pk__in=cart.keys()
+        )
+
+        items = []
+
+        for product in products:
+
+            quantity = cart[product.id]
+
+            items.append({
+                "product": ProductSerializer(
+                    product
+                ).data,
+                "quantity": quantity,
+            })
+
+        return Response(
+            items,
+            status=status.HTTP_200_OK
+        )
+
+
 
 
 class OrderItemDetailView(generics.GenericAPIView):
