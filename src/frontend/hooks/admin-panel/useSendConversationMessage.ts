@@ -1,3 +1,4 @@
+
 import {
     useMutation,
     useQueryClient,
@@ -12,7 +13,6 @@ interface SendMessageParams {
 }
 
 export default function useSendConversationMessage() {
-
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -42,3 +42,4 @@ export default function useSendConversationMessage() {
         },
     });
 }
+
