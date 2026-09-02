@@ -3,7 +3,8 @@ from order.models import *
 from customer.models import *
 from website.models import *
 from vendor.api.v1.serializers import ProductSerializer
-
+from ...services import CartService
+from django.db import transaction
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -145,58 +146,22 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
         return value
 
+
+
+
+
 class BillSerilizers(serializers.ModelSerializer):
-    """
-    Serializer for the Bill model, handling creation and representation of bills/invoices.
 
-    Responsibilities
-    ----------------
-    - Serialize Bill instances for API responses.
-    - Include nested details of the associated Order (cart) in the representation.
-    - Validate and create new Bill instances, linking them to a specific Order.
-
-    Attributes
-    ----------
-    Meta.model : Bill
-        - The model associated with this serializer.
-    Meta.fields : '__all__'
-        - Includes all fields of the Bill model.
-    Meta.read_only_fields : ['cart']
-        - The 'cart' (Order) field is read-only and set automatically.
-
-    Methods
-    -------
-    create(self, validated_data)
-        - Retrieves the Order instance from context using 'pk'.
-        - Associates the Bill with this Order.
-        - Creates and returns the new Bill instance.
-
-    to_representation(self, instance)
-        - Overrides default representation to include nested Order data using OrderSerializer.
-        - Ensures that the 'cart' field returns detailed order information instead of just the ID.
-
-    Usage
-    -----
-        # Create a new Bill for Order ID 5
-        POST /api/v1/bills/create/5/
-        {
-            "total_amount": 100,
-            "payment_status": "P"
-        }
-        -> returns the created Bill with nested order details
-
-    Notes
-    -----
-    - Requires 'pk' in serializer context to identify the Order for which the bill is created.
-    - Useful for checkout or invoicing functionality in e-commerce systems.
-    - The nested representation allows frontend apps to display full order details within the bill response.
-    """
     class Meta:
-        model=Bill
-        fields='__all__'
-        read_only_fields=['cart','address']
-        
+        model = Bill
+        fields = "__all__"
+        read_only_fields = [
+            "cart",
+            "address",
+        ]
+
     def validate(self, attrs):
+
         request = self.context.get("request")
         address_pk = self.context.get("pk")
 
@@ -210,54 +175,103 @@ class BillSerilizers(serializers.ModelSerializer):
                 {"address": "Address is required."}
             )
 
-        order = Order.objects.filter(
-            customer__user=request.user,
-            status=False
+        customer = Customer.objects.filter(
+            user=request.user
         ).first()
 
-        if not order:
+        if not customer:
             raise serializers.ValidationError(
-                {"order": "You don't have an active order."}
+                {"customer": "Customer does not exist."}
             )
 
         address = Address.objects.filter(
             pk=address_pk,
-            customer__user=request.user
+            customer=customer
         ).first()
 
         if not address:
             raise serializers.ValidationError(
-                {"address": "Address does not exist or does not belong to you."}
+                {
+                    "address":
+                    "Address does not exist or does not belong to you."
+                }
             )
 
-        if not order.items.exists():
+        cart = CartService.get_cart(
+            customer_id=customer.id
+        )
+
+        if not cart:
             raise serializers.ValidationError(
-                {"order": "Cannot create a bill for an empty order."}
+                {
+                    "order":
+                    "Cannot create a bill for an empty cart."
+                }
             )
 
-        self.order = order
+        self.customer = customer
         self.address = address
+        self.cart = cart
 
-        return attrs     
-        
-    def to_representation(self, instance):
-        response=super().to_representation(instance)
-        response['cart']=OrderSerializer(instance.cart).data
-        return response
-    
-    
+        return attrs
+
     def create(self, validated_data):
-        request = self.context.get('request')
-        order=Order.objects.get(customer__user = request.user,status=False)
-        address = Address.objects.get(pk = self.context.get('pk'))
-        validated_data['cart']=order
-        validated_data['address']=address        
-        bill = Bill.objects.create(**validated_data)
-        order.status=True
-        order.save(update_fields=['status'])
+
+        with transaction.atomic():
+
+            order = Order.objects.create(
+                customer=self.customer,
+                status=False,
+            )
+
+            for product_id, quantity in self.cart.items():
+
+                product = Product.objects.filter(
+                    pk=product_id
+                ).first()
+
+                if not product:
+                    raise serializers.ValidationError(
+                        {
+                            "product":
+                            f"Product {product_id} does not exist."
+                        }
+                    )
+
+                if quantity > product.quantity_in_stock:
+                    raise serializers.ValidationError(
+                        {
+                            "product":
+                            f"Requested quantity for "
+                            f"'{product}' exceeds available stock."
+                        }
+                    )
+
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=quantity,
+                )
+
+            validated_data["cart"] = order
+            validated_data["address"] = self.address
+
+            bill = Bill.objects.create(
+                **validated_data
+            )
+
         return bill
-        
-    
+
+    def to_representation(self, instance):
+
+        response = super().to_representation(instance)
+
+        response["cart"] = OrderSerializer(
+            instance.cart
+        ).data
+
+        return response
+
 
 
 
@@ -290,3 +304,34 @@ class CartAddSerializer(serializers.Serializer):
     
 class CartMessageSerializer(serializers.Serializer):
     detail = serializers.CharField()
+    
+    
+    
+
+
+
+class AddToCartSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField(
+        min_value=1
+    )
+
+    def validate_quantity(self, value):
+        product_id = self.context.get("product_id")
+
+        product = Product.objects.filter(
+            pk=product_id
+        ).first()
+
+        if not product:
+            raise serializers.ValidationError(
+                "Product does not exist."
+            )
+
+        if value > product.quantity_in_stock:
+            raise serializers.ValidationError(
+                "Requested quantity exceeds available stock."
+            )
+
+        return value
+
+
