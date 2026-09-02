@@ -86,12 +86,12 @@ class AddToCartApiView(generics.GenericAPIView):
     serializer_class = AddToCartSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, product_id):
+    def post(self, request, pk):
 
         serializer = self.get_serializer(
             data=request.data,
             context={
-                "product_id": product_id,
+                "product_id": pk,
             },
         )
 
@@ -107,7 +107,7 @@ class AddToCartApiView(generics.GenericAPIView):
 
         CartService.add_item(
             customer_id=customer.id,
-            product_id=product_id,
+            product_id=pk,
             quantity=quantity,
         )
 
