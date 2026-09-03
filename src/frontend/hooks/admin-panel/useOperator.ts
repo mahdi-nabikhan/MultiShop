@@ -5,30 +5,29 @@ import {
     useQuery,
 } from "@tanstack/react-query";
 
-import { getCustomerOrders } from "@/services/order.services";
+import { getOperators } from "@/services/shop-admin-panel.services";
+import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
-import { customerQueryKeys } from "@/Lib/query-keys/customer.keys";
-
-export default function useCustomerOrders(
+export default function useOperators(
     page: number,
     pageSize: number = 8
 ) {
     return useQuery({
-        queryKey: customerQueryKeys.orders(
+        queryKey: shopAdminQueryKeys.operators(
             page,
             pageSize
         ),
 
         queryFn: () =>
-            getCustomerOrders(
+            getOperators(
                 page,
                 pageSize
             ),
 
         placeholderData: keepPreviousData,
 
-        staleTime: 10 * 60 * 1000,
+        staleTime: 2 * 60 * 1000,
 
-        gcTime: 30 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
     });
 }

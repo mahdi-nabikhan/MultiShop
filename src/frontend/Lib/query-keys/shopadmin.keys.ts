@@ -1,12 +1,22 @@
 export const shopAdminQueryKeys = {
-    products: () =>
-        ["shop-admin", "products"] as const,
-
+    products: (page: number, pageSize: number) =>
+    ["shop-admin", "products", page, pageSize] as const,
+    
     product: (productId: number) =>
         ["shop-admin", "product", productId] as const,
 
-    productDiscounts: (productId: number) =>
-        ["shop-admin", "product-discounts", productId] as const,
+    productDiscounts: (
+        productId: number,
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "product-discounts",
+            productId,
+            page,
+            pageSize,
+        ] as const,
 
     productImages: (productId: number) =>
         ["shop-admin", "product-images", productId] as const,
@@ -19,21 +29,59 @@ export const shopAdminQueryKeys = {
 
     admin: (adminId: number | string) =>
         ["shop-admin", "admin", adminId] as const,
-
-    admins: () =>
-        ["shop-admin", "admins"] as const,
+    admins: (
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "admins",
+            page,
+            pageSize,
+        ] as const,
 
     operator: (operatorId: number | string) =>
         ["shop-admin", "operator", operatorId] as const,
 
-    orderItems: (orderId: number | string) =>
-        ["shop-admin", "order-items", orderId] as const,
+    operators: (
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "operators",
+            page,
+            pageSize,
+        ] as const,
+
+
+
+    orderItems: (
+        orderId: number | string,
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "order-items",
+            orderId,
+            page,
+            pageSize,
+        ] as const,
 
     orderItem: (orderItemId: number | string) =>
         ["shop-admin", "order-item", orderItemId] as const,
 
-    orders: () =>
-        ["shop-admin", "orders"] as const,
+    orders: (
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "orders",
+            page,
+            pageSize,
+        ] as const,
 
     userRole: () =>
         ["shop-admin", "user-role"] as const,
@@ -41,12 +89,13 @@ export const shopAdminQueryKeys = {
     profile: (role: string) =>
         ["shop-admin", "profile", role] as const,
 
-    tickets: () =>
-        ["shop-admin", "tickets"] as const,
+    tickets: (page: number, pageSize: number) =>
+        ["shop-admin", "tickets", page, pageSize] as const,
+
 
     storeProfile: () =>
-    ["shop-admin", "store-profile"] as const,
-    
+        ["shop-admin", "store-profile"] as const,
+
     ticketReplies: (ticketId: number) =>
-    ["shop-admin", "ticket-replies", ticketId] as const,
+        ["shop-admin", "ticket-replies", ticketId] as const,
 };

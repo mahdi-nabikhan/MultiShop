@@ -1,81 +1,61 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
-import { getShopProducts } from "@/services/shop-admin-panel.services";
+import Pagination from "@/components/commen/Paginations";
+import useShopProducts from "@/hooks/admin-panel/useShopProducts";
 
 import ProductRow from "../ProductRow/ProductRow";
 
 import "./ShopProductList.css";
 
-
 export default function ShopProductList() {
+    const [page, setPage] = useState(1);
+    const pageSize = 8;
 
     const {
-        data: products = [],
+        data,
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: shopAdminQueryKeys.products(),
-        queryFn: getShopProducts,
-    });
-
+        isFetching,
+    } = useShopProducts(page, pageSize);
 
     // ==========================================
     // Loading
     // ==========================================
 
     if (isLoading) {
-
         return (
-
             <div className="product-list">
-
                 <div className="products-loading">
-
                     Loading products...
-
                 </div>
-
             </div>
-
         );
-
     }
-
 
     // ==========================================
     // Error
     // ==========================================
 
     if (isError) {
-
         return (
-
             <div className="product-list">
-
                 <div className="products-error">
-
                     Failed to load products.
-
                 </div>
-
             </div>
-
         );
-
     }
 
+    const products = data?.results ?? [];
 
     // ==========================================
     // UI
     // ==========================================
 
     return (
-
         <div className="product-list">
-
 
             {/* ==========================================
                 HEADER
@@ -84,7 +64,6 @@ export default function ShopProductList() {
             <div className="product-header">
 
                 <div>
-
                     <h1>
                         Products
                     </h1>
@@ -92,9 +71,7 @@ export default function ShopProductList() {
                     <p>
                         Manage all products in your store
                     </p>
-
                 </div>
-
 
                 <button
                     className="add-product-btn"
@@ -103,7 +80,6 @@ export default function ShopProductList() {
                 </button>
 
             </div>
-
 
 
             {/* ==========================================
@@ -117,26 +93,19 @@ export default function ShopProductList() {
                     placeholder="Search product..."
                 />
 
-
                 <select>
-
                     <option>
                         All Categories
                     </option>
-
                 </select>
 
-
                 <select>
-
                     <option>
                         All Stock
                     </option>
-
                 </select>
 
             </div>
-
 
 
             {/* ==========================================
@@ -158,7 +127,6 @@ export default function ShopProductList() {
                 </div>
 
             ) : (
-
 
                 /* ==========================================
                     TABLE
@@ -220,8 +188,25 @@ export default function ShopProductList() {
 
             )}
 
+
+            {/* ==========================================
+                PAGINATION
+            ========================================== */}
+
+            {data && (
+                <Pagination
+                    next={data.links.next}
+                    previous={data.links.previous}
+                    loading={isFetching}
+                    onNext={() =>
+                        setPage((prev) => prev + 1)
+                    }
+                    onPrevious={() =>
+                        setPage((prev) => prev - 1)
+                    }
+                />
+            )}
+
         </div>
-
     );
-
 }

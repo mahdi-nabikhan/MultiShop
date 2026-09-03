@@ -1,28 +1,25 @@
-
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import useStores from "@/hooks/shop/useStores";
 
-import ShopPagination from "./ShopPagination";
+import Pagination from "@/components/commen/Paginations";
 
 import BACKEND_URLS from "@/utils";
 
 import "./ShopList.css";
 
-
 interface Props {
-
     page: string;
-
 }
-
 
 export default function ShopList({
     page,
 }: Props) {
 
+    const router = useRouter();
 
     const {
         data,
@@ -74,6 +71,28 @@ export default function ShopList({
 
 
     // ==========================================
+    // Pagination
+    // ==========================================
+
+    const goToPage = (url: string | null) => {
+
+        if (!url) {
+            return;
+        }
+
+        const urlObject = new URL(url);
+
+        const pageNumber =
+            urlObject.searchParams.get("page");
+
+        if (pageNumber) {
+            router.push(`/?page=${pageNumber}`);
+        }
+
+    };
+
+
+    // ==========================================
     // UI
     // ==========================================
 
@@ -93,7 +112,6 @@ export default function ShopList({
                         className="shop-card"
                         key={item.pk}
                     >
-
 
                         {/* Image */}
 
@@ -119,13 +137,11 @@ export default function ShopList({
                                 {item.name}
                             </h3>
 
-
                             <p>
                                 {item.description}
                             </p>
 
                         </div>
-
 
                     </Link>
 
@@ -136,9 +152,16 @@ export default function ShopList({
 
             {/* Pagination */}
 
-            <ShopPagination
+            <Pagination
                 next={data.links.next}
                 previous={data.links.previous}
+                loading={isLoading}
+                onNext={() =>
+                    goToPage(data.links.next)
+                }
+                onPrevious={() =>
+                    goToPage(data.links.previous)
+                }
             />
 
 

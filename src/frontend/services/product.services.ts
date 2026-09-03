@@ -1,6 +1,6 @@
 import axios from "axios";
 import BACKEND_URLS from "@/utils";
-import { Product,StoreResult,ProductImage,ProductResult,SearchResponse } from "@/types/product";
+import { Product, StoreResult, ProductImage, ProductResult, SearchResponse } from "@/types/product";
 
 
 
@@ -83,21 +83,37 @@ export async function addProductRating(
 
 
 
+
+
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
+
 export async function getStoreProducts(
     shopId: string,
+    page: number,
+    pageSize: number,
     headers: Record<string, string> = {}
-): Promise<Product[]> {
+): Promise<PaginatedResponse<Product>> {
 
-    const { data } = await axios.get<Product[]>(
+    const { data } = await axios.get<PaginatedResponse<Product>>(
         `${BACKEND_URLS}website/api/v1/product/list/${shopId}`,
         {
             headers,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
 
 
 export async function getFilteredProducts(
@@ -118,15 +134,34 @@ export async function getFilteredProducts(
 
 
 
-export async function getRandomProducts(): Promise<Product[]> {
 
-    const { data } = await axios.get<Product[]>(
-        `${BACKEND_URLS}website/api/v1/products/random/`
+
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
+
+export async function getRandomProducts(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Product>> {
+
+    const { data } = await axios.get<PaginatedResponse<Product>>(
+        `${BACKEND_URLS}website/api/v1/products/random/`,
+        {
+            params: {
+                page,
+                page_size: pageSize,
+            },
+        }
     );
 
     return data;
 }
-
 
 
 

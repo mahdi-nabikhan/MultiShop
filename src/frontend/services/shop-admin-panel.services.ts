@@ -160,14 +160,31 @@ export async function updateShopAdmin(
 
 
 
-export async function getProductDiscounts(
-    productId: number
-): Promise<DiscountData[]> {
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
 
-    const { data } = await axios.get<DiscountData[]>(
+export async function getProductDiscounts(
+    productId: number,
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<DiscountData>> {
+
+    const { data } = await axios.get<
+        PaginatedResponse<DiscountData>
+    >(
         `${BACKEND_URLS}vendor/api/v1/add/product/discount/${productId}/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
@@ -195,18 +212,24 @@ export async function updateProduct(
 
 
 
-export async function getAdmins(): Promise<Admin[]> {
+export async function getAdmins(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Admin>> {
 
-    const { data } = await axios.get<Admin[]>(
+    const { data } = await axios.get<PaginatedResponse<Admin>>(
         `${BACKEND_URLS}vendor/api/v1/shop/admin/list/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
 
 
 
@@ -246,18 +269,24 @@ export async function getOperatorDetail(
 
 
 
-export async function getOperators(): Promise<Operator[]> {
+export async function getOperators(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Operator>> {
 
-    const { data } = await axios.get<Operator[]>(
+    const { data } = await axios.get<PaginatedResponse<Operator>>(
         `${BACKEND_URLS}vendor/api/v1/shop/operator/list/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
 
 
 
@@ -265,13 +294,21 @@ export async function getOperators(): Promise<Operator[]> {
 
 
 export async function getOrderItems(
-    orderId: number | string
-): Promise<OrderItem[]> {
+    orderId: number | string,
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<OrderItem>> {
 
-    const { data } = await axios.get<OrderItem[]>(
+    const { data } = await axios.get<
+        PaginatedResponse<OrderItem>
+    >(
         `${BACKEND_URLS}order/api/v1/related/order/orderitem/${orderId}/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
@@ -283,20 +320,26 @@ export async function getOrderItems(
 
 
 
+export async function getShopOrders(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Order>> {
 
-export async function getShopOrders(): Promise<Order[]> {
-
-    const { data } = await axios.get<Order[]>(
+    const { data } = await axios.get<
+        PaginatedResponse<Order>
+    >(
         `${BACKEND_URLS}vendor/api/v1/shop/list/order/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
-
 
 
 
@@ -473,31 +516,43 @@ export async function deleteProductImage(
 
 
 
-export async function getShopProducts(): Promise<ShopProductListData[]> {
-    const response = await axios.get<ShopProductListData[]>(
+export async function getShopProducts(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<ShopProductListData>> {
+    const response = await axios.get<
+        PaginatedResponse<ShopProductListData>
+    >(
         `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return response.data;
 }
 
-
-
-export async function getShopTickets(): Promise<Ticket[]> {
-
-    const response = await axios.get<Ticket[]>(
+export async function getShopTickets(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Ticket>> {
+    const response = await axios.get<PaginatedResponse<Ticket>>(
         `${BACKEND_URLS}dashboard/api/v1/shop/all/ticket/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return response.data;
 }
-
 
 
 

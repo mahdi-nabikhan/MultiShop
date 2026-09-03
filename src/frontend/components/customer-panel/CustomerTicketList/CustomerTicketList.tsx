@@ -1,6 +1,6 @@
-
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 import {
@@ -10,16 +10,21 @@ import {
 } from "lucide-react";
 
 import useCustomerTickets from "@/hooks/customer/useCustomerTickets";
+import Pagination from "@/components/commen/Paginations";
 
 import "./CustomerTicketList.css";
 
 export default function CustomerTicketList() {
+    const [page, setPage] = useState(1);
+
+    const pageSize = 8;
 
     const {
-        data: tickets = [],
+        data,
         isLoading,
+        isFetching,
         isError,
-    } = useCustomerTickets();
+    } = useCustomerTickets(page, pageSize);
 
     if (isLoading) {
         return (
@@ -37,6 +42,16 @@ export default function CustomerTicketList() {
         );
     }
 
+    if (!data) {
+        return (
+            <div className="ticket-loading">
+                No tickets found.
+            </div>
+        );
+    }
+
+    const tickets = data.results;
+
     return (
         <section className="customer-ticket-list">
 
@@ -47,68 +62,81 @@ export default function CustomerTicketList() {
                 </h2>
 
                 <span>
-                    {tickets.length} Tickets
+                    {data.count} Tickets
                 </span>
 
             </div>
 
             <div className="ticket-grid">
 
-                {tickets.map((ticket) => (
+                {tickets.length > 0 ? (
 
-                    <div
-                        className="ticket-card"
-                        key={ticket.pk}
-                    >
+                    tickets.map((ticket) => (
 
-                        <div className="ticket-icon">
+                        <div
+                            className="ticket-card"
+                            key={ticket.pk}
+                        >
 
-                            <Ticket size={30} />
+                            <div className="ticket-icon">
+                                <Ticket size={30} />
+                            </div>
 
-                        </div>
+                            <div className="ticket-content">
 
-                        <div className="ticket-content">
+                                <h3>
+                                    {ticket.title}
+                                </h3>
 
-                            <h3>
-                                {ticket.title}
-                            </h3>
+                                <p>
+                                    {ticket.content.length > 120
+                                        ? `${ticket.content.slice(0, 120)}...`
+                                        : ticket.content}
+                                </p>
 
-                            <p>
-                                {ticket.content.length > 120
-                                    ? `${ticket.content.slice(0, 120)}...`
-                                    : ticket.content}
-                            </p>
+                                <div className="ticket-footer">
 
-                            <div className="ticket-footer">
+                                    <div className="ticket-store">
 
-                                <div className="ticket-store">
+                                        <Store size={16} />
 
-                                    <Store size={16} />
+                                        Store #{ticket.store}
 
-                                    Store #{ticket.store}
+                                    </div>
+
+                                    <Link
+                                        href={`/customer-panel/tickets/${ticket.pk}`}
+                                        className="ticket-detail-btn"
+                                    >
+                                        View
+                                        <ChevronRight size={16} />
+                                    </Link>
 
                                 </div>
-
-                                <Link
-                                    href={`/customer-panel/tickets/${ticket.pk}`}
-                                    className="ticket-detail-btn"
-                                >
-
-                                    View
-
-                                    <ChevronRight size={16} />
-
-                                </Link>
 
                             </div>
 
                         </div>
 
+                    ))
+
+                ) : (
+
+                    <div className="ticket-loading">
+                        No tickets found.
                     </div>
 
-                ))}
+                )}
 
             </div>
+
+            <Pagination
+                next={data.links.next}
+                previous={data.links.previous}
+                loading={isFetching}
+                onNext={() => setPage((prev) => prev + 1)}
+                onPrevious={() => setPage((prev) => prev - 1)}
+            />
 
         </section>
     );

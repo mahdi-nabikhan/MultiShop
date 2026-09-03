@@ -1,16 +1,16 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
-import { getShopProducts } from "@/services/shop-admin-panel.services";
+import { getShopTickets } from "@/services/shop-admin-panel.services";
 
-export default function useShopProducts(
+export default function useShopTickets(
     page: number,
     pageSize: number = 8
 ) {
     return useQuery({
-        queryKey: shopAdminQueryKeys.products(page, pageSize),
+        queryKey: shopAdminQueryKeys.tickets(page, pageSize),
 
-        queryFn: () => getShopProducts(page, pageSize),
+        queryFn: () => getShopTickets(page, pageSize),
 
         placeholderData: keepPreviousData,
 

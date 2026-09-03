@@ -125,6 +125,7 @@ export interface OrderItem {
 
 
 export interface Operator {
+    id:number
     username: string;
     user: {
         email: string;

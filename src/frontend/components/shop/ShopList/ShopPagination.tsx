@@ -1,65 +1,162 @@
+"use client";
+
 import Link from "next/link";
 
-import "./ShopPagination.css";
+import useStores from "@/hooks/shop/useStores";
+
+import Pagination from "@/components/commen/Paginations";
+
+import BACKEND_URLS from "@/utils";
+
+import "./ShopList.css";
 
 interface Props {
-    next: string | null;
-    previous: string | null;
+    page: string;
 }
 
-export default function ShopPagination({
-    next,
-    previous,
+export default function ShopList({
+    page,
 }: Props) {
 
-    function getPageNumber(url: string | null) {
-        if (!url) {
-            return null;
-        }
+    const {
+        data,
+        isLoading,
+        isError,
+    } = useStores(page);
 
-        const urlObject = new URL(url);
 
-        return urlObject.searchParams.get("page");
+    // ==========================================
+    // Loading
+    // ==========================================
+
+    if (isLoading) {
+
+        return (
+
+            <section className="shop-list container">
+
+                <p>
+                    Loading shops...
+                </p>
+
+            </section>
+
+        );
+
     }
 
-    const nextPage = getPageNumber(next);
-    const previousPage = getPageNumber(previous);
+
+    // ==========================================
+    // Error
+    // ==========================================
+
+    if (isError || !data) {
+
+        return (
+
+            <section className="shop-list container">
+
+                <p>
+                    Error loading shops.
+                </p>
+
+            </section>
+
+        );
+
+    }
+
+
+    // ==========================================
+    // UI
+    // ==========================================
 
     return (
-        <div className="shop-pagination">
 
-            {previousPage ? (
-                <Link
-                    href={`/?page=${previousPage}`}
-                    className="pagination-button"
-                >
-                    ← Previous
-                </Link>
-            ) : (
-                <button
-                    className="pagination-button disabled"
-                    disabled
-                >
-                    ← Previous
-                </button>
-            )}
+        <section className="shop-list container">
 
-            {nextPage ? (
-                <Link
-                    href={`/?page=${nextPage}`}
-                    className="pagination-button"
-                >
-                    Next →
-                </Link>
-            ) : (
-                <button
-                    className="pagination-button disabled"
-                    disabled
-                >
-                    Next →
-                </button>
-            )}
 
-        </div>
+            {/* Shops */}
+
+            <div className="shops-grid">
+
+                {data.results.map((item) => (
+
+                    <Link
+                        href={`/shop/${item.pk}`}
+                        className="shop-card"
+                        key={item.pk}
+                    >
+
+                        {/* Image */}
+
+                        <div className="shop-image">
+
+                            <img
+                                src={
+                                    item.image
+                                        ? `${BACKEND_URLS.replace(/\/$/, "")}${item.image}`
+                                        : "/images/banner-1.jpg"
+                                }
+                                alt={item.name}
+                            />
+
+                        </div>
+
+
+                        {/* Content */}
+
+                        <div className="shop-content">
+
+                            <h3>
+                                {item.name}
+                            </h3>
+
+                            <p>
+                                {item.description}
+                            </p>
+
+                        </div>
+
+                    </Link>
+
+                ))}
+
+            </div>
+
+
+            {/* Pagination */}
+
+            <Pagination
+                next={data.links.next}
+                previous={data.links.previous}
+                loading={isLoading}
+                onNext={() => {
+                    if (data.links.next) {
+                        const url = new URL(data.links.next);
+                        const nextPage =
+                            url.searchParams.get("page");
+
+                        if (nextPage) {
+                            window.location.href = `/?page=${nextPage}`;
+                        }
+                    }
+                }}
+                onPrevious={() => {
+                    if (data.links.previous) {
+                        const url = new URL(data.links.previous);
+                        const previousPage =
+                            url.searchParams.get("page");
+
+                        if (previousPage) {
+                            window.location.href = `/?page=${previousPage}`;
+                        }
+                    }
+                }}
+            />
+
+        </section>
+
     );
+
 }

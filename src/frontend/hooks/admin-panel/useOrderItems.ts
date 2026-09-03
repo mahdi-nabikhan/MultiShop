@@ -5,29 +5,29 @@ import {
     useQuery,
 } from "@tanstack/react-query";
 
-import { getProductDiscounts } from "@/services/shop-admin-panel.services";
+import { getOrderItems } from "@/services/shop-admin-panel.services";
 import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
-export default function useProductDiscounts(
-    productId: number,
+export default function useOrderItems(
+    orderId: number | string,
     page: number,
     pageSize: number = 8
 ) {
     return useQuery({
-        queryKey: shopAdminQueryKeys.productDiscounts(
-            productId,
+        queryKey: shopAdminQueryKeys.orderItems(
+            orderId,
             page,
             pageSize
         ),
 
         queryFn: () =>
-            getProductDiscounts(
-                productId,
+            getOrderItems(
+                orderId,
                 page,
                 pageSize
             ),
 
-        enabled: !!productId,
+        enabled: !!orderId,
 
         placeholderData: keepPreviousData,
 

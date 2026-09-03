@@ -1,23 +1,28 @@
-
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 import BACKEND_URLS from "@/utils";
 
 import useRandomProducts from "@/hooks/shop/useRandomProducts";
 
-import "./RandomProduct.css";
+import Pagination from "@/components/commen/Paginations";
 
+import "./RandomProduct.css";
 
 export default function RandomProducts() {
 
+    const [page, setPage] = useState(1);
+
+    const pageSize = 8;
 
     const {
-        data: products = [],
+        data,
         isLoading,
         isError,
-    } = useRandomProducts();
+        isFetching,
+    } = useRandomProducts(page, pageSize);
 
 
     // ==========================================
@@ -70,6 +75,9 @@ export default function RandomProducts() {
     }
 
 
+    const products = data?.results ?? [];
+
+
     // ==========================================
     // Empty
     // ==========================================
@@ -101,7 +109,6 @@ export default function RandomProducts() {
 
             <div className="random-products-grid">
 
-
                 {products.map(product => (
 
                     <Link
@@ -114,26 +121,20 @@ export default function RandomProducts() {
 
                     >
 
-
                         <div className="random-product-image">
 
                             <img
-
                                 src={
                                     `${BACKEND_URLS}${product.product_image}`
                                 }
-
                                 alt={product.name}
-
                                 className="product-image"
-
                             />
 
                         </div>
 
 
                         <div className="random-product-content">
-
 
                             <h3>
                                 {product.name}
@@ -147,38 +148,37 @@ export default function RandomProducts() {
 
                             <div className="random-product-footer">
 
-
                                 <span className="old-price">
-
                                     ${product.price}
-
                                 </span>
-
 
                                 <span className="new-price">
-
                                     ${product.price_after}
-
                                 </span>
-
 
                             </div>
 
-
                         </div>
-
 
                     </Link>
 
                 ))}
 
-
             </div>
 
+
+            <Pagination
+                next={data?.links.next ?? null}
+                previous={data?.links.previous ?? null}
+                loading={isFetching}
+                onNext={() => setPage(prev => prev + 1)}
+                onPrevious={() =>
+                    setPage(prev => Math.max(1, prev - 1))
+                }
+            />
 
         </section>
 
     );
 
 }
-

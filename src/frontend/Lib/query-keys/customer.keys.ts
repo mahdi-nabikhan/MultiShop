@@ -3,11 +3,15 @@ export const customerQueryKeys = {
     // =========================
     // Comments
     // =========================
-
-    comments: () =>
-        ["customer", "comments"] as const,
-
-
+    comments: (
+        page: number,
+        pageSize: number
+    ) => [
+        "customer",
+        "comments",
+        page,
+        pageSize,
+    ] as const,
     // =========================
     // Addresses
     // =========================
@@ -41,12 +45,26 @@ export const customerQueryKeys = {
     // =========================
     // Orders
     // =========================
-
-    orders: () =>
-        ["customer", "orders"] as const,
-
-    orderItems: (orderId: number | string) =>
-        ["customer", "order-items", orderId] as const,
+    orders: (
+        page: number,
+        pageSize: number
+    ) => [
+        "customer",
+        "orders",
+        page,
+        pageSize,
+    ] as const,
+    orderItems: (
+        orderId: number | string,
+        page: number,
+        pageSize: number
+    ) => [
+        "customer",
+        "order-items",
+        orderId,
+        page,
+        pageSize,
+    ] as const,
 
     orderItem: (orderItemId: number | string) =>
         ["customer", "order-item", orderItemId] as const,
@@ -56,9 +74,15 @@ export const customerQueryKeys = {
     // Tickets
     // =========================
 
-    tickets: () =>
-        ["customer", "tickets"] as const,
-
+    tickets: (
+        page: number,
+        pageSize: number
+    ) => [
+        "customer",
+        "tickets",
+        page,
+        pageSize,
+    ] as const,
     ticket: (ticketId: number | string) =>
         ["customer", "ticket", ticketId] as const,
 
@@ -70,8 +94,16 @@ export const customerQueryKeys = {
     // Bills
     // =========================
 
-    bills: () =>
-        ["customer", "bills"] as const,
+    bills: (
+        page: number,
+        pageSize: number
+    ) => [
+        "customer",
+        "bills",
+        page,
+        pageSize,
+    ] as const,
+
     comment: (commentId: number) =>
-    ["customer", "comment", commentId] as const,
+        ["customer", "comment", commentId] as const,
 };
