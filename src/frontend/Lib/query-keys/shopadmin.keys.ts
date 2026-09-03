@@ -5,8 +5,18 @@ export const shopAdminQueryKeys = {
     product: (productId: number) =>
         ["shop-admin", "product", productId] as const,
 
-    productDiscounts: (productId: number) =>
-        ["shop-admin", "product-discounts", productId] as const,
+    productDiscounts: (
+        productId: number,
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "product-discounts",
+            productId,
+            page,
+            pageSize,
+        ] as const,
 
     productImages: (productId: number) =>
         ["shop-admin", "product-images", productId] as const,
@@ -45,8 +55,8 @@ export const shopAdminQueryKeys = {
         ["shop-admin", "tickets"] as const,
 
     storeProfile: () =>
-    ["shop-admin", "store-profile"] as const,
-    
+        ["shop-admin", "store-profile"] as const,
+
     ticketReplies: (ticketId: number) =>
-    ["shop-admin", "ticket-replies", ticketId] as const,
+        ["shop-admin", "ticket-replies", ticketId] as const,
 };

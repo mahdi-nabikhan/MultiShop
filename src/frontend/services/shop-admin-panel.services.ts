@@ -160,14 +160,31 @@ export async function updateShopAdmin(
 
 
 
-export async function getProductDiscounts(
-    productId: number
-): Promise<DiscountData[]> {
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
 
-    const { data } = await axios.get<DiscountData[]>(
+export async function getProductDiscounts(
+    productId: number,
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<DiscountData>> {
+
+    const { data } = await axios.get<
+        PaginatedResponse<DiscountData>
+    >(
         `${BACKEND_URLS}vendor/api/v1/add/product/discount/${productId}/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
