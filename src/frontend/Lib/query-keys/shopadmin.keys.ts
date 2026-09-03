@@ -56,8 +56,18 @@ export const shopAdminQueryKeys = {
 
 
 
-    orderItems: (orderId: number | string) =>
-        ["shop-admin", "order-items", orderId] as const,
+    orderItems: (
+    orderId: number | string,
+    page: number,
+    pageSize: number
+) =>
+    [
+        "shop-admin",
+        "order-items",
+        orderId,
+        page,
+        pageSize,
+    ] as const,
 
     orderItem: (orderItemId: number | string) =>
         ["shop-admin", "order-item", orderItemId] as const,

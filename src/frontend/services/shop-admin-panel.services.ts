@@ -294,19 +294,26 @@ export async function getOperators(
 
 
 export async function getOrderItems(
-    orderId: number | string
-): Promise<OrderItem[]> {
+    orderId: number | string,
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<OrderItem>> {
 
-    const { data } = await axios.get<OrderItem[]>(
+    const { data } = await axios.get<
+        PaginatedResponse<OrderItem>
+    >(
         `${BACKEND_URLS}order/api/v1/related/order/orderitem/${orderId}/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
 
 
 
