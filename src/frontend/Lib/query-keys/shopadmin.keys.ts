@@ -43,6 +43,19 @@ export const shopAdminQueryKeys = {
     operator: (operatorId: number | string) =>
         ["shop-admin", "operator", operatorId] as const,
 
+    operators: (
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "operators",
+            page,
+            pageSize,
+        ] as const,
+
+
+
     orderItems: (orderId: number | string) =>
         ["shop-admin", "order-items", orderId] as const,
 

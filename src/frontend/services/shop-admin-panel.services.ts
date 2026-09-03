@@ -269,18 +269,24 @@ export async function getOperatorDetail(
 
 
 
-export async function getOperators(): Promise<Operator[]> {
+export async function getOperators(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Operator>> {
 
-    const { data } = await axios.get<Operator[]>(
+    const { data } = await axios.get<PaginatedResponse<Operator>>(
         `${BACKEND_URLS}vendor/api/v1/shop/operator/list/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
 
 
 
