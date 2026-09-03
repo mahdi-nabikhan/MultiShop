@@ -15,27 +15,35 @@ export const shopQueryKeys = {
 
     productImages: (productId: number | string) =>
         ["shop", "product-images", productId] as const,
-
-    storeProducts: (shopId: number | string) =>
-        ["shop", "store-products", shopId] as const,
+    storeProducts: (
+        shopId: number | string,
+        page: number,
+        pageSize: number
+    ) =>
+        ["shop", "store-products", shopId, page, pageSize] as const,
 
     canRateProduct: (productId: number | string) =>
         ["shop", "can-rate-product", productId] as const,
 
-
-    randomProducts: () =>
-    ["shop", "random-products"] as const,
-
+    randomProducts: (
+        page: number,
+        pageSize: number
+    ) => [
+        "shop",
+        "random-products",
+        page,
+        pageSize,
+    ] as const,
 
     search: (searchQuery: string) =>
-    ["shop", "search", searchQuery] as const,
+        ["shop", "search", searchQuery] as const,
 
 
     stores: (page: string) =>
-    ["shop", "stores", page] as const,
+        ["shop", "stores", page] as const,
 
 
     storeCategories: () =>
-    ["shop", "store-categories"] as const,
-    
+        ["shop", "store-categories"] as const,
+
 };

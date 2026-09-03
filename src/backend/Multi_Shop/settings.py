@@ -181,6 +181,7 @@ REST_FRAMEWORK = {
         "reset_code_veri":'1000/day',
         "password_reset":"1000/day"
     },
+    "DEFAULT_PAGINATION_CLASS": "Multi_Shop.pagination.StandardPagination",
 }
 
 AXES_FAILURE_LIMIT = 5

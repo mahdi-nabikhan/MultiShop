@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import {
+    keepPreviousData,
+    useQuery,
+} from "@tanstack/react-query";
 
 import { getProductComments } from "@/services/comment.services";
 
@@ -47,11 +50,10 @@ export default function CommentList({
 }: Props) {
 
     const [page, setPage] = useState(1);
-
-
     const {
         data,
-        isLoading: loading,
+        isLoading,
+        isFetching,
     } = useQuery<IResponse>({
         queryKey: [
             "product-comments",
@@ -64,7 +66,11 @@ export default function CommentList({
                 productID,
                 page
             ),
+
+        placeholderData: keepPreviousData,
     });
+
+
 
 
     return (
@@ -83,33 +89,17 @@ export default function CommentList({
 
 
             <Pagination
-
-                next={
-                    data?.links.next ?? null
-                }
-
-                previous={
-                    data?.links.previous ?? null
-                }
-
-                loading={loading}
-
+                next={data?.links.next ?? null}
+                previous={data?.links.previous ?? null}
+                loading={isFetching}
                 onNext={() =>
-                    setPage(
-                        prev => prev + 1
-                    )
+                    setPage(prev => prev + 1)
                 }
-
                 onPrevious={() =>
-                    setPage(
-                        prev =>
-                            Math.max(
-                                1,
-                                prev - 1
-                            )
+                    setPage(prev =>
+                        Math.max(1, prev - 1)
                     )
                 }
-
             />
 
         </div>
