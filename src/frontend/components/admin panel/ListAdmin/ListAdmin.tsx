@@ -1,35 +1,50 @@
 "use client";
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
-import { useQuery } from "@tanstack/react-query";
+
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAdmins } from "@/services/shop-admin-panel.services";
+
+import useAdmins from "@/hooks/admin-panel/useAdmins";
+import Pagination from "@/components/commen/Paginations";
+
 import "./ListAdmin.css";
 
 
-
 export default function AdminList() {
-    const router = useRouter()
+
+    const router = useRouter();
+
+    const [page, setPage] = useState(1);
+
+    const pageSize = 8;
+
     const {
-        data: admins = [],
+        data,
         isLoading,
         isError,
-    } = useQuery({
-        queryKey: shopAdminQueryKeys.admins(),
-        queryFn: getAdmins,
-    });
-
+        isFetching,
+    } = useAdmins(
+        page,
+        pageSize
+    );
 
 
     if (isLoading) {
         return <h2>Loading...</h2>;
     }
+
+
     if (isError) {
         return <h2>Failed to load admins.</h2>;
     }
 
+
+    const admins = data?.results ?? [];
+
+
     if (admins.length === 0) {
         return <h2>No Admin Found</h2>;
     }
+
 
     return (
 
@@ -45,32 +60,35 @@ export default function AdminList() {
 
             </div>
 
+
             <div className="admin-list">
 
                 {
-                    admins.map((admin, index) => (
+                    admins.map((admin) => (
 
                         <div
-                            key={index}
+                            key={admin.id}
                             className="admin-card"
                         >
 
                             <div className="avatar">
 
                                 {
-                                    admin.user.email.charAt(0).toUpperCase()
+                                    admin.user.email
+                                        .charAt(0)
+                                        .toUpperCase()
                                 }
 
                             </div>
 
+
                             <div className="admin-info">
 
                                 <h2>
-
                                     {
-                                        admin.username || "No Username"
+                                        admin.username ||
+                                        "No Username"
                                     }
-
                                 </h2>
 
                                 <span>
@@ -79,12 +97,16 @@ export default function AdminList() {
 
                             </div>
 
-                            <div className="admin-badge" onClick={() => {
-                                router.push(`admin/${admin.id}`)
-                            }}>
 
+                            <div
+                                className="admin-badge"
+                                onClick={() => {
+                                    router.push(
+                                        `admin/${admin.id}`
+                                    );
+                                }}
+                            >
                                 Detail
-
                             </div>
 
                         </div>
@@ -94,8 +116,28 @@ export default function AdminList() {
 
             </div>
 
+
+            {
+                data && (
+                    <Pagination
+                        next={data.links.next}
+                        previous={data.links.previous}
+                        loading={isFetching}
+                        onNext={() =>
+                            setPage(
+                                (prev) => prev + 1
+                            )
+                        }
+                        onPrevious={() =>
+                            setPage(
+                                (prev) => prev - 1
+                            )
+                        }
+                    />
+                )
+            }
+
         </div>
 
     );
-
 }

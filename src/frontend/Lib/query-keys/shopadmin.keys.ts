@@ -29,9 +29,16 @@ export const shopAdminQueryKeys = {
 
     admin: (adminId: number | string) =>
         ["shop-admin", "admin", adminId] as const,
-
-    admins: () =>
-        ["shop-admin", "admins"] as const,
+    admins: (
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "admins",
+            page,
+            pageSize,
+        ] as const,
 
     operator: (operatorId: number | string) =>
         ["shop-admin", "operator", operatorId] as const,

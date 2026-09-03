@@ -212,18 +212,24 @@ export async function updateProduct(
 
 
 
-export async function getAdmins(): Promise<Admin[]> {
+export async function getAdmins(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Admin>> {
 
-    const { data } = await axios.get<Admin[]>(
+    const { data } = await axios.get<PaginatedResponse<Admin>>(
         `${BACKEND_URLS}vendor/api/v1/shop/admin/list/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
 
 
 
