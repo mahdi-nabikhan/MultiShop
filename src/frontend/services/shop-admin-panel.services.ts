@@ -536,19 +536,23 @@ export async function getShopProducts(
     return response.data;
 }
 
-
-export async function getShopTickets(): Promise<Ticket[]> {
-
-    const response = await axios.get<Ticket[]>(
+export async function getShopTickets(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Ticket>> {
+    const response = await axios.get<PaginatedResponse<Ticket>>(
         `${BACKEND_URLS}dashboard/api/v1/shop/all/ticket/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return response.data;
 }
-
 
 
 

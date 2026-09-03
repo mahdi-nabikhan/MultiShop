@@ -1,45 +1,88 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getShopTickets } from "@/services/shop-admin-panel.services";
+import { useState } from "react";
+
+import Pagination from "@/components/commen/Paginations";
+import useShopTickets from "@/hooks/admin-panel/useShopTickets";
+
 import "./ShopTicketList.css";
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
 
 export default function ShopTicketList() {
+    const [page, setPage] = useState(1);
+    const pageSize = 8;
 
-      const {
-        data: tickets = [],
-        isPending,
+    const {
+        data,
+        isLoading,
         isError,
-    } = useQuery({
-        queryKey: shopAdminQueryKeys.tickets(),
-        queryFn: getShopTickets,
-    });
-    if (isPending) {
-        return <h2>Loading...</h2>;
+        isFetching,
+    } = useShopTickets(page, pageSize);
+
+    // ==========================================
+    // Loading
+    // ==========================================
+
+    if (isLoading) {
+        return (
+            <div className="ticket-page">
+                <h2>Loading...</h2>
+            </div>
+        );
     }
+
+    // ==========================================
+    // Error
+    // ==========================================
 
     if (isError) {
-        return <h2>Failed to load tickets.</h2>;
+        return (
+            <div className="ticket-page">
+                <h2>Failed to load tickets.</h2>
+            </div>
+        );
     }
+
+    const tickets = data?.results ?? [];
+
+    // ==========================================
+    // Empty
+    // ==========================================
 
     if (tickets.length === 0) {
-        return <h2>No Tickets Found</h2>;
+        return (
+            <div className="ticket-page">
+                <h2>No Tickets Found</h2>
+            </div>
+        );
     }
 
-    return (
+    // ==========================================
+    // UI
+    // ==========================================
 
+    return (
         <div className="ticket-page">
+
+            {/* ==========================================
+                HEADER
+            ========================================== */}
 
             <div className="ticket-header">
 
-                <h1>Support Tickets</h1>
+                <h1>
+                    Support Tickets
+                </h1>
 
                 <p>
                     All customer tickets for your shop
                 </p>
 
             </div>
+
+
+            {/* ==========================================
+                TICKETS
+            ========================================== */}
 
             <div className="ticket-list">
 
@@ -72,24 +115,22 @@ export default function ShopTicketList() {
 
                         </div>
 
+
                         <p className="ticket-content">
 
                             {ticket.content}
 
                         </p>
 
+
                         <div className="ticket-footer">
 
                             <span>
-
                                 Customer ID: {ticket.customer.id}
-
                             </span>
 
                             <button>
-
                                 View Ticket
-
                             </button>
 
                         </div>
@@ -100,7 +141,25 @@ export default function ShopTicketList() {
 
             </div>
 
-        </div>
 
+            {/* ==========================================
+                PAGINATION
+            ========================================== */}
+
+            {data && (
+                <Pagination
+                    next={data.links.next}
+                    previous={data.links.previous}
+                    loading={isFetching}
+                    onNext={() =>
+                        setPage((prev) => prev + 1)
+                    }
+                    onPrevious={() =>
+                        setPage((prev) => prev - 1)
+                    }
+                />
+            )}
+
+        </div>
     );
 }

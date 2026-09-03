@@ -89,8 +89,9 @@ export const shopAdminQueryKeys = {
     profile: (role: string) =>
         ["shop-admin", "profile", role] as const,
 
-    tickets: () =>
-        ["shop-admin", "tickets"] as const,
+    tickets: (page: number, pageSize: number) =>
+        ["shop-admin", "tickets", page, pageSize] as const,
+
 
     storeProfile: () =>
         ["shop-admin", "store-profile"] as const,
