@@ -53,17 +53,32 @@ export async function getAddressDetail(
 
 
 
-export async function getCustomerComments(): Promise<Comment[]> {
-    const response = await axios.get<Comment[]>(
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
+
+export async function getCustomerComments(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Comment>> {
+    const response = await axios.get<PaginatedResponse<Comment>>(
         `${BACKEND_URLS}customer/api/v1/all/comments/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return response.data;
 }
-
 
 
 
@@ -109,12 +124,30 @@ export async function updateCustomerProfile(
 
 
 
-export async function getCustomerTickets(): Promise<CustomerTicket[]> {
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
 
-    const response = await axios.get<CustomerTicket[]>(
+export async function getCustomerTickets(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<CustomerTicket>> {
+
+    const response = await axios.get<
+        PaginatedResponse<CustomerTicket>
+    >(
         `${BACKEND_URLS}dashboard/api/v1/customer/list/ticket/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 

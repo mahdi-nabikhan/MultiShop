@@ -7,20 +7,32 @@ import type { Bill,Cart,CustomerOrderItem,OrderAddress,OrderItem,SessionCartResp
 // ==========================================
 
 
-export async function getBills(): Promise<Bill[]> {
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
 
-    const response = await axios.get<Bill[]>(
+export async function getBills(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Bill>> {
 
+    const response = await axios.get<PaginatedResponse<Bill>>(
         `${BACKEND_URLS}order/api/v1/bill/list/`,
-
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
-
     );
 
     return response.data;
-
 }
 
 
@@ -31,24 +43,36 @@ export async function getBills(): Promise<Bill[]> {
 
 
 
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
+
 export async function getCustomerOrderItems(
-    orderId: number
-): Promise<CustomerOrderItem[]> {
+    orderId: number,
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<CustomerOrderItem>> {
 
-    const response = await axios.get<CustomerOrderItem[]>(
-
+    const response = await axios.get<
+        PaginatedResponse<CustomerOrderItem>
+    >(
         `${BACKEND_URLS}order/api/v1/order/item/list/${orderId}/`,
-
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
-
     );
 
     return response.data;
-
 }
-
 
 export async function getCustomerOrderItemDetail(
     itemId: number
@@ -307,12 +331,28 @@ export async function updateSessionCartQuantity(
 
 
 
-export async function getCustomerOrders(): Promise<Order[]> {
+interface PaginatedResponse<T> {
+    links: {
+        next: string | null;
+        previous: string | null;
+    };
+    count: number;
+    results: T[];
+}
 
-    const response = await axios.get<Order[]>(
+export async function getCustomerOrders(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Order>> {
+
+    const response = await axios.get<PaginatedResponse<Order>>(
         `${BACKEND_URLS}order/api/v1/orders/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
