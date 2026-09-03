@@ -1,7 +1,7 @@
 export const shopAdminQueryKeys = {
-    products: () =>
-        ["shop-admin", "products"] as const,
-
+    products: (page: number, pageSize: number) =>
+    ["shop-admin", "products", page, pageSize] as const,
+    
     product: (productId: number) =>
         ["shop-admin", "product", productId] as const,
 
@@ -57,23 +57,31 @@ export const shopAdminQueryKeys = {
 
 
     orderItems: (
-    orderId: number | string,
-    page: number,
-    pageSize: number
-) =>
-    [
-        "shop-admin",
-        "order-items",
-        orderId,
-        page,
-        pageSize,
-    ] as const,
+        orderId: number | string,
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "order-items",
+            orderId,
+            page,
+            pageSize,
+        ] as const,
 
     orderItem: (orderItemId: number | string) =>
         ["shop-admin", "order-item", orderItemId] as const,
 
-    orders: () =>
-        ["shop-admin", "orders"] as const,
+    orders: (
+        page: number,
+        pageSize: number
+    ) =>
+        [
+            "shop-admin",
+            "orders",
+            page,
+            pageSize,
+        ] as const,
 
     userRole: () =>
         ["shop-admin", "user-role"] as const,

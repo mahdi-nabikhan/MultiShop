@@ -320,19 +320,26 @@ export async function getOrderItems(
 
 
 
-export async function getShopOrders(): Promise<Order[]> {
+export async function getShopOrders(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<Order>> {
 
-    const { data } = await axios.get<Order[]>(
+    const { data } = await axios.get<
+        PaginatedResponse<Order>
+    >(
         `${BACKEND_URLS}vendor/api/v1/shop/list/order/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return data;
 }
-
-
 
 
 
@@ -509,17 +516,25 @@ export async function deleteProductImage(
 
 
 
-export async function getShopProducts(): Promise<ShopProductListData[]> {
-    const response = await axios.get<ShopProductListData[]>(
+export async function getShopProducts(
+    page: number,
+    pageSize: number
+): Promise<PaginatedResponse<ShopProductListData>> {
+    const response = await axios.get<
+        PaginatedResponse<ShopProductListData>
+    >(
         `${BACKEND_URLS}vendor/api/v1/all/product/shop/`,
         {
             withCredentials: true,
+            params: {
+                page,
+                page_size: pageSize,
+            },
         }
     );
 
     return response.data;
 }
-
 
 
 export async function getShopTickets(): Promise<Ticket[]> {
