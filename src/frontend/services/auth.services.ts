@@ -134,3 +134,11 @@ export async function getCurrentUser(): Promise<CurrentUser> {
 
     return response.data;
 }
+
+
+export async function logout() { 
+    const response = await axios.post( 
+        `${BACKEND_URLS}account/api/v1/logout/`, {}, 
+        { withCredentials: true,} ); 
+        return response.data; 
+    }
