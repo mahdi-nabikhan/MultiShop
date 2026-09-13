@@ -98,4 +98,5 @@ export const shopAdminQueryKeys = {
 
     ticketReplies: (ticketId: number) =>
         ["shop-admin", "ticket-replies", ticketId] as const,
+
 };

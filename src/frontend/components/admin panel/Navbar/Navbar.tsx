@@ -1,63 +1,68 @@
+
+"use client";
+
 import Link from "next/link";
+
+import useLogout from "@/hooks/auth/useLogout";
+
 import "./Navbar.css";
 
 export default function AdminNavbar() {
-  return (
-    <header className="admin-navbar">
+    const logoutMutation = useLogout();
 
-      <div className="admin-logo">
-        <Link href="/admin-panel">
-          MultiShop Admin
-        </Link>
-      </div>
+    return (
+        <header className="admin-navbar">
 
+            <div className="admin-logo">
+                <Link href="/admin-panel">
+                    MultiShop Admin
+                </Link>
+            </div>
 
-      <div className="admin-search">
+            <div className="admin-search">
+                <input
+                    type="text"
+                    placeholder="Search..."
+                />
+            </div>
 
-        <input
-          type="text"
-          placeholder="Search..."
-        />
+            <div className="admin-actions">
 
-      </div>
+                <button className="notification">
+                    🔔
+                </button>
 
+                <div className="admin-profile">
 
-      <div className="admin-actions">
+                    <div className="avatar">
+                        A
+                    </div>
 
-        <button className="notification">
-          🔔
-        </button>
+                    <div className="profile-info">
+                        <span>
+                            Admin
+                        </span>
 
+                        <small>
+                            Manager
+                        </small>
+                    </div>
 
-        <div className="admin-profile">
+                </div>
 
-          <div className="avatar">
-            A
-          </div>
+                <button
+                    className="logout"
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                >
+                    {logoutMutation.isPending
+                        ? "Logging out..."
+                        : "Logout"}
+                </button>
 
-          <div className="profile-info">
+            </div>
 
-            <span>
-              Admin
-            </span>
-
-            <small>
-              Manager
-            </small>
-
-          </div>
-
-        </div>
-
-
-        <button className="logout">
-          Logout
-        </button>
-
-
-      </div>
-
-
-    </header>
-  );
+        </header>
+    );
 }
+
