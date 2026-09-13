@@ -115,3 +115,9 @@ export interface RegisterManagerData {
     last_name: string;
 
 }
+
+
+export interface CurrentUser {
+    pk: number;
+    email: string;
+}

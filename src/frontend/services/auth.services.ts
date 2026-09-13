@@ -4,7 +4,7 @@ import {
     ChangePasswordData, LoginRequest
     , LoginResponse, RegisterRequest
     , RegisterShopAdminPayload, CreateOperatorData,
-    RegisterManagerData
+    RegisterManagerData,CurrentUser
 } from "@/types/auth";
 
 export async function changePassword(
@@ -119,4 +119,18 @@ export async function registerManager(
 
     );
 
+}
+
+
+
+
+export async function getCurrentUser(): Promise<CurrentUser> {
+    const response = await axios.get<CurrentUser>(
+        `${BACKEND_URLS}account/api/v1/me/`,
+        {
+            withCredentials: true,
+        }
+    );
+
+    return response.data;
 }
