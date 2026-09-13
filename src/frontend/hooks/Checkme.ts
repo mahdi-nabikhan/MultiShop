@@ -1,28 +1,12 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import BACKEND_URLS from "@/utils";
+import { useQuery } from "@tanstack/react-query";
+
+import { authQueryKeys } from "@/Lib/query-keys/auth.key";
+import { getCurrentUser } from "@/services/auth.services";
 
 export default function useCheckMe() {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-    useEffect(() => {
-        const check = async () => {
-            try {
-                await axios.get(
-                    `${BACKEND_URLS}account/api/v1/me/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
-
-                setIsAuthenticated(true);
-            } catch {
-                setIsAuthenticated(false);
-            }
-        };
-
-        check();
-    }, []);
-
-    return isAuthenticated;
+    return useQuery({
+        queryKey: authQueryKeys.me(),
+        queryFn: getCurrentUser,
+        retry: false,
+    });
 }

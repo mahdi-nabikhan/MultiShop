@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -7,34 +8,41 @@ import {
     Bell,
     Heart,
     ChevronDown,
-    Menu
+    Menu,
 } from "lucide-react";
+
+import useCustomerProfile from "@/hooks/customer/useCustomerProfile";
 
 import "./Navbar.css";
 
 export default function Navbar() {
+    const {
+        profile: customer,
+        isLoading,
+    } = useCustomerProfile();
+
+    const username = customer?.username ?? "User";
+
+    const avatar = username
+        .charAt(0)
+        .toUpperCase();
 
     return (
-
         <header className="customer-navbar">
 
             <div className="navbar-left">
 
                 <button className="mobile-menu">
-
                     <Menu size={24} />
-
                 </button>
 
                 <Link
                     href="/"
                     className="navbar-logo"
                 >
-
                     <span className="logo-dot"></span>
 
                     MultiShop
-
                 </Link>
 
             </div>
@@ -57,9 +65,7 @@ export default function Navbar() {
                     <Heart size={20} />
 
                     <span className="badge">
-
                         2
-
                     </span>
 
                 </button>
@@ -69,9 +75,7 @@ export default function Navbar() {
                     <ShoppingCart size={20} />
 
                     <span className="badge">
-
                         4
-
                     </span>
 
                 </button>
@@ -81,9 +85,7 @@ export default function Navbar() {
                     <Bell size={20} />
 
                     <span className="badge">
-
                         1
-
                     </span>
 
                 </button>
@@ -92,7 +94,9 @@ export default function Navbar() {
 
                     <div className="profile-avatar">
 
-                        M
+                        {isLoading
+                            ? "..."
+                            : avatar}
 
                     </div>
 
@@ -100,14 +104,14 @@ export default function Navbar() {
 
                         <span>
 
-                            Mahdi
+                            {isLoading
+                                ? "Loading..."
+                                : username}
 
                         </span>
 
                         <small>
-
-                            Premium Member
-
+                            Customer
                         </small>
 
                     </div>
@@ -119,7 +123,6 @@ export default function Navbar() {
             </div>
 
         </header>
-
     );
-
 }
+

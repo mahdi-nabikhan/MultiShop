@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+
+import useLogout from "@/hooks/auth/useLogout";
+import useUserRole from "@/hooks/admin-panel/useUserRole";
 
 import {
     LayoutDashboard,
@@ -16,15 +18,9 @@ import {
     ChevronRight,
 } from "lucide-react";
 
-import BACKEND_URLS from "@/utils";
+import type { Role } from "@/services/shop-admin-panel.services";
 
 import "./Sidebar.css";
-
-type Role = "manager" | "admin" | "operator";
-
-interface RoleResponse {
-    role: Role;
-}
 
 interface ChildItem {
     title: string;
@@ -114,236 +110,161 @@ const menuItems: MenuItem[] = [
 ];
 
 export default function Sidebar() {
-
-    const [role, setRole] = useState<Role | null>(null);
-
-    const [loading, setLoading] = useState(true);
-
     const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-    useEffect(() => {
+    const {
+        data: role,
+        isLoading,
+        isError,
+    } = useUserRole();
 
-        const getRole = async () => {
+    const logoutMutation = useLogout();
 
-            try {
-
-                const { data } = await axios.get<RoleResponse>(
-                    `${BACKEND_URLS}vendor/api/v1/store/user/roles/`,
-                    {
-                        withCredentials: true,
-                    }
-                );
-
-                setRole(data.role);
-
-            } catch (err) {
-
-                console.log(err);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-
-        };
-
-        getRole();
-
-    }, []);
-
-    if (loading) {
-
+    if (isLoading) {
         return (
             <aside className="sidebar">
                 Loading...
             </aside>
         );
-
     }
 
-    if (!role) {
-
+    if (isError || !role) {
         return (
             <aside className="sidebar">
                 No Role Found
             </aside>
         );
-
     }
 
-    const filteredMenu = menuItems.filter(item =>
+    const filteredMenu = menuItems.filter((item) =>
         item.roles.includes(role)
     );
 
     return (
-
         <aside className="sidebar">
 
             <div className="sidebar-title">
-
                 Multi Shop
-
             </div>
 
             <nav>
 
-                {
+                {filteredMenu.map((item) => {
 
-                    filteredMenu.map((item) => {
+                    const Icon = item.icon;
 
-                        const Icon = item.icon;
+                    if (item.children) {
 
-                        if (item.children) {
-
-                            const isOpen = openMenu === item.title;
-
-                            return (
-
-                                <div
-                                    key={item.title}
-                                    className="sidebar-group"
-                                >
-
-                                    <button
-                                        className="sidebar-dropdown"
-                                        onClick={() =>
-                                            setOpenMenu(
-                                                isOpen
-                                                    ? null
-                                                    : item.title
-                                            )
-                                        }
-                                    >
-
-                                        <div className="left">
-
-                                            <Icon size={20} />
-
-                                            <span>
-
-                                                {item.title}
-
-                                            </span>
-
-                                        </div>
-
-                                        {
-
-                                            isOpen
-                                                ? <ChevronDown size={18} />
-                                                : <ChevronRight size={18} />
-
-                                        }
-
-                                    </button>
-
-                                    {
-
-                                        isOpen && (
-
-                                            <div className="submenu">
-
-                                                {
-
-                                                    item.children.map(child => (
-
-                                                        <Link
-
-                                                            key={child.title}
-
-                                                            href={child.href}
-
-                                                            className="submenu-link"
-
-                                                        >
-
-                                                            {child.title}
-
-                                                        </Link>
-
-                                                    ))
-
-                                                }
-
-                                            </div>
-
-                                        )
-
-                                    }
-
-                                </div>
-
-                            );
-
-                        }
+                        const isOpen =
+                            openMenu === item.title;
 
                         return (
-
-                            <Link
-
+                            <div
                                 key={item.title}
-
-                                href={item.href!}
-
-                                className="sidebar-link"
-
+                                className="sidebar-group"
                             >
 
-                                <Icon size={20} />
+                                <button
+                                    className="sidebar-dropdown"
+                                    onClick={() =>
+                                        setOpenMenu(
+                                            isOpen
+                                                ? null
+                                                : item.title
+                                        )
+                                    }
+                                >
 
-                                <span>
+                                    <div className="left">
 
-                                    {item.title}
+                                        <Icon size={20} />
 
-                                </span>
+                                        <span>
+                                            {item.title}
+                                        </span>
 
-                            </Link>
+                                    </div>
 
+                                    {isOpen ? (
+                                        <ChevronDown size={18} />
+                                    ) : (
+                                        <ChevronRight size={18} />
+                                    )}
+
+                                </button>
+
+                                {isOpen && (
+                                    <div className="submenu">
+
+                                        {item.children.map(
+                                            (child) => (
+                                                <Link
+                                                    key={child.title}
+                                                    href={child.href}
+                                                    className="submenu-link"
+                                                >
+                                                    {child.title}
+                                                </Link>
+                                            )
+                                        )}
+
+                                    </div>
+                                )}
+
+                            </div>
                         );
+                    }
 
-                    })
+                    return (
+                        <Link
+                            key={item.title}
+                            href={item.href!}
+                            className="sidebar-link"
+                        >
 
-                }
+                            <Icon size={20} />
+
+                            <span>
+                                {item.title}
+                            </span>
+
+                        </Link>
+                    );
+                })}
 
             </nav>
 
             <div className="sidebar-bottom">
 
-                {
+                {role !== "operator" && (
+                    <Link
+                        href="/shop-admin-panel/settings"
+                        className="sidebar-link"
+                    >
 
-                    role !== "operator" && (
+                        <Settings size={20} />
 
-                        <Link
+                        <span>
+                            Settings
+                        </span>
 
-                            href="/shop-admin-panel/settings"
+                    </Link>
+                )}
 
-                            className="sidebar-link"
-
-                        >
-
-                            <Settings size={20} />
-
-                            <span>
-
-                                Settings
-
-                            </span>
-
-                        </Link>
-
-                    )
-
-                }
-
-                <button className="logout-link">
+                <button
+                    className="logout-link"
+                    onClick={() =>
+                        logoutMutation.mutate()
+                    }
+                    disabled={logoutMutation.isPending}
+                >
 
                     <LogOut size={20} />
 
                     <span>
-
-                        Logout
-
+                        {logoutMutation.isPending
+                            ? "Logging out..."
+                            : "Logout"}
                     </span>
 
                 </button>
@@ -351,7 +272,5 @@ export default function Sidebar() {
             </div>
 
         </aside>
-
     );
-
 }
