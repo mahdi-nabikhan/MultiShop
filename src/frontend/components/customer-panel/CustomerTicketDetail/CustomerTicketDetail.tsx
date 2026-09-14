@@ -1,20 +1,15 @@
-
 "use client";
 
 import { useState } from "react";
 
 import {
     ArrowLeft,
-    Store,
-    User,
-    MessageSquare,
-    Edit,
-    Trash2,
 } from "lucide-react";
 
 import Link from "next/link";
 
-import useCustomerTicketDetail from "@/hooks/customer/useCustomerTicketDetail";
+import useCustomerTicketDetail
+    from "@/hooks/customer/useCustomerTicketDetail";
 
 import EditTicketModal
     from "../EditTicketModal/EditTicketModal";
@@ -22,9 +17,20 @@ import EditTicketModal
 import DeleteTicketModal
     from "../DeleteTicketModal/DeleteTicketModal";
 
-import Skeleton from "@/components/commen/Skeleton";
-import ErrorState from "@/components/commen/ErrorState";
-import EmptyState from "@/components/commen/EmptyState";
+import Skeleton
+    from "@/components/commen/Skeleton";
+
+import ErrorState
+    from "@/components/commen/ErrorState";
+
+import EmptyState
+    from "@/components/commen/EmptyState";
+
+import CustomerTicketInfo
+    from "./CustomerTicketInfo";
+
+import CustomerTicketConversation
+    from "./CustomerTicketConversation";
 
 import "./CustomerTicketDetail.css";
 
@@ -43,9 +49,7 @@ export default function CustomerTicketDetail({
         replies,
         isLoading,
         isError,
-        refresh,
     } = useCustomerTicketDetail(ticketId);
-
 
     const [openEdit, setOpenEdit] =
         useState(false);
@@ -53,10 +57,6 @@ export default function CustomerTicketDetail({
     const [openDelete, setOpenDelete] =
         useState(false);
 
-
-    // ==========================================
-    // Loading
-    // ==========================================
 
     if (isLoading) {
 
@@ -68,10 +68,6 @@ export default function CustomerTicketDetail({
 
     }
 
-
-    // ==========================================
-    // Error
-    // ==========================================
 
     if (isError) {
 
@@ -86,10 +82,6 @@ export default function CustomerTicketDetail({
     }
 
 
-    // ==========================================
-    // Not Found
-    // ==========================================
-
     if (!ticket) {
 
         return (
@@ -103,228 +95,48 @@ export default function CustomerTicketDetail({
     }
 
 
-    // ==========================================
-    // UI
-    // ==========================================
-
     return (
-
         <section className="customer-ticket-detail">
-
 
             <Link
                 href="/customer-panel/tickets"
                 className="ticket-back"
             >
-
                 <ArrowLeft size={18} />
-
                 Back To Tickets
-
             </Link>
 
-
-            {/* ==================================
-                TICKET
-            ================================== */}
-
-            <div className="ticket-detail-card">
-
-
-                <div className="ticket-top">
-
-
-                    <div>
-
-                        <h1>
-                            {ticket.title}
-                        </h1>
-
-                        <p>
-                            {ticket.content}
-                        </p>
-
-                    </div>
-
-
-                    <div className="ticket-actions">
-
-
-                        <button
-                            className="ticket-edit-btn"
-                            onClick={() =>
-                                setOpenEdit(true)
-                            }
-                        >
-
-                            <Edit size={18} />
-
-                            Edit
-
-                        </button>
-
-
-                        <button
-                            className="ticket-delete-btn"
-                            onClick={() =>
-                                setOpenDelete(true)
-                            }
-                        >
-
-                            <Trash2 size={18} />
-
-                            Delete
-
-                        </button>
-
-
-                    </div>
-
-
-                </div>
-
-
-                <div className="ticket-info">
-
-
-                    <div>
-
-                        <User size={18} />
-
-                        {ticket.customer.username}
-
-                    </div>
-
-
-                    <div>
-
-                        <Store size={18} />
-
-                        Store #{ticket.store}
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-            {/* ==================================
-                CONVERSATION
-            ================================== */}
-
-            <div className="conversation">
-
-
-                <h2>
-                    Conversation
-                </h2>
-
-
-                <div className="conversation-list">
-
-
-                    {/* Customer Message */}
-
-                    <div className="customer-message">
-
-
-                        <div className="message-badge">
-                            Customer
-                        </div>
-
-
-                        <div className="message-box">
-
-                            <MessageSquare size={18} />
-
-                            <p>
-                                {ticket.content}
-                            </p>
-
-                        </div>
-
-
-                    </div>
-
-
-                    {/* Support Replies */}
-
-                    {replies.map((reply) => (
-
-                        <div
-                            className="support-message"
-                            key={reply.pk}
-                        >
-
-
-                            <div className="message-badge support">
-
-                                Support
-
-                            </div>
-
-
-                            <div className="message-box">
-
-                                <MessageSquare size={18} />
-
-                                <p>
-                                    {reply.content}
-                                </p>
-
-                            </div>
-
-
-                        </div>
-
-                    ))}
-
-
-                </div>
-
-
-            </div>
-
-
-            {/* ==================================
-                EDIT
-            ================================== */}
+            <CustomerTicketInfo
+                ticket={ticket}
+                onEdit={() =>
+                    setOpenEdit(true)
+                }
+                onDelete={() =>
+                    setOpenDelete(true)
+                }
+            />
+
+            <CustomerTicketConversation
+                ticketContent={ticket.content}
+                replies={replies}
+            />
 
             <EditTicketModal
-
                 open={openEdit}
-
                 close={() =>
                     setOpenEdit(false)
                 }
-
                 ticket={ticket}
-
             />
 
-
-            {/* ==================================
-                DELETE
-            ================================== */}
-
             <DeleteTicketModal
-
                 open={openDelete}
-
                 close={() =>
                     setOpenDelete(false)
                 }
-
                 ticketId={ticket.pk}
-
             />
 
-
         </section>
-
     );
-
 }

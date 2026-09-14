@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -17,6 +16,9 @@ import DiscountList from "../DiscountList/DiscountList";
 import AddProductImageModal from "../AddImageProduct/AddImageProduct";
 import DeleteImageModal from "../DeleteImageModal/DeleteImageModal";
 
+import ProductGallery from "./ProductGallery";
+import ProductInfo from "./ProductInfo";
+
 import BACKEND_URLS from "@/utils";
 
 import {
@@ -33,28 +35,12 @@ import EmptyState from "@/components/commen/EmptyState";
 
 import "./ShopProductDetail.css";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-
-import {
-    Navigation,
-    Pagination,
-    Thumbs,
-} from "swiper/modules";
-
-import type { Swiper as SwiperType } from "swiper";
-
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/thumbs";
-
 
 function ShopProductDetail({
     productId,
 }: {
     productId: number;
 }) {
-
     const queryClient = useQueryClient();
 
 
@@ -76,14 +62,6 @@ function ShopProductDetail({
 
 
     // ==========================================
-    // Swiper
-    // ==========================================
-
-    const [thumbsSwiper, setThumbsSwiper] =
-        useState<SwiperType | null>(null);
-
-
-    // ==========================================
     // Selected Image
     // ==========================================
 
@@ -100,13 +78,11 @@ function ShopProductDetail({
         isLoading: productLoading,
         isError: productError,
     } = useQuery({
-
         queryKey:
             shopAdminQueryKeys.product(productId),
 
         queryFn: () =>
             getShopProductDetail(productId),
-
     });
 
 
@@ -119,13 +95,11 @@ function ShopProductDetail({
         isLoading: imagesLoading,
         isError: imagesError,
     } = useQuery({
-
         queryKey:
             shopAdminQueryKeys.productImages(productId),
 
         queryFn: () =>
             getShopProductImages(productId),
-
     });
 
 
@@ -134,47 +108,34 @@ function ShopProductDetail({
     // ==========================================
 
     const deleteImageMutation = useMutation({
-
         mutationFn: (imageId: number) =>
             deleteProductImage(imageId),
 
         onSuccess: async () => {
-
             setOpenDeleteImageModal(false);
-
             setSelectedImage(null);
 
-
             await queryClient.invalidateQueries({
-
                 queryKey:
                     shopAdminQueryKeys.productImages(
                         productId
                     ),
-
             });
 
-
             await queryClient.invalidateQueries({
-
                 queryKey:
                     shopAdminQueryKeys.product(
                         productId
                     ),
-
             });
-
         },
 
         onError: (error) => {
-
             console.error(
                 "Failed to delete product image:",
                 error
             );
-
         },
-
     });
 
 
@@ -183,7 +144,6 @@ function ShopProductDetail({
     // ==========================================
 
     const deleteProductImageHandler = () => {
-
         if (!selectedImage) {
             return;
         }
@@ -191,7 +151,6 @@ function ShopProductDetail({
         deleteImageMutation.mutate(
             selectedImage.id
         );
-
     };
 
 
@@ -201,13 +160,9 @@ function ShopProductDetail({
     // ==========================================
 
     const images: ProductImage[] = product
-
         ? [
-
             ...(product.product_image
-
                 ? [
-
                     {
                         id: product.id,
 
@@ -222,17 +177,12 @@ function ShopProductDetail({
 
                         product:
                             product.id,
-
                     },
-
                 ]
-
                 : []),
 
             ...productImages,
-
         ]
-
         : [];
 
 
@@ -244,17 +194,11 @@ function ShopProductDetail({
         productLoading ||
         imagesLoading
     ) {
-
         return (
-
             <div className="detail-body">
-
                 <Skeleton count={6} />
-
             </div>
-
         );
-
     }
 
 
@@ -266,19 +210,13 @@ function ShopProductDetail({
         productError ||
         imagesError
     ) {
-
         return (
-
             <div className="detail-body">
-
                 <ErrorState
                     message="Failed to load product."
                 />
-
             </div>
-
         );
-
     }
 
 
@@ -287,19 +225,13 @@ function ShopProductDetail({
     // ==========================================
 
     if (!product) {
-
         return (
-
             <div className="detail-body">
-
                 <EmptyState
                     message="Product not found."
                 />
-
             </div>
-
         );
-
     }
 
 
@@ -310,473 +242,146 @@ function ShopProductDetail({
     const getImageUrl = (
         image: string
     ) => {
-
         if (image.startsWith("http")) {
-
             return image;
-
         }
 
         return `${BACKEND_URLS.replace(
             "/api/v1/",
             ""
         )}${image}`;
+    };
 
+
+    // ==========================================
+    // Image Click Handler
+    // ==========================================
+
+    const handleImageClick = (
+        image: ProductImage
+    ) => {
+        setSelectedImage(image);
+        setOpenDeleteImageModal(true);
     };
 
 
     return (
-
         <>
-
             <div className="detail-body">
 
-
-                {/* ------------------------------------------------------ */}
+                {/* ========================================== */}
                 {/* Product Gallery */}
-                {/* ------------------------------------------------------ */}
+                {/* ========================================== */}
 
-                <div className="gallery-card">
-
-
-                    {/* Main Swiper */}
-
-                    <Swiper
-
-                        modules={[
-                            Navigation,
-                            Pagination,
-                            Thumbs,
-                        ]}
-
-                        navigation
-
-                        pagination={{
-                            clickable: true,
-                        }}
-
-                        thumbs={{
-                            swiper: thumbsSwiper,
-                        }}
-
-                        className="main-swiper"
-                    >
-
-                        {
-                            images.length > 0
-
-                                ? (
-
-                                    images.map(
-                                        (
-                                            image,
-                                            index
-                                        ) => (
-
-                                            <SwiperSlide
-                                                key={
-                                                    image.id
-                                                }
-                                            >
-
-                                                <img
-
-                                                    src={
-                                                        getImageUrl(
-                                                            image.product_image
-                                                        )
-                                                    }
-
-                                                    alt={`Product Image ${
-                                                        index + 1
-                                                    }`}
-
-                                                    onClick={() => {
-
-                                                        setSelectedImage(
-                                                            image
-                                                        );
-
-                                                        setOpenDeleteImageModal(
-                                                            true
-                                                        );
-
-                                                    }}
-
-                                                />
-
-                                            </SwiperSlide>
-
-                                        )
-                                    )
-
-                                )
-
-                                : (
-
-                                    <SwiperSlide>
-
-                                        <img
-                                            src="/images/no-image.png"
-                                            alt="No Image"
-                                        />
-
-                                    </SwiperSlide>
-
-                                )
-                        }
-
-                    </Swiper>
+                <ProductGallery
+                    images={images}
+                    getImageUrl={getImageUrl}
+                    onImageClick={handleImageClick}
+                />
 
 
-                    {/* Thumbnail Swiper */}
-
-                    <Swiper
-
-                        onSwiper={
-                            setThumbsSwiper
-                        }
-
-                        modules={[
-                            Thumbs,
-                        ]}
-
-                        slidesPerView={4}
-
-                        spaceBetween={12}
-
-                        watchSlidesProgress
-
-                        className="thumb-swiper"
-                    >
-
-                        {
-                            images.length > 0
-
-                                ? (
-
-                                    images.map(
-                                        (image) => (
-
-                                            <SwiperSlide
-                                                key={
-                                                    image.id
-                                                }
-                                            >
-
-                                                <img
-
-                                                    src={
-                                                        getImageUrl(
-                                                            image.product_image
-                                                        )
-                                                    }
-
-                                                    alt={
-                                                        image.title ??
-                                                        "Product Image"
-                                                    }
-
-                                                    onClick={() => {
-
-                                                        setSelectedImage(
-                                                            image
-                                                        );
-
-                                                        setOpenDeleteImageModal(
-                                                            true
-                                                        );
-
-                                                    }}
-
-                                                />
-
-                                            </SwiperSlide>
-
-                                        )
-                                    )
-
-                                )
-
-                                : (
-
-                                    <SwiperSlide>
-
-                                        <img
-                                            src="/images/no-image.png"
-                                            alt="No Image"
-                                        />
-
-                                    </SwiperSlide>
-
-                                )
-                        }
-
-                    </Swiper>
-
-                </div>
-
-
-                {/* ------------------------------------------------------ */}
+                {/* ========================================== */}
                 {/* Product Information */}
-                {/* ------------------------------------------------------ */}
+                {/* ========================================== */}
 
-                <div className="info-card">
+                <ProductInfo
+                    product={product}
 
+                    onEdit={() =>
+                        setOpenEditModal(true)
+                    }
 
-                    <div className="card-header">
+                    onAddDiscount={() =>
+                        setOpenDiscountModal(true)
+                    }
 
-                        <h2>
-                            {product.name}
-                        </h2>
+                    /*
+                     * Delete Product had no handler
+                     * in the original component.
+                     *
+                     * Keep the same behavior for now.
+                     */
+                    onDelete={() => {}}
 
-
-                        <span
-                            className={
-                                product.quantity_in_stock > 0
-                                    ? "status in-stock"
-                                    : "status out-stock"
-                            }
-                        >
-
-                            {
-                                product.quantity_in_stock > 0
-                                    ? "In Stock"
-                                    : "Out of Stock"
-                            }
-
-                        </span>
-
-                    </div>
+                    onAddImage={() =>
+                        setOpenImageModal(true)
+                    }
+                />
 
 
-                    <div className="info-grid">
-
-
-                        <div className="info-item">
-
-                            <span>
-                                Product ID
-                            </span>
-
-                            <strong>
-                                #{product.id}
-                            </strong>
-
-                        </div>
-
-
-                        <div className="info-item">
-
-                            <span>
-                                Category
-                            </span>
-
-                            <strong>
-                                {product.category}
-                            </strong>
-
-                        </div>
-
-
-                        <div className="info-item">
-
-                            <span>
-                                Price
-                            </span>
-
-                            <strong>
-                                ${product.price}
-                            </strong>
-
-                        </div>
-
-
-                        <div className="info-item">
-
-                            <span>
-                                Sale Price
-                            </span>
-
-                            <strong className="sale-price">
-                                ${product.price_after}
-                            </strong>
-
-                        </div>
-
-
-                        <div className="info-item">
-
-                            <span>
-                                Stock
-                            </span>
-
-                            <strong>
-                                {product.quantity_in_stock}
-                            </strong>
-
-                        </div>
-
-
-                        <div className="info-item">
-
-                            <span>
-                                Store
-                            </span>
-
-                            <strong>
-                                {product.store}
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div className="description-box">
-
-                        <h3>
-                            Description
-                        </h3>
-
-                        <p>
-                            {product.description}
-                        </p>
-
-                    </div>
-
-
-                    <div className="action-buttons">
-
-
-                        <button
-                            className="edit-btn"
-                            onClick={() =>
-                                setOpenEditModal(true)
-                            }
-                        >
-                            Edit Product
-                        </button>
-
-
-                        <button
-                            className="primary-btn"
-                            onClick={() =>
-                                setOpenDiscountModal(true)
-                            }
-                        >
-                            Add Discount
-                        </button>
-
-
-                        <button className="delete-btn">
-                            Delete Product
-                        </button>
-
-
-                        <button
-                            className="primary-btn"
-                            onClick={() =>
-                                setOpenImageModal(true)
-                            }
-                        >
-                            Add Product Image
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                {/* ------------------------------------------------------ */}
+                {/* ========================================== */}
                 {/* Discounts */}
-                {/* ------------------------------------------------------ */}
+                {/* ========================================== */}
 
                 <DiscountList
-                    productId={
-                        Number(productId)
-                    }
+                    productId={Number(productId)}
                 />
 
             </div>
 
 
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
             {/* Add Discount Modal */}
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
 
             <AddDiscountModal
-    open={openDiscountModal}
-    onClose={() =>
-        setOpenDiscountModal(false)
-    }
-    productId={product.id}
-/>
+                open={openDiscountModal}
 
-            {/* ------------------------------------------------------ */}
+                onClose={() =>
+                    setOpenDiscountModal(false)
+                }
+
+                productId={product.id}
+            />
+
+
+            {/* ========================================== */}
             {/* Edit Product Modal */}
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
 
             <EditProductModal
-                open={
-                    openEditModal
-                }
+                open={openEditModal}
 
                 onClose={() =>
                     setOpenEditModal(false)
                 }
 
-                product={
-                    product
-                }
+                product={product}
             />
 
 
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
             {/* Add Product Image Modal */}
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
 
             <AddProductImageModal
-                open={
-                    openImageModal
-                }
+                open={openImageModal}
 
                 onClose={() =>
                     setOpenImageModal(false)
                 }
 
-                productId={
-                    product.id
-                }
+                productId={product.id}
 
-                refreshImages={
-                    async () => {
-
-                        await queryClient.invalidateQueries({
-
-                            queryKey:
-                                shopAdminQueryKeys.productImages(
-                                    productId
-                                ),
-
-                        });
-
-                    }
-                }
+                refreshImages={async () => {
+                    await queryClient.invalidateQueries({
+                        queryKey:
+                            shopAdminQueryKeys.productImages(
+                                productId
+                            ),
+                    });
+                }}
             />
 
 
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
             {/* Delete Image Modal */}
-            {/* ------------------------------------------------------ */}
+            {/* ========================================== */}
 
             <DeleteImageModal
-                open={
-                    openDeleteImageModal
-                }
+                open={openDeleteImageModal}
 
                 onClose={() => {
-
                     setOpenDeleteImageModal(
                         false
                     );
@@ -784,16 +389,13 @@ function ShopProductDetail({
                     setSelectedImage(
                         null
                     );
-
                 }}
 
                 onConfirm={
                     deleteProductImageHandler
                 }
             />
-
         </>
-
     );
 }
 

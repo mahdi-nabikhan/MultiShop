@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -12,11 +11,12 @@ import useShopProducts from "@/hooks/admin-panel/useShopProducts";
 
 import ProductRow from "../ProductRow/ProductRow";
 
+import ProductListHeader from "./ProductListHeader";
+import ProductListToolbar from "./ProductListToolbar";
+
 import "./ShopProductList.css";
 
-
 export default function ShopProductList() {
-
     const [page, setPage] = useState(1);
 
     const pageSize = 8;
@@ -31,7 +31,6 @@ export default function ShopProductList() {
         pageSize
     );
 
-
     // ==========================================
     // Loading
     // ==========================================
@@ -43,7 +42,6 @@ export default function ShopProductList() {
             </div>
         );
     }
-
 
     // ==========================================
     // Error
@@ -59,9 +57,7 @@ export default function ShopProductList() {
         );
     }
 
-
     const products = data?.results ?? [];
-
 
     // ==========================================
     // Empty
@@ -77,7 +73,6 @@ export default function ShopProductList() {
         );
     }
 
-
     // ==========================================
     // UI
     // ==========================================
@@ -89,60 +84,13 @@ export default function ShopProductList() {
                 HEADER
             ========================================== */}
 
-            <div className="product-header">
-
-                <div>
-
-                    <h1>
-                        Products
-                    </h1>
-
-                    <p>
-                        Manage all products in your store
-                    </p>
-
-                </div>
-
-
-                <button
-                    className="add-product-btn"
-                >
-                    + Add Product
-                </button>
-
-            </div>
-
+            <ProductListHeader />
 
             {/* ==========================================
                 TOOLBAR
             ========================================== */}
 
-            <div className="toolbar">
-
-                <input
-                    type="text"
-                    placeholder="Search product..."
-                />
-
-                <select>
-
-                    <option>
-                        All Categories
-                    </option>
-
-                </select>
-
-
-                <select>
-
-                    <option>
-                        All Stock
-                    </option>
-
-                </select>
-
-            </div>
-
+            <ProductListToolbar />
 
             {/* ==========================================
                 TABLE
@@ -151,57 +99,27 @@ export default function ShopProductList() {
             <table className="product-table">
 
                 <thead>
-
                     <tr>
-
-                        <th>
-                            Image
-                        </th>
-
-                        <th>
-                            Name
-                        </th>
-
-                        <th>
-                            Price
-                        </th>
-
-                        <th>
-                            Sale Price
-                        </th>
-
-                        <th>
-                            Stock
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                        <th>
-                            Action
-                        </th>
-
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Sale Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
-
                 </thead>
 
-
                 <tbody>
-
                     {products.map((product) => (
-
                         <ProductRow
                             key={product.id}
                             product={product}
                         />
-
                     ))}
-
                 </tbody>
 
             </table>
-
 
             {/* ==========================================
                 PAGINATION
@@ -228,4 +146,3 @@ export default function ShopProductList() {
         </div>
     );
 }
-

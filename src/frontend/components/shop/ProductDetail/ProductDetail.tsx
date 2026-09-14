@@ -1,25 +1,16 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-
-import ProductRating from "@/components/shop/ProductRating/ProductRating";
-
-import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
-import SessionProductOrderBox from "../SessionProductOrderBox/SessionProductOrderBox";
 
 import useCheckMe from "@/hooks/Checkme";
 import useProduct from "@/hooks/shop/useProduct";
 import useProductImages from "@/hooks/shop/useProductImages";
+
 import Skeleton from "@/components/commen/Skeleton";
 import ErrorState from "@/components/commen/ErrorState";
 
-import {
-    Star,
-    ShieldCheck,
-    Truck,
-} from "lucide-react";
+import ProductGallery from "./ProductGallery";
+import ProductInfo from "./ProductInfo";
 
 import "./ProductDetail.css";
 
@@ -30,52 +21,34 @@ interface Props {
 export default function ProductDetail({
     productId,
 }: Props) {
-
-    // ==========================================
-    // Product
-    // ==========================================
-
     const {
         data: product,
         isLoading: productLoading,
         isError: productError,
     } = useProduct(productId);
 
-
-    // ==========================================
-    // Product Images
-    // ==========================================
-
     const {
         data: productImages = [],
         isLoading: imagesLoading,
         isError: imagesError,
     } = useProductImages(productId);
+    const {
+        data: currentUser,
+        isLoading: authLoading,
+    } = useCheckMe();
 
+    const isAuthenticated =
+        authLoading
+            ? null
+            : !!currentUser;
 
-    // ==========================================
-    // Authentication
-    // ==========================================
-
-    const isAuthenticated = useCheckMe();
-
-
-    // ==========================================
-    // Active Image
-    // ==========================================
 
     const [activeImage, setActiveImage] =
         useState<string | null>(null);
 
-
-    // ==========================================
-    // Fix Image URL
-    // ==========================================
-
     function fixImageUrl(
         image: string | null
     ): string | null {
-
         if (!image) {
             return null;
         }
@@ -87,287 +60,64 @@ export default function ProductDetail({
         return `http://localhost:8000${image}`;
     }
 
-
-    // ==========================================
-    // Images
-    // ==========================================
-
     const images = product
         ? [
-            fixImageUrl(product.product_image),
-
+            fixImageUrl(
+                product.product_image
+            ),
             ...productImages.map(
-                item =>
-                    fixImageUrl(item.product_image)
+                (item) =>
+                    fixImageUrl(
+                        item.product_image
+                    )
             ),
         ].filter(Boolean) as string[]
         : [];
 
-
-    // ==========================================
-    // Set First Image
-    // ==========================================
-
     useEffect(() => {
-
-        if (images.length > 0) {
-
-            setActiveImage(images[0]);
-
-        } else {
-
-            setActiveImage(null);
-
-        }
-
+        setActiveImage(
+            images.length > 0
+                ? images[0]
+                : null
+        );
     }, [product, productImages]);
-
-
-    // ==========================================
-    // Loading
-    // ==========================================
 
     if (
         productLoading ||
         imagesLoading
     ) {
-
         return <Skeleton count={6} />;
-
     }
-
-
-    // ==========================================
-    // Error
-    // ==========================================
 
     if (
         productError ||
         imagesError ||
         !product
     ) {
-
         return (
             <ErrorState
                 message="Failed to load product."
             />
         );
-
     }
 
-    
-
-
-    // ==========================================
-    // UI
-    // ==========================================
-
     return (
-
         <section className="product-detail container">
-
-            {/* ==================================
-                Gallery
-            ================================== */}
-
-            <div className="gallery">
-
-                <div className="thumbnail-list">
-
-                    {images.map(
-                        (img, index) => (
-
-                            <div
-                                key={index}
-                                className={
-                                    `thumbnail ${
-                                        activeImage === img
-                                            ? "active"
-                                            : ""
-                                    }`
-                                }
-                                onClick={() =>
-                                    setActiveImage(img)
-                                }
-                            >
-
-                                <img
-                                    src={img}
-                                    alt={product.name}
-                                />
-
-                            </div>
-
-                        )
-                    )}
-
-                </div>
-
-
-                <div className="main-image">
-
-                    {activeImage && (
-
-                        <img
-                            src={activeImage}
-                            alt={product.name}
-                        />
-
-                    )}
-
-                </div>
-
-            </div>
-
-
-            {/* ==================================
-                Product Information
-            ================================== */}
-
-            <div className="info">
-
-                <h1>
-                    {product.name}
-                </h1>
-
-
-                {/* Rating */}
-
-                <div className="rating">
-
-                    <Star
-                        fill="#FFD700"
-                        stroke="#FFD700"
-                        size={18}
-                    />
-
-                    <span>
-                        0.0
-                    </span>
-
-                </div>
-
-
-                {/* Price */}
-
-                <div className="price-box">
-
-                    <span className="old-price">
-                        ${product.price}
-                    </span>
-
-                    <span className="new-price">
-                        ${product.price_after}
-                    </span>
-
-                </div>
-
-
-                {/* Description */}
-
-                <p className="description">
-                    {product.description}
-                </p>
-
-
-                {/* Stock */}
-
-                <div className="stock">
-
-                    In Stock:{" "}
-                    {product.quantity_in_stock}
-
-                </div>
-
-
-                {/* ==================================
-                    Order
-                ================================== */}
-
-                {
-                    isAuthenticated === null
-
-                        ?
-
-                        (
-                            <div>
-                                Loading...
-                            </div>
-                        )
-
-                        :
-
-                        isAuthenticated
-
-                            ?
-
-                            (
-                                <>
-
-                                    <ProductOrderBox
-                                        productId={product.id}
-                                    />
-
-                                    <Link
-                                        href={`/chatbox/${product.store}`}
-                                        className="chat-link"
-                                    >
-                                        Chat with seller
-                                    </Link>
-
-                                </>
-                            )
-
-                            :
-
-                            (
-                                <SessionProductOrderBox
-                                    productId={product.id}
-                                />
-                            )
+            <ProductGallery
+                images={images}
+                activeImage={activeImage}
+                productName={product.name}
+                onImageSelect={
+                    setActiveImage
                 }
+            />
 
-
-                {/* ==================================
-                    Features
-                ================================== */}
-
-                <div className="features">
-
-                    <div>
-
-                        <Truck size={18} />
-
-                        Free Shipping
-
-                    </div>
-
-
-                    <div>
-
-                        <ShieldCheck size={18} />
-
-                        Warranty Included
-
-                    </div>
-
-                </div>
-
-
-                {/* ==================================
-                    Rating
-                ================================== */}
-
-                <ProductRating
-                    productId={product.id}
-                    isAuthenticated={
-                        isAuthenticated ?? false
-                    }
-                />
-
-            </div>
-
+            <ProductInfo
+                product={product}
+                isAuthenticated={
+                    isAuthenticated
+                }
+            />
         </section>
-
     );
 }
