@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,10 +11,12 @@ import Skeleton from "@/components/commen/Skeleton";
 import ErrorState from "@/components/commen/ErrorState";
 import EmptyState from "@/components/commen/EmptyState";
 
+import CustomerProfileInfo from "./CustomerProfileInfo";
+import CustomerSecurity from "./CustomerSecurity";
+
 import "./CustomerProfile.css";
 
 export default function CustomerProfile() {
-
     // ==========================================
     // Profile Hook
     // ==========================================
@@ -27,7 +30,6 @@ export default function CustomerProfile() {
         isUpdating,
     } = useCustomerProfile();
 
-
     // ==========================================
     // Profile State
     // ==========================================
@@ -36,8 +38,8 @@ export default function CustomerProfile() {
         username: "",
     });
 
-    const [editing, setEditing] = useState(false);
-
+    const [editing, setEditing] =
+        useState(false);
 
     // ==========================================
     // Password Modal
@@ -46,23 +48,17 @@ export default function CustomerProfile() {
     const [passwordModal, setPasswordModal] =
         useState(false);
 
-
     // ==========================================
     // Sync Profile With Form
     // ==========================================
 
     useEffect(() => {
-
         if (profile) {
-
             setEditData({
                 username: profile.username,
             });
-
         }
-
     }, [profile]);
-
 
     // ==========================================
     // Profile Input
@@ -71,63 +67,63 @@ export default function CustomerProfile() {
     function handleProfileChange(
         e: React.ChangeEvent<HTMLInputElement>
     ) {
-
         setEditData({
             ...editData,
             [e.target.name]: e.target.value,
         });
-
     }
-
 
     // ==========================================
     // Update Profile
     // ==========================================
 
     function handleUpdateProfile(
-        e: React.FormEvent
+        e: React.FormEvent<HTMLFormElement>
     ) {
-
         e.preventDefault();
 
         updateProfile(editData, {
-
             onSuccess: (data) => {
-
                 setEditData({
                     username: data.username,
                 });
 
                 setEditing(false);
-
             },
-
         });
-
     }
 
+    // ==========================================
+    // Cancel Editing
+    // ==========================================
+
+    function handleCancelEdit() {
+        setEditing(false);
+
+        if (profile) {
+            setEditData({
+                username: profile.username,
+            });
+        }
+    }
 
     // ==========================================
     // Loading
     // ==========================================
 
     if (isLoading) {
-
         return (
             <div className="customer-profile-loading">
                 <Skeleton count={4} />
             </div>
         );
-
     }
-
 
     // ==========================================
     // Error
     // ==========================================
 
     if (isError && !profile) {
-
         return (
             <div className="customer-profile-error">
 
@@ -135,316 +131,63 @@ export default function CustomerProfile() {
                     message="Failed to load profile."
                 />
 
-                <button onClick={() => refetch()}>
+                <button
+                    type="button"
+                    onClick={() => refetch()}
+                >
                     Try Again
                 </button>
 
             </div>
         );
-
     }
-
 
     // ==========================================
     // Profile Not Found
     // ==========================================
 
     if (!profile) {
-
         return (
             <div className="customer-profile-error">
-                <EmptyState message="Profile not found." />
+                <EmptyState
+                    message="Profile not found."
+                />
             </div>
         );
-
     }
-
 
     // ==========================================
     // UI
     // ==========================================
 
     return (
-
         <div className="customer-profile-container">
 
-
-            {/* ==================================
-                PROFILE CARD
-            ================================== */}
-
-            <section className="customer-profile-card">
-
-
-                <div className="customer-profile-header">
-
-
-                    <div>
-
-                        <span className="profile-label">
-                            ACCOUNT
-                        </span>
-
-                        <h1>
-                            My Profile
-                        </h1>
-
-                        <p>
-                            Manage your account
-                            information.
-                        </p>
-
-                    </div>
-
-
-                    {!editing && (
-
-                        <button
-                            type="button"
-                            className="edit-profile-btn"
-                            onClick={() =>
-                                setEditing(true)
-                            }
-                        >
-
-                            Edit Profile
-
-                        </button>
-
-                    )}
-
-
-                </div>
-
-
-                {!editing ? (
-
-                    <div className="customer-profile-info">
-
-
-                        {/* Username */}
-
-                        <div className="profile-info-row">
-
-                            <div className="profile-info-label">
-                                Username
-                            </div>
-
-                            <div className="profile-info-value">
-                                {profile.username}
-                            </div>
-
-                        </div>
-
-
-                        {/* Customer ID */}
-
-                        <div className="profile-info-row">
-
-                            <div className="profile-info-label">
-                                Customer ID
-                            </div>
-
-                            <div className="profile-info-value">
-                                #{profile.id}
-                            </div>
-
-                        </div>
-
-
-                        {/* Account Type */}
-
-                        <div className="profile-info-row">
-
-                            <div className="profile-info-label">
-                                Account Type
-                            </div>
-
-                            <div className="profile-info-value">
-
-                                <span className="customer-badge">
-                                    Customer
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* Status */}
-
-                        <div className="profile-info-row">
-
-                            <div className="profile-info-label">
-                                Status
-                            </div>
-
-                            <div className="profile-info-value">
-
-                                <span className="active-badge">
-                                    Active
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                    </div>
-
-                ) : (
-
-                    /* ==================================
-                       EDIT FORM
-                    ================================== */
-
-                    <form
-                        onSubmit={handleUpdateProfile}
-                        className="customer-profile-form"
-                    >
-
-
-                        <div className="form-group">
-
-                            <label>
-                                Username
-                            </label>
-
-                            <input
-                                type="text"
-                                name="username"
-                                value={editData.username}
-                                onChange={
-                                    handleProfileChange
-                                }
-                                required
-                            />
-
-                        </div>
-
-
-                        {/* Update Error */}
-
-                        {isError && (
-
-                            <p className="form-error">
-                                Failed to update profile.
-                            </p>
-
-                        )}
-
-
-                        <div className="profile-form-actions">
-
-
-                            <button
-                                type="button"
-                                className="cancel-btn"
-                                onClick={() => {
-
-                                    setEditing(false);
-
-                                    setEditData({
-                                        username:
-                                            profile.username,
-                                    });
-
-                                }}
-                            >
-
-                                Cancel
-
-                            </button>
-
-
-                            <button
-                                type="submit"
-                                className="save-profile-btn"
-                                disabled={isUpdating}
-                            >
-
-                                {isUpdating
-                                    ? "Saving..."
-                                    : "Save Changes"
-                                }
-
-                            </button>
-
-
-                        </div>
-
-
-                    </form>
-
-                )}
-
-
-            </section>
-
-
-            {/* ==================================
-                SECURITY CARD
-            ================================== */}
-
-            <section className="customer-security-card">
-
-
-                <div className="security-header">
-
-
-                    <div>
-
-                        <span className="profile-label">
-                            SECURITY
-                        </span>
-
-                        <h2>
-                            Password & Security
-                        </h2>
-
-                        <p>
-                            Manage your account password.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        className="change-password-btn"
-                        onClick={() =>
-                            setPasswordModal(true)
-                        }
-                    >
-
-                        Change Password
-
-                    </button>
-
-
-                </div>
-
-
-            </section>
-
-
-            {/* ==================================
-                PASSWORD MODAL
-            ================================== */}
+            <CustomerProfileInfo
+                profile={profile}
+                editing={editing}
+                editData={editData}
+                isUpdating={isUpdating}
+                isError={isError}
+                onEdit={() => setEditing(true)}
+                onChange={handleProfileChange}
+                onSubmit={handleUpdateProfile}
+                onCancel={handleCancelEdit}
+            />
+
+            <CustomerSecurity
+                onChangePassword={() =>
+                    setPasswordModal(true)
+                }
+            />
 
             <ChangePasswordModal
-
                 isOpen={passwordModal}
-
                 onClose={() =>
                     setPasswordModal(false)
                 }
-
             />
 
-
         </div>
-
     );
-
 }
