@@ -2,7 +2,10 @@
 
 import DeleteOrderItemModal from "../DeleteOrderItemModal/DeleteOrderItemModal";
 
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState,
+} from "react";
 
 import {
     useQuery,
@@ -18,91 +21,61 @@ import {
     updateOrderItem,
 } from "@/services/order.services";
 
-import BACKEND_URLS from "@/utils";
+import OrderHeader from "./OrderHeader";
+import OrderItemCard from "./OrderItemCard";
+import OrderAddressSelector from "./OrderAddressSelector";
+import OrderSummary from "./OrderSummary";
 
 import "./OrderDetail.css";
 
 
 interface OrderProduct {
-
     id: number;
-
     name: string;
-
     description: string;
-
     quantity_in_stock: number;
-
     price: number;
-
     price_after: number;
-
     product_image: string | null;
-
     category: number;
-
     store: number;
-
 }
 
 
 interface OrderItem {
-
     id: number;
-
     quantity: number;
-
     status: string;
-
     created: string;
-
     total: string;
-
     order: number;
-
     product: OrderProduct;
-
 }
 
 
 interface OrderAddress {
-
     id: number;
-
     state: string;
-
     city: string;
-
     postal_code: string;
-
     customer: {
-
         username: string;
-
     };
-
 }
 
 
 export default function OrderDetail() {
-
 
     // ==========================================
     // Order Items
     // ==========================================
 
     const {
-
         data: items = [],
-
         isLoading: loading,
-
-    } = useQuery({
-
+    } = useQuery<OrderItem[]>({
         queryKey: ["order-items"],
-
         queryFn: getOrderItems,
-
     });
 
 
@@ -113,45 +86,33 @@ export default function OrderDetail() {
     const [selectedItem, setSelectedItem] =
         useState<OrderItem | null>(null);
 
-
     const [openDelete, setOpenDelete] =
         useState(false);
 
+    const queryClient =
+        useQueryClient();
 
-    const queryClient = useQueryClient();
 
+    const deleteMutation =
+        useMutation({
+            mutationFn: deleteOrderItem,
 
-    const deleteMutation = useMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ["order-items"],
+                });
 
-        mutationFn: deleteOrderItem,
+                setOpenDelete(false);
+                setSelectedItem(null);
+            },
 
-        onSuccess: () => {
-
-            queryClient.invalidateQueries({
-
-                queryKey: ["order-items"],
-
-            });
-
-            setOpenDelete(false);
-
-            setSelectedItem(null);
-
-        },
-
-        onError: (error) => {
-
-            console.error(
-
-                "Delete order item error:",
-
-                error
-
-            );
-
-        },
-
-    });
+            onError: (error) => {
+                console.error(
+                    "Delete order item error:",
+                    error
+                );
+            },
+        });
 
 
     // ==========================================
@@ -163,19 +124,13 @@ export default function OrderDetail() {
 
 
     useEffect(() => {
-
         const qty: Record<number, number> = {};
 
-
-        items.forEach(item => {
-
+        items.forEach((item) => {
             qty[item.id] = item.quantity;
-
         });
 
-
         setQuantities(qty);
-
     }, [items]);
 
 
@@ -188,34 +143,26 @@ export default function OrderDetail() {
 
 
     const {
-
         data: addresses = [],
-
-        isLoading: addressesLoading,
-
-    } = useQuery({
-
+    } = useQuery<OrderAddress[]>({
         queryKey: ["order-addresses"],
-
         queryFn: getOrderAddresses,
-
     });
 
 
     useEffect(() => {
-
         if (
             addresses.length > 0 &&
             selectedAddress === null
         ) {
-
             setSelectedAddress(
                 addresses[0].id
             );
-
         }
-
-    }, [addresses, selectedAddress]);
+    }, [
+        addresses,
+        selectedAddress,
+    ]);
 
 
     // ==========================================
@@ -229,54 +176,40 @@ export default function OrderDetail() {
     const checkout = async () => {
 
         if (!selectedAddress) {
-
             alert(
                 "Please select an address."
             );
 
             return;
-
         }
 
-
         try {
-
             setCheckoutLoading(true);
-
 
             const data =
                 await createBill(
                     selectedAddress
                 );
 
-
             console.log(data);
-
 
             alert(
                 "Bill created successfully."
             );
-
         }
         catch (err) {
-
             console.error(
                 "Checkout error:",
                 err
             );
 
-
             alert(
                 "Failed to create bill."
             );
-
         }
         finally {
-
             setCheckoutLoading(false);
-
         }
-
     };
 
 
@@ -286,12 +219,13 @@ export default function OrderDetail() {
 
     const handleDelete = () => {
 
-        if (!selectedItem) return;
+        if (!selectedItem) {
+            return;
+        }
 
         deleteMutation.mutate(
             selectedItem.id
         );
-
     };
 
 
@@ -299,43 +233,33 @@ export default function OrderDetail() {
     // Update Quantity
     // ==========================================
 
-    const updateMutation = useMutation({
-
-        mutationFn: ({
-            itemId,
-            quantity,
-        }: {
-            itemId: number;
-            quantity: number;
-        }) =>
-            updateOrderItem(
+    const updateMutation =
+        useMutation({
+            mutationFn: ({
                 itemId,
-                quantity
-            ),
+                quantity,
+            }: {
+                itemId: number;
+                quantity: number;
+            }) =>
+                updateOrderItem(
+                    itemId,
+                    quantity
+                ),
 
-        onSuccess: () => {
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ["order-items"],
+                });
+            },
 
-            queryClient.invalidateQueries({
-
-                queryKey: ["order-items"],
-
-            });
-
-        },
-
-        onError: (error) => {
-
-            console.error(
-
-                "Update quantity error:",
-
-                error
-
-            );
-
-        },
-
-    });
+            onError: (error) => {
+                console.error(
+                    "Update quantity error:",
+                    error
+                );
+            },
+        });
 
 
     // ==========================================
@@ -343,17 +267,11 @@ export default function OrderDetail() {
     // ==========================================
 
     if (loading) {
-
         return (
-
             <h2>
-
                 Loading...
-
             </h2>
-
         );
-
     }
 
 
@@ -362,17 +280,11 @@ export default function OrderDetail() {
     // ==========================================
 
     if (items.length === 0) {
-
         return (
-
             <h2>
-
                 No Items Found
-
             </h2>
-
         );
-
     }
 
 
@@ -381,12 +293,9 @@ export default function OrderDetail() {
     // ==========================================
 
     const total = items.reduce(
-
         (sum, item) =>
             sum + Number(item.total),
-
         0
-
     );
 
 
@@ -395,56 +304,17 @@ export default function OrderDetail() {
     // ==========================================
 
     return (
-
         <section className="order-page">
-
 
             {/* ==================================
                 HEADER
             ================================== */}
 
-            <div className="order-banner">
-
-                <div>
-
-                    <h1>
-
-                        🛒 My Shopping Cart
-
-                    </h1>
-
-                    <p>
-
-                        Review your products
-                        before checkout.
-
-                    </p>
-
-                </div>
-
-
-                <button
-
-                    className="checkout-top-btn"
-
-                    disabled={
-                        !selectedAddress ||
-                        checkoutLoading
-                    }
-
-                    onClick={checkout}
-
-                >
-
-                    {
-                        checkoutLoading
-                            ? "Creating..."
-                            : "Proceed To Checkout →"
-                    }
-
-                </button>
-
-            </div>
+            <OrderHeader
+                selectedAddress={selectedAddress}
+                checkoutLoading={checkoutLoading}
+                onCheckout={checkout}
+            />
 
 
             {/* ==================================
@@ -453,63 +323,40 @@ export default function OrderDetail() {
 
             <div className="order-stats">
 
-
                 <div className="stat-card">
-
                     <h4>
-
                         Products
-
                     </h4>
 
                     <strong>
-
                         {items.length}
-
                     </strong>
-
                 </div>
 
 
                 <div className="stat-card">
-
                     <h4>
-
                         Created
-
                     </h4>
 
                     <strong>
-
-                        {
-                            new Date(
-                                items[0].created
-                            ).toLocaleDateString()
-                        }
-
+                        {new Date(
+                            items[0].created
+                        ).toLocaleDateString()}
                     </strong>
-
                 </div>
 
 
                 <div className="stat-card">
-
                     <h4>
-
                         Total
-
                     </h4>
 
                     <strong>
-
                         $
-
                         {total.toFixed(2)}
-
                     </strong>
-
                 </div>
-
 
             </div>
 
@@ -520,13 +367,11 @@ export default function OrderDetail() {
 
             <div className="order-layout">
 
-
                 {/* ==================================
                     LEFT
                 ================================== */}
 
                 <div className="left-section">
-
 
                     {/* ==================================
                         PRODUCTS
@@ -534,348 +379,50 @@ export default function OrderDetail() {
 
                     <div className="cart-list">
 
-
-                        {items.map(item => (
-
-                            <div
-
-                                className="cart-card"
-
-                                key={item.id}
-
-                            >
-
-
-                                {/* Product Image */}
-
-                                <div className="product-image">
-
-                                    <img
-
-                                        src={
-
-                                            item.product.product_image
-
-                                                ?
-
-                                                `${BACKEND_URLS.replace(
-                                                    /\/$/,
-                                                    ""
-                                                )}${item.product.product_image}`
-
-                                                :
-
-                                                "/no-image.png"
-
-                                        }
-
-                                        alt={
-                                            item.product.name
-                                        }
-
-                                    />
-
-                                </div>
-
-
-                                {/* Product Info */}
-
-                                <div className="product-info">
-
-
-                                    <h2>
-
-                                        {
-                                            item.product.name
-                                        }
-
-                                    </h2>
-
-
-                                    <p>
-
-                                        {
-                                            item.product.description
-                                        }
-
-                                    </p>
-
-
-                                    {/* Product Grid */}
-
-                                    <div className="product-grid">
-
-
-                                        {/* Quantity */}
-
-                                        <div>
-
-                                            <span>
-
-                                                Quantity
-
-                                            </span>
-
-
-                                            <input
-
-                                                type="number"
-
-                                                min={1}
-
-                                                value={
-
-                                                    quantities[
-                                                        item.id
-                                                    ]
-
-                                                    ??
-
-                                                    item.quantity
-
-                                                }
-
-                                                onChange={e => {
-
-                                                    setQuantities(
-
-                                                        prev => ({
-
-                                                            ...prev,
-
-                                                            [item.id]:
-                                                                Number(
-                                                                    e.target.value
-                                                                ),
-
-                                                        })
-
-                                                    );
-
-                                                }}
-
-                                            />
-
-                                        </div>
-
-
-                                        {/* Price */}
-
-                                        <div>
-
-                                            <span>
-
-                                                Price
-
-                                            </span>
-
-
-                                            <strong>
-
-                                                $
-
-                                                {
-                                                    item.product.price
-                                                }
-
-                                            </strong>
-
-                                        </div>
-
-
-                                        {/* Discount */}
-
-                                        <div>
-
-                                            <span>
-
-                                                Discount
-
-                                            </span>
-
-
-                                            <strong>
-
-                                                $
-
-                                                {
-                                                    item.product.price_after
-                                                }
-
-                                            </strong>
-
-                                        </div>
-
-
-                                        {/* Total */}
-
-                                        <div>
-
-                                            <span>
-
-                                                Total
-
-                                            </span>
-
-
-                                            <strong>
-
-                                                $
-
-                                                {(
-
-                                                    (
-
-                                                        quantities[
-                                                            item.id
-                                                        ]
-
-                                                        ??
-
-                                                        item.quantity
-
-                                                    )
-
-                                                    *
-
-                                                    item.product.price_after
-
-                                                ).toFixed(2)}
-
-                                            </strong>
-
-                                        </div>
-
-
-                                    </div>
-
-
-                                    {/* Actions */}
-
-                                    <div className="product-actions">
-
-
-                                        <span
-
-                                            className={
-
-                                                item.status === "P"
-
-                                                    ?
-
-                                                    "pending"
-
-                                                    :
-
-                                                    "paid"
-
-                                            }
-
-                                        >
-
-                                            {
-
-                                                item.status === "P"
-
-                                                    ?
-
-                                                    "Pending"
-
-                                                    :
-
-                                                    item.status
-
-                                            }
-
-                                        </span>
-
-
-                                        <div>
-
-
-                                            <button
-
-                                                className="view-btn"
-
-                                            >
-
-                                                View Product
-
-                                            </button>
-
-
-                                            <button
-
-                                                className="update-btn"
-
-                                                disabled={
-                                                    updateMutation.isPending
-                                                }
-
-                                                onClick={() => {
-
-                                                    updateMutation.mutate({
-
-                                                        itemId:
-                                                            item.id,
-
-                                                        quantity:
-                                                            quantities[
-                                                                item.id
-                                                            ] ??
-                                                            item.quantity,
-
-                                                    });
-
-                                                }}
-
-                                            >
-
-                                                {
-                                                    updateMutation.isPending
-                                                        ? "Updating..."
-                                                        : "Update"
-                                                }
-
-                                            </button>
-
-
-                                            <button
-
-                                                className="remove-btn"
-
-                                                onClick={() => {
-
-                                                    setSelectedItem(
-                                                        item
-                                                    );
-
-                                                    setOpenDelete(
-                                                        true
-                                                    );
-
-                                                }}
-
-                                            >
-
-                                                Remove
-
-                                            </button>
-
-
-                                        </div>
-
-
-                                    </div>
-
-
-                                </div>
-
-
-                            </div>
-
-                        ))}
-
+                        {items.map((item) => {
+
+                            const quantity =
+                                quantities[item.id]
+                                ?? item.quantity;
+
+                            return (
+                                <OrderItemCard
+                                    key={item.id}
+                                    item={item}
+                                    quantity={quantity}
+                                    updating={
+                                        updateMutation.isPending
+                                    }
+                                    onQuantityChange={(
+                                        newQuantity
+                                    ) => {
+                                        setQuantities(
+                                            (prev) => ({
+                                                ...prev,
+                                                [item.id]:
+                                                    newQuantity,
+                                            })
+                                        );
+                                    }}
+                                    onUpdate={() => {
+                                        updateMutation.mutate({
+                                            itemId:
+                                                item.id,
+                                            quantity,
+                                        });
+                                    }}
+                                    onRemove={() => {
+                                        setSelectedItem(
+                                            item
+                                        );
+
+                                        setOpenDelete(
+                                            true
+                                        );
+                                    }}
+                                />
+                            );
+                        })}
 
                     </div>
 
@@ -884,116 +431,15 @@ export default function OrderDetail() {
                         ADDRESS
                     ================================== */}
 
-                    <div className="address-section">
-
-
-                        <h2>
-
-                            📍 Select Shipping Address
-
-                        </h2>
-
-
-                        <p>
-
-                            Choose where your order
-                            should be delivered.
-
-                        </p>
-
-
-                        <div className="address-list">
-
-
-                            {addresses.map(address => (
-
-                                <label
-
-                                    key={address.id}
-
-                                    className={
-
-                                        `address-card ${
-                                            selectedAddress ===
-                                            address.id
-
-                                                ?
-
-                                                "active-address"
-
-                                                :
-
-                                                ""
-
-                                        }`
-
-                                    }
-
-                                >
-
-
-                                    <input
-
-                                        type="radio"
-
-                                        checked={
-
-                                            selectedAddress ===
-                                            address.id
-
-                                        }
-
-                                        onChange={() =>
-                                            setSelectedAddress(
-                                                address.id
-                                            )
-                                        }
-
-                                    />
-
-
-                                    <div>
-
-                                        <h4>
-
-                                            {
-                                                address.state
-                                            }
-
-                                            {" / "}
-
-                                            {
-                                                address.city
-                                            }
-
-                                        </h4>
-
-
-                                        <span>
-
-                                            Postal Code:
-
-                                            {" "}
-
-                                            {
-                                                address.postal_code
-                                            }
-
-                                        </span>
-
-                                    </div>
-
-
-                                </label>
-
-                            ))}
-
-
-                        </div>
-
-
-                    </div>
-
+                    <OrderAddressSelector
+                        addresses={addresses}
+                        selectedAddress={
+                            selectedAddress
+                        }
+                        onSelect={
+                            setSelectedAddress
+                        }
+                    />
 
                 </div>
 
@@ -1002,124 +448,17 @@ export default function OrderDetail() {
                     RIGHT
                 ================================== */}
 
-                <div className="summary-card">
-
-
-                    <h2>
-
-                        Order Summary
-
-                    </h2>
-
-
-                    <div className="summary-row">
-
-                        <span>
-
-                            Products
-
-                        </span>
-
-                        <strong>
-
-                            {items.length}
-
-                        </strong>
-
-                    </div>
-
-
-                    <div className="summary-row">
-
-                        <span>
-
-                            Shipping
-
-                        </span>
-
-                        <strong>
-
-                            Free
-
-                        </strong>
-
-                    </div>
-
-
-                    <div className="summary-row">
-
-                        <span>
-
-                            Discount
-
-                        </span>
-
-                        <strong>
-
-                            $0.00
-
-                        </strong>
-
-                    </div>
-
-
-                    <hr />
-
-
-                    <div className="summary-total">
-
-                        <span>
-
-                            Total
-
-                        </span>
-
-
-                        <h2>
-
-                            $
-
-                            {total.toFixed(2)}
-
-                        </h2>
-
-                    </div>
-
-
-                    <button
-
-                        className="checkout-btn"
-
-                        onClick={checkout}
-
-                        disabled={
-
-                            !selectedAddress ||
-                            checkoutLoading
-
-                        }
-
-                    >
-
-                        {
-
-                            checkoutLoading
-
-                                ?
-
-                                "Creating..."
-
-                                :
-
-                                "Checkout"
-
-                        }
-
-                    </button>
-
-
-                </div>
-
+                <OrderSummary
+                    itemCount={items.length}
+                    total={total}
+                    selectedAddress={
+                        selectedAddress
+                    }
+                    checkoutLoading={
+                        checkoutLoading
+                    }
+                    onCheckout={checkout}
+                />
 
             </div>
 
@@ -1129,32 +468,21 @@ export default function OrderDetail() {
             ================================== */}
 
             <DeleteOrderItemModal
-
                 open={openDelete}
-
                 loading={
                     deleteMutation.isPending
                 }
-
                 productName={
-                    selectedItem?.product.name ?? ""
+                    selectedItem
+                        ?.product.name ?? ""
                 }
-
                 onClose={() => {
-
                     setOpenDelete(false);
-
                     setSelectedItem(null);
-
                 }}
-
                 onConfirm={handleDelete}
-
             />
 
-
         </section>
-
     );
-
 }
