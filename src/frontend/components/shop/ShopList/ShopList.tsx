@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -18,10 +19,7 @@ interface Props {
     page: string;
 }
 
-export default function ShopList({
-    page,
-}: Props) {
-
+export default function ShopList({ page }: Props) {
     const router = useRouter();
 
     const {
@@ -36,51 +34,37 @@ export default function ShopList({
     // ==========================================
 
     if (isLoading) {
-
         return (
             <section className="shop-list container">
-
                 <Skeleton count={8} />
-
             </section>
         );
-
     }
+
 
     // ==========================================
     // Error
     // ==========================================
 
     if (isError || !data) {
-
         return (
             <section className="shop-list container">
-
-                <ErrorState
-                    message="Error loading shops."
-                />
-
+                <ErrorState message="Error loading shops." />
             </section>
         );
-
     }
+
 
     // ==========================================
     // Empty
     // ==========================================
 
     if (data.results.length === 0) {
-
         return (
             <section className="shop-list container">
-
-                <EmptyState
-                    message="No shops found."
-                />
-
+                <EmptyState message="No shops found." />
             </section>
         );
-
     }
 
 
@@ -89,7 +73,6 @@ export default function ShopList({
     // ==========================================
 
     const goToPage = (url: string | null) => {
-
         if (!url) {
             return;
         }
@@ -102,7 +85,6 @@ export default function ShopList({
         if (pageNumber) {
             router.push(`/?page=${pageNumber}`);
         }
-
     };
 
 
@@ -111,11 +93,7 @@ export default function ShopList({
     // ==========================================
 
     return (
-
         <section className="shop-list container">
-
-
-            {/* Shops */}
 
             <div className="shops-grid">
 
@@ -127,23 +105,22 @@ export default function ShopList({
                         key={item.pk}
                     >
 
-                        {/* Image */}
-
                         <div className="shop-image">
 
-                            <img
+                            <Image
                                 src={
                                     item.image
                                         ? `${BACKEND_URLS.replace(/\/$/, "")}${item.image}`
                                         : "/images/banner-1.jpg"
                                 }
                                 alt={item.name}
+                                width={300}
+                                height={200}
+                                loading="lazy"
                             />
 
                         </div>
 
-
-                        {/* Content */}
 
                         <div className="shop-content">
 
@@ -164,23 +141,24 @@ export default function ShopList({
             </div>
 
 
-            {/* Pagination */}
-
             <Pagination
+
                 next={data.links.next}
+
                 previous={data.links.previous}
+
                 loading={isLoading}
+
                 onNext={() =>
                     goToPage(data.links.next)
                 }
+
                 onPrevious={() =>
                     goToPage(data.links.previous)
                 }
+
             />
 
-
         </section>
-
     );
-
 }

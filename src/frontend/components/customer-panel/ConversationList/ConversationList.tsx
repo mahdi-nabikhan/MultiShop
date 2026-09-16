@@ -1,25 +1,36 @@
 "use client";
+
 import useConversations from "@/hooks/chat/useConversations";
-import "./ConversationList.css";
+
 import Skeleton from "@/components/commen/Skeleton";
 import ErrorState from "@/components/commen/ErrorState";
-import EmptyState from "@/components/commen/EmptyState";
+
+import "./ConversationList.css";
+
 
 interface Props {
     selectedConversation: number | null;
     onSelectConversation: (conversationId: number) => void;
 }
 
+
 export default function ConversationList({
     selectedConversation,
     onSelectConversation,
 }: Props) {
+
 
     const {
         data: conversations = [],
         isLoading,
         isError,
     } = useConversations();
+
+
+
+    // ==========================
+    // Loading
+    // ==========================
 
     if (isLoading) {
         return (
@@ -29,12 +40,16 @@ export default function ConversationList({
         );
     }
 
+
+
+    // ==========================
+    // Error
+    // ==========================
+
     if (isError) {
         return (
             <aside className="customer-conversation-list">
-                <ErrorState
-                    message="Failed to load conversations."
-                />
+                <ErrorState message="Failed to load conversations." />
             </aside>
         );
     }
@@ -45,6 +60,7 @@ export default function ConversationList({
 
         <aside className="customer-conversation-list">
 
+
             <div className="customer-conversation-header">
 
                 <div>
@@ -52,6 +68,7 @@ export default function ConversationList({
                     <h2>
                         Messages
                     </h2>
+
 
                     <span>
                         {conversations.length} conversations
@@ -62,7 +79,9 @@ export default function ConversationList({
             </div>
 
 
+
             <div className="customer-conversation-items">
+
 
                 {conversations.length === 0 ? (
 
@@ -85,46 +104,48 @@ export default function ConversationList({
                             type="button"
 
                             className={
-                                `customer-conversation-item ${selectedConversation === conversation.id
-                                    ? "active"
-                                    : ""
+                                `customer-conversation-item ${
+                                    selectedConversation === conversation.id
+                                        ? "active"
+                                        : ""
                                 }`
                             }
 
                             onClick={() =>
-                                onSelectConversation(
-                                    conversation.id
-                                )
+                                onSelectConversation(conversation.id)
                             }
 
                         >
 
+
                             <div className="customer-conversation-avatar">
 
-                                {conversation.customer_name
-                                    ?.charAt(0)
-                                    .toUpperCase() || "C"}
+                                {
+                                    conversation.customer_name
+                                        ?.charAt(0)
+                                        .toUpperCase() || "C"
+                                }
 
                             </div>
 
 
+
                             <div className="customer-conversation-info">
+
 
                                 <div className="customer-conversation-top">
 
                                     <strong>
-
                                         Store #{conversation.store}
-
                                     </strong>
 
+
                                     <span>
-
                                         #{conversation.id}
-
                                     </span>
 
                                 </div>
+
 
 
                                 <div className="customer-conversation-bottom">
@@ -134,14 +155,14 @@ export default function ConversationList({
                                             `conversation-status ${conversation.status}`
                                         }
                                     >
-
                                         {conversation.status}
-
                                     </span>
 
                                 </div>
 
+
                             </div>
+
 
                         </button>
 
@@ -149,10 +170,11 @@ export default function ConversationList({
 
                 )}
 
+
             </div>
+
 
         </aside>
 
     );
-
 }
