@@ -91,9 +91,9 @@ export default function OperatorList() {
                         <div className="avatar">
 
                             {
-                                operator.user.email
-                                    .charAt(0)
-                                    .toUpperCase()
+                                operator.user?.email
+                                    ?.charAt(0)
+                                    ?.toUpperCase() || "O"
                             }
 
                         </div>
@@ -109,7 +109,10 @@ export default function OperatorList() {
                             </h2>
 
                             <span>
-                                {operator.user.email}
+                                {
+                                    operator.user?.email ||
+                                    "No Email"
+                                }
                             </span>
 
                         </div>
@@ -122,7 +125,6 @@ export default function OperatorList() {
                     </div>
 
                 ))}
-
             </div>
 
 

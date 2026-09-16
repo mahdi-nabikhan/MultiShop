@@ -35,7 +35,7 @@ export default function ProductRow({ product }: Props) {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: shopAdminQueryKeys.products(),
+        queryKey: shopAdminQueryKeys.products(1,8),
       });
       setOpen(false);
       router.refresh();

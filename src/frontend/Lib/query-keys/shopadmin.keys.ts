@@ -2,8 +2,8 @@ export const shopAdminQueryKeys = {
     products: (page: number, pageSize: number) =>
     ["shop-admin", "products", page, pageSize] as const,
     
-    product: (productId: number) =>
-        ["shop-admin", "product", productId] as const,
+    product: (productId: number,    page?: number,pageSize?: number) =>
+        ["shop-admin", "product", productId,page,pageSize] as const,
 
     productDiscounts: (
         productId: number,

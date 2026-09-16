@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -31,6 +30,7 @@ interface Props {
 
 
 export default function ConversationList({
+    selectedConversation,
     onSelectConversation,
 }: Props) {
 
@@ -49,10 +49,6 @@ export default function ConversationList({
     });
 
 
-    // ==========================================
-    // Loading
-    // ==========================================
-
     if (isLoading) {
 
         return (
@@ -67,10 +63,6 @@ export default function ConversationList({
 
     }
 
-
-    // ==========================================
-    // Error
-    // ==========================================
 
     if (isError) {
 
@@ -88,10 +80,6 @@ export default function ConversationList({
 
     }
 
-
-    // ==========================================
-    // Empty
-    // ==========================================
 
     if (conversations.length === 0) {
 
@@ -131,10 +119,6 @@ export default function ConversationList({
     }
 
 
-    // ==========================================
-    // UI
-    // ==========================================
-
     return (
 
         <aside className="conversation-list">
@@ -173,7 +157,13 @@ export default function ConversationList({
                                     conversation.id
                                 }
                                 type="button"
-                                className="conversation-item"
+                                className={
+                                    `conversation-item ${
+                                        selectedConversation === conversation.id
+                                            ? "active"
+                                            : ""
+                                    }`
+                                }
                                 onClick={() =>
                                     onSelectConversation(
                                         conversation.id
@@ -183,7 +173,9 @@ export default function ConversationList({
 
                                 <div className="conversation-avatar">
 
-                                    C
+                                    {
+                                        `C${conversation.customer}`
+                                    }
 
                                 </div>
 

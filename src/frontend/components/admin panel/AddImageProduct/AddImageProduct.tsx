@@ -1,10 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createProductImage } from "@/services/shop-admin-panel.services";
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
+
+import {
+    useMutation,
+    useQueryClient,
+} from "@tanstack/react-query";
+
+
+import {
+    createProductImage,
+} from "@/services/shop-admin-panel.services";
+
+
+import {
+    shopAdminQueryKeys,
+} from "@/Lib/query-keys/shopadmin.keys";
+
+
 import "./AddImageProduct.css";
+
 
 
 interface Props {
@@ -14,8 +29,6 @@ interface Props {
     onClose: () => void;
 
     productId: number;
-
-    refreshImages: () => void;
 
 }
 
@@ -29,101 +42,224 @@ export default function AddProductImageModal({
 
     productId,
 
-    refreshImages
-
 }: Props) {
 
 
-    const [image, setImage] = useState<File | null>(null);
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [image, setImage] =
+        useState<File | null>(null);
+
+
+    const [title, setTitle] =
+        useState("");
+
+
+    const [description, setDescription] =
+        useState("");
+
+
+
     const queryClient = useQueryClient();
 
+
+
+
     const createImageMutation = useMutation({
-        mutationFn: (formData: FormData) =>
-            createProductImage(productId, formData),
+
+
+        mutationFn: (
+            formData: FormData
+        ) =>
+            createProductImage(
+                productId,
+                formData
+            ),
+
+
+
 
         onSuccess: () => {
 
+
             queryClient.invalidateQueries({
-                queryKey: shopAdminQueryKeys.productDiscounts(productId),
+
+                queryKey:
+                    shopAdminQueryKeys.productImages(
+                        productId
+                    ),
+
             });
 
+
+
             setImage(null);
+
             setTitle("");
+
             setDescription("");
 
+
+
             onClose();
+
         },
 
+
+
+
         onError: (error) => {
+
 
             console.error(
                 "Image upload error:",
                 error
             );
 
-            alert("Failed to upload image.");
+
+            alert(
+                "Failed to upload image."
+            );
+
+
         },
+
+
     });
+
+
+
+
+
+
     const handleSubmit = () => {
 
+
+
         if (!image) {
-            alert("Please select an image.");
+
+            alert(
+                "Please select an image."
+            );
+
             return;
+
         }
+
+
+
 
         if (!image.type.startsWith("image/")) {
-            alert("Please select a valid image file.");
+
+            alert(
+                "Please select a valid image file."
+            );
+
             return;
+
         }
+
+
+
 
         if (image.size > 5 * 1024 * 1024) {
-            alert("Image size cannot exceed 5MB.");
+
+            alert(
+                "Image size cannot exceed 5MB."
+            );
+
             return;
+
         }
+
+
+
 
         if (!title.trim()) {
-            alert("Title is required.");
+
+            alert(
+                "Title is required."
+            );
+
             return;
+
         }
+
+
+
 
         if (title.trim().length < 3) {
-            alert("Title must be at least 3 characters.");
+
+            alert(
+                "Title must be at least 3 characters."
+            );
+
             return;
+
         }
+
+
+
 
         if (title.trim().length > 200) {
-            alert("Title cannot exceed 200 characters.");
+
+            alert(
+                "Title cannot exceed 200 characters."
+            );
+
             return;
+
         }
 
+
+
+
         if (description.trim().length > 1000) {
+
             alert(
                 "Description cannot exceed 1000 characters."
             );
+
             return;
+
         }
 
+
+
+
         const formData = new FormData();
+
+
 
         formData.append(
             "product_image",
             image
         );
 
+
+
         formData.append(
             "title",
             title.trim()
         );
+
+
 
         formData.append(
             "description",
             description.trim()
         );
 
-        createImageMutation.mutate(formData);
+
+
+        createImageMutation.mutate(
+            formData
+        );
+
+
     };
+
+
+
+
 
 
     if (!open) {
@@ -138,8 +274,8 @@ export default function AddProductImageModal({
 
 
 
-
     return (
+
 
         <div className="image-modal-overlay">
 
@@ -147,11 +283,11 @@ export default function AddProductImageModal({
             <div className="image-modal">
 
 
+
                 <h2>
-
                     Add Product Image
-
                 </h2>
+
 
 
 
@@ -173,6 +309,8 @@ export default function AddProductImageModal({
 
 
 
+
+
                 <input
 
                     placeholder="Title"
@@ -180,12 +318,14 @@ export default function AddProductImageModal({
                     value={title}
 
                     onChange={(e) =>
-
-                        setTitle(e.target.value)
-
+                        setTitle(
+                            e.target.value
+                        )
                     }
 
                 />
+
+
 
 
 
@@ -196,27 +336,43 @@ export default function AddProductImageModal({
                     value={description}
 
                     onChange={(e) =>
-
-                        setDescription(e.target.value)
-
+                        setDescription(
+                            e.target.value
+                        )
                     }
 
                 />
 
 
 
+
+
                 <div>
 
 
+
                     <button
+
                         onClick={handleSubmit}
-                        disabled={createImageMutation.isPending}
-                    >
-                        {createImageMutation.isPending
-                            ? "Uploading..."
-                            : "Upload"
+
+                        disabled={
+                            createImageMutation.isPending
                         }
+
+                    >
+
+                        {
+                            createImageMutation.isPending
+                                ? "Uploading..."
+                                : "Upload"
+                        }
+
+
                     </button>
+
+
+
+
 
                     <button
 
@@ -226,10 +382,13 @@ export default function AddProductImageModal({
 
                         Cancel
 
+
                     </button>
 
 
+
                 </div>
+
 
 
 
@@ -237,6 +396,7 @@ export default function AddProductImageModal({
 
 
         </div>
+
 
     );
 

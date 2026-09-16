@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
     useMutation,
@@ -36,131 +36,167 @@ import EmptyState from "@/components/commen/EmptyState";
 import "./ShopProductDetail.css";
 
 
+const getImageUrl = (
+    image: string
+) => {
+    if (image.startsWith("http")) {
+        return image;
+    }
+
+    return `${BACKEND_URLS.replace(
+        "/api/v1/",
+        ""
+    )}${image}`;
+};
+
+
+
 function ShopProductDetail({
     productId,
 }: {
     productId: number;
 }) {
+
     const queryClient = useQueryClient();
 
 
-    // ==========================================
-    // Modal States
-    // ==========================================
-
-    const [openImageModal, setOpenImageModal] =
-        useState(false);
-
-    const [openEditModal, setOpenEditModal] =
-        useState(false);
-
-    const [openDiscountModal, setOpenDiscountModal] =
-        useState(false);
-
-    const [openDeleteImageModal, setOpenDeleteImageModal] =
-        useState(false);
+    const [
+        openImageModal,
+        setOpenImageModal,
+    ] = useState(false);
 
 
-    // ==========================================
-    // Selected Image
-    // ==========================================
-
-    const [selectedImage, setSelectedImage] =
-        useState<ProductImage | null>(null);
+    const [
+        openEditModal,
+        setOpenEditModal,
+    ] = useState(false);
 
 
-    // ==========================================
-    // Product Query
-    // ==========================================
+    const [
+        openDiscountModal,
+        setOpenDiscountModal,
+    ] = useState(false);
+
+
+    const [
+        openDeleteImageModal,
+        setOpenDeleteImageModal,
+    ] = useState(false);
+
+
+    const [
+        selectedImage,
+        setSelectedImage,
+    ] = useState<ProductImage | null>(null);
+
+
 
     const {
         data: product,
         isLoading: productLoading,
         isError: productError,
     } = useQuery({
+
         queryKey:
             shopAdminQueryKeys.product(productId),
 
         queryFn: () =>
             getShopProductDetail(productId),
+
     });
 
 
-    // ==========================================
-    // Product Images Query
-    // ==========================================
 
     const {
         data: productImages = [],
         isLoading: imagesLoading,
         isError: imagesError,
     } = useQuery({
+
         queryKey:
-            shopAdminQueryKeys.productImages(productId),
+            shopAdminQueryKeys.productImages(
+                productId
+            ),
 
         queryFn: () =>
             getShopProductImages(productId),
+
     });
 
 
-    // ==========================================
-    // Delete Product Image Mutation
-    // ==========================================
 
     const deleteImageMutation = useMutation({
-        mutationFn: (imageId: number) =>
+
+        mutationFn: (imageId:number) =>
             deleteProductImage(imageId),
 
+
         onSuccess: async () => {
+
             setOpenDeleteImageModal(false);
+
             setSelectedImage(null);
 
+
             await queryClient.invalidateQueries({
+
                 queryKey:
                     shopAdminQueryKeys.productImages(
                         productId
                     ),
+
             });
 
+
             await queryClient.invalidateQueries({
+
                 queryKey:
                     shopAdminQueryKeys.product(
                         productId
                     ),
+
             });
+
         },
 
+
         onError: (error) => {
+
             console.error(
                 "Failed to delete product image:",
                 error
             );
+
         },
+
     });
 
 
-    // ==========================================
-    // Delete Product Image Handler
-    // ==========================================
 
     const deleteProductImageHandler = () => {
+
         if (!selectedImage) {
             return;
         }
 
+
         deleteImageMutation.mutate(
             selectedImage.id
         );
+
     };
 
 
-    // ==========================================
-    // Combine Main Product Image
-    // + Additional Images
-    // ==========================================
 
-    const images: ProductImage[] = product
-        ? [
+    const images = useMemo(() => {
+
+        if (!product) {
+            return [];
+        }
+
+
+        return [
+
             ...(product.product_image
                 ? [
                     {
@@ -181,222 +217,241 @@ function ShopProductDetail({
                 ]
                 : []),
 
+
             ...productImages,
-        ]
-        : [];
+
+        ];
+
+    }, [
+        product,
+        productImages,
+    ]);
 
 
-    // ==========================================
-    // Loading
-    // ==========================================
+
 
     if (
         productLoading ||
         imagesLoading
     ) {
+
         return (
+
             <div className="detail-body">
-                <Skeleton count={6} />
+
+                <Skeleton count={6}/>
+
             </div>
+
         );
+
     }
 
 
-    // ==========================================
-    // Error
-    // ==========================================
+
 
     if (
         productError ||
         imagesError
     ) {
+
         return (
+
             <div className="detail-body">
+
                 <ErrorState
                     message="Failed to load product."
                 />
+
             </div>
+
         );
+
     }
 
 
-    // ==========================================
-    // Product Not Found
-    // ==========================================
+
 
     if (!product) {
+
         return (
+
             <div className="detail-body">
+
                 <EmptyState
                     message="Product not found."
                 />
+
             </div>
+
         );
+
     }
 
 
-    // ==========================================
-    // Image URL
-    // ==========================================
 
-    const getImageUrl = (
-        image: string
-    ) => {
-        if (image.startsWith("http")) {
-            return image;
-        }
-
-        return `${BACKEND_URLS.replace(
-            "/api/v1/",
-            ""
-        )}${image}`;
-    };
-
-
-    // ==========================================
-    // Image Click Handler
-    // ==========================================
 
     const handleImageClick = (
         image: ProductImage
     ) => {
+
         setSelectedImage(image);
+
         setOpenDeleteImageModal(true);
+
     };
 
 
+
+
     return (
+
         <>
+
             <div className="detail-body">
 
-                {/* ========================================== */}
-                {/* Product Gallery */}
-                {/* ========================================== */}
 
                 <ProductGallery
+
                     images={images}
+
                     getImageUrl={getImageUrl}
-                    onImageClick={handleImageClick}
+
+                    onImageClick={
+                        handleImageClick
+                    }
+
                 />
 
 
-                {/* ========================================== */}
-                {/* Product Information */}
-                {/* ========================================== */}
 
                 <ProductInfo
+
                     product={product}
+
 
                     onEdit={() =>
                         setOpenEditModal(true)
                     }
 
+
                     onAddDiscount={() =>
                         setOpenDiscountModal(true)
                     }
 
-                    /*
-                     * Delete Product had no handler
-                     * in the original component.
-                     *
-                     * Keep the same behavior for now.
-                     */
+
                     onDelete={() => {}}
+
 
                     onAddImage={() =>
                         setOpenImageModal(true)
                     }
+
                 />
 
 
-                {/* ========================================== */}
-                {/* Discounts */}
-                {/* ========================================== */}
 
                 <DiscountList
-                    productId={Number(productId)}
+
+                    productId={
+                        Number(productId)
+                    }
+
                 />
+
 
             </div>
 
 
-            {/* ========================================== */}
-            {/* Add Discount Modal */}
-            {/* ========================================== */}
+
 
             <AddDiscountModal
+
                 open={openDiscountModal}
+
 
                 onClose={() =>
                     setOpenDiscountModal(false)
                 }
 
-                productId={product.id}
+
+                productId={
+                    product.id
+                }
+
             />
 
 
-            {/* ========================================== */}
-            {/* Edit Product Modal */}
-            {/* ========================================== */}
+
 
             <EditProductModal
+
                 open={openEditModal}
+
 
                 onClose={() =>
                     setOpenEditModal(false)
                 }
 
+
                 product={product}
+
             />
 
 
-            {/* ========================================== */}
-            {/* Add Product Image Modal */}
-            {/* ========================================== */}
+
+
 
             <AddProductImageModal
+
                 open={openImageModal}
+
 
                 onClose={() =>
                     setOpenImageModal(false)
                 }
 
-                productId={product.id}
 
-                refreshImages={async () => {
-                    await queryClient.invalidateQueries({
-                        queryKey:
-                            shopAdminQueryKeys.productImages(
-                                productId
-                            ),
-                    });
-                }}
+                productId={
+                    product.id
+                }
+
             />
 
 
-            {/* ========================================== */}
-            {/* Delete Image Modal */}
-            {/* ========================================== */}
+
+
 
             <DeleteImageModal
-                open={openDeleteImageModal}
+
+                open={
+                    openDeleteImageModal
+                }
+
 
                 onClose={() => {
+
                     setOpenDeleteImageModal(
                         false
                     );
 
-                    setSelectedImage(
-                        null
-                    );
+
+                    setSelectedImage(null);
+
                 }}
+
 
                 onConfirm={
                     deleteProductImageHandler
                 }
+
             />
+
+
         </>
+
     );
+
 }
 
 
