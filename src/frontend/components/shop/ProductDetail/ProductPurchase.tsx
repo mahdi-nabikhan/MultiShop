@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 
+import Skeleton from "@/components/commen/Skeleton";
+
 import ProductOrderBox from "../ProductOrderBox/ProductOrderBox";
 import SessionProductOrderBox from "../SessionProductOrderBox/SessionProductOrderBox";
+
+
 
 interface ProductPurchaseProps {
     productId: number;
@@ -11,35 +15,77 @@ interface ProductPurchaseProps {
     isAuthenticated: boolean | null;
 }
 
+
+
 export default function ProductPurchase({
+
     productId,
+
     storeId,
+
     isAuthenticated,
+
 }: ProductPurchaseProps) {
+
+
+
     if (isAuthenticated === null) {
-        return <div>Loading...</div>;
+
+        return (
+            <Skeleton count={1} />
+        );
+
     }
+
+
+
 
     if (!isAuthenticated) {
+
         return (
+
             <SessionProductOrderBox
+
                 productId={productId}
+
             />
+
         );
+
     }
 
+
+
+
+
     return (
-        <>
+
+        <div className="product-purchase">
+
+
             <ProductOrderBox
+
                 productId={productId}
+
             />
 
+
+
             <Link
+
                 href={`/chatbox/${storeId}`}
+
                 className="chat-link"
+
             >
+
                 Chat with seller
+
             </Link>
-        </>
+
+
+        </div>
+
     );
+
 }

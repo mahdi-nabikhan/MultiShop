@@ -8,23 +8,23 @@ import "./ProductCard.css";
 
 export interface Product {
 
-  id: number;
+    id: number;
 
-  name: string;
+    name: string;
 
-  description: string;
+    description: string;
 
-  quantity_in_stock: number;
+    quantity_in_stock: number;
 
-  price: number;
+    price: number;
 
-  price_after: number;
+    price_after: number;
 
-  product_image: string | null;
+    product_image: string | null;
 
-  category: number;
+    category: number;
 
-  store: number;
+    store: number;
 
 }
 
@@ -32,9 +32,9 @@ export interface Product {
 
 interface Props {
 
-  product: Product;
+    product: Product;
 
-  shopId: string;
+    shopId: string;
 
 }
 
@@ -42,117 +42,125 @@ interface Props {
 
 export default function ProductCard({
 
-  product,
+    product,
 
-  shopId
+    shopId,
 
 }: Props) {
 
 
-  return (
+    return (
 
-    <Link
+        <Link
 
-      href={`/product/${product.id}`}
+            href={`/product/${product.id}`}
 
-      className="product-card"
+            className="product-card"
 
-    >
-
-
-      <div className="product-image">
+        >
 
 
-        <img
-
-          src={
-            product.product_image
-              ?
-              product.product_image
-              :
-              "/images/no-image.png"
-          }
-
-          alt={product.name}
-
-        />
+            <div className="product-image">
 
 
-        {
-          product.quantity_in_stock === 0 && (
+                <Image
 
-            <span className="out-stock">
+                    src={
+                        product.product_image
+                            ? product.product_image
+                            : "/images/no-image.png"
+                    }
 
-              Out Of Stock
+                    alt={product.name}
 
-            </span>
+                    width={300}
 
-          )
-        }
+                    height={300}
 
+                    loading="lazy"
 
-      </div>
+                />
 
 
 
-      <div className="product-content">
+                {
+                    product.quantity_in_stock === 0 && (
+
+                        <span className="out-stock">
+
+                            Out Of Stock
+
+                        </span>
+
+                    )
+                }
 
 
-        <h3>
-
-          {product.name}
-
-        </h3>
-
-
-
-        <div className="rating">
-
-
-          <Star
-
-            size={16}
-
-            fill="#FFD700"
-
-            stroke="#FFD700"
-
-          />
-
-
-          <span>
-
-            4.9
-
-          </span>
-
-
-        </div>
+            </div>
 
 
 
-        <div className="price">
 
-          ${product.price_after}
-
-        </div>
+            <div className="product-content">
 
 
+                <h3>
 
-        <button>
+                    {product.name}
 
-          <ShoppingCart size={18} />
-
-          Show Details
-
-        </button>
+                </h3>
 
 
-      </div>
+
+                <div className="rating">
 
 
-    </Link>
+                    <Star
 
-  );
+                        size={16}
+
+                        fill="#FFD700"
+
+                        stroke="#FFD700"
+
+                    />
+
+
+                    <span>
+
+                        4.9
+
+                    </span>
+
+
+                </div>
+
+
+
+                <div className="price">
+
+                    ${product.price_after}
+
+                </div>
+
+
+
+
+                <span className="product-button">
+
+                    <ShoppingCart size={18} />
+
+                    Show Details
+
+                </span>
+
+
+
+            </div>
+
+
+        </Link>
+
+    );
 
 }

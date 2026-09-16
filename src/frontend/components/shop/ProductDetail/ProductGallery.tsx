@@ -1,5 +1,8 @@
 "use client";
 
+import Image from "next/image";
+
+
 interface ProductGalleryProps {
     images: string[];
     activeImage: string | null;
@@ -7,44 +10,97 @@ interface ProductGalleryProps {
     onImageSelect: (image: string) => void;
 }
 
+
 export default function ProductGallery({
     images,
     activeImage,
     productName,
     onImageSelect,
 }: ProductGalleryProps) {
+
+
     return (
+
         <div className="gallery">
+
+
             <div className="thumbnail-list">
+
+
                 {images.map((image, index) => (
+
                     <button
+
                         key={`${image}-${index}`}
+
                         type="button"
-                        className={`thumbnail ${
-                            activeImage === image
-                                ? "active"
-                                : ""
-                        }`}
+
+                        className={
+                            `thumbnail ${
+                                activeImage === image
+                                    ? "active"
+                                    : ""
+                            }`
+                        }
+
                         onClick={() =>
                             onImageSelect(image)
                         }
+
                     >
-                        <img
+
+
+                        <Image
+
                             src={image}
+
                             alt={`${productName} ${index + 1}`}
+
+                            width={80}
+
+                            height={80}
+
+                            loading="lazy"
+
                         />
+
+
                     </button>
+
                 ))}
+
+
             </div>
 
+
+
+
             <div className="main-image">
+
+
                 {activeImage && (
-                    <img
+
+                    <Image
+
                         src={activeImage}
+
                         alt={productName}
+
+                        width={600}
+
+                        height={600}
+
+                        priority
+
                     />
+
                 )}
+
+
             </div>
+
+
         </div>
+
     );
 }
