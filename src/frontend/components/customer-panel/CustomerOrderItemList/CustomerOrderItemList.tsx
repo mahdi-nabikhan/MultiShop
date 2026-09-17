@@ -168,7 +168,6 @@ export default function CustomerOrderItemList({
 
                                     height={120}
 
-                                    loading="lazy"
 
                                 />
 
