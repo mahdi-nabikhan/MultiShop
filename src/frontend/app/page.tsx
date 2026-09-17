@@ -1,3 +1,6 @@
+
+import dynamic from "next/dynamic";
+
 import Footer from "@/components/shop/Footer/Footer";
 import Navbar from "@/components/shop/Navbar/Navbar";
 import Topbar from "@/components/shop/Topbar/Topbar";
@@ -6,75 +9,64 @@ import ShopList from "@/components/shop/ShopList/ShopList";
 import RandomProducts from "@/components/shop/RandomProduct/RandomProduct";
 import StoreCategoryList from "@/components/shop/StoreCategoryList/StoreCategoryList";
 import StoreExplorer from "@/components/shop/StoreExplore/StoreExplore";
-import ProductFilterList from "@/components/shop/ProductFiltering/ProductFiltering";
+
+const ProductFilterList = dynamic(
+    () =>
+        import(
+            "@/components/shop/ProductFiltering/ProductFiltering"
+        )
+);
 
 interface Props {
-  searchParams: Promise<{
-    page?: string;
-  }>;
+    searchParams: Promise<{
+        page?: string;
+    }>;
 }
 
 export default async function Page({ searchParams }: Props) {
+    const params = await searchParams;
 
-  const params = await searchParams;
+    const page = params.page ?? "1";
 
-  const page = params.page ?? "1";
+    return (
+        <>
+            <Navbar />
 
-  return (
-    <>
+            <Topbar />
 
-      <Navbar />
+            <main>
+                <div className="container">
+                    <SectionHeader
+                        title="Category"
+                        description="Explore stores by category"
+                    />
 
-      <Topbar />
+                    <StoreExplorer />
 
+                    <SectionHeader
+                        title="Shops"
+                        description="List Of All Shops On This Site"
+                    />
 
-      <main>
+                    <ShopList page={page} />
 
-        <div className="container">
+                    <SectionHeader
+                        title="Products"
+                        description="List Of Products On This Site"
+                    />
 
+                    <RandomProducts />
 
-          <SectionHeader
-            title="Category"
-            description="Explore stores by category"
-          />
+                    <SectionHeader
+                        title="Filter Products"
+                        description="Find products based on your preferences"
+                    />
 
-          <StoreExplorer />
+                    <ProductFilterList />
+                </div>
+            </main>
 
-
-
-          <SectionHeader
-            title="Shops"
-            description="List Of All Shops On This Site"
-          />
-
-          <ShopList page={page} />
-
-
-
-          <SectionHeader
-            title="Products"
-            description="List Of Products On This Site"
-          />
-
-          <RandomProducts />
-
-
-
-          <SectionHeader
-            title="Filter Products"
-            description="Find products based on your preferences"
-          />
-
-          <ProductFilterList />
-
-
-        </div>
-
-      </main>
-
-
-      <Footer />
-
-    </>
-  );
+            <Footer />
+        </>
+    );
 }

@@ -1,14 +1,27 @@
+
 "use client";
+
+import Image from "next/image";
 
 import {
   deleteProduct,
 } from "@/services/shop-admin-panel.services";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import DeleteModal from "../DeleteModal/DeleteModal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { shopAdminQueryKeys } from "@/Lib/query-keys/shopadmin.keys";
+
+import {
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+
+import {
+  shopAdminQueryKeys,
+} from "@/Lib/query-keys/shopadmin.keys";
+
+import BACKEND_URLS from "@/utils";
 
 interface ShopProductListData {
   id: number;
@@ -26,17 +39,22 @@ interface Props {
   product: ShopProductListData;
 }
 
-export default function ProductRow({ product }: Props) {
+export default function ProductRow({
+  product,
+}: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: shopAdminQueryKeys.products(),
+        queryKey:
+          shopAdminQueryKeys.products(1, 8),
       });
+
       setOpen(false);
       router.refresh();
     },
@@ -53,30 +71,30 @@ export default function ProductRow({ product }: Props) {
     deleteMutation.mutate(product.id);
   };
 
-
   return (
     <>
       <tr>
-
         <td>
-          <img
-            src={product.product_image || "/no-image.png"}
+          <Image
+            src={
+              product.product_image
+                ? `${BACKEND_URLS}${product.product_image}`
+                : "/no-image.png"
+            }
             alt={product.name}
+            width={80}
+            height={80}
           />
         </td>
 
         <td>
-
           <div className="product-name">
-
             <strong>{product.name}</strong>
 
             <span>
               {product.description.slice(0, 40)}...
             </span>
-
           </div>
-
         </td>
 
         <td>${product.price}</td>
@@ -86,7 +104,6 @@ export default function ProductRow({ product }: Props) {
         <td>{product.quantity_in_stock}</td>
 
         <td>
-
           <span
             className={
               product.quantity_in_stock > 0
@@ -98,15 +115,15 @@ export default function ProductRow({ product }: Props) {
               ? "In Stock"
               : "Out of Stock"}
           </span>
-
         </td>
 
         <td>
-
           <button
             className="edit-btn"
             onClick={() =>
-              router.push(`/shop-admin-panel/product/${product.id}`)
+              router.push(
+                `/shop-admin-panel/product/${product.id}`
+              )
             }
           >
             Detail
@@ -118,9 +135,7 @@ export default function ProductRow({ product }: Props) {
           >
             Delete
           </button>
-
         </td>
-
       </tr>
 
       <DeleteModal

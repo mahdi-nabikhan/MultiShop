@@ -1,5 +1,7 @@
+
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface EditProductImagePreviewProps {
@@ -34,9 +36,11 @@ function EditProductImagePreview({
 
     return (
         <div className="image-preview">
-            <img
+            <Image
                 src={previewUrl ?? preview}
                 alt={alt}
+                width={300}
+                height={300}
             />
         </div>
     );

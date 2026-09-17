@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -18,13 +17,10 @@ export default function AdminList() {
 
     const router = useRouter();
 
-
     const [page, setPage] =
         useState(1);
 
-
     const pageSize = 8;
-
 
     const {
         data,
@@ -37,39 +33,23 @@ export default function AdminList() {
     );
 
 
-    // ==========================================
-    // Loading
-    // ==========================================
-
     if (isLoading) {
-
         return (
             <div className="admin-page">
-
                 <Skeleton count={8} />
-
             </div>
         );
-
     }
 
 
-    // ==========================================
-    // Error
-    // ==========================================
-
     if (isError) {
-
         return (
             <div className="admin-page">
-
                 <ErrorState
                     message="Failed to load admins."
                 />
-
             </div>
         );
-
     }
 
 
@@ -77,22 +57,14 @@ export default function AdminList() {
         data?.results ?? [];
 
 
-    // ==========================================
-    // Empty
-    // ==========================================
-
     if (admins.length === 0) {
-
         return (
             <div className="admin-page">
-
                 <EmptyState
                     message="No admins found."
                 />
-
             </div>
         );
-
     }
 
 
@@ -115,106 +87,88 @@ export default function AdminList() {
 
             <div className="admin-list">
 
-                {
-                    admins.map((admin) => (
+                {admins.map((admin) => (
 
-                        <div
-                            key={admin.id}
-                            className="admin-card"
-                        >
+                    <div
+                        key={admin.id}
+                        className="admin-card"
+                    >
 
-                            <div className="avatar">
+                        <div className="avatar">
 
-                                {
-                                    admin.user.email
-                                        .charAt(0)
-                                        .toUpperCase()
-                                }
-
-                            </div>
-
-
-                            <div className="admin-info">
-
-                                <h2>
-
-                                    {
-                                        admin.username ||
-                                        "No Username"
-                                    }
-
-                                </h2>
-
-
-                                <span>
-
-                                    {
-                                        admin.user.email
-                                    }
-
-                                </span>
-
-                            </div>
-
-
-                            <div
-                                className="admin-badge"
-                                onClick={() => {
-
-                                    router.push(
-                                        `admin/${admin.id}`
-                                    );
-
-                                }}
-                            >
-
-                                Detail
-
-                            </div>
+                            {
+                                admin.user.email
+                                    .charAt(0)
+                                    .toUpperCase()
+                            }
 
                         </div>
 
-                    ))
-                }
+
+                        <div className="admin-info">
+
+                            <h2>
+                                {
+                                    admin.username ||
+                                    "No Username"
+                                }
+                            </h2>
+
+
+                            <span>
+                                {
+                                    admin.user.email
+                                }
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            className="admin-badge"
+                            onClick={() =>
+                                router.push(
+                                    `/shop-admin-panel/admin/${admin.id}`
+                                )
+                            }
+                        >
+                            Detail
+                        </button>
+
+
+                    </div>
+
+                ))}
 
             </div>
 
 
-            {
-                data && (
+            {data && (
 
-                    <Pagination
+                <Pagination
 
-                        next={
-                            data.links.next
-                        }
+                    next={data.links.next}
 
-                        previous={
-                            data.links.previous
-                        }
+                    previous={data.links.previous}
 
-                        loading={
-                            isFetching
-                        }
+                    loading={isFetching}
 
-                        onNext={() =>
-                            setPage(
-                                (prev) =>
-                                    prev + 1
-                            )
-                        }
+                    onNext={() =>
+                        setPage(
+                            (prev) => prev + 1
+                        )
+                    }
 
-                        onPrevious={() =>
-                            setPage(
-                                (prev) =>
-                                    prev - 1
-                            )
-                        }
+                    onPrevious={() =>
+                        setPage(
+                            (prev) => prev - 1
+                        )
+                    }
 
-                    />
+                />
 
-                )
-            }
+            )}
 
         </div>
 

@@ -1,5 +1,7 @@
+
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import useFilteredProducts from "@/hooks/shop/useFilteredProducts";
@@ -18,7 +20,6 @@ const filters = [
 ];
 
 export default function ProductFilterList() {
-
     const [order, setOrder] = useState("");
 
     const {
@@ -37,13 +38,10 @@ export default function ProductFilterList() {
 
     return (
         <div>
-
             {/* Filter Buttons */}
 
             <div className="filter-buttons">
-
                 {filters.map((filter) => (
-
                     <button
                         key={filter.value}
                         onClick={() =>
@@ -57,37 +55,30 @@ export default function ProductFilterList() {
                     >
                         {filter.title}
                     </button>
-
                 ))}
-
             </div>
-
 
             {/* Products */}
 
             {isLoading ? (
-
                 <p>
                     Loading products...
                 </p>
-
             ) : (
-
                 <div className="product-grid">
-
                     {products.map((product) => (
-
                         <div
                             key={product.id}
                             className="product-card"
                         >
-
-                            <img
+                            <Image
                                 src={
                                     product.product_image ??
                                     "/product.jpg"
                                 }
                                 alt={product.name}
+                                width={300}
+                                height={300}
                             />
 
                             <h3>
@@ -97,15 +88,11 @@ export default function ProductFilterList() {
                             <p>
                                 ${product.price_after}
                             </p>
-
                         </div>
-
                     ))}
-
                 </div>
-
             )}
-
         </div>
     );
 }
+

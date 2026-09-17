@@ -1,5 +1,7 @@
+
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface ProductImagePreviewProps {
@@ -29,9 +31,12 @@ function ProductImagePreview({
 
     return (
         <div className="preview">
-            <img
+            <Image
                 src={previewUrl}
                 alt="Product preview"
+                width={300}
+                height={300}
+                loading="lazy"
             />
         </div>
     );

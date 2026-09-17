@@ -23,6 +23,7 @@
     "swiper": "^14.0.5"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.3.5",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

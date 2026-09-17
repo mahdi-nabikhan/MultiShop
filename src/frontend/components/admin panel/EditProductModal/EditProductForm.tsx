@@ -1,6 +1,9 @@
 "use client";
 
+import type { FormEvent } from "react";
+
 import EditProductImagePreview from "./EditProductImagePreview";
+
 
 interface EditProductFormProps {
     name: string;
@@ -22,11 +25,12 @@ interface EditProductFormProps {
     onImageChange: (file: File | null) => void;
 
     onSubmit: (
-        e: React.FormEvent<HTMLFormElement>
+        e: FormEvent<HTMLFormElement>
     ) => void;
 
     onCancel: () => void;
 }
+
 
 function EditProductForm({
     name,
@@ -48,22 +52,25 @@ function EditProductForm({
     onSubmit,
     onCancel,
 }: EditProductFormProps) {
+
     return (
         <form
             className="edit-form"
             onSubmit={onSubmit}
         >
-            {/* Image Preview */}
 
             <EditProductImagePreview
                 image={image}
                 preview={preview}
-                alt={name || "Product preview"}
+                alt={
+                    name ||
+                    "Product preview"
+                }
             />
 
-            {/* Image */}
 
             <div className="form-group">
+
                 <label>
                     Product Image
                 </label>
@@ -72,18 +79,19 @@ function EditProductForm({
                     type="file"
                     accept="image/*"
                     onChange={(e) => {
-                        const file =
-                            e.target.files?.[0] ??
-                            null;
 
-                        onImageChange(file);
+                        onImageChange(
+                            e.target.files?.[0] ?? null
+                        );
+
                     }}
                 />
+
             </div>
 
-            {/* Name */}
 
             <div className="form-group">
+
                 <label>
                     Product Name
                 </label>
@@ -97,11 +105,12 @@ function EditProductForm({
                         )
                     }
                 />
+
             </div>
 
-            {/* Description */}
 
             <div className="form-group">
+
                 <label>
                     Description
                 </label>
@@ -115,12 +124,14 @@ function EditProductForm({
                         )
                     }
                 />
+
             </div>
 
-            {/* Price */}
 
             <div className="grid-2">
+
                 <div className="form-group">
+
                     <label>
                         Price
                     </label>
@@ -134,9 +145,12 @@ function EditProductForm({
                             )
                         }
                     />
+
                 </div>
 
+
                 <div className="form-group">
+
                     <label>
                         Sale Price
                     </label>
@@ -150,13 +164,16 @@ function EditProductForm({
                             )
                         }
                     />
+
                 </div>
+
             </div>
 
-            {/* Stock / Category */}
 
             <div className="grid-2">
+
                 <div className="form-group">
+
                     <label>
                         Stock
                     </label>
@@ -170,9 +187,12 @@ function EditProductForm({
                             )
                         }
                     />
+
                 </div>
 
+
                 <div className="form-group">
+
                     <label>
                         Category
                     </label>
@@ -186,12 +206,14 @@ function EditProductForm({
                             )
                         }
                     />
+
                 </div>
+
             </div>
 
-            {/* Actions */}
 
             <div className="modal-actions">
+
                 <button
                     type="button"
                     className="cancel-btn"
@@ -201,18 +223,24 @@ function EditProductForm({
                     Cancel
                 </button>
 
+
                 <button
                     type="submit"
                     className="save-btn"
                     disabled={isPending}
                 >
-                    {isPending
-                        ? "Saving..."
-                        : "Save Changes"}
+                    {
+                        isPending
+                            ? "Saving..."
+                            : "Save Changes"
+                    }
                 </button>
+
             </div>
+
         </form>
     );
 }
+
 
 export default EditProductForm;

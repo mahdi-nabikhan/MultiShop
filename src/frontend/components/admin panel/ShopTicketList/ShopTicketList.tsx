@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -12,8 +11,11 @@ import useShopTickets from "@/hooks/admin-panel/useShopTickets";
 
 import "./ShopTicketList.css";
 
+
 export default function ShopTicketList() {
+
     const [page, setPage] = useState(1);
+
     const pageSize = 8;
 
     const {
@@ -21,11 +23,11 @@ export default function ShopTicketList() {
         isLoading,
         isError,
         isFetching,
-    } = useShopTickets(page, pageSize);
+    } = useShopTickets(
+        page,
+        pageSize
+    );
 
-    // ==========================================
-    // Loading
-    // ==========================================
 
     if (isLoading) {
         return (
@@ -35,9 +37,6 @@ export default function ShopTicketList() {
         );
     }
 
-    // ==========================================
-    // Error
-    // ==========================================
 
     if (isError) {
         return (
@@ -49,11 +48,9 @@ export default function ShopTicketList() {
         );
     }
 
+
     const tickets = data?.results ?? [];
 
-    // ==========================================
-    // Empty
-    // ==========================================
 
     if (tickets.length === 0) {
         return (
@@ -65,16 +62,11 @@ export default function ShopTicketList() {
         );
     }
 
-    // ==========================================
-    // UI
-    // ==========================================
 
     return (
+
         <div className="ticket-page">
 
-            {/* ==========================================
-                HEADER
-            ========================================== */}
 
             <div className="ticket-header">
 
@@ -89,9 +81,6 @@ export default function ShopTicketList() {
             </div>
 
 
-            {/* ==========================================
-                TICKETS
-            ========================================== */}
 
             <div className="ticket-list">
 
@@ -102,6 +91,7 @@ export default function ShopTicketList() {
                         key={ticket.pk}
                     >
 
+
                         <div className="ticket-top">
 
                             <div>
@@ -110,66 +100,99 @@ export default function ShopTicketList() {
                                     {ticket.title}
                                 </h2>
 
+
                                 <span>
                                     Ticket #{ticket.pk}
                                 </span>
 
                             </div>
 
+
                             <div className="ticket-user">
 
-                                {ticket.customer.username}
+                                {
+                                    ticket.customer?.username ||
+                                    "Unknown Customer"
+                                }
 
                             </div>
+
 
                         </div>
 
 
+
                         <p className="ticket-content">
 
-                            {ticket.content}
+                            {
+                                ticket.content.length > 200
+                                    ? `${ticket.content.slice(0, 200)}...`
+                                    : ticket.content
+                            }
 
                         </p>
 
 
+
                         <div className="ticket-footer">
 
+
                             <span>
-                                Customer ID: {ticket.customer.id}
+
+                                Customer ID: {
+                                    ticket.customer?.id || "-"
+                                }
+
                             </span>
+
+
 
                             <button>
                                 View Ticket
                             </button>
 
+
                         </div>
+
 
                     </div>
 
                 ))}
 
+
             </div>
 
 
-            {/* ==========================================
-                PAGINATION
-            ========================================== */}
 
             {data && (
+
                 <Pagination
+
                     next={data.links.next}
+
                     previous={data.links.previous}
+
                     loading={isFetching}
+
                     onNext={() =>
-                        setPage((prev) => prev + 1)
+                        setPage(
+                            (prev) => prev + 1
+                        )
                     }
+
                     onPrevious={() =>
-                        setPage((prev) => prev - 1)
+                        setPage(
+                            (prev) => prev - 1
+                        )
                     }
+
                 />
+
             )}
 
-        </div>
-    );
-}
 
+        </div>
+
+    );
+
+}

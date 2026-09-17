@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import BACKEND_URLS from "@/utils";
 
 interface OrderProduct {
@@ -44,7 +46,10 @@ function OrderItemCard({
     onRemove,
 }: OrderItemCardProps) {
     const imageUrl = item.product.product_image
-        ? `${BACKEND_URLS.replace(/\/$/, "")}${item.product.product_image}`
+        ? `${BACKEND_URLS.replace(
+            /\/$/,
+            ""
+        )}${item.product.product_image}`
         : "/no-image.png";
 
     const itemTotal =
@@ -52,16 +57,16 @@ function OrderItemCard({
 
     return (
         <div className="cart-card">
-
             <div className="product-image">
-                <img
+                <Image
                     src={imageUrl}
                     alt={item.product.name}
+                    width={120}
+                    height={120}
                 />
             </div>
 
             <div className="product-info">
-
                 <h2>
                     {item.product.name}
                 </h2>
@@ -71,7 +76,6 @@ function OrderItemCard({
                 </p>
 
                 <div className="product-grid">
-
                     <div>
                         <span>
                             Quantity
@@ -118,11 +122,9 @@ function OrderItemCard({
                             ${itemTotal.toFixed(2)}
                         </strong>
                     </div>
-
                 </div>
 
                 <div className="product-actions">
-
                     <span
                         className={
                             item.status === "P"
@@ -136,7 +138,6 @@ function OrderItemCard({
                     </span>
 
                     <div>
-
                         <button
                             type="button"
                             className="view-btn"
@@ -162,13 +163,9 @@ function OrderItemCard({
                         >
                             Remove
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     );
 }

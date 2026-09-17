@@ -3,116 +3,149 @@
 import { useState } from "react";
 
 import ProductCard from "../ProductCard/ProductCard";
+
 import "./ProductList.css";
 
 import useStoreProducts from "@/hooks/shop/useStoreProducts";
+
 import Pagination from "@/components/commen/Paginations";
 import Skeleton from "@/components/commen/Skeleton";
 import ErrorState from "@/components/commen/ErrorState";
 import EmptyState from "@/components/commen/EmptyState";
 
+
 interface ProductListProps {
-  shopId: string;
+    shopId: string;
 }
 
 
 export default function ProductList({
-  shopId
+    shopId,
 }: ProductListProps) {
 
-  const [page, setPage] = useState(1);
+    const [page, setPage] = useState(1);
 
-  const pageSize = 8;
-
-  const {
-    data,
-    isLoading,
-    isError,
-    isFetching,
-  } = useStoreProducts(shopId, page, pageSize);
+    const pageSize = 8;
 
 
-  if (isLoading) {
-     return <Skeleton count={8} />;
-  }
-
-  if (isError) {
-    <ErrorState message="Error loading products." />
-  }
-
-
-  const products = data?.results ?? [];
-
-   if (products.length === 0) {
-    return (
-      <EmptyState message="No products found." />
+    const {
+        data,
+        isLoading,
+        isError,
+        isFetching,
+    } = useStoreProducts(
+        shopId,
+        page,
+        pageSize
     );
-  }
+
+
+    // ==========================
+    // Loading
+    // ==========================
+
+    if (isLoading) {
+        return (
+            <Skeleton count={8} />
+        );
+    }
+
+
+    // ==========================
+    // Error
+    // ==========================
+
+    if (isError) {
+        return (
+            <ErrorState message="Error loading products." />
+        );
+    }
+
+
+    const products = data?.results ?? [];
+
+
+    // ==========================
+    // Empty
+    // ==========================
+
+    if (products.length === 0) {
+        return (
+            <EmptyState message="No products found." />
+        );
+    }
+
+
+    // ==========================
+    // UI
+    // ==========================
+
+    return (
+        <section className="product-list container">
+
+
+            <div className="product-list-header">
+
+                <div>
+
+                    <h2>
+                        Store Products
+                    </h2>
+
+
+                    <p>
+                        Showing all products of this store
+                    </p>
+
+                </div>
+
+
+                <span>
+                    {data?.count ?? 0} Products
+                </span>
+
+
+            </div>
 
 
 
-  return (
+            <div className="products-grid">
 
-    <section className="product-list container">
+                {products.map((product) => (
 
-      <div className="product-list-header">
+                    <ProductCard
+                        key={product.id}
+                        product={product}
+                        shopId={shopId}
+                    />
 
-        <div>
+                ))}
 
-          <h2>
-            Store Products
-          </h2>
-
-          <p>
-            Showing all products of this store
-          </p>
-
-        </div>
+            </div>
 
 
-        <span>
-          {data?.count ?? 0} Products
-        </span>
 
-      </div>
+            <Pagination
+
+                next={data?.links.next ?? null}
+
+                previous={data?.links.previous ?? null}
+
+                loading={isFetching}
+
+                onNext={() =>
+                    setPage((prev) => prev + 1)
+                }
+
+                onPrevious={() =>
+                    setPage((prev) =>
+                        Math.max(1, prev - 1)
+                    )
+                }
+
+            />
 
 
-      <div className="products-grid">
-
-        {products.map((product) => (
-
-          <ProductCard
-            key={product.id}
-            product={product}
-            shopId={shopId}
-          />
-
-        ))}
-
-      </div>
-
-
-      <Pagination
-
-        next={data?.links.next ?? null}
-
-        previous={data?.links.previous ?? null}
-
-        loading={isFetching}
-
-        onNext={() =>
-          setPage(prev => prev + 1)
-        }
-
-        onPrevious={() =>
-          setPage(prev =>
-            Math.max(1, prev - 1)
-          )
-        }
-
-      />
-
-    </section>
-
-  );
+        </section>
+    );
 }
