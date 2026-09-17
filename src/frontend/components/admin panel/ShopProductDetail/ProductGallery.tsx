@@ -1,5 +1,7 @@
+
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -55,13 +57,15 @@ function ProductGallery({
                 {images.length > 0 ? (
                     images.map((image, index) => (
                         <SwiperSlide key={image.id}>
-                            <img
+                            <Image
                                 src={getImageUrl(
                                     image.product_image
                                 )}
                                 alt={`Product Image ${
                                     index + 1
                                 }`}
+                                fill
+                                sizes="(max-width: 768px) 100vw, 600px"
                                 onClick={() =>
                                     onImageClick(image)
                                 }
@@ -70,9 +74,11 @@ function ProductGallery({
                     ))
                 ) : (
                     <SwiperSlide>
-                        <img
+                        <Image
                             src="/images/no-image.png"
                             alt="No Image"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 600px"
                         />
                     </SwiperSlide>
                 )}
@@ -90,7 +96,7 @@ function ProductGallery({
                 {images.length > 0 ? (
                     images.map((image) => (
                         <SwiperSlide key={image.id}>
-                            <img
+                            <Image
                                 src={getImageUrl(
                                     image.product_image
                                 )}
@@ -98,6 +104,8 @@ function ProductGallery({
                                     image.title ??
                                     "Product Image"
                                 }
+                                fill
+                                sizes="(max-width: 768px) 25vw, 150px"
                                 onClick={() =>
                                     onImageClick(image)
                                 }
@@ -106,9 +114,11 @@ function ProductGallery({
                     ))
                 ) : (
                     <SwiperSlide>
-                        <img
+                        <Image
                             src="/images/no-image.png"
                             alt="No Image"
+                            fill
+                            sizes="(max-width: 768px) 25vw, 150px"
                         />
                     </SwiperSlide>
                 )}
