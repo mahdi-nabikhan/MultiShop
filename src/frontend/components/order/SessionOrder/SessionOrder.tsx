@@ -1,5 +1,7 @@
+
 "use client";
 
+import Image from "next/image";
 import DeleteOrderItemModal from "../DeleteOrderItemModal/DeleteOrderItemModal";
 
 import { useState } from "react";
@@ -23,15 +25,13 @@ import type {
     SessionProduct,
 } from "@/types/order";
 
+import BACKEND_URLS from "@/utils";
+
 import "./SessionOrder.css";
 
-
 export default function SessionOrder() {
-
     const router = useRouter();
-
     const queryClient = useQueryClient();
-
 
     // ==========================================
     // Cart
@@ -45,14 +45,12 @@ export default function SessionOrder() {
         queryFn: getSessionCart,
     });
 
-
     // ==========================================
     // Quantities
     // ==========================================
 
     const [quantities, setQuantities] =
         useState<Record<number, number>>({});
-
 
     // ==========================================
     // Delete
@@ -64,42 +62,32 @@ export default function SessionOrder() {
     const [selectedProduct, setSelectedProduct] =
         useState<SessionProduct | null>(null);
 
-
     const deleteMutation = useMutation({
-
         mutationFn: (productId: number) =>
             deleteSessionCartProduct(productId),
 
         onSuccess: () => {
-
             queryClient.invalidateQueries({
                 queryKey: ["session-cart"],
             });
 
             setOpenDelete(false);
-
             setSelectedProduct(null);
-
         },
 
         onError: (error) => {
-
             console.error(
                 "DELETE SESSION CART PRODUCT ERROR:",
                 error
             );
-
         },
-
     });
-
 
     // ==========================================
     // Update Quantity
     // ==========================================
 
     const updateMutation = useMutation({
-
         mutationFn: ({
             productId,
             quantity,
@@ -113,24 +101,18 @@ export default function SessionOrder() {
             ),
 
         onSuccess: () => {
-
             queryClient.invalidateQueries({
                 queryKey: ["session-cart"],
             });
-
         },
 
         onError: (error) => {
-
             console.error(
                 "UPDATE SESSION CART QUANTITY ERROR:",
                 error
             );
-
         },
-
     });
-
 
     // ==========================================
     // Checkout
@@ -139,42 +121,28 @@ export default function SessionOrder() {
     const [checkoutLoading, setCheckoutLoading] =
         useState(false);
 
-
     const checkout = async () => {
-
         try {
-
             setCheckoutLoading(true);
 
             const data =
                 await getCustomerDetail();
 
-
             if (data) {
-
                 router.push("/checkout");
-
             }
-
         } catch (error) {
-
             router.push("/login");
-
         } finally {
-
             setCheckoutLoading(false);
-
         }
-
     };
-
 
     // ==========================================
     // Delete Product
     // ==========================================
 
     const removeProduct = () => {
-
         if (!selectedProduct) {
             return;
         }
@@ -182,9 +150,7 @@ export default function SessionOrder() {
         deleteMutation.mutate(
             selectedProduct.id
         );
-
     };
-
 
     // ==========================================
     // Increase Quantity
@@ -194,18 +160,12 @@ export default function SessionOrder() {
         productId: number,
         currentQuantity: number
     ) => {
-
-        setQuantities(prev => ({
-
+        setQuantities((prev) => ({
             ...prev,
-
             [productId]:
                 (prev[productId] ?? currentQuantity) + 1,
-
         }));
-
     };
-
 
     // ==========================================
     // Decrease Quantity
@@ -215,59 +175,41 @@ export default function SessionOrder() {
         productId: number,
         currentQuantity: number
     ) => {
-
-        setQuantities(prev => {
-
+        setQuantities((prev) => {
             const quantity =
                 prev[productId] ?? currentQuantity;
 
             return {
-
                 ...prev,
-
                 [productId]:
                     quantity > 1
                         ? quantity - 1
                         : 1,
-
             };
-
         });
-
     };
-
 
     // ==========================================
     // Loading
     // ==========================================
 
     if (loading) {
-
         return (
-
             <section className="session-cart-loading">
-
                 <h2>
                     Loading Cart...
                 </h2>
-
             </section>
-
         );
-
     }
-
 
     // ==========================================
     // Empty Cart
     // ==========================================
 
     if (!cart || cart.items.length === 0) {
-
         return (
-
             <section className="empty-cart">
-
                 <h1>
                     Your Shopping Cart Is Empty
                 </h1>
@@ -277,79 +219,54 @@ export default function SessionOrder() {
                     to your cart.
                 </p>
 
-
                 <button
-
                     className="continue-shopping-btn"
-
                     onClick={() =>
                         router.push("/")
                     }
-
                 >
-
                     Continue Shopping
-
                 </button>
-
             </section>
-
         );
-
     }
-
 
     // ==========================================
     // Calculate Totals
     // ==========================================
 
     const subtotal = cart.items.reduce(
-
         (sum, item) => {
-
             const quantity =
                 quantities[item.product.id]
                 ?? item.quantity;
 
             return (
-
                 sum +
-
                 item.product.price_after *
                 quantity
-
             );
-
         },
-
         0
-
     );
-
 
     const shipping = 0;
 
     const grandTotal =
         subtotal + shipping;
 
-
     // ==========================================
     // UI
     // ==========================================
 
     return (
-
         <>
-
             <section className="session-cart">
-
                 <div className="cart-container">
-
 
                     {/* Header */}
 
                     <div className="cart-header">
-
                         <h1>
                             Shopping Cart
                         </h1>
@@ -357,66 +274,58 @@ export default function SessionOrder() {
                         <span>
                             {cart.items.length} Items
                         </span>
-
                     </div>
 
-
                     <div className="cart-content">
-
 
                         {/* Products List */}
 
                         <div className="cart-items">
-
-
-                            {cart.items.map(item => {
-
+                            {cart.items.map((item) => {
                                 const quantity =
                                     quantities[
                                         item.product.id
-                                    ]
-                                    ?? item.quantity;
+                                    ] ?? item.quantity;
 
+                                const imageUrl =
+                                    item.product.product_image
+                                        ? item.product.product_image.startsWith(
+                                            "http"
+                                        )
+                                            ? item.product.product_image
+                                            : `${BACKEND_URLS.replace(
+                                                /\/$/,
+                                                ""
+                                            )}${item.product.product_image}`
+                                        : "/product.jpg";
 
                                 return (
-
                                     <div
                                         className="cart-item"
                                         key={item.product.id}
                                     >
 
-
                                         {/* Product Image */}
 
                                         <div className="cart-product-image">
-
-                                            <img
-
-                                                src={
-                                                    item.product.product_image
-                                                    ??
-                                                    "/product.jpg"
-                                                }
-
+                                            <Image
+                                                src={imageUrl}
                                                 alt={
                                                     item.product.name
                                                 }
-
+                                                width={120}
+                                                height={120}
                                             />
-
                                         </div>
-
 
                                         {/* Product Info */}
 
                                         <div className="cart-product-info">
-
                                             <h3>
                                                 {
                                                     item.product.name
                                                 }
                                             </h3>
-
 
                                             <p>
                                                 {
@@ -424,167 +333,104 @@ export default function SessionOrder() {
                                                 }
                                             </p>
 
-
                                             <span className="product-price">
-
                                                 $
                                                 {
                                                     item.product.price_after
                                                 }
-
                                             </span>
 
-
                                             <span className="stock">
-
                                                 Stock:{" "}
-
                                                 {
                                                     item.product
                                                         .quantity_in_stock
                                                 }
-
                                             </span>
-
                                         </div>
-
 
                                         {/* Quantity */}
 
                                         <div className="quantity-control">
 
-
                                             <button
-
                                                 type="button"
-
                                                 onClick={() =>
                                                     decreaseQuantity(
                                                         item.product.id,
                                                         item.quantity
                                                     )
                                                 }
-
                                             >
-
                                                 -
-
                                             </button>
 
-
                                             <input
-
                                                 type="number"
-
                                                 min={1}
-
                                                 value={quantity}
-
-                                                onChange={e => {
-
+                                                onChange={(e) => {
                                                     setQuantities(
-                                                        prev => ({
-
+                                                        (prev) => ({
                                                             ...prev,
-
                                                             [item.product.id]:
                                                                 Number(
                                                                     e.target.value
                                                                 ),
-
                                                         })
                                                     );
-
                                                 }}
-
                                             />
 
-
                                             <button
-
                                                 type="button"
-
                                                 onClick={() =>
                                                     increaseQuantity(
                                                         item.product.id,
                                                         item.quantity
                                                     )
                                                 }
-
                                             >
-
                                                 +
-
                                             </button>
 
-
                                             <button
-
                                                 type="button"
-
                                                 className="update-btn"
-
                                                 disabled={
                                                     updateMutation.isPending
                                                 }
-
                                                 onClick={() => {
-
                                                     updateMutation.mutate({
-
                                                         productId:
                                                             item.product.id,
-
                                                         quantity,
-
                                                     });
-
                                                 }}
-
                                             >
-
                                                 {
                                                     updateMutation.isPending
                                                         ? "Updating..."
                                                         : "Update"
                                                 }
-
                                             </button>
-
-
                                         </div>
-
 
                                         {/* Actions */}
 
                                         <div className="cart-item-actions">
-
-
                                             <strong>
-
                                                 $
-
-                                                {
-
-                                                    (
-                                                        item.product.price_after
-                                                        *
-                                                        quantity
-                                                    ).toFixed(2)
-
-                                                }
-
+                                                {(
+                                                    item.product.price_after *
+                                                    quantity
+                                                ).toFixed(2)}
                                             </strong>
 
-
                                             <button
-
                                                 type="button"
-
                                                 className="delete-btn"
-
                                                 onClick={() => {
-
                                                     setSelectedProduct(
                                                         item.product
                                                     );
@@ -592,41 +438,24 @@ export default function SessionOrder() {
                                                     setOpenDelete(
                                                         true
                                                     );
-
                                                 }}
-
                                             >
-
                                                 Remove
-
                                             </button>
-
-
                                         </div>
-
-
                                     </div>
-
                                 );
-
                             })}
-
-
                         </div>
-
 
                         {/* Order Summary */}
 
                         <aside className="cart-summary">
-
-
                             <h2>
                                 Order Summary
                             </h2>
 
-
                             <div className="summary-row">
-
                                 <span>
                                     Total Items
                                 </span>
@@ -634,12 +463,9 @@ export default function SessionOrder() {
                                 <strong>
                                     {cart.total_quantity}
                                 </strong>
-
                             </div>
 
-
                             <div className="summary-row">
-
                                 <span>
                                     Subtotal
                                 </span>
@@ -647,12 +473,9 @@ export default function SessionOrder() {
                                 <strong>
                                     ${subtotal.toFixed(2)}
                                 </strong>
-
                             </div>
 
-
                             <div className="summary-row">
-
                                 <span>
                                     Shipping
                                 </span>
@@ -660,15 +483,11 @@ export default function SessionOrder() {
                                 <strong>
                                     Free
                                 </strong>
-
                             </div>
-
 
                             <hr />
 
-
                             <div className="summary-total">
-
                                 <span>
                                     Total
                                 </span>
@@ -676,86 +495,52 @@ export default function SessionOrder() {
                                 <strong>
                                     ${grandTotal.toFixed(2)}
                                 </strong>
-
                             </div>
 
-
                             <button
-
                                 type="button"
-
                                 className="checkout-btn"
-
                                 onClick={checkout}
-
                                 disabled={checkoutLoading}
-
                             >
-
                                 {
                                     checkoutLoading
                                         ? "Loading..."
                                         : "Proceed To Checkout"
                                 }
-
                             </button>
 
-
                             <button
-
                                 type="button"
-
                                 className="continue-shopping-btn"
-
                                 onClick={() =>
                                     router.push("/")
                                 }
-
                             >
-
                                 Continue Shopping
-
                             </button>
-
-
                         </aside>
-
-
                     </div>
-
                 </div>
-
             </section>
-
 
             {/* Delete Modal */}
 
             <DeleteOrderItemModal
-
                 open={openDelete}
-
                 loading={
                     deleteMutation.isPending
                 }
-
                 productName={
                     selectedProduct?.name ?? ""
                 }
-
                 onClose={() => {
-
                     setOpenDelete(false);
-
                     setSelectedProduct(null);
-
                 }}
-
                 onConfirm={removeProduct}
-
             />
-
         </>
-
     );
-
 }
+
