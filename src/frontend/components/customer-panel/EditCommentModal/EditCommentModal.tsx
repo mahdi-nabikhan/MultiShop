@@ -56,7 +56,7 @@ export default function EditCommentModal({
             queryClient.invalidateQueries({
 
                 queryKey:
-                    customerQueryKeys.comments(),
+                    customerQueryKeys.comments(1,7),
 
             });
 

@@ -69,7 +69,7 @@ export default function EditTicketModal({
 
             await queryClient.invalidateQueries({
                 queryKey:
-                    customerQueryKeys.tickets(),
+                    customerQueryKeys.tickets(1,8),
             });
 
 
