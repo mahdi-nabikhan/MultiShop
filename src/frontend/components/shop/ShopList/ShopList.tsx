@@ -1,164 +1,119 @@
+
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-
-import useStores from "@/hooks/shop/useStores";
-
-import Pagination from "@/components/commen/Paginations";
-import Skeleton from "@/components/commen/Skeleton";
-import ErrorState from "@/components/commen/ErrorState";
-import EmptyState from "@/components/commen/EmptyState";
 
 import BACKEND_URLS from "@/utils";
 
-import "./ShopList.css";
+import useRandomProducts from "@/hooks/shop/useRandomProducts";
+import Skeleton from "@/components/commen/Skeleton";
+import ErrorState from "@/components/commen/ErrorState";
 
-interface Props {
-    page: string;
-}
+import Pagination from "@/components/commen/Paginations";
 
-export default function ShopList({ page }: Props) {
-    const router = useRouter();
+import "./RandomProduct.css";
+
+export default function RandomProducts() {
+    const [page, setPage] = useState(1);
+
+    const pageSize = 8;
 
     const {
         data,
         isLoading,
         isError,
-    } = useStores(page);
-
-
-    // ==========================================
-    // Loading
-    // ==========================================
+        isFetching,
+    } = useRandomProducts(page, pageSize);
 
     if (isLoading) {
         return (
-            <section className="shop-list container">
+            <section className="random-products">
+                <h2>
+                    Recommended Products
+                </h2>
+
                 <Skeleton count={8} />
             </section>
         );
     }
 
-
-    // ==========================================
-    // Error
-    // ==========================================
-
-    if (isError || !data) {
+    if (isError) {
         return (
-            <section className="shop-list container">
-                <ErrorState message="Error loading shops." />
+            <section className="random-products">
+                <h2>
+                    Recommended Products
+                </h2>
+
+                <ErrorState message="Failed to load products." />
             </section>
         );
     }
 
+    const products = data?.results ?? [];
 
-    // ==========================================
-    // Empty
-    // ==========================================
-
-    if (data.results.length === 0) {
-        return (
-            <section className="shop-list container">
-                <EmptyState message="No shops found." />
-            </section>
-        );
+    if (products.length === 0) {
+        return null;
     }
-
-
-    // ==========================================
-    // Pagination
-    // ==========================================
-
-    const goToPage = (url: string | null) => {
-        if (!url) {
-            return;
-        }
-
-        const urlObject = new URL(url);
-
-        const pageNumber =
-            urlObject.searchParams.get("page");
-
-        if (pageNumber) {
-            router.push(`/?page=${pageNumber}`);
-        }
-    };
-
-
-    // ==========================================
-    // UI
-    // ==========================================
 
     return (
-        <section className="shop-list container">
+        <section className="random-products">
+            <div className="random-products-header">
+                <h2>
+                    Recommended Products
+                </h2>
+            </div>
 
-            <div className="shops-grid">
-
-                {data.results.map((item) => (
-
+            <div className="random-products-grid">
+                {products.map((product) => (
                     <Link
-                        href={`/shop/${item.pk}`}
-                        className="shop-card"
-                        key={item.pk}
+                        href={`/product/${product.id}`}
+                        className="random-product-card"
+                        key={product.id}
                     >
-
-                        <div className="shop-image">
-
+                        <div className="random-product-image">
                             <Image
-                                src={
-                                    item.image
-                                        ? `${BACKEND_URLS.replace(/\/$/, "")}${item.image}`
-                                        : "/images/banner-1.jpg"
-                                }
-                                alt={item.name}
-                                width={300}
-                                height={200}
-                                loading="lazy"
+                                src={`${BACKEND_URLS}${product.product_image}`}
+                                alt={product.name}
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                className="product-image"
                             />
-
                         </div>
 
-
-                        <div className="shop-content">
-
+                        <div className="random-product-content">
                             <h3>
-                                {item.name}
+                                {product.name}
                             </h3>
 
                             <p>
-                                {item.description}
+                                {product.description}
                             </p>
 
+                            <div className="random-product-footer">
+                                <span className="old-price">
+                                    ${product.price}
+                                </span>
+
+                                <span className="new-price">
+                                    ${product.price_after}
+                                </span>
+                            </div>
                         </div>
-
                     </Link>
-
                 ))}
-
             </div>
 
-
             <Pagination
-
-                next={data.links.next}
-
-                previous={data.links.previous}
-
-                loading={isLoading}
-
-                onNext={() =>
-                    goToPage(data.links.next)
-                }
-
+                next={data?.links.next ?? null}
+                previous={data?.links.previous ?? null}
+                loading={isFetching}
+                onNext={() => setPage((prev) => prev + 1)}
                 onPrevious={() =>
-                    goToPage(data.links.previous)
+                    setPage((prev) => Math.max(1, prev - 1))
                 }
-
             />
-
         </section>
     );
 }

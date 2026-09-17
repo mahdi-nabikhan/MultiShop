@@ -60,8 +60,6 @@ export default function ProductGallery({
 
                             height={80}
 
-                            loading="lazy"
-
                         />
 
 

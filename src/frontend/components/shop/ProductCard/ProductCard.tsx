@@ -77,7 +77,7 @@ export default function ProductCard({
 
                     height={300}
 
-                    loading="lazy"
+
 
                 />
 
