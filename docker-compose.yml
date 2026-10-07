@@ -55,11 +55,11 @@ services:
     ports:
       - "${BACKEND_PORT}:8000"
 
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=${DEBUG}
+    env_file:
+      - .env
 
     depends_on:
+      - db
       - redis
 
     mem_limit: 300MB
@@ -97,6 +97,9 @@ services:
       dockerfile: docker/Dockerfile.backend
 
     command: celery -A Multi_Shop worker --loglevel=info
+
+    env_file:
+      - .env
 
     depends_on:
       - redis
@@ -147,9 +150,6 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
-
-    ports:
-      - "${ELASTICSEARCH_PORT}:9200"
 
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
@@ -224,9 +224,6 @@ services:
 
   locust_worker:
     image: locustio/locust
-
-    ports:
-      - "${LOCUST_PORT}:8009"
 
     volumes:
       - ./Multi_Shop/locust:/mnt/locust
