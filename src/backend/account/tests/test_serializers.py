@@ -7,6 +7,7 @@ from account.api.v1.serializers import (
     CheckMeSerializer
 )
 from account.models import User
+from django.test import RequestFactory
 
 
 @pytest.mark.django_db
@@ -83,13 +84,16 @@ class TestLoginSerializer:
         )
         assert serializer.is_valid() is True
 
+    
     def test_login_fail(self):
+        from django.test import RequestFactory
+
+        request = RequestFactory().post("/login/")
         serializer = LoginSerializer(
-            data={"email": "wrong@example.com", "password": "Wrong123!"}
+            data={"email": "wrong@example.com", "password": "Wrong123!"},
+            context={"request": request},
         )
         assert serializer.is_valid() is False
-
-
 @pytest.mark.django_db
 class TestUsersSerializer:
     """
@@ -115,31 +119,29 @@ class TestUsersSerializer:
 
 @pytest.mark.django_db
 class TestChangePasswordSerializer:
-    """
-    Test suite for `ChangePasswordSerializer`.
+    def setup_method(self):
+        from django.test import RequestFactory
 
-    ---
-    **Purpose:**
-        Validates password change logic, including matching new passwords
-        and enforcing password rules.
+        self.user = User.objects.create_user(
+            email="password-test@example.com",
+            password="OldPass123!",
+        )
 
-    ### Test Cases:
+        request = RequestFactory().post("/change/password/")
+        request.user = self.user
+        self.context = {"request": request}
 
-    1. `test_password_match_and_valid`:
-        - Ensures serializer is valid when new passwords match and satisfy
-          validation requirements.
-
-    2. `test_password_mismatch`:
-        - Ensures serializer is invalid when new passwords do not match.
-        - Validates correct validation error message is returned.
-    """
     def test_password_match_and_valid(self):
         data = {
             "old_password": "OldPass123!",
             "new_password": "StrongPass123!",
             "new_password1": "StrongPass123!",
         }
-        serializer = ChangePasswordSerializer(data=data)
+
+        serializer = ChangePasswordSerializer(
+            data=data,
+            context=self.context,
+        )
         assert serializer.is_valid() is True
 
     def test_password_mismatch(self):
@@ -148,12 +150,14 @@ class TestChangePasswordSerializer:
             "new_password": "StrongPass123!",
             "new_password1": "WrongPass123!",
         }
-        serializer = ChangePasswordSerializer(data=data)
+
+        serializer = ChangePasswordSerializer(
+            data=data,
+            context=self.context,
+        )
         assert serializer.is_valid() is False
         assert "passwords do not match" in str(serializer.errors).lower()
-
-
-@pytest.mark.djanfo_db
+@pytest.mark.django_db
 class TestChechMeSerializer:
     
     def setup_method(self):
@@ -169,8 +173,8 @@ class TestChechMeSerializer:
         assert data ["email"] == self.user.email
         
     def test_serializer_only_contains_expected_fields(self):
-        serializer = CheckMeSerializer(instance= self.user)
-        assert set(serializer.data.key()) =={"pk","email"}
+        serializer = CheckMeSerializer(instance=self.user)
+        assert set(serializer.data.keys()) == {"pk", "email"}
                      
     def test_serializer_fields_are_read_only(self):
         serializer = CheckMeSerializer(instance= self.user)

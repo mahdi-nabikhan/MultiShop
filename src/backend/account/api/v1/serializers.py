@@ -295,7 +295,7 @@ class ChangePasswordSerializer(serializers.Serializer):
              raise serializers.ValidationError({
                 "new_password": e.messages
             }) 
-
+        return data
 
 
 

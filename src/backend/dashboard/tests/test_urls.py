@@ -1,3 +1,4 @@
+
 import pytest
 
 from django.urls import reverse
@@ -36,16 +37,13 @@ class TestCreateConversationAPIView:
         )
 
     def test_create_conversation(self):
-
         self.client.force_authenticate(self.customer)
 
-        url = reverse("api/v1:create_conversation")
+        url = "/dashboard/api/v1/chat/conversations/"
 
         response = self.client.post(
             url,
-            {
-                "store": self.store.id,
-            },
+            {"store": self.store.id},
             format="json",
         )
 
@@ -53,7 +51,6 @@ class TestCreateConversationAPIView:
         assert Conversation.objects.count() == 1
 
     def test_duplicate_conversation(self):
-
         Conversation.objects.create(
             customer=self.customer,
             store=self.store,
@@ -61,13 +58,11 @@ class TestCreateConversationAPIView:
 
         self.client.force_authenticate(self.customer)
 
-        url = reverse("api/v1:create_conversation")
+        url = "/dashboard/api/v1/chat/conversations/"
 
         response = self.client.post(
             url,
-            {
-                "store": self.store.id,
-            },
+            {"store": self.store.id},
             format="json",
         )
 
