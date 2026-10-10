@@ -130,7 +130,7 @@ class AddressSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Address
-        fields = ['id', 'state', 'city', 'postal_code', 'customer']
+        fields = ['id', 'state', 'city', 'postal_code', 'customer',"street"]
         read_only_fields = ['customer','id']
 
     def create(self, validated_data):

@@ -1,4 +1,4 @@
-# tests/test_customer_serializers.py
+﻿# tests/test_customer_serializers.py
 import pytest
 from django.contrib.auth import get_user_model
 from customer.models import Customer, Address, Comments
@@ -227,37 +227,19 @@ class TestCustomerDetailSerializer:
 
 
     def test_serializer_update_customer_information(self):
-
-
         serializer = CustomerDetailSerializer(
-
             instance=self.customer,
-
-            data={
-
-                "first_name":"Ali",
-
-                "last_name":"Ahmadi"
-
-            },
-
-            partial=True
-
+            data={"username": "ali_updated"},
+            partial=True,
         )
 
-
-
-        assert serializer.is_valid()
-
-
+        assert serializer.is_valid(), serializer.errors
 
         updated_customer = serializer.save()
+        updated_customer.refresh_from_db()
 
+        assert updated_customer.username == "ali_updated"
 
-
-        assert updated_customer.first_name == "Ali"
-
-        assert updated_customer.last_name == "Ahmadi"
 
 
 

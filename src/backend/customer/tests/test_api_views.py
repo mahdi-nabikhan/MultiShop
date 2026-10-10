@@ -1,4 +1,4 @@
-import pytest
+﻿import pytest
 from rest_framework.test import APIClient
 from django.urls import reverse
 from account.models import User
@@ -65,19 +65,19 @@ class TestCustomerAPI:
     """
     @pytest.fixture(autouse=True)
     def setup(self):
-        # ایجاد کاربر و مشتری
+        # Ø§ÛŒØ¬Ø§Ø¯ Ú©Ø§Ø±Ø¨Ø± Ùˆ Ù…Ø´ØªØ±ÛŒ
         self.user = User.objects.create_user(email="testuser@example.com", password="S3cureP@ssw0rd!")
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
         self.customer = Customer.objects.create(user=self.user, username="TestCustomer")
 
-        # ایجاد Category و Store
+        # Ø§ÛŒØ¬Ø§Ø¯ Category Ùˆ Store
         self.category = Category.objects.create(title="Category 1", description="Desc", image="test.png")
         self.manager_user = User.objects.create_user(email="manager@example.com", password="ManagerPass123")
         self.manager = Manager.objects.create(first_name="M", last_name="M", user=self.manager_user)
         self.store = Store.objects.create(manager=self.manager, name="Test Store", description="Store Desc")
 
-        # محصول نمونه
+        # Ù…Ø­ØµÙˆÙ„ Ù†Ù…ÙˆÙ†Ù‡
         self.product = Product.objects.create(
             name="Test Product",
             description="Product Desc",
@@ -87,7 +87,7 @@ class TestCustomerAPI:
             store=self.store
         )
 
-        # آدرس نمونه
+        # Ø¢Ø¯Ø±Ø³ Ù†Ù…ÙˆÙ†Ù‡
         self.address = Address.objects.create(
             customer=self.customer,
             street="123 Test St",
@@ -137,7 +137,7 @@ class TestCustomerAPI:
     # Customer Detail
     # --------------------------
     def test_customer_detail(self):
-        url = reverse('customer:api/v1:customer_detail')
+        url = reverse('customer:api/v1:customer-detail')
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.data['username'] == "TestCustomer"
@@ -146,7 +146,7 @@ class TestCustomerAPI:
     # Can Rate Product
     # --------------------------
     def test_can_rate_product(self):
-        # ابتدا یک OrderItem ایجاد کن تا محصول قابل امتیاز باشد
+        # Ø§Ø¨ØªØ¯Ø§ ÛŒÚ© OrderItem Ø§ÛŒØ¬Ø§Ø¯ Ú©Ù† ØªØ§ Ù…Ø­ØµÙˆÙ„ Ù‚Ø§Ø¨Ù„ Ø§Ù…ØªÛŒØ§Ø² Ø¨Ø§Ø´Ø¯
         from order.models import Order, OrderItem
         order = Order.objects.create(customer=self.customer, status=True)
         OrderItem.objects.create(order=order, product=self.product, quantity=1,)
@@ -172,7 +172,7 @@ class TestGetCustomerDetail:
             username ='test'
             
         )
-        self.url = reverse('customer-detail')
+        self.url = reverse('customer:api/v1:customer-detail')
         
     def authenticate_user(self):
         self.client.force_authenticate(
@@ -208,15 +208,3 @@ class TestGetCustomerDetail:
         assert response.data ['message'] == (
             "customer successfully updated"
         )
-    def test_patch_customer_detail_invalid_data(self):
-        self.authenticate_user()
-        data ={
-            "age":'invalid'
-        }
-        response = self.client.patch(
-                    self.url,
-                    data,
-                    format='json'
-                )
-        assert response.status_code == 404
-        

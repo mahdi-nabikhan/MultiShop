@@ -50,11 +50,24 @@ class TestCustomerAPI:
         assert response.status_code == 200 or response.status_code == 201
 
     def test_add_address(self):
-        url = reverse('customer:api/v1:add-address')
-        data = {"street":"Test St","city":"Test City","state":"Test State","postal_code":"12345"}
-        response = self.client.post(url, data, format='json')
+        url = reverse("customer:api/v1:add-address")
+        data = {
+            "street": "Test St",
+            "city": "Test City",
+            "state": "Test State",
+            "postal_code": "12345",
+        }
+
+        response = self.client.post(url, data, format="json")
+
         assert response.status_code == 201
-        assert response.data['city'] == "Test City"
+        assert response.data["massage"] == "address successfully add"
+        assert Address.objects.filter(
+            customer=self.customer,
+            city="Test City",
+            street="Test St",).exists()
+
+
 
     def test_add_comment(self):
         url = reverse('customer:api/v1:add-comment', args=[self.product.id])
@@ -64,7 +77,7 @@ class TestCustomerAPI:
         assert response.data['descriptions'] == "This is a test comment"
 
     def test_customer_detail(self):
-        url = reverse('customer:api/v1:customer_detail')
+        url = reverse("customer:api/v1:customer-detail")
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.data['username'] == "TestCustomer"

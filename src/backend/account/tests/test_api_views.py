@@ -1,9 +1,7 @@
-
 import pytest
-
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.test import override_settings
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from rest_framework import status
@@ -95,15 +93,17 @@ def create_operator(create_user, create_store):
 
 
 # ------------------------------------------------------------------
-# Authentication API
+# Token Login, Profile, Logout and Password
 # ------------------------------------------------------------------
 
-@pytest.mark.django_db
+
 class TestAuthAPI:
 
     def test_login_success(self, create_user, api_client):
+        url = reverse("account:api/v1:login")
+
         response = api_client.post(
-            reverse("account:api/v1:login"),
+            url,
             {
                 "email": "user@example.com",
                 "password": "testpass123",
@@ -114,9 +114,11 @@ class TestAuthAPI:
         assert "user-id" in response.data
         assert "token" in response.data
 
-    def test_login_invalid_credentials(self, api_client):
+    def test_login_invalid_credentials(self, api_client, db):
+        url = reverse("account:api/v1:login")
+
         response = api_client.post(
-            reverse("account:api/v1:login"),
+            url,
             {
                 "email": "wrong@example.com",
                 "password": "wrongpass",
@@ -127,10 +129,9 @@ class TestAuthAPI:
 
     def test_get_profile(self, create_user, api_client):
         api_client.force_authenticate(user=create_user)
+        url = reverse("account:api/v1:profile")
 
-        response = api_client.get(
-            reverse("account:api/v1:profile")
-        )
+        response = api_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["email"] == create_user.email
@@ -139,19 +140,21 @@ class TestAuthAPI:
         Token.objects.create(user=create_user)
         api_client.force_authenticate(user=create_user)
 
-        response = api_client.post(
-            reverse("account:api/v1:logout")
-        )
+        url = reverse("account:api/v1:logout")
+        response = api_client.post(url)
 
         assert response.status_code == status.HTTP_200_OK
+
+        # مطابق قرارداد مورد انتظار LogoutAPIView
         assert response.data["success"] is True
         assert response.data["message"] == "Logout successfully."
 
     def test_change_password(self, create_user, api_client):
         api_client.force_authenticate(user=create_user)
+        url = reverse("account:api/v1:change-password")
 
         response = api_client.put(
-            reverse("account:api/v1:change-password"),
+            url,
             {
                 "old_password": "testpass123",
                 "new_password": "newpass456",
@@ -172,17 +175,6 @@ class TestAuthAPI:
             ("create_admin", "panel"),
             ("create_operator", "panel"),
         ],
-    )
-    @override_settings(
-        REST_FRAMEWORK={
-            **settings.REST_FRAMEWORK,
-            "DEFAULT_THROTTLE_RATES": {
-                **settings.REST_FRAMEWORK.get(
-                    "DEFAULT_THROTTLE_RATES", {}
-                ),
-                "login": "100/minute",
-            },
-        }
     )
     def test_jwt_login_redirect(
         self,
@@ -227,7 +219,10 @@ class TestLogoutAPIView:
         assert response.data["success"] is True
         assert response.data["message"] == "Logout successfully."
 
+        assert "access_token" in response.cookies
         assert response.cookies["access_token"].value == ""
+
+        assert "refresh_token" in response.cookies
         assert response.cookies["refresh_token"].value == ""
 
     def test_logout_without_refresh_cookie(self, api_client, user, tokens):
@@ -253,6 +248,7 @@ class TestLogoutAPIView:
 # ------------------------------------------------------------------
 # Check Me API
 # ------------------------------------------------------------------
+
 
 @pytest.mark.django_db
 class TestCheckMeAPIView:
