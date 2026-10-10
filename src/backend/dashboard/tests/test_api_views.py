@@ -1,3 +1,4 @@
+
 import pytest
 
 from rest_framework import status
@@ -5,14 +6,13 @@ from rest_framework.test import APIClient
 
 from account.models import User
 from vendor.models import Manager, Store
-from dashboard.models import Conversation, Message
+from dashboard.models import Conversation
 
 
 @pytest.mark.django_db
 class TestCreateConversationAPIView:
 
     def setup_method(self):
-
         self.client = APIClient()
 
         self.customer = User.objects.create_user(
@@ -36,11 +36,10 @@ class TestCreateConversationAPIView:
         )
 
     def test_create_conversation(self):
-
         self.client.force_authenticate(self.customer)
 
         response = self.client.post(
-            "/dashboard/api/v1/conversations/",
+            "/dashboard/api/v1/chat/conversations/",
             {
                 "store": self.store.id,
             },
@@ -48,11 +47,9 @@ class TestCreateConversationAPIView:
         )
 
         assert response.status_code == status.HTTP_201_CREATED
-
         assert Conversation.objects.count() == 1
 
     def test_duplicate_conversation(self):
-
         Conversation.objects.create(
             customer=self.customer,
             store=self.store,
@@ -61,7 +58,7 @@ class TestCreateConversationAPIView:
         self.client.force_authenticate(self.customer)
 
         response = self.client.post(
-            "/dashboard/api/v1/conversations/",
+            "/dashboard/api/v1/chat/conversations/",
             {
                 "store": self.store.id,
             },
@@ -69,5 +66,5 @@ class TestCreateConversationAPIView:
         )
 
         assert response.status_code == status.HTTP_200_OK
-
         assert Conversation.objects.count() == 1
+
