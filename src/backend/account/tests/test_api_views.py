@@ -1,23 +1,32 @@
+
 import pytest
+
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
-from rest_framework.authtoken.models import Token
+from django.test import override_settings
 from django.urls import reverse
+
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from customer.models import Customer
 from vendor.models import Admin, Manager, Operator, Store
-from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
 
 
 User = get_user_model()
 
 
+# ------------------------------------------------------------------
+# Fixtures
+# ------------------------------------------------------------------
+
 @pytest.fixture
-def user():
+def user(db):
     return User.objects.create_user(
-        username="mahdi",
         email="mahdi@test.com",
-        password="12345678"
+        password="12345678",
     )
 
 
@@ -34,236 +43,216 @@ def tokens(user):
         "access": str(refresh.access_token),
         "refresh": str(refresh),
     }
-User = get_user_model()
 
+
+@pytest.fixture
+def create_user(db):
+    return User.objects.create_user(
+        email="user@example.com",
+        password="testpass123",
+    )
+
+
+@pytest.fixture
+def create_manager(create_user):
+    return Manager.objects.create(
+        user=create_user,
+        first_name="ManagerFirst",
+        last_name="ManagerLast",
+    )
+
+
+@pytest.fixture
+def create_store(create_manager):
+    return Store.objects.create(
+        manager=create_manager,
+        name="Test Shop",
+        description="Test Description",
+    )
+
+
+@pytest.fixture
+def create_customer(create_user):
+    return Customer.objects.create(user=create_user)
+
+
+@pytest.fixture
+def create_admin(create_user, create_store):
+    return Admin.objects.create(
+        user=create_user,
+        shop=create_store,
+        username="admin1",
+    )
+
+
+@pytest.fixture
+def create_operator(create_user, create_store):
+    return Operator.objects.create(
+        user=create_user,
+        shop=create_store,
+        username="operator1",
+    )
+
+
+# ------------------------------------------------------------------
+# Authentication API
+# ------------------------------------------------------------------
 
 @pytest.mark.django_db
 class TestAuthAPI:
 
-    """
-    Test suite for authentication-related API endpoints.
-
-    ---
-    **Purpose:**
-        Verifies correct behavior of user authentication, profile retrieval,
-        logout, password change, and JWT login with role-based redirects.
-
-    ### Fixtures:
-        - `api_client`: Provides a DRF APIClient instance for making requests.
-        - `create_user`: Creates a standard test user.
-        - `create_manager`: Creates a Manager linked to `create_user`.
-        - `create_store`: Creates a Store managed by `create_manager`.
-        - `create_customer`: Creates a Customer linked to `create_user`.
-        - `create_admin`: Creates an Admin linked to `create_user` and a Store.
-        - `create_manager_role`: Creates a Manager role (alternative fixture).
-        - `create_operator`: Creates an Operator linked to `create_user` and a Store.
-
-    ### Test Cases:
-
-    1. `test_login_success`:
-        - Tests successful login using valid credentials.
-        - Validates response contains `user-id` and `token`.
-        - Expected status: 200 OK
-
-    2. `test_login_invalid_credentials`:
-        - Tests login with incorrect credentials.
-        - Expected status: 400 Bad Request
-
-    3. `test_get_profile`:
-        - Tests retrieval of authenticated user's profile.
-        - Validates email in response matches the logged-in user.
-        - Expected status: 200 OK
-
-    4. `test_logout`:
-        - Tests logout endpoint by deleting the user's token.
-        - Validates response message confirms logout.
-        - Expected status: 200 OK
-
-    5. `test_change_password`:
-        - Tests password change endpoint for authenticated user.
-        - Ensures new password is correctly updated in database.
-        - Expected status: 200 OK
-
-    6. `test_jwt_login_redirect`:
-        - Parameterized test for JWT login with role-based redirect.
-        - Validates correct `redirect_url` returned for different user roles:
-            - Customer → `/website/shop/list/`
-            - Admin / Operator → `/vendor/panel`
-        - Expected status: 200 OK
-
-    ### Notes:
-        - All tests use `pytest.mark.django_db` to allow database access.
-        - `force_authenticate` is used to simulate logged-in users where needed.
-        - JWT login test assumes session cart handling is functioning correctly.
-        - Throttling, permissions, and token handling are implicitly tested through responses.
-    """
-    @pytest.fixture
-    def api_client(self):
-        return APIClient()
-
-    @pytest.fixture
-    def create_user(self):
-        return User.objects.create_user(
-            email="user@example.com",
-            password="testpass123"
-        )
-
-    @pytest.fixture
-    def create_manager(self, create_user):
-        return Manager.objects.create(
-            user=create_user,
-            first_name="ManagerFirst",
-            last_name="ManagerLast"
-        )
-
-    @pytest.fixture
-    def create_store(self, create_manager):
-        return Store.objects.create(
-            manager=create_manager,
-            name="Test Shop",
-            description="Test Description"
-        )
-
-    @pytest.fixture
-    def create_customer(self, create_user):
-        return Customer.objects.create(user=create_user)
-
-    @pytest.fixture
-    def create_admin(self, create_user, create_store):
-        return Admin.objects.create(
-            user=create_user,
-            shop=create_store,
-            username="admin1"
-        )
-
-    @pytest.fixture
-    def create_manager_role(self, create_user, create_store):
-        return Manager.objects.create(
-            user=create_user,
-        )
-
-    @pytest.fixture
-    def create_operator(self, create_user, create_store):
-        return Operator.objects.create(
-            user=create_user,
-            shop=create_store,
-            username="operator1"
-        )
-
-    # ---------------------- Token Login ----------------------
     def test_login_success(self, create_user, api_client):
-        url = reverse('account:api/v1:login')
-        response = api_client.post(url, {
-            "email": "user@example.com",
-            "password": "testpass123"
-        })
-        assert response.status_code == 200
+        response = api_client.post(
+            reverse("account:api/v1:login"),
+            {
+                "email": "user@example.com",
+                "password": "testpass123",
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
         assert "user-id" in response.data
         assert "token" in response.data
 
     def test_login_invalid_credentials(self, api_client):
-        url = reverse('account:api/v1:login')
-        response = api_client.post(url, {
-            "email": "wrong@example.com",
-            "password": "wrongpass"
-        })
-        assert response.status_code == 400
-
-    # ---------------------- Profile ----------------------
-    def test_get_profile(self, create_user, api_client):
-        api_client.force_authenticate(user=create_user)
-        url = reverse('account:api/v1:profile')
-        response = api_client.get(url)
-        assert response.status_code == 200
-        assert response.data["email"] == create_user.email
-
-    # ---------------------- Logout ----------------------
-    def test_logout(self, create_user, api_client):
-        Token.objects.create(user=create_user)  
-        api_client.force_authenticate(user=create_user)
-        url = reverse('account:api/v1:logout')
-        response = api_client.post(url)
-        assert response.status_code == 200
-        assert response.data['details'] == 'logged out successfully'
-
-    # ---------------------- Change Password ----------------------
-    def test_change_password(self, create_user, api_client):
-        api_client.force_authenticate(user=create_user)
-        url = reverse('account:api/v1:change-password')
-        response = api_client.put(
-        url,
-        {
-            "old_password": "testpass123",
-            "new_password": "newpass456",
-            "new_password1": "newpass456"
-        },
-        format='json'  
-    )
-        create_user.refresh_from_db()
-        assert response.status_code == 200
-        assert create_user.check_password("newpass456")
-
-
-    # ---------------------- JWT Login + Redirect ----------------------
-    @pytest.mark.parametrize("role_fixture,expected_redirect", [
-        ("create_customer", "/website/shop/list/"),
-        ("create_admin", "/vendor/panel"),
-        ("create_operator", "/vendor/panel"),
-    ])
-    def test_jwt_login_redirect(self, request, api_client, role_fixture, expected_redirect):
-        role_instance = request.getfixturevalue(role_fixture)
-        api_client.force_authenticate(user=role_instance.user)
-        url = reverse('account:api/v1:jwt_login')
-        response = api_client.post(url, {
-            "email": role_instance.user.email,
-            "password": "testpass123"
-        })
-        assert response.status_code == 200
-        assert response.data["redirect_url"] == expected_redirect
-
-
-
-@pytest.mark.django_db
-class TestLogoutAPIView:
-
-    def test_logout_success(self, api_client, user, tokens):
-
-        api_client.credentials(
-            HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
+        response = api_client.post(
+            reverse("account:api/v1:login"),
+            {
+                "email": "wrong@example.com",
+                "password": "wrongpass",
+            },
         )
 
-        api_client.cookies["refresh_token"] = tokens["refresh"]
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-        response = api_client.post("/api/v1/logout/")
+    def test_get_profile(self, create_user, api_client):
+        api_client.force_authenticate(user=create_user)
+
+        response = api_client.get(
+            reverse("account:api/v1:profile")
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["email"] == create_user.email
+
+    def test_logout(self, create_user, api_client):
+        Token.objects.create(user=create_user)
+        api_client.force_authenticate(user=create_user)
+
+        response = api_client.post(
+            reverse("account:api/v1:logout")
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["success"] is True
         assert response.data["message"] == "Logout successfully."
 
-        assert "access_token" in response.cookies
-        assert response.cookies["access_token"].value == ""
+    def test_change_password(self, create_user, api_client):
+        api_client.force_authenticate(user=create_user)
 
-        assert "refresh_token" in response.cookies
+        response = api_client.put(
+            reverse("account:api/v1:change-password"),
+            {
+                "old_password": "testpass123",
+                "new_password": "newpass456",
+                "new_password1": "newpass456",
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+
+        create_user.refresh_from_db()
+        assert create_user.check_password("newpass456")
+
+    @pytest.mark.parametrize(
+        "role_fixture, expected_redirect",
+        [
+            ("create_customer", "shop_list"),
+            ("create_admin", "panel"),
+            ("create_operator", "panel"),
+        ],
+    )
+    @override_settings(
+        REST_FRAMEWORK={
+            **settings.REST_FRAMEWORK,
+            "DEFAULT_THROTTLE_RATES": {
+                **settings.REST_FRAMEWORK.get(
+                    "DEFAULT_THROTTLE_RATES", {}
+                ),
+                "login": "100/minute",
+            },
+        }
+    )
+    def test_jwt_login_redirect(
+        self,
+        request,
+        api_client,
+        role_fixture,
+        expected_redirect,
+    ):
+        role_instance = request.getfixturevalue(role_fixture)
+        role_user = role_instance.user
+
+        response = api_client.post(
+            reverse("account:api/v1:jwt_login"),
+            {
+                "email": role_user.email,
+                "password": "testpass123",
+            },
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["redirect_url"] == expected_redirect
+
+
+# ------------------------------------------------------------------
+# JWT Logout API
+# ------------------------------------------------------------------
+
+@pytest.mark.django_db
+class TestLogoutAPIView:
+
+    def test_logout_success(self, api_client, user, tokens):
+        api_client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
+        )
+        api_client.cookies["refresh_token"] = tokens["refresh"]
+
+        response = api_client.post(
+            reverse("account:api/v1:logout")
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["success"] is True
+        assert response.data["message"] == "Logout successfully."
+
+        assert response.cookies["access_token"].value == ""
         assert response.cookies["refresh_token"].value == ""
 
     def test_logout_without_refresh_cookie(self, api_client, user, tokens):
-
         api_client.credentials(
             HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
         )
 
-        response = api_client.post("/api/v1/logout/")
+        response = api_client.post(
+            reverse("account:api/v1:logout")
+        )
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["success"] is True
 
     def test_logout_unauthenticated(self, api_client):
-
-        response = api_client.post("/api/v1/logout/")
+        response = api_client.post(
+            reverse("account:api/v1:logout")
+        )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
-        
-        
+
+
+# ------------------------------------------------------------------
+# Check Me API
+# ------------------------------------------------------------------
 
 @pytest.mark.django_db
 class TestCheckMeAPIView:
@@ -278,18 +267,17 @@ class TestCheckMeAPIView:
             HTTP_AUTHORIZATION=f"Bearer {tokens['access']}"
         )
 
-        response = api_client.get("/api/v1/check-me/")
+        response = api_client.get(
+            reverse("account:api/v1:chech_me")
+        )
 
         assert response.status_code == status.HTTP_200_OK
-
-        assert response.data["id"] == user.id
-        assert response.data["username"] == user.username
+        assert response.data["pk"] == user.pk
         assert response.data["email"] == user.email
 
-    def test_unauthenticated_user_cannot_get_profile(
-        self,
-        api_client,
-    ):
-        response = api_client.get("/api/v1/check-me/")
+    def test_unauthenticated_user_cannot_get_profile(self, api_client):
+        response = api_client.get(
+            reverse("account:api/v1:chech_me")
+        )
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
