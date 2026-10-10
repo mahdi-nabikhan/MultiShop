@@ -4,8 +4,8 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.core.files.uploadedfile import SimpleUploadedFile
 from account.models import User
-from vendor.models import Manager, Admin, Operator, Store, ShopAddress
-from website.models import Category, Product, ProductImages, Discount,StoreCategory
+from vendor.models import Manager, Admin, Operator, Store, ShopAddress,StoreCategory
+from website.models import Category, Product, ProductImages, Discount
 from order.models import OrderItem
 
 # ------------------ Fixtures ------------------ #
